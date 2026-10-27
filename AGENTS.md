@@ -1,3 +1,19 @@
+# Agent instructions
+
+MyClinics is a web application for a dental professional to manage clinics, activity, and income.
+
+## Project essentials
+
+- Use pnpm for dependencies and scripts; use the version declared in `package.json` and keep `pnpm-lock.yaml` as the lockfile.
+- Use Next.js App Router and TypeScript. Tailwind CSS is the selected styling approach; its setup is still pending.
+- Write all project documentation in English.
+- Keep shared components directly in `src/lib/components`, without subfolders until their volume justifies grouping. Read [architecture and component guidance](docs/architecture.md) before adding UI or choosing where application code belongs.
+- Read the [Git workflow](docs/git-workflow.md) before creating branches, committing, merging, or tagging releases.
+
+## Validation
+
+For application changes, run `pnpm lint`, `pnpm typecheck`, and `pnpm format:check`. Run `pnpm build` for changes affecting the production build. For documentation-only changes, check formatting and links. Report checks that could not run.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know

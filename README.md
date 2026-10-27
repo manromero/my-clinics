@@ -1,47 +1,48 @@
 # MyClinics
 
-Aplicación para gestionar clínicas, actividad e ingresos de una profesional dental.
+A web application for a dental professional to manage clinics, activity, and income.
 
-Cascarón generado con el asistente oficial de Next.js y pnpm: App Router, TypeScript, CSS Modules y ESLint. Prettier configura el formato. Código en src/ y alias @/*.
+The current starter uses Next.js App Router, TypeScript, CSS Modules, ESLint, and Prettier, with source code under `src/` and the `@/*` import alias. The selected stack uses pnpm and Tailwind CSS; Tailwind setup is still pending.
 
-## Desarrollo local
+## Local development
 
-Requiere Node.js 20.9 o superior (entorno de creación: Node.js 24) y pnpm 11.25.0.
+Use Node.js 24 (the version used to create the project) and the pnpm version declared in `package.json`.
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Abre http://localhost:3000.
+Open [localhost:3000](http://localhost:3000).
 
-## Comandos
+## Commands
 
-| Comando           | Uso                                             |
-| ----------------- | ----------------------------------------------- |
-| pnpm dev          | Servidor de desarrollo                          |
-| pnpm build        | Compilación de producción                       |
-| pnpm start        | Servir la compilación de producción             |
-| pnpm lint         | Análisis estático con ESLint                    |
-| pnpm typecheck    | Generar tipos de Next.js y comprobar TypeScript |
-| pnpm format       | Aplicar Prettier                                |
-| pnpm format:check | Comprobar el formato                            |
+| Command             | Purpose                                     |
+| ------------------- | ------------------------------------------- |
+| `pnpm dev`          | Start the development server                |
+| `pnpm build`        | Create a production build                   |
+| `pnpm start`        | Serve the production build                  |
+| `pnpm lint`         | Run ESLint                                  |
+| `pnpm typecheck`    | Generate Next.js types and check TypeScript |
+| `pnpm format`       | Apply Prettier formatting                   |
+| `pnpm format:check` | Check formatting                            |
 
-## Estructura
+## Project guidance
 
-- src/app/layout.tsx: layout raíz, metadatos e idioma.
-- src/app/page.tsx: inicio mínimo.
-- src/app/page.module.css: estilos de la página.
-- src/app/globals.css: estilos globales.
+- [Agent instructions](AGENTS.md)
+- [Git workflow](docs/git-workflow.md): `develop` → feature branch → `develop` → `main`, followed by a release tag on `main`.
+- [Architecture and shared components](docs/architecture.md): application organization and shared component conventions.
 
-El repositorio está en MyClinics/my-clinics. El Excel de referencia se mantiene en la carpeta superior, fuera del código. Los archivos Excel también están excluidos de Git.
+All project documentation is maintained in English.
 
-## Alcance inicial
+The reference spreadsheet is kept in the parent directory, outside the application source. Excel files are excluded from Git.
 
-1. Gestión de clínicas y porcentajes por tipo de actividad.
-2. Registro de actividad, con honorarios por porcentaje o importe directo.
-3. Resumen mensual por clínica.
+## Initial scope
 
-Este cascarón aún no implementa esos módulos. Facturas, contraste de importes e integración de IA se abordarán en futuras iteraciones.
+1. Manage clinics and percentages by activity type.
+2. Record activity with percentage-based fees or direct amounts.
+3. Display a monthly summary by clinic.
 
-Referencia: [instalación oficial de Next.js](https://nextjs.org/docs/app/getting-started/installation).
+These modules have not been implemented yet. Invoicing, amount reconciliation, and AI integration are planned for later iterations.
+
+See the [official Next.js installation guide](https://nextjs.org/docs/app/getting-started/installation).
