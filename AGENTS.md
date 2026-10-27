@@ -5,7 +5,7 @@ MyClinics is a web application for a dental professional to manage clinics, acti
 ## Project essentials
 
 - Use pnpm for dependencies and scripts; use the version declared in `package.json` and keep `pnpm-lock.yaml` as the lockfile.
-- Use Next.js App Router and TypeScript. Tailwind CSS is the selected styling approach; its setup is still pending.
+- Use Next.js App Router, TypeScript, and Tailwind CSS v4 via the PostCSS plugin.
 - Write all project documentation in English.
 - Keep shared components directly in `src/lib/components`, without subfolders until their volume justifies grouping. Read [architecture and component guidance](docs/architecture.md) before adding UI or choosing where application code belongs.
 - Read the [Git workflow](docs/git-workflow.md) before creating branches, committing, merging, or tagging releases.

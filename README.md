@@ -2,7 +2,7 @@
 
 A web application for a dental professional to manage clinics, activity, and income.
 
-The current starter uses Next.js App Router, TypeScript, CSS Modules, ESLint, and Prettier, with source code under `src/` and the `@/*` import alias. The selected stack uses pnpm and Tailwind CSS; Tailwind setup is still pending.
+The current starter uses Next.js App Router, TypeScript, Tailwind CSS v4, ESLint, and Prettier, with source code under `src/` and the `@/*` import alias. Dependencies are managed with pnpm. Existing CSS Modules remain supported.
 
 ## Local development
 
@@ -14,6 +14,12 @@ pnpm dev
 ```
 
 Open [localhost:3000](http://localhost:3000).
+
+## Styling
+
+Tailwind CSS runs through `@tailwindcss/postcss` in `postcss.config.mjs` and is imported in `src/app/globals.css`. Add utility classes directly to components; source detection is automatic, so no `tailwind.config.js` is needed for the current setup. The home page includes a responsive example card.
+
+See the [Tailwind CSS guide for Next.js](https://tailwindcss.com/docs/installation/framework-guides/nextjs) and [project styling conventions](docs/architecture.md#nextjs-and-styling).
 
 ## Commands
 

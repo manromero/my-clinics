@@ -8,7 +8,7 @@
 - Keep shared logic in `src/lib` and route-specific implementation close to its route.
 - Write project documentation in English.
 
-The current application is a starter with code under `src/app` and the `@/*` import alias. It uses CSS Modules and global CSS; Tailwind CSS has not been installed or configured yet. Create the shared folders below when there is code to put in them.
+The current application is a starter with code under `src/app` and the `@/*` import alias. Tailwind CSS v4 is configured through `@tailwindcss/postcss` in `postcss.config.mjs` and imported in `src/app/globals.css`. Existing CSS Modules remain supported. Create the shared folders below when there is code to put in them.
 
 ## Organization
 
@@ -49,7 +49,7 @@ No component library has been selected. Evaluate one when defining the initial U
 
 Keep pages and layouts as Server Components by default. Add a Client Component boundary for state, event handlers, or browser APIs, close to the interactive part. Keep secrets and server data access out of client imports.
 
-Once Tailwind CSS is configured, use its utilities for new UI and shared theme tokens for colors, typography, and spacing. Keep global CSS focused on the theme and application-wide base styles. Existing CSS Modules can remain during migration; document the Tailwind setup when it is implemented.
+Use Tailwind CSS utilities for new UI and shared theme tokens for colors, typography, and spacing. Keep global CSS focused on the theme and application-wide base styles. Tailwind detects source files automatically; no JavaScript configuration file or explicit content paths are needed for the current setup. Existing CSS Modules can remain during migration. The home page includes a responsive card styled with Tailwind utilities.
 
 ## Rationale and references
 
