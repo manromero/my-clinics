@@ -1,0 +1,36 @@
+.main {
+  min-height: 100svh;
+  width: 100%;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: clamp(5rem, 18vh, 12rem) 1.5rem 3rem;
+}
+
+.eyebrow {
+  color: #37685c;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.title {
+  margin: 1rem 0;
+  font-size: clamp(3rem, 9vw, 5rem);
+  letter-spacing: -0.06em;
+}
+
+.description {
+  max-width: 32rem;
+  color: #4d625d;
+  font-size: 1.25rem;
+  line-height: 1.6;
+}
+
+.status {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid #cbdcd5;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+}
