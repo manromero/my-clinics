@@ -1,6 +1,6 @@
 # Task 01 — Configure implementer
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -43,6 +43,40 @@ links; run any configuration checks supported by that tooling.
 
 ## Progress notes
 
-Not started. Tasks 00 and 04 are complete; dependencies are satisfied under the
-approved three-role revision. Configure a delegated implementer receiving a ready
-task and branch.
+Started after Tasks 00 and 04 completed. The coordinator prepared the branch and
+assignment, and a separate bootstrap implementer created the native role.
+
+- Configuration: [native implementer](../../../.codex/agents/implementer.toml).
+- Fresh CLI discovery found the native role and exact description. A normal
+  read-only CLI session actually launched the configured implementer and confirmed
+  a distinctive developer instruction, plus five correct intake/handoff scenarios.
+- [Validation report](implementer-validation.md) distinguishes the failed ephemeral
+  launch from the successful persisted run and records external-app limitations.
+- No product code or UI changed; application builds and browser visual comparison
+  are not applicable to this configuration/documentation assignment.
+- Independent bootstrap review found no blocking findings or optional suggestions.
+  The native reviewer remains Task 02; bootstrap review does not claim it is configured.
+- Validation passed: native discovery and persisted read-only role launch with five
+  correct scenarios, Prettier, 60 local Markdown links/heading anchors, and
+  `git diff --check`. No correction rounds were needed.
+- Delivery: [PR #2](https://github.com/manromero/my-clinics/pull/2), targeting
+  `develop`. Agent work is complete; human approval and manual merge remain pending
+  in GitHub. This `done` tracking update is included in final review and the PR.
+
+## Execution context
+
+- Readiness: user authorized configuring the implementer under the three-role
+  contract. No product decisions are missing.
+- Branch: `feature/configure-implementer`, from updated `origin/develop`.
+- Base commit: `b341abf9e86c186f5cd5c751cc169418c7ca97a6`.
+- References: `AGENTS.md`, `docs/agents/coordinator.md`, the workflow contract, and
+  official Codex custom-agent documentation.
+- Implementation target: project-scoped `.codex/agents/implementer.toml` with
+  explicit role boundaries, inherited model/settings, and verifiable loading.
+- Validation: native loading and bounded intake/handoff scenarios, formatting,
+  local links, and independent bootstrap review. No product or UI changes.
+- Constraint: configured reviewer remains Task 02; use clearly identified
+  independent bootstrap review for this configuration.
+- Tracking: mark task/index `done` in this PR after required validation and review,
+  before human acceptance; no post-merge status commit is required.
+- Correction rounds used: 0.

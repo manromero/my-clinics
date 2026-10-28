@@ -1,8 +1,9 @@
 # Milestone 00 — Development workflow
 
 Scope, workflow decisions, and Task 00 documentation: accepted by the user.
-Tasks 00 and 04 are complete. Coordinator configuration was manually merged by
-the user; implementer/reviewer configuration and full execution remain pending.
+Tasks 00 and 04 are complete. The native implementer is configured and delivered
+through Task 01, pending human PR acceptance in GitHub. Reviewer configuration
+and the full workflow exercise remain pending.
 
 ## Objective
 
@@ -40,7 +41,7 @@ for handoffs, evidence, escalation, and the representative exercise.
 | --------------------- | ------------------------------------------------------------------ | --------- | ---------------------------------------- |
 | Workflow definition   | [00 — Define workflow](<task 00 - define workflow.md>)             | `done`    | User acceptance recorded on 2026-10-28   |
 | Agent configuration   | [04 — Configure coordinator](<task 04 - configure coordinator.md>) | `done`    | Task 00 and approved three-role revision |
-| Agent configuration   | [01 — Configure implementer](<task 01 - configure implementer.md>) | `pending` | Task 04                                  |
+| Agent configuration   | [01 — Configure implementer](<task 01 - configure implementer.md>) | `done`    | Task 04                                  |
 | Agent configuration   | [02 — Configure reviewer](<task 02 - configure reviewer.md>)       | `pending` | Task 04                                  |
 | Workflow verification | [03 — Validate workflow](<task 03 - validate workflow.md>)         | `pending` | Tasks 04, 01, and 02                     |
 
@@ -65,8 +66,8 @@ The user approved the following on 2026-10-28:
 
 Task 00 is complete following user acceptance on 2026-10-28. Git push and GitHub CLI
 access have been verified, and remote `develop` has been created from `main`.
-Coordinator configuration is complete; delegated roles and the actual workflow
-exercise remain pending. Merge strategy and
+Coordinator and native implementer configuration are complete; native reviewer
+configuration and the actual workflow exercise remain pending. Merge strategy and
 branch protections are separate open decisions.
 
 ## Completion criteria
