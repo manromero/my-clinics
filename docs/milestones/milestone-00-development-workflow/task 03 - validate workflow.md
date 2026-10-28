@@ -1,6 +1,6 @@
 # Task 03 — Validate workflow
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -54,7 +54,7 @@ Document the exercise, commands/checks, review findings, evidence, corrections,
 PR link, and final result using the location agreed in Task 00. Report any steps
 that could not be exercised. Check updated documentation formatting and links.
 
-## Progress notes
+## Progress notes (chronological)
 
 Started after verifying PR #3 merged into `develop`. Both native delegated roles
 are available. The user authorized the global exercise and formatting the five
@@ -62,7 +62,7 @@ existing visual-reference files so required application checks can pass.
 
 - Stage 1: native implementer `/root/task03_implementer` created the temporary UI
   and isolated working fixture; all four application checks passed. The fixture
-  intentionally remains at 2/6 passing for initial review.
+  intentionally returned 2/6 passing at initial review; round 1 later fixed it.
 - Permission handoff: native staging was denied at `.git/index.lock` and its
   sandbox could not validate GitHub credentials. The coordinator independently
   verified valid host credentials and performs the exact requested Git/PR
@@ -74,7 +74,7 @@ existing visual-reference files so required application checks can pass.
   all four application checks independently passed.
 - Round 1 assigned to the retained implementer: edit the working fixture, rerun
   checks, and complete the originally planned route removal/history cleanup.
-  The retained native reviewer will verify the resulting new commit.
+  The retained native reviewer subsequently verified the resulting new commit.
 - Four policy handoffs were exercised as explicit simulations, not extra source
   defects or correction rounds. Native reviewer inspected screenshots and code;
   independent live browser access was unavailable. Live actions were performed
@@ -82,8 +82,25 @@ existing visual-reference files so required application checks can pass.
 - Native re-review of `ecf50f1eb612edab8cc78aa81e2c477a44b8fb68` independently
   closed B01: runner unchanged, 6/6 passing; all app checks passed and `src` matches
   base. It opened B02 for conflicting current/historical publication statements
-  in the report and history. Round 2 is assigned to the same implementer for
+  in the report and history. Round 2 was assigned to the same implementer for
   evidence-documentation consistency only; no code or optional-suggestion edits.
+- Final round 2 review of `be05e172ccf711a99edd409165bf242348b4bf69` closed B02:
+  chronology, actor attribution and simulation labeling were independently verified.
+  B01 remained closed; all 67 other tracked files were unchanged. Formatting,
+  33 local targets/9 anchors, source identities and whitespace checks passed.
+  No blockers remained; O01 (JSDoc usage example) was deferred as optional.
+- Coordinator delivery records task/index `done` in this same PR after that clean
+  review, with the administrative change subject to a narrow final recheck. Human
+  approval and manual merge are tracked in [PR #4](https://github.com/manromero/my-clinics/pull/4).
+  Agent validation is complete; human acceptance is not implied by `done`.
+- Validation summary: fixture 6/6; lint, typecheck, format and production build
+  passed independently at the round 1 evidence head. Round 2 and closing tracking
+  change documentation only. Temporary route removal was verified in source/build
+  and by the coordinator's live 404; the source matches the exercise base.
+  See the [chronological report](workflow-validation.md) for captures and results.
+- Material limitations: native sandbox publication required the approved host
+  Git/PR handoff. Reviewer visual checks used captures, source and design references;
+  live interactions were performed by the coordinator, not the reviewer.
 
 ## Execution context
 
@@ -98,7 +115,8 @@ existing visual-reference files so required application checks can pass.
   selected context; retain both for this task's sequential handoffs.
 - Coordinator owns task/index/evidence. Implementer owns assigned source changes,
   check results and delivery artifacts; reviewer independently verifies them.
-- Correction rounds used: 2 (second assigned; final verification pending). Fixture seeding is an intentional initial exercise
+- Correction rounds used: 2, both independently reviewed; no blockers remain.
+  Fixture seeding was an intentional initial exercise
   condition, not a product defect or completed correction. Actual review/fix and
   revalidation must be recorded at distinct commits.
 - Delivery: PR to `develop`; final `done` tracking and independent recheck before

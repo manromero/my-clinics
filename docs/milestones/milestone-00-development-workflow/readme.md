@@ -2,8 +2,9 @@
 
 Scope, workflow decisions, and Task 00 documentation: accepted by the user.
 Coordinator and both native delegated roles are configured and validated through
-Tasks 04, 01, and 02. Task 02 delivery remains subject to human PR acceptance in
-GitHub. The full workflow exercise remains Task 03.
+Tasks 04, 01, and 02. Task 02 was merged in PR #3. Task 03 completed the global
+agent validation and is delivered in PR #4; GitHub tracks human approval and
+manual merge separately from task completion.
 
 ## Objective
 
@@ -33,17 +34,19 @@ reviews and manually merges its PR into `develop`.
 Product ambiguities, scope changes, and unresolved review disagreements return
 to the user. The approved limit is two automatic correction rounds after the
 initial review. See the [development workflow contract](../../development-workflow.md)
-for handoffs, evidence, escalation, and the representative exercise.
+for everyday handoffs, evidence and escalation; the
+[exercise](workflow-exercise.md), [validation report](workflow-validation.md) and
+[history](workflow-history.md) preserve the milestone-specific demonstration.
 
 ## Submilestones and tasks
 
-| Submilestone          | Task                                                               | Status        | Depends on                               |
-| --------------------- | ------------------------------------------------------------------ | ------------- | ---------------------------------------- |
-| Workflow definition   | [00 — Define workflow](<task 00 - define workflow.md>)             | `done`        | User acceptance recorded on 2026-10-28   |
-| Agent configuration   | [04 — Configure coordinator](<task 04 - configure coordinator.md>) | `done`        | Task 00 and approved three-role revision |
-| Agent configuration   | [01 — Configure implementer](<task 01 - configure implementer.md>) | `done`        | Task 04                                  |
-| Agent configuration   | [02 — Configure reviewer](<task 02 - configure reviewer.md>)       | `done`        | Task 04                                  |
-| Workflow verification | [03 — Validate workflow](<task 03 - validate workflow.md>)         | `in_progress` | Tasks 04, 01, and 02                     |
+| Submilestone          | Task                                                               | Status | Depends on                               |
+| --------------------- | ------------------------------------------------------------------ | ------ | ---------------------------------------- |
+| Workflow definition   | [00 — Define workflow](<task 00 - define workflow.md>)             | `done` | User acceptance recorded on 2026-10-28   |
+| Agent configuration   | [04 — Configure coordinator](<task 04 - configure coordinator.md>) | `done` | Task 00 and approved three-role revision |
+| Agent configuration   | [01 — Configure implementer](<task 01 - configure implementer.md>) | `done` | Task 04                                  |
+| Agent configuration   | [02 — Configure reviewer](<task 02 - configure reviewer.md>)       | `done` | Task 04                                  |
+| Workflow verification | [03 — Validate workflow](<task 03 - validate workflow.md>)         | `done` | Tasks 04, 01, and 02                     |
 
 Task statuses follow the [shared tracking rules](../readme.md#task-structure-and-status).
 The existence of these task files does not mean the agents are configured.
@@ -67,7 +70,9 @@ The user approved the following on 2026-10-28:
 Task 00 is complete following user acceptance on 2026-10-28. Git push and GitHub CLI
 access have been verified, and remote `develop` has been created from `main`.
 Coordinator, native implementer, and native reviewer configuration are complete;
-the actual end-to-end workflow exercise remains pending. Merge strategy and
+the end-to-end agent workflow exercise passed with two correction rounds and no
+remaining blockers. Task 03's ready-delivery tracking is part of PR #4, with final
+administrative review; human approval/manual merge are tracked in GitHub. Merge strategy and
 branch protections are separate open decisions.
 
 ## Completion criteria
