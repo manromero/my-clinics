@@ -1,5 +1,47 @@
 # Task 03 — Stage 1 implementation evidence
 
+## Coordinator publication and browser evidence
+
+The implementer requested publication but its sandbox denied `.git/index.lock`
+and access to GitHub credentials. The coordinator used approved host execution
+to run the requested staging/commit/push and prepared PR creation. Host GitHub
+authentication was independently valid; no login, credential or permission
+configuration was changed. Initial source commit:
+`67215644845c514ccac788f8dd59113358d0e21e`.
+[PR #4](https://github.com/manromero/my-clinics/pull/4) targets `develop` and is
+draft while the known fixture blocker and planned cleanup remain. The coordinator
+attached it because that tool was unavailable to the implementer. This is a
+permission-mediated delivery handoff, not proof the native sandbox can publish.
+
+The coordinator started `pnpm dev --hostname 127.0.0.1 --port 3020` and performed
+live browser actions through the supported browser UI tool. Source blob remained
+`7e63765858000c4c2d75cb4d82ad5cf963207eec`; no application source changed during
+capture. Screenshots are of that running initial source, not the later report commit.
+
+| Check              | Actual observation                                                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Desktop viewport   | DOM `innerWidth=1440`, `innerHeight=900`, scroll/client width both 1440                                                                     |
+| Mobile viewport    | DOM `innerWidth=390`, `innerHeight=844`, scroll/client width both 390                                                                       |
+| Initial/fresh load | `Pendiente`, complete button enabled; mobile reload also starts pending                                                                     |
+| Complete/reset     | `Completado` disables primary action; reset restores pending/enabled; repeated mobile cycles passed                                         |
+| Keyboard           | Enter completed, Space on reset restored pending; Shift+Tab focused the complete button with a visible solid blue outline                   |
+| Live region        | Status has `role=status`, `aria-live=polite` and atomic text                                                                                |
+| Browser console    | Captured error log list was empty                                                                                                           |
+| Visual observation | Card/content visible without horizontal overflow; serif heading, tonal rounded surfaces, blue gradient primary action; mobile actions stack |
+
+| Evidence                                                               | State                       |
+| ---------------------------------------------------------------------- | --------------------------- |
+| [Desktop pending](evidence/workflow-desktop-pending.jpg)               | Initial state               |
+| [Desktop completed](evidence/workflow-desktop-completed.jpg)           | Disabled primary action     |
+| [Desktop keyboard focus](evidence/workflow-desktop-keyboard-focus.jpg) | Visible blue focus outline  |
+| [Mobile pending](evidence/workflow-mobile-pending.jpg)                 | Fresh load, stacked actions |
+| [Mobile completed](evidence/workflow-mobile-completed.jpg)             | Completed state             |
+
+Viewport overrides were reset after testing. The desktop/mobile comparison uses
+Alexandria and the activity Stitch reference as visual language, not a product
+screen replica. Native reviewer inspection of these artifacts and code is a
+separate handoff; do not attribute the coordinator's live browser actions to it.
+
 Status: initial implementation only, not final task completion. The intentional
 fixture blocker remains. Task/index stay `in_progress`; correction rounds used: 0.
 
