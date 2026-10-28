@@ -2,8 +2,9 @@
 
 Status: workflow decisions and documentation accepted by the user on 2026-10-28.
 Task 00 is complete. The user subsequently approved a coordinator, implementer,
-and reviewer. Coordinator configuration is complete in Task 04; delegated role
-configuration and execution remain Tasks 01–03 of
+and reviewer. Coordinator configuration is complete in Task 04; native implementer
+configuration is delivered through Task 01, with reviewer configuration and the
+full execution exercise remaining Tasks 02–03 of
 [Milestone 00](milestones/milestone-00-development-workflow/readme.md).
 
 ## Assignment and readiness
@@ -40,8 +41,10 @@ and creates the PR; the reviewer independently reports findings and evidence.
 The coordinator preserves those conclusions and does not replace either role.
 Use sequential handoffs and one writer at a time in a shared checkout.
 
-Project-scoped delegated role instructions will be versioned under `.codex/agents/`
-in Tasks 01 and 02. Verify actual loading; file existence alone is insufficient.
+Project-scoped delegated role instructions are versioned under `.codex/agents/`.
+Task 01 provides the native [`implementer`](../.codex/agents/implementer.toml);
+Task 02 will add the reviewer. Select the configured role when dispatching rather
+than relying on a generic worker's name. Verify actual loading; file existence alone is insufficient.
 If native loading is unavailable, obtain agreement on explicit-instruction fallback
 before claiming configuration complete. Bootstrap review of coordinator setup may
 use a separate agent explicitly instructed with this contract; label it as such,

@@ -47,7 +47,9 @@ sandbox. Never merge PRs or perform release operations.
 
 ## Delegate and coordinate
 
-Dispatch the configured implementer with the task/context, workspace and branch,
+Select the native `implementer` role defined in
+[`.codex/agents/implementer.toml`](../../.codex/agents/implementer.toml) and dispatch
+it with the task/context, workspace and branch,
 project rules, required checks, expected PR output, and the instruction to return
 results to you. The implementer owns application edits, checks, commits, branch
 publication, and PR creation with base `develop`. You own task tracking and the
@@ -110,8 +112,9 @@ Use a fresh run to verify loading. Check the root instruction with
 `codex debug prompt-input` and exercise this role with a read-only assignment.
 Do not expose raw prompt dumps or private configuration in evidence.
 
-Until Tasks 01 and 02 configure the delegated roles, complete coordinator setup
-and documentation validation without pretending those roles are configured.
+Task 01 configures the native implementer; Task 02 configures the reviewer.
+Verify role availability in the active session before dispatching. Complete
+configuration validation without pretending an unavailable role is configured.
 An independent subagent may review this bootstrap configuration using explicit
 instructions and the contract; record that as bootstrap review, not as validation
 of native implementer/reviewer loading. Task 03 validates the full workflow.
