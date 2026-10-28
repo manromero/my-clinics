@@ -9,6 +9,7 @@ MyClinics is a web application for a dental professional to manage clinics, acti
 - Write all project documentation in English.
 - Keep shared components directly in `src/lib/components`, without subfolders until their volume justifies grouping. Read [architecture and component guidance](docs/architecture.md) before adding UI or choosing where application code belongs.
 - Read the [Git workflow](docs/git-workflow.md) before creating branches, committing, merging, or tagging releases.
+- Follow the [development workflow contract](docs/development-workflow.md) for task intake, separate review, bounded corrections, evidence, and human acceptance. Role configuration is tracked in Milestone 00; the contract alone does not configure agents.
 
 ## Validation
 

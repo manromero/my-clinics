@@ -1,6 +1,7 @@
 # Milestone 00 — Development workflow
 
-Scope: validated by the user. Implementation: not started.
+Scope, workflow decisions, and Task 00 documentation: accepted by the user.
+Task 00 is complete. Agent configuration and execution have not started.
 
 ## Objective
 
@@ -24,32 +25,40 @@ reviews and manually merges its PR into `develop`.
 7. The user reviews and manually merges the PR into `develop`.
 
 Product ambiguities, scope changes, and unresolved review disagreements return
-to the user. Automatic correction rounds must be bounded; their exact limit
-requires user validation before configuring the workflow.
+to the user. The approved limit is two automatic correction rounds after the
+initial review. See the [development workflow contract](../../development-workflow.md)
+for handoffs, evidence, escalation, and the representative exercise.
 
 ## Submilestones and tasks
 
-| Submilestone          | Task                                                               | Status    | Depends on                                 |
-| --------------------- | ------------------------------------------------------------------ | --------- | ------------------------------------------ |
-| Workflow definition   | [00 — Define workflow](<task 00 - define workflow.md>)             | `pending` | User validation of configuration decisions |
-| Agent configuration   | [01 — Configure implementer](<task 01 - configure implementer.md>) | `pending` | Task 00                                    |
-| Agent configuration   | [02 — Configure reviewer](<task 02 - configure reviewer.md>)       | `pending` | Task 00                                    |
-| Workflow verification | [03 — Validate workflow](<task 03 - validate workflow.md>)         | `pending` | Tasks 01 and 02                            |
+| Submilestone          | Task                                                               | Status    | Depends on                             |
+| --------------------- | ------------------------------------------------------------------ | --------- | -------------------------------------- |
+| Workflow definition   | [00 — Define workflow](<task 00 - define workflow.md>)             | `done`    | User acceptance recorded on 2026-10-28 |
+| Agent configuration   | [01 — Configure implementer](<task 01 - configure implementer.md>) | `pending` | Task 00                                |
+| Agent configuration   | [02 — Configure reviewer](<task 02 - configure reviewer.md>)       | `pending` | Task 00                                |
+| Workflow verification | [03 — Validate workflow](<task 03 - validate workflow.md>)         | `pending` | Tasks 01 and 02                        |
 
 Task statuses follow the [shared tracking rules](../readme.md#task-structure-and-status).
 The existence of these task files does not mean the agents are configured.
 
-## Decisions requiring validation before implementation
+## Validated decisions and remaining work
 
-- How assignment starts the workflow and how the two agents are configured and
-  coordinated in the selected tooling.
-- The limit on automatic correction/review rounds and the handoff when reached.
-- Where review findings, validation evidence, and workflow progress are recorded.
-- A small representative task or exercise for verifying the workflow.
+The user approved the following on 2026-10-28:
 
-Task 00 must present concrete options for these decisions and obtain user
-validation. Inspect available tooling and repository configuration to establish
-facts before asking the user to choose.
+- A task assignment starts the workflow. The main agent implements and coordinates
+  a separate reviewer, with project-scoped role instructions configured in Tasks
+  01 and 02 and their actual loading verified.
+- Two automatic correction rounds follow the initial review; remaining blockers
+  return to the user with the current PR and evidence.
+- Task files record progress and decisions; PRs record detailed review and
+  validation, including linked visual evidence.
+- Task 03 uses a temporary UI demonstration and a separate known-defect fixture,
+  with documented escalation scenarios and manual user merge.
+
+Task 00 is complete following user acceptance on 2026-10-28. Git push and GitHub CLI
+access have been verified, and remote `develop` has been created from `main`.
+Role configuration and the actual PR exercise remain pending. Merge strategy and
+branch protections are separate open decisions.
 
 ## Completion criteria
 

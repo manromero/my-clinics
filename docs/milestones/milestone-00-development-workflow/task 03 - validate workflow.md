@@ -18,6 +18,10 @@ agreed workflow to a reviewable PR and manual user merge.
 - Verify task statuses and the milestone index track the actual work.
 - Record evidence, limitations, and final user handoff; wait for the user's PR
   review and manual merge.
+- Before final delivery, move the representative exercise, desk walkthrough, and
+  temporary setup notes from the operational contract into milestone historical
+  records, preserving evidence and updating links. Keep the contract focused on
+  everyday workflow rules, as agreed with the user after Task 00 review.
 
 ## Dependencies
 

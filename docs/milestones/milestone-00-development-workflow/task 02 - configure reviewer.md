@@ -43,4 +43,5 @@ distinguishes them and rechecks a correction. Validate links and formatting.
 
 ## Progress notes
 
-Not started. Awaiting Task 00.
+Not started. Task 00 was accepted by the user on 2026-10-28; its dependency is
+satisfied. Implement the role against the approved workflow contract.
