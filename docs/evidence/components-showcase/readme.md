@@ -37,4 +37,4 @@ passed. Tests cover initial state and accessible headings, keyboard-operable
 section links and destinations, and registration of a synthetic interactive
 example. Native fragment scrolling and CSS fidelity were checked in the browser.
 
-Independent review and human acceptance are pending at this implementation handoff.
+The separate reviewer independently inspected the running desktop/mobile result, the S02 HTML/PNG and Alexandria references, and these captures at head `041231ca425804732063b010d6557ec343ac67ce`. Required checks passed independently; review found no blocking or optional findings. Human acceptance and manual merge remain pending in PR #6.
