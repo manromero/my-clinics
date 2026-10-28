@@ -66,9 +66,11 @@ Only steps actually executed count as runtime evidence. Scenarios 3–4 are poli
 simulations, not failed application checks or actual correction rounds. The
 coordinator owns dispatch, tracking and any later product decisions.
 
-## Configuration staging limitation
+## Native configuration
 
-[reviewer.toml](reviewer.toml) is the intended native definition, staged here
-because this implementer's environment rejected writes under `.codex/`. It does
-not configure a native role at this location. Installation at
-`.codex/agents/reviewer.toml` remains a coordinator prerequisite for runtime checks.
+The installed definition is
+[`.codex/agents/reviewer.toml`](../../.codex/agents/reviewer.toml).
+The implementer initially staged it here because its sandbox protected `.codex/`.
+The coordinator installed the exact candidate through approved escalation,
+verified the matching SHA-256, and removed the temporary duplicate. Native loading
+and the actual fixture/policy results are recorded in the validation report.

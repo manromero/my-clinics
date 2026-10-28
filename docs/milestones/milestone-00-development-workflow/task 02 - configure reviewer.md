@@ -1,6 +1,6 @@
 # Task 02 — Configure reviewer
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -59,9 +59,19 @@ Started after coordinator readiness checks and verification of Task 01's merge.
 - [Validation evidence](reviewer-validation.md) records commands, native role and
   session receipts, results, limitations, and the distinction between fixture
   scenarios and actual implementation correction rounds (0).
-- Changed-file formatting, installed TOML parsing, and ESLint passed. Global
-  formatting still reports five unchanged visual references; they are outside
-  this task and were preserved. Final configuration review and delivery are pending.
+- Changed-file formatting, installed TOML parsing, ESLint, and 76 local Markdown
+  links/heading anchors passed. Global formatting still reports five unchanged
+  visual references; they are outside this task and were preserved.
+- Independent bootstrap configuration review found no blockers after verifying
+  the native receipts and directly checking the definition and fixtures. The
+  native final-review continuation was interrupted by CLI quota before a verdict;
+  it is not represented as a passing native review.
+- Delivery: [PR #3](https://github.com/manromero/my-clinics/pull/3), targeting
+  `develop`. Agent work is complete; human approval and manual merge remain pending
+  in GitHub. The `done` update is included in final tracking review and this PR.
+- Implementation correction rounds used: 0. The coordinator repaired the staging
+  link and evidence wording before the first completed configuration review;
+  fixture transitions were simulations, not implementation correction rounds.
 
 ## Execution context
 

@@ -3,7 +3,7 @@
 Status: workflow decisions and documentation accepted by the user on 2026-10-28.
 Task 00 is complete. The user subsequently approved a coordinator, implementer,
 and reviewer. Coordinator configuration is complete in Task 04; native implementer
-configuration is delivered through Task 01. Task 02 prepares the reviewer candidate;
+configuration is delivered through Task 01. Task 02 provides the native reviewer;
 its [validation report](milestones/milestone-00-development-workflow/reviewer-validation.md)
 separates local checks from native installation and runtime verification. The full
 execution exercise remains Task 03 of
@@ -266,8 +266,10 @@ when starting work. At that baseline, no test PR had been created, and branch
 protection, merge strategy and role loading had not been configured or validated.
 The [coordinator](milestones/milestone-00-development-workflow/coordinator-validation.md)
 and [implementer](milestones/milestone-00-development-workflow/implementer-validation.md)
-records describe subsequent loading checks. Reviewer installation/runtime checks
-remain Task 02; full workflow validation remains the exercise in Task 03.
+records describe subsequent loading checks. Task 02's
+[reviewer report](milestones/milestone-00-development-workflow/reviewer-validation.md)
+records native installation and runtime checks; full workflow validation remains
+the exercise in Task 03.
 
 The user approved coordination, the two-round limit, evidence locations, and the
 representative exercise on 2026-10-28. Merge strategy and branch protections remain

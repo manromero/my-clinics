@@ -3,8 +3,9 @@
 Date: 2026-10-28. Assignment: [Task 02](<task 02 - configure reviewer.md>).
 Branch: `feature/configure-reviewer`.
 Base and implementation-start head: `b1c474d14758afcf1565304dde1afdc234e3ed7c`.
-Implementation is an uncommitted working-tree change until coordinator delivery;
-local checks below must not be represented as checks of a new committed head.
+Runtime checks below were performed on uncommitted artifacts over that base.
+Committed delivery and reviewed heads are recorded separately in the PR; the
+runtime results must not be misrepresented as tests run against a later commit.
 
 ## Configuration and boundaries
 
@@ -126,6 +127,32 @@ or user-wide configuration is included in this evidence.
 Independent final configuration review and PR delivery follow this runtime test.
 Human acceptance remains in GitHub. Full implementation/PR/visual exercise and
 manual merge remain Task 03.
+
+## Independent bootstrap configuration review
+
+A fresh independent reviewer in the active session inspected the role, committed
+diff and coordinator documentation fixes without editing. It found no blocking
+defects; independently reran the fixture checks, ESLint and format checks; parsed
+the installed native definition and verified its hash; checked local links; and
+verified the known native parent/child metadata and spawn/follow-up receipts.
+This is explicitly bootstrap quality review, not a claim that this active
+session selected the native role type. The successful native runtime evidence
+above is separate from the quota-interrupted final native review.
+
+Final changed-file Prettier and 76 local Markdown links/heading anchors passed.
+Global formatting remains failing only for five unchanged visual-reference
+files. Application build and browser comparison remain N/A. No implementation
+correction rounds were required. [PR #3](https://github.com/manromero/my-clinics/pull/3)
+includes the task/index `done` update for final tracking review; human approval
+and manual merge remain pending in GitHub, without a post-merge status commit.
+
+The native review continuation inspected head
+`952c57e1060be858fb3fbbdb294a2af91123856e` but was interrupted by a CLI usage limit
+before a final verdict. It is not recorded as a clean review. Independent bootstrap
+configuration review through the active session is recorded separately; it does
+not replace the already completed native discovery/behavior evidence or claim a
+completed end-to-end workflow. The coordinator also repaired a stale staging link
+after removing the temporary TOML duplicate and clarified historical artifact state.
 
 ## Runtime limitations
 
