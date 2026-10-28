@@ -60,10 +60,12 @@ the shared tokens and Noto Serif / Inter / Public Sans font loading.
 Capture into a temporary directory outside the repository. Upload useful captures
 as GitHub PR attachments and verify the saved inline URLs and image retrieval
 before removing temporary files and delivering the PR. Do not commit new delivery
-screenshots or use source commits to host them. Retain textual evidence records
+screenshots or use source commits to host them. Retain textual evidence records in the PR,
 with attachment URLs, actual viewport, image dimensions when different, state,
 source commit, capturer, and who performed live interactions. Refresh attachments
 after visual changes and preserve historical evidence and supplied references.
+Keep only a validation summary and PR link in the task; do not add a separate
+`docs/evidence` report that duplicates the PR.
 For example, `gh pr edit <number> --body-file <temporary-body-file> --attach <capture>`
 uploads a capture; a matching local Markdown reference in the body is rewritten
 to its attachment URL. Repeat `--attach` for multiple files. See the

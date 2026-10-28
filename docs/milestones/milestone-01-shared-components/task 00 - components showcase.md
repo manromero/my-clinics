@@ -53,7 +53,7 @@ Planning merged in PR #5. Implementation assigned and accepted by the user on 20
 - Delivered `/components`: Spanish empty catalogue, stable section anchors, accessible headings and extensible route-local registration API. No later shared components or business behavior were introduced.
 - Implementer and separate reviewer each passed `pnpm test` (3 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build`, and `pnpm peers check`. Reviewer also passed `git diff --check`. Sandbox process restrictions required escalation; completed checks passed.
 - Both agents performed live desktop (1440 × 900) and mobile (390 × 844) checks: direct route, fragment navigation, keyboard activation, destination focus, visible focus and no horizontal overflow. The reviewer additionally verified the skip link. They compared the result with Alexandria and the applicable S02 HTML/PNG reference; exact fonts/theme remain Task 01.
-- [Visual evidence](../../evidence/components-showcase/readme.md) records capture source, viewports, image dimensions and implementer attribution; durable screenshots appear inline in the PR.
+- [PR #6 visual evidence](https://github.com/manromero/my-clinics/pull/6) records capture source, viewports, image dimensions and implementer attribution, with screenshots attached inline. Detailed evidence is maintained in the PR.
 - Independent review: no blocking findings, no optional suggestions, 0 correction rounds. Final tracking documentation is subject to corresponding format, link and consistency review before delivery.
 
 ## Evidence storage follow-up

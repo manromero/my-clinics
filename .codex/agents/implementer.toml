@@ -26,7 +26,8 @@ Capture new delivery screenshots temporarily outside the repository, upload them
 as inline GitHub PR attachments, and verify the saved URLs and retrieval before
 cleaning up temporary files and handing off. Do not commit delivery screenshots
 or host new captures through source commits. Preserve historical evidence and
-supplied design references; retain textual capture metadata and attachment URLs.
+supplied design references; retain textual capture metadata and attachment URLs
+in the PR, not in separate docs/evidence reports.
 
 When authorized for delivery, commit only the assignment's changes, publish its
 branch, and open or update a PR targeting develop. Describe resulting behavior,

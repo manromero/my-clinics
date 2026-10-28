@@ -142,7 +142,8 @@ they help assess the change. Screenshots supplement interaction checks.
   references. Record who captured them and who performed live interactions;
   disclose unavailable tools rather than implying independent browser checks.
 - Keep useful evidence as GitHub attachments and retain textual capture records
-  with those URLs. After upload and verification, remove temporary captures,
+  with those URLs in the PR. Do not create separate `docs/evidence` reports.
+  After upload and verification, remove temporary captures,
   throwaway fixtures and scripts before ready delivery. Refresh attachments after
   visual corrections while preserving review history. Do not delete historical
   evidence or rewrite Git history as part of this cleanup.
@@ -210,6 +211,8 @@ not a reason to bypass review or silently restart the correction budget.
 - The PR holds the implementation description, criteria coverage, detailed check
   results, reviewer findings, correction responses, and linked evidence. Preserve
   review history when updating the description.
+- Keep detailed capture metadata and validation evidence in the PR; the task
+  retains a concise summary and PR link rather than duplicating the report.
 - Attach or link screenshots and other visual evidence from the PR, identifying
   commit and viewport. Do not rely on transient chat output as the only record.
 - The coordinator updates the task file and milestone index together, following
