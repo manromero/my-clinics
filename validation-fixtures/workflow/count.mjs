@@ -1,4 +1,4 @@
-// Intentional exercise defect; never import this fixture into production code.
+// Workflow exercise fixture; never import this fixture into production code.
 export function countAtOrBelow(values, limit) {
-  return values.filter((value) => value < limit).length;
+  return values.filter((value) => value <= limit).length;
 }

@@ -110,7 +110,7 @@ them. No post-merge status commit or automatic monitor is needed. Keep blocked w
 `in_progress`; reopen a delivered task if new blockers or requested changes require
 implementation. Follow the direct-acceptance path for documentation when applicable.
 
-## Loading and bootstrap verification
+## Instruction loading and native availability
 
 Open Codex with the repository `my-clinics` as its working directory; starting
 only in its parent folder does not discover this repository's `AGENTS.md`.
@@ -120,14 +120,10 @@ Use a fresh run to verify loading. Check the root instruction with
 `codex debug prompt-input` and exercise this role with a read-only assignment.
 Do not expose raw prompt dumps or private configuration in evidence.
 
-Task 01 records native implementer loading; Task 02's
-[reviewer validation report](../milestones/milestone-00-development-workflow/reviewer-validation.md)
-distinguishes local configuration checks from native installation and runtime
-verification. Verify role availability in a fresh session before dispatching.
-Complete configuration validation without pretending an unavailable role has loaded.
-An independent subagent may review this bootstrap configuration using explicit
-instructions and the contract; record that as bootstrap review, not as validation
-of native implementer/reviewer loading. Task 03 validates the full workflow.
+Native implementer and reviewer configuration is validated in the
+[workflow history](../milestones/milestone-00-development-workflow/workflow-history.md#role-configuration-and-acceptance-notes)
+and linked role validation reports. Verify role availability in the active session
+before dispatching; configuration files alone do not prove a role has loaded.
 
 Sources: [Codex instruction discovery](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
 and [subagent configuration](https://learn.chatgpt.com/docs/agent-configuration/subagents).

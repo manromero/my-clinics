@@ -67,6 +67,18 @@ existing visual-reference files so required application checks can pass.
   sandbox could not validate GitHub credentials. The coordinator independently
   verified valid host credentials and performs the exact requested Git/PR
   publication through approved execution, recording that actor distinction.
+- Initial native review of `0f2c20bd79b5feb08227ea9ec677a60114b37453` opened B01
+  at `validation-fixtures/workflow/count.mjs:3`: strict comparison excludes equality;
+  independent reproduction returned exit 1 and 2/6 passing. O01 (JSDoc example)
+  remains optional for final human review. No other code or visual blockers found;
+  all four application checks independently passed.
+- Round 1 assigned to the retained implementer: edit the working fixture, rerun
+  checks, and complete the originally planned route removal/history cleanup.
+  The retained native reviewer will verify the resulting new commit.
+- Four policy handoffs were exercised as explicit simulations, not extra source
+  defects or correction rounds. Native reviewer inspected screenshots and code;
+  independent live browser access was unavailable. Live actions were performed
+  by the coordinator and are recorded separately.
 
 ## Execution context
 
@@ -81,7 +93,7 @@ existing visual-reference files so required application checks can pass.
   selected context; retain both for this task's sequential handoffs.
 - Coordinator owns task/index/evidence. Implementer owns assigned source changes,
   check results and delivery artifacts; reviewer independently verifies them.
-- Correction rounds used: 0. Fixture seeding is an intentional initial exercise
+- Correction rounds used: 1 (assigned; verification pending). Fixture seeding is an intentional initial exercise
   condition, not a product defect or completed correction. Actual review/fix and
   revalidation must be recorded at distinct commits.
 - Delivery: PR to `develop`; final `done` tracking and independent recheck before
