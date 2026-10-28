@@ -1,8 +1,8 @@
 # Milestone 00 — Development workflow
 
 Scope, workflow decisions, and Task 00 documentation: accepted by the user.
-Task 00 is complete. The subsequently approved coordinator is being configured
-in Task 04; implementer/reviewer configuration and full execution remain pending.
+Tasks 00 and 04 are complete. Coordinator configuration was manually merged by
+the user; implementer/reviewer configuration and full execution remain pending.
 
 ## Objective
 
@@ -36,13 +36,13 @@ for handoffs, evidence, escalation, and the representative exercise.
 
 ## Submilestones and tasks
 
-| Submilestone          | Task                                                               | Status        | Depends on                               |
-| --------------------- | ------------------------------------------------------------------ | ------------- | ---------------------------------------- |
-| Workflow definition   | [00 — Define workflow](<task 00 - define workflow.md>)             | `done`        | User acceptance recorded on 2026-10-28   |
-| Agent configuration   | [04 — Configure coordinator](<task 04 - configure coordinator.md>) | `in_progress` | Task 00 and approved three-role revision |
-| Agent configuration   | [01 — Configure implementer](<task 01 - configure implementer.md>) | `pending`     | Task 04                                  |
-| Agent configuration   | [02 — Configure reviewer](<task 02 - configure reviewer.md>)       | `pending`     | Task 04                                  |
-| Workflow verification | [03 — Validate workflow](<task 03 - validate workflow.md>)         | `pending`     | Tasks 04, 01, and 02                     |
+| Submilestone          | Task                                                               | Status    | Depends on                               |
+| --------------------- | ------------------------------------------------------------------ | --------- | ---------------------------------------- |
+| Workflow definition   | [00 — Define workflow](<task 00 - define workflow.md>)             | `done`    | User acceptance recorded on 2026-10-28   |
+| Agent configuration   | [04 — Configure coordinator](<task 04 - configure coordinator.md>) | `done`    | Task 00 and approved three-role revision |
+| Agent configuration   | [01 — Configure implementer](<task 01 - configure implementer.md>) | `pending` | Task 04                                  |
+| Agent configuration   | [02 — Configure reviewer](<task 02 - configure reviewer.md>)       | `pending` | Task 04                                  |
+| Workflow verification | [03 — Validate workflow](<task 03 - validate workflow.md>)         | `pending` | Tasks 04, 01, and 02                     |
 
 Task statuses follow the [shared tracking rules](../readme.md#task-structure-and-status).
 The existence of these task files does not mean the agents are configured.
@@ -65,7 +65,7 @@ The user approved the following on 2026-10-28:
 
 Task 00 is complete following user acceptance on 2026-10-28. Git push and GitHub CLI
 access have been verified, and remote `develop` has been created from `main`.
-Coordinator configuration is in progress; delegated roles and the actual workflow
+Coordinator configuration is complete; delegated roles and the actual workflow
 exercise remain pending. Merge strategy and
 branch protections are separate open decisions.
 

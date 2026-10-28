@@ -6,9 +6,9 @@ before implementation begins.
 
 ## Milestone index
 
-| Milestone                                                                | Description                                                                    | Planning status                                            |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ---------------------------------------------------------- |
-| [00 — Development workflow](milestone-00-development-workflow/readme.md) | Coordinator, implementer, and reviewer workflow with human PR review and merge | Task 00 complete; Task 04 in progress; Tasks 01–03 pending |
+| Milestone                                                                | Description                                                                    | Planning status                               |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | --------------------------------------------- |
+| [00 — Development workflow](milestone-00-development-workflow/readme.md) | Coordinator, implementer, and reviewer workflow with human PR review and merge | Tasks 00 and 04 complete; Tasks 01–03 pending |
 
 Further milestones will be added after the user validates their scope and order.
 

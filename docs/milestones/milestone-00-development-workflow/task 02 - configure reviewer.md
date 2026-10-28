@@ -47,5 +47,6 @@ distinguishes them and rechecks a correction. Validate links and formatting.
 
 ## Progress notes
 
-Not started. Task 00 is accepted; awaiting Task 04 under the approved three-role
-revision. Configure independent review with handoff through the coordinator.
+Not started. Tasks 00 and 04 are complete; dependencies are satisfied under the
+approved three-role revision. Configure independent review with handoff through
+the coordinator.

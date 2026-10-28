@@ -1,6 +1,6 @@
 # Task 04 — Configure coordinator
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -72,6 +72,8 @@ Full delegated role loading and the real workflow exercise remain Tasks 01–03.
 - Validation passed: Prettier across all changed documentation and milestone files,
   53 local Markdown links with referenced heading anchors, and `git diff --check`.
   Application checks are not applicable to this configuration/documentation change.
-- Delivery remains subject to human review and manual merge into `develop`.
-- Delivery: [PR #1](https://github.com/manromero/my-clinics/pull/1), targeting
-  `develop`. Remains `in_progress` while human review and manual merge are pending.
+- Delivery: [PR #1](https://github.com/manromero/my-clinics/pull/1) was manually
+  merged by the user into `develop` on 2026-10-28 at 15:51:11 UTC.
+- Verified GitHub state `MERGED`, base `develop`, and merge commit
+  `010a1cc9eff04fe2f537055039437950241d3d24`. Task 04 is `done`; task and milestone
+  tracking were updated after the user reported the merge. Tasks 01/02 are unblocked.

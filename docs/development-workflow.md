@@ -2,7 +2,7 @@
 
 Status: workflow decisions and documentation accepted by the user on 2026-10-28.
 Task 00 is complete. The user subsequently approved a coordinator, implementer,
-and reviewer. Coordinator configuration is tracked in Task 04; delegated role
+and reviewer. Coordinator configuration is complete in Task 04; delegated role
 configuration and execution remain Tasks 01–03 of
 [Milestone 00](milestones/milestone-00-development-workflow/readme.md).
 

@@ -43,5 +43,6 @@ links; run any configuration checks supported by that tooling.
 
 ## Progress notes
 
-Not started. Task 00 is accepted; awaiting Task 04 under the approved three-role
-revision. Configure a delegated implementer receiving a ready task and branch.
+Not started. Tasks 00 and 04 are complete; dependencies are satisfied under the
+approved three-role revision. Configure a delegated implementer receiving a ready
+task and branch.
