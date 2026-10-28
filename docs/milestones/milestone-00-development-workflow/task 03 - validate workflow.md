@@ -1,6 +1,6 @@
 # Task 03 — Validate workflow
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -45,7 +45,8 @@ agreed workflow to a reviewable PR and manual user merge.
   the agreed user handoff instead of an unsupported clean result.
 - The ready PR includes task/index `done` updates covered by final review; human
   approval and merge remain pending in GitHub. Blocked work stays `in_progress`.
-- The user performs the manual merge; the resulting task notes record it.
+- Human approval and manual merge remain the final user action in GitHub; the
+  ready PR already includes the `done` update, without a post-merge status commit.
 
 ## Validation
 
@@ -55,4 +56,33 @@ that could not be exercised. Check updated documentation formatting and links.
 
 ## Progress notes
 
-Not started. Awaiting role configuration and the agreed validation exercise.
+Started after verifying PR #3 merged into `develop`. Both native delegated roles
+are available. The user authorized the global exercise and formatting the five
+existing visual-reference files so required application checks can pass.
+
+- Stage 1: native implementer `/root/task03_implementer` created the temporary UI
+  and isolated working fixture; all four application checks passed. The fixture
+  intentionally remains at 2/6 passing for initial review.
+- Permission handoff: native staging was denied at `.git/index.lock` and its
+  sandbox could not validate GitHub credentials. The coordinator independently
+  verified valid host credentials and performs the exact requested Git/PR
+  publication through approved execution, recording that actor distinction.
+
+## Execution context
+
+- Branch: `feature/validate-workflow`, from updated `origin/develop`.
+- Base: `1aa5a3f2c547b19b54f867112b6a64dea9f02b60`.
+- Scope and criteria: [global exercise assignment](workflow-exercise.md).
+- Readiness: approved three-role workflow, native definitions and GitHub access
+  available; no product decisions missing. Normal usage is available again.
+- References: `AGENTS.md`, operational contract, coordinator/native role files,
+  architecture, Alexandria, and the activity screen's Stitch reference.
+- One fresh native implementer and a separate fresh native reviewer receive
+  selected context; retain both for this task's sequential handoffs.
+- Coordinator owns task/index/evidence. Implementer owns assigned source changes,
+  check results and delivery artifacts; reviewer independently verifies them.
+- Correction rounds used: 0. Fixture seeding is an intentional initial exercise
+  condition, not a product defect or completed correction. Actual review/fix and
+  revalidation must be recorded at distinct commits.
+- Delivery: PR to `develop`; final `done` tracking and independent recheck before
+  human approval. Never merge automatically.

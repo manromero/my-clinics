@@ -37,13 +37,13 @@ for handoffs, evidence, escalation, and the representative exercise.
 
 ## Submilestones and tasks
 
-| Submilestone          | Task                                                               | Status    | Depends on                               |
-| --------------------- | ------------------------------------------------------------------ | --------- | ---------------------------------------- |
-| Workflow definition   | [00 — Define workflow](<task 00 - define workflow.md>)             | `done`    | User acceptance recorded on 2026-10-28   |
-| Agent configuration   | [04 — Configure coordinator](<task 04 - configure coordinator.md>) | `done`    | Task 00 and approved three-role revision |
-| Agent configuration   | [01 — Configure implementer](<task 01 - configure implementer.md>) | `done`    | Task 04                                  |
-| Agent configuration   | [02 — Configure reviewer](<task 02 - configure reviewer.md>)       | `done`    | Task 04                                  |
-| Workflow verification | [03 — Validate workflow](<task 03 - validate workflow.md>)         | `pending` | Tasks 04, 01, and 02                     |
+| Submilestone          | Task                                                               | Status        | Depends on                               |
+| --------------------- | ------------------------------------------------------------------ | ------------- | ---------------------------------------- |
+| Workflow definition   | [00 — Define workflow](<task 00 - define workflow.md>)             | `done`        | User acceptance recorded on 2026-10-28   |
+| Agent configuration   | [04 — Configure coordinator](<task 04 - configure coordinator.md>) | `done`        | Task 00 and approved three-role revision |
+| Agent configuration   | [01 — Configure implementer](<task 01 - configure implementer.md>) | `done`        | Task 04                                  |
+| Agent configuration   | [02 — Configure reviewer](<task 02 - configure reviewer.md>)       | `done`        | Task 04                                  |
+| Workflow verification | [03 — Validate workflow](<task 03 - validate workflow.md>)         | `in_progress` | Tasks 04, 01, and 02                     |
 
 Task statuses follow the [shared tracking rules](../readme.md#task-structure-and-status).
 The existence of these task files does not mean the agents are configured.
