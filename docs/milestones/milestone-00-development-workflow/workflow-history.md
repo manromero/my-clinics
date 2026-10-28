@@ -5,7 +5,7 @@ material moved from the operational [workflow contract](../../development-workfl
 during Task 03. These are historical observations and plans, not current progress
 claims or additional operational requirements. The source contract and coordinator
 notes are retained at commit `0f2c20bd79b5feb08227ea9ec677a60114b37453`.
-Current execution evidence is in the [validation report](workflow-validation.md).
+Execution events and review evidence are in the [validation report](workflow-validation.md).
 
 ## Role configuration and acceptance notes
 
@@ -52,6 +52,10 @@ instructions and the contract; record that as bootstrap review, not as validatio
 of native implementer/reviewer loading. Task 03 validates the full workflow.
 
 ## Representative exercise for Task 03
+
+The following is the historical exercise plan from the contract at
+`0f2c20bd79b5feb08227ea9ec677a60114b37453`, preserved as written. Its future-tense
+instructions describe that plan, not the present execution state.
 
 Use a temporary workflow demonstration page with one responsive card and a simple
 interaction, without persistence or clinic business rules. Before implementation,
@@ -101,6 +105,10 @@ The following is a desk walkthrough, not an executed agent or PR exercise:
 
 ## Technical baseline and remaining work
 
+The following setup observations and remaining-work notes were recorded in the
+contract at `0f2c20bd79b5feb08227ea9ec677a60114b37453`. They are historical text,
+not a statement of live access, settings or task status.
+
 Verified on 2026-10-28: `main` and remote `develop` both pointed to `92de852`;
 Git push succeeded. This repository uses Git's `schannel` TLS backend. GitHub CLI
 2.103.3 was installed and authenticated as `manromero` with repository admin
@@ -143,7 +151,15 @@ Its original [`src/app/workflow-demo/page.tsx`](https://github.com/manromero/my-
 has Git blob `7e63765858000c4c2d75cb4d82ad5cf963207eec`. Commit history preserves
 the source without leaving a compiled archive in the application. The
 [coordinator captures and observations](workflow-validation.md#coordinator-live-ui-evidence)
-preserve the running result; the route is removed in the round 1 cleanup. Initial
-review used report head `0f2c20bd79b5feb08227ea9ec677a60114b37453` with that same
-UI blob. The report distinguishes observed route removal from pending live 404
-verification and independent re-review.
+preserve the running result. Initial review used report head
+`0f2c20bd79b5feb08227ea9ec677a60114b37453` with that same UI blob. The root
+coordinator published route removal and the actual fixture correction in commit
+`23cfb67f767cf9d2d0de4c26e68360f8f614dbe8`, then observed the known temporary
+URL return 404 in a fresh local browser tab and stopped the dev server. The
+[retirement capture](evidence/workflow-route-removed.jpg) records that local
+observation; it is not a deployment or active-endpoint claim. The same native
+reviewer independently verified the correction/removal at evidence head
+`ecf50f1eb612edab8cc78aa81e2c477a44b8fb68` and closed B01. That review opened
+B02 for inconsistent historical/progress prose, addressed in the documentation-only
+round 2 handoff recorded in the validation report. Task status is owned by Task 03
+and the milestone index, with approval and merge recorded in GitHub.

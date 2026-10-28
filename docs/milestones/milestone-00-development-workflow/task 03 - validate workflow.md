@@ -79,6 +79,11 @@ existing visual-reference files so required application checks can pass.
   defects or correction rounds. Native reviewer inspected screenshots and code;
   independent live browser access was unavailable. Live actions were performed
   by the coordinator and are recorded separately.
+- Native re-review of `ecf50f1eb612edab8cc78aa81e2c477a44b8fb68` independently
+  closed B01: runner unchanged, 6/6 passing; all app checks passed and `src` matches
+  base. It opened B02 for conflicting current/historical publication statements
+  in the report and history. Round 2 is assigned to the same implementer for
+  evidence-documentation consistency only; no code or optional-suggestion edits.
 
 ## Execution context
 
@@ -93,7 +98,7 @@ existing visual-reference files so required application checks can pass.
   selected context; retain both for this task's sequential handoffs.
 - Coordinator owns task/index/evidence. Implementer owns assigned source changes,
   check results and delivery artifacts; reviewer independently verifies them.
-- Correction rounds used: 1 (assigned; verification pending). Fixture seeding is an intentional initial exercise
+- Correction rounds used: 2 (second assigned; final verification pending). Fixture seeding is an intentional initial exercise
   condition, not a product defect or completed correction. Actual review/fix and
   revalidation must be recorded at distinct commits.
 - Delivery: PR to `develop`; final `done` tracking and independent recheck before

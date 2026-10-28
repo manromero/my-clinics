@@ -1,31 +1,10 @@
 # Task 03 — Workflow validation evidence
 
-## Coordinator correction publication and route-retirement check
-
-The retained implementer returned the actual working-fixture edit and planned
-cleanup with all checks passing. The coordinator published its requested changes
-through the approved host bridge as commit
-`23cfb67f767cf9d2d0de4c26e68360f8f614dbe8`. The fixture changed from initial blob
-`8254375ef223ca89b9a7c933db09f0d839f792a7` to corrected blob
-`8957381700e9e31eaf2d333edf280d1389a89ce5`; the runner stayed
-`c186fcbb898ca5b0615d3ca923fa298930461d67`. This is an actual edited/committed
-correction, not selection of a prewritten corrected fixture.
-
-`git diff --exit-code origin/develop..HEAD -- src` passed at that commit: final
-application source matches the exercise base. The coordinator opened the known
-temporary URL in a fresh supported browser tab after publication; it displayed
-`404` and `This page could not be found.`. The prior tab had been cleaned up, so
-no stale-tab observation was treated as evidence. See
-[retired route](evidence/workflow-route-removed.jpg). The dev server was then
-stopped; screenshots remain as historical evidence of the temporary UI.
-
-Current-head independent re-review remains the next step. B01 is not considered
-closed merely because the implementer and coordinator observed the correction.
-
-Current state: correction round 1 implemented; coordinator publication and the
-same native reviewer's recheck are pending. Task/index remain `in_progress`.
-This report preserves historical failures separately from current validation;
-it does not declare Task 03 ready or complete.
+This is a chronological record of implementation, publication, evidence and review
+events. Stage-specific handoffs describe what was known at that event; later
+publication and review events supersede their provisional observations. Task 03
+and the milestone index own task status; GitHub owns PR approval and merge state.
+This report does not act as a live status summary.
 
 ## Assignment, roles and source identity
 
@@ -34,31 +13,44 @@ it does not declare Task 03 ready or complete.
 - Prepared branch: `feature/validate-workflow`.
 - Base: `1aa5a3f2c547b19b54f867112b6a64dea9f02b60`.
 - Initial published source commit: `67215644845c514ccac788f8dd59113358d0e21e`.
-- Initial reviewed report head / correction starting HEAD:
+- Initial reviewed report head / round 1 starting HEAD:
   `0f2c20bd79b5feb08227ea9ec677a60114b37453`.
-- [PR #4](https://github.com/manromero/my-clinics/pull/4) targets `develop`; it remains
-  draft pending required revalidation, re-review and final tracking.
+- Round 1 correction/removal commit: `23cfb67f767cf9d2d0de4c26e68360f8f614dbe8`.
+- Round 1 evidence head independently re-reviewed:
+  `ecf50f1eb612edab8cc78aa81e2c477a44b8fb68`.
+- [PR #4](https://github.com/manromero/my-clinics/pull/4) was opened as a draft
+  targeting `develop`; its evolving approval/merge state is recorded in GitHub.
 - Scope: [approved exercise](workflow-exercise.md) and
   [Task 03](<task 03 - validate workflow.md>).
 - Runtime: Node `v24.14.0`, pnpm `11.25.0`, Next.js `16.4.3`.
 
-| Actor                      | Role / identity                                            | Responsibility and reuse                                                               |
-| -------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Parent                     | Coordinator, `01a18475-ee64-7393-8a76-91b9de9ab95f`        | Intake, tracking, live UI actions, approved host publication and review dispatch       |
-| `/root/task03_implementer` | Native implementer, `01a18476-b667-7b93-9d1a-c703e5d87e00` | Initial implementation and this actual round 1 correction/cleanup; same agent retained |
-| `/root/task03_reviewer`    | Native reviewer, `01a18481-784b-74c0-8549-acbf3088ede8`    | Independent initial review and policy simulations; same agent retained for recheck     |
+| Actor                      | Functional role / identity                                                                                 | Recorded responsibility                                                                                           |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Root user chat             | Coordinator, `01a182f7-9a3c-7d50-97bf-8ee7bb6522c1`                                                        | Readiness/branch preparation, tracking, CUA live browser actions, approved host Git/PR publication and attachment |
+| Native parent              | Selected-context orchestration relay for the same coordinator role, `01a18475-ee64-7393-8a76-91b9de9ab95f` | Relayed selected task context and native-agent handoffs; did not perform browser or host Git/PR actions           |
+| `/root/task03_implementer` | Native implementer, `01a18476-b667-7b93-9d1a-c703e5d87e00`                                                 | Initial implementation and both assigned correction rounds; same agent retained                                   |
+| `/root/task03_reviewer`    | Native reviewer, `01a18481-784b-74c0-8549-acbf3088ede8`                                                    | Independent initial review, simulations and round 1 re-review; same agent retained                                |
 
-| Source                                   | Stage 1 / initial-review blob              | Current round 1 blob or disposition            |
+These are three functional roles. The native relay was part of coordinator
+orchestration, not an additional decision-maker or a browser-capability test.
+References to live coordinator actions and host publication below identify the
+root user chat, not the native relay.
+
+| Source                                   | Stage 1 / initial-review blob              | Published round 1 blob or disposition          |
 | ---------------------------------------- | ------------------------------------------ | ---------------------------------------------- |
 | `src/app/workflow-demo/page.tsx`         | `7e63765858000c4c2d75cb4d82ad5cf963207eec` | Removed; preserved in published initial commit |
 | `validation-fixtures/workflow/count.mjs` | `8254375ef223ca89b9a7c933db09f0d839f792a7` | `8957381700e9e31eaf2d333edf280d1389a89ce5`     |
 | `validation-fixtures/workflow/check.mjs` | `c186fcbb898ca5b0615d3ca923fa298930461d67` | Same runner, unchanged                         |
 
-The current correction is a working-tree change, not yet a new commit. Blob
-identities tie the implementer checks to actual source; the coordinator will
-record the resulting commit, live route-removal observation and review outcome.
+At the round 1 implementer handoff, these checks described a working-tree
+snapshot based on `0f2c20bd79b5feb08227ea9ec677a60114b37453`; no correction commit
+had been created by the native implementer at that event. The root coordinator
+subsequently published the same corrected fixture and route removal as
+`23cfb67f767cf9d2d0de4c26e68360f8f614dbe8`, recorded the live 404 and supplied
+evidence head `ecf50f1eb612edab8cc78aa81e2c477a44b8fb68` for native re-review.
 The [source archive](workflow-history.md#temporary-ui-source-archive) links the
-immutable original route. No compiled `.tsx` archive is retained in the app.
+immutable original route. At the reviewed evidence head, no compiled `.tsx`
+archive remained in the app.
 
 ## Stage 1 — Historical implementation and checks
 
@@ -76,6 +68,11 @@ The working fixture was copied from `validation-fixtures/reviewer/initial.mjs`
 with its intentional strict comparator. The new runner imported `./count.mjs`
 directly and exercised six cases plus input preservation. This expected initial
 exercise defect was outside production imports, not a failing product check.
+
+The Stage 1 checks below ran on the implementer's working-tree snapshot based on
+`1aa5a3f2c547b19b54f867112b6a64dea9f02b60`, before the native handoff and later
+root publication. Its source blobs were subsequently published in initial commit
+`67215644845c514ccac788f8dd59113358d0e21e`.
 
 | Exact command                                 | Exit | Historical Stage 1 result                                                 |
 | --------------------------------------------- | ---- | ------------------------------------------------------------------------- |
@@ -122,9 +119,10 @@ staging/commit/push and draft PR #4 creation through approved host execution,
 producing source commit `67215644845c514ccac788f8dd59113358d0e21e`. It attached the
 PR because `attach_artifact` was unavailable to the implementer. No login,
 credential, permission or settings configuration was changed. This is a
-permission-mediated handoff, not successful native sandbox publication. The same
-known boundary applies to the present correction; no Git mutation or PR CLI
-publication was retried by the implementer.
+permission-mediated handoff, not successful native sandbox publication. For the
+round 1 and round 2 native implementer handoffs, the implementer prepared host
+publication requests without retrying Git mutations or PR CLI publication. The
+recorded initial and round 1 publications were performed by the root coordinator.
 
 ## Coordinator live UI evidence
 
@@ -184,13 +182,15 @@ limitation was not reported as an application failure or a live-browser pass.
 
 ### Policy simulations performed during Stage 2
 
-The retained reviewer exercised the following hypothetical handoffs. None was an
-additional actual defect, missing capture, dispute, correction round or permission
-change. The real initial blocker was B01; current actual correction count is 1,
-assigned with verification pending. O01 never requires an approval interruption
-and never consumes a round.
+The retained reviewer exercised the following hypothetical handoffs during Stage 2.
+The wording is a **paraphrase of simulated coordinator-to-user handoffs**, not a
+verbatim transcript or an actual user decision. None was an additional actual
+defect, missing capture, dispute, correction round or permission change. These
+simulations did not increment the correction count. Actual rounds 1 and 2 are
+recorded separately below. O01 is optional and does not require an approval
+interruption or consume a round.
 
-| Scenario                    | Hypothetical situation and concrete coordinator-to-user handoff                                                                                                                                                                                                                                                                                                                                                                                         | Contract basis                                                                                                                                                                       |
+| Scenario                    | Hypothetical situation and paraphrased coordinator-to-user handoff                                                                                                                                                                                                                                                                                                                                                                                      | Contract basis                                                                                                                                                                       |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | S01 — Scope ambiguity       | A request to save completion across sessions conflicts with the exercise's persistence exclusion. Handoff: “Persistence changes the approved scope. Should it be added? If so, specify storage and retention before dependent implementation. Independent authorized preparation continues.” No persistence was implemented.                                                                                                                            | [Assignment and readiness](../../development-workflow.md#assignment-and-readiness), [roles and coordination](../../development-workflow.md#roles-and-coordination)                   |
 | S02 — Missing evidence      | If desktop/mobile captures were unavailable, readiness would remain incomplete/blocked. Handoff: “The required visual evidence is unavailable due to the reported tooling issue; this is separate from an app defect. Provide actual pending/completed/focus captures with source and viewport identity, or decide how to resolve the evidence requirement before a clean handoff.” In reality all five captures exist and the reviewer inspected them. | [Review and evidence](../../development-workflow.md#review-and-evidence)                                                                                                             |
@@ -204,14 +204,17 @@ B01 response: the same implementer edited the comparator in the working
 a prewritten corrected artifact. The stale intentional-defect comment now labels
 it as an exercise fixture. The runner is unchanged, as is the scope: finite inputs,
 inclusive boundary, repeats, zero, negatives, empty input and input preservation.
-O01 was not implemented. B01 is implemented and awaiting independent verification;
-it is not yet recorded as closed by the reviewer.
+O01 was not implemented. At the round 1 implementer handoff, B01 had been
+implemented but not yet independently verified. The retained reviewer's later
+closure at `ecf50f1eb612edab8cc78aa81e2c477a44b8fb68` is recorded below.
 
 The temporary `src/app/workflow-demo/page.tsx` was removed. No application archive,
 shared behavior, clinic rules, dependency or native role-definition edits were
-introduced. The original source commit/blob and existing visual evidence remain
-auditable. The source tree must equal the base and the production route list must
-omit `/workflow-demo`; live 404 verification remains assigned to the coordinator.
+introduced. The original source commit/blob and visual evidence were retained.
+At the round 1 handoff, source/build checks confirmed equality to the base and
+omission of `/workflow-demo` from the production route list. The implementer had
+not performed a live 404 check; the later root-coordinator observation is recorded
+below.
 
 The contract's representative exercise, Task 00 walkthrough, technical baseline,
 approval/status notes and configuration/bootstrap narratives were preserved in
@@ -223,13 +226,13 @@ and coordinator guidance now link historical configuration evidence without
 changing operational rules. Coordinator-owned Task 03 content is preserved; no
 tracking status, criteria or correction semantics were changed by the implementer.
 
-### Current implementer validation
+### Round 1 implementer checks before publication
 
 These checks ran after correction, route removal and documentation restructuring,
-against the current blobs above. Formatting and link checks were repeated after
+against the round 1 source blobs above. Formatting and link checks were repeated after
 recording these results; no source changed between checks and handoff.
 
-| Exact command                                                          | Exit | Current result                                                                                                                                                                                                          |
+| Exact command                                                          | Exit | Round 1 result                                                                                                                                                                                                          |
 | ---------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `node validation-fixtures/workflow/check.mjs`                          | 0    | All six cases pass, including equality, repeats, zero, negatives, empty input and input preservation                                                                                                                    |
 | `pnpm lint`                                                            | 0    | `eslint .` completed without findings                                                                                                                                                                                   |
@@ -256,7 +259,95 @@ commit and initial fixture blobs locally. The three historical contract sections
 and original status/acceptance text were compared with the prior report head,
 normalizing only whitespace and relocated link paths. JPEG headers confirm the
 recorded image dimensions, and their blobs match the reviewed report head.
-These static checks do not claim a live 404 or the reviewer's final approval.
+At that implementer handoff, these static checks did not constitute a live 404
+observation or an independent review result.
+
+### Root coordinator publication and route-retirement observation
+
+The retained implementer returned the actual working-fixture edit and planned
+cleanup with all checks passing. The root coordinator published its requested changes
+through the approved host bridge as commit
+`23cfb67f767cf9d2d0de4c26e68360f8f614dbe8`. The fixture changed from initial blob
+`8254375ef223ca89b9a7c933db09f0d839f792a7` to corrected blob
+`8957381700e9e31eaf2d333edf280d1389a89ce5`; the runner stayed
+`c186fcbb898ca5b0615d3ca923fa298930461d67`. This is an actual edited/committed
+correction, not selection of a prewritten corrected fixture.
+
+`git diff --exit-code origin/develop..HEAD -- src` passed at that commit: the
+application source matches the exercise base. The root coordinator opened the known
+temporary URL in a fresh supported browser tab after publication; it displayed
+`404` and `This page could not be found.`. The prior tab had been cleaned up, so
+no stale-tab observation was treated as evidence. See
+[retired route](evidence/workflow-route-removed.jpg). The dev server was then
+stopped; screenshots remain as historical evidence of the temporary UI.
+
+### Retained native reviewer recheck at the round 1 evidence head
+
+The same native reviewer independently re-reviewed
+`ecf50f1eb612edab8cc78aa81e2c477a44b8fb68` against base
+`1aa5a3f2c547b19b54f867112b6a64dea9f02b60`. It closed B01 after verifying the
+actual `<=` edit, unchanged direct-import runner and 6/6 passing cases. It also
+independently passed `pnpm lint`, `pnpm typecheck`, `pnpm format:check` and
+`pnpm build`, confirmed `src` matched the base and the route was absent. These
+are round 1 review results, not application checks executed in round 2.
+
+That review opened B02 as blocking: the report/history combined provisional
+round 1 handoff statements with the later published correction and live 404,
+leaving contradictory claims about publication, verification and source state.
+The code fix was independently verified; the evidence-documentation contradiction
+required a separate documentation-only correction. O01 stayed optional and was
+not implemented.
+
+## Stage 4 — Actual correction round 2 documentation handoff
+
+The root coordinator assigned the retained implementer B02 at evidence head
+`ecf50f1eb612edab8cc78aa81e2c477a44b8fb68`. The patch replaced the perpetual
+progress summary with event-based records, attributed provisional working-tree
+statements to the round 1 handoff, and recorded the subsequent correction commit,
+live 404 and B01 closure. It reconciled the archive's retirement note and clarified
+the root coordinator/native relay actors and paraphrased simulations. Initial
+failures, source identities, checks, capture dimensions, approval history and
+publication/tool limitations were preserved.
+
+At the 2026-10-28 round 2 implementer handoff, B02's documentation patch was supplied for
+approved host publication and final independent review of the resulting head.
+This records the handoff event, not an ongoing claim that publication or review
+is pending. The implementer did not publish, dispatch the reviewer or declare B02
+verified. Task/index status is maintained by the root coordinator and approval/
+merge state by GitHub. This was the second and last automatic correction; after
+final review the coordinator delivers an accepted result or hands any unresolved
+blockers to the user. There is no automatic round 3 or counter reset.
+
+### Round 2 documentation checks
+
+The documentation-only patch was checked against reviewed head
+`ecf50f1eb612edab8cc78aa81e2c477a44b8fb68` at the round 2 handoff. Results below
+are documentation/source-identity checks; the earlier application and fixture
+commands were not rerun in this round.
+
+| Exact command                                         | Exit | Round 2 handoff result                                                                                                             |
+| ----------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm format:check`                                   | 0    | All matched files use Prettier style; run after final report updates                                                               |
+| `node "$env:TEMP/myclinics-task03-round2-verify.mjs"` | 0    | 33 local Markdown targets and 9 fragment anchors across report/history and the coordinator-owned task note; external URLs excluded |
+| `git diff --check`                                    | 0    | No whitespace findings                                                                                                             |
+
+The temporary verifier compared all 31 protected application, fixture, native-role,
+visual-reference/evidence and dependency files with their reviewed blobs; all were
+unchanged, including the five initial JPEGs and retirement capture. It confirmed
+the corrected count blob `8957381700e9e31eaf2d333edf280d1389a89ce5`, unchanged
+runner `c186fcbb898ca5b0615d3ca923fa298930461d67`, archived UI blob
+`7e63765858000c4c2d75cb4d82ad5cf963207eec` at source commit
+`67215644845c514ccac788f8dd59113358d0e21e`, and initial defective fixture blob
+`8254375ef223ca89b9a7c933db09f0d839f792a7`. The demo source was absent and `src`
+matched the base. Only the report, history and pre-existing coordinator task note
+differed from the reviewed head; no untracked files existed. Historical role,
+acceptance, exercise, walkthrough and baseline paragraphs were retained, with
+explicit historical framing added. The implementer left the task note untouched.
+
+No browser/server action, Git mutation, PR update, permission change or reviewer
+dispatch was performed in this round 2 implementer assignment. B02 was returned
+as addressed in the documentation patch, requiring the final reviewer's decision
+after root publication; it was not marked reviewer-closed at this handoff.
 
 ## References consulted
 
@@ -273,21 +364,18 @@ Next.js guides under `node_modules/next/dist/docs/` consulted for the task:
 - `01-app/01-getting-started/02-project-structure.md`
 
 Route removal was checked against the installed layout/page and project-structure
-guidance again in this correction. No external documentation update was assumed.
+guidance again during round 1. No external documentation update was assumed.
 
-## Remaining handoff and limitations
+## Recorded operational limitations and optional suggestions
 
-The implementer returns the corrected working tree, check evidence and prepared
-multiline PR update to the coordinator, without retrying the known Git sandbox
-boundary. The coordinator will record the new commit/live 404 and dispatch the
-same reviewer for B01 verification, cleanup review and current-head validation.
-Final task/index updates and narrow independent recheck remain pending. Human
-approval and manual merge remain pending in GitHub; agents never merge.
+At the initial and both correction handoffs, the native sandbox could not write
+Git metadata/access host credentials. Root-coordinator host credentials were
+independently valid. Approved host publication and attachment were performed by
+the root coordinator, not the native relay or implementer. This operational
+limitation does not prove native publication success, and no permission, security
+or settings change was made. A repeatable approved host-publication handoff was
+collected as an optional future workflow improvement.
 
-The native sandbox's inability to write Git metadata/access host credentials is an
-operational limitation. An optional future workflow improvement is documenting a
-repeatable approved host-publication handoff; no permissions or settings changes
-were made to address it. Optional O01 remains for final human PR review. Neither
-optional item blocks execution or consumes a correction round. No readiness claim
-is made before required validation, current-head independent review and final
-tracking review are complete.
+O01, a JSDoc usage example, was collected for human PR review and left unimplemented
+through both correction rounds. Neither optional suggestion triggered an approval
+interruption, expanded implementation scope or consumed a correction round.
