@@ -1,6 +1,6 @@
 # Task 00 — Create the /components screen and unit-test infrastructure
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -37,4 +37,11 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+Planning merged in PR #5. Implementation assigned on 2026-10-29; human acceptance and manual merge of the implementation remain pending.
+
+## Execution context
+
+- Intake on 2026-10-29: planning was merged in PR #5; refreshed `origin/develop` is `86d0a34`. The working tree was clean at intake.
+- Scope and acceptance criteria are ready. Assignment branch: `feature/components-showcase`; base: `86d0a344a7e1e11f932237e5dd571a931615ae33` from refreshed `origin/develop`.
+- Session limitation: the available subagent dispatch interface does not expose native `implementer` or `reviewer` role selection. Reading their configuration files does not verify native loading. The user authorized delegation using the defined agents on 2026-10-29; pass each configuration explicitly to a separate subagent. Do not claim native role loading.
+- Correction rounds used: 0. Implementation checks and visual evidence have not started.
