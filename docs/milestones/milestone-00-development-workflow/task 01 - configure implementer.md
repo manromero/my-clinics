@@ -1,6 +1,6 @@
 # Task 01 — Configure implementer
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -54,7 +54,14 @@ assignment, and a separate bootstrap implementer created the native role.
   launch from the successful persisted run and records external-app limitations.
 - No product code or UI changed; application builds and browser visual comparison
   are not applicable to this configuration/documentation assignment.
-- Independent bootstrap review and final delivery tracking are pending.
+- Independent bootstrap review found no blocking findings or optional suggestions.
+  The native reviewer remains Task 02; bootstrap review does not claim it is configured.
+- Validation passed: native discovery and persisted read-only role launch with five
+  correct scenarios, Prettier, 60 local Markdown links/heading anchors, and
+  `git diff --check`. No correction rounds were needed.
+- Delivery: [PR #2](https://github.com/manromero/my-clinics/pull/2), targeting
+  `develop`. Agent work is complete; human approval and manual merge remain pending
+  in GitHub. This `done` tracking update is included in final review and the PR.
 
 ## Execution context
 
