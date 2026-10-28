@@ -10,6 +10,9 @@ before implementation begins.
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | -------------------------------------------------------------- |
 | [00 — Development workflow](milestone-00-development-workflow/readme.md) | Coordinator, implementer, and reviewer workflow with human PR review and merge | All agent tasks done; human acceptance tracked in GitHub PR #4 |
 
+| [01 — Visual foundations and shared components](milestone-01-shared-components/readme.md) | Components catalogue, visual foundations, basic controls and shared screen structure | Proposed in planning PR; all implementation tasks pending |
+
+Milestone 01 definitions await human approval through merge of their planning PR.
 Further milestones will be added after the user validates their scope and order.
 
 ## Task structure and status
