@@ -1,5 +1,27 @@
 # Task 03 — Workflow validation evidence
 
+## Coordinator correction publication and route-retirement check
+
+The retained implementer returned the actual working-fixture edit and planned
+cleanup with all checks passing. The coordinator published its requested changes
+through the approved host bridge as commit
+`23cfb67f767cf9d2d0de4c26e68360f8f614dbe8`. The fixture changed from initial blob
+`8254375ef223ca89b9a7c933db09f0d839f792a7` to corrected blob
+`8957381700e9e31eaf2d333edf280d1389a89ce5`; the runner stayed
+`c186fcbb898ca5b0615d3ca923fa298930461d67`. This is an actual edited/committed
+correction, not selection of a prewritten corrected fixture.
+
+`git diff --exit-code origin/develop..HEAD -- src` passed at that commit: final
+application source matches the exercise base. The coordinator opened the known
+temporary URL in a fresh supported browser tab after publication; it displayed
+`404` and `This page could not be found.`. The prior tab had been cleaned up, so
+no stale-tab observation was treated as evidence. See
+[retired route](evidence/workflow-route-removed.jpg). The dev server was then
+stopped; screenshots remain as historical evidence of the temporary UI.
+
+Current-head independent re-review remains the next step. B01 is not considered
+closed merely because the implementer and coordinator observed the correction.
+
 Current state: correction round 1 implemented; coordinator publication and the
 same native reviewer's recheck are pending. Task/index remain `in_progress`.
 This report preserves historical failures separately from current validation;
