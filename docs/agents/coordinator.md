@@ -93,9 +93,12 @@ checks, review conclusion, rounds used, optional suggestions, limitations, and
 any concrete decision needed. Readiness requires completed required validation
 and no unresolved blockers; it is not a guarantee that no defects exist.
 
-Keep `in_progress` until the user's merge into `develop` is verified. Then record
-the merge evidence and update the task and index together. Follow the contract's
-explicit direct-acceptance path for documentation tasks when applicable.
+Before ready delivery, mark task and index `done` in the feature branch after
+required checks and independent review pass. Include that tracking commit in final
+review. Explicitly report human approval and manual merge as pending; GitHub tracks
+them. No post-merge status commit or automatic monitor is needed. Keep blocked work
+`in_progress`; reopen a delivered task if new blockers or requested changes require
+implementation. Follow the direct-acceptance path for documentation when applicable.
 
 ## Loading and bootstrap verification
 

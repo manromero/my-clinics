@@ -79,17 +79,17 @@ to the user. Merge strategy and branch protections remain separate decisions.
 
 ## Handoff contract
 
-| Handoff                                    | Required input                                                                                         | Expected output                                                                      | Next responsible role |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | --------------------- |
-| User to coordinator                        | Task/request and approved references                                                                   | Readiness decision; when ready, branch/base and enriched task marked `in_progress`   | Coordinator           |
-| Coordinator to implementer                 | Ready task, execution context, workspace, branch, rules, and checks                                    | Implementation, PR to `develop`, head commit, checks, and evidence                   | Implementer           |
-| Implementer to coordinator                 | PR/head, implementation summary, checks, and limitations                                               | Recorded result and focused independent review assignment                            | Coordinator           |
-| Coordinator to reviewer                    | Task, source references, PR, base/head, checks, and evidence                                           | Independent code, functional, and applicable visual review                           | Reviewer              |
-| Reviewer to coordinator                    | Reviewed commit, blockers, optional findings, evidence, and verification steps                         | Recorded findings; correction assignment within remaining budget, or delivery        | Coordinator           |
-| Coordinator to implementer for corrections | Blockers, expected verification, current head, and round number                                        | Scoped fixes, new head, checks, and responses, returned to coordinator for re-review | Implementer           |
-| Coordinator to user on escalation          | Current state/PR, evidence, attempted resolutions, impact, and concrete question                       | Decision needed to continue                                                          | User                  |
-| Coordinator to user on delivery            | PR, reviewed head, criteria coverage, checks, review result, rounds, optional suggestions, limitations | Human review/manual merge, or direction for blocked work                             | User                  |
-| User merge to coordinator                  | Verified merge into `develop`                                                                          | Task and milestone updated with merge evidence                                       | Coordinator           |
+| Handoff                                    | Required input                                                                                         | Expected output                                                                             | Next responsible role |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- | --------------------- |
+| User to coordinator                        | Task/request and approved references                                                                   | Readiness decision; when ready, branch/base and enriched task marked `in_progress`          | Coordinator           |
+| Coordinator to implementer                 | Ready task, execution context, workspace, branch, rules, and checks                                    | Implementation, PR to `develop`, head commit, checks, and evidence                          | Implementer           |
+| Implementer to coordinator                 | PR/head, implementation summary, checks, and limitations                                               | Recorded result and focused independent review assignment                                   | Coordinator           |
+| Coordinator to reviewer                    | Task, source references, PR, base/head, checks, and evidence                                           | Independent code, functional, and applicable visual review                                  | Reviewer              |
+| Reviewer to coordinator                    | Reviewed commit, blockers, optional findings, evidence, and verification steps                         | Recorded findings; correction assignment within remaining budget, or delivery               | Coordinator           |
+| Coordinator to implementer for corrections | Blockers, expected verification, current head, and round number                                        | Scoped fixes, new head, checks, and responses, returned to coordinator for re-review        | Implementer           |
+| Coordinator to user on escalation          | Current state/PR, evidence, attempted resolutions, impact, and concrete question                       | Decision needed to continue                                                                 | User                  |
+| Coordinator to user on delivery            | PR, reviewed head, criteria coverage, checks, review result, rounds, optional suggestions, limitations | Human review/manual merge, or direction for blocked work                                    | User                  |
+| Coordinator prepares ready delivery        | Implementation, required checks, and independent review complete                                       | Task/index `done` update included in final review and the same PR; human acceptance pending | Coordinator           |
 
 Every review identifies the exact head commit and base reviewed. Any subsequent
 code change requires review of the affected changes and behavior and appropriate
@@ -177,10 +177,15 @@ not a reason to bypass review or silently restart the correction budget.
 - The coordinator updates the task file and milestone index together, following
   the [shared tracking rules](milestones/readme.md#task-structure-and-status).
 
-Use `in_progress` during implementation, review, blocking, and the wait for manual
-merge. Mark a PR-delivered task `done` only after verifying the user's merge into
-`develop`; record the PR and merge commit. A documentation-only task accepted
-directly by the user may instead record that acceptance and become `done` without
+Use `in_progress` during implementation, incomplete checks/review, and blocking.
+After required validation and independent review pass with no blockers, mark task
+and index `done` in the feature branch before delivering the PR. Include the
+tracking change in final review. `done` means agent work is complete and ready for
+human acceptance; GitHub tracks approval and manual merge separately. The final
+handoff explicitly reports these as pending. No post-merge status update or
+automatic monitor is required. Reopen delivered work as `in_progress` when new
+blockers or requested changes require implementation. A documentation-only task
+accepted directly by the user may record that acceptance and become `done` without
 a PR. Record that delivery path explicitly. Task 00 uses this direct-documentation
 path; the user accepted the resulting document on 2026-10-28, completing Task 00.
 
@@ -228,12 +233,13 @@ The following is a desk walkthrough, not an executed agent or PR exercise:
    interrupting corrections or requiring an intermediate user decision.
 4. The implementer fixes the blocker in round 1 and reruns affected checks. The
    reviewer verifies the new head and correction. Passing checks and no remaining
-   blockers allow delivery; the task stays `in_progress` until manual merge.
+   blockers allow the coordinator to include a `done` task/index update in final
+   review and deliver the PR for human acceptance.
 5. If a required check cannot run, the result stays incomplete. If behavior is
    ambiguous or a blocker is disputed, the user receives the concrete decision.
    If blockers persist through round 2, further corrections await user direction.
-6. After the user's merge is verified, the coordinator records merge evidence and
-   updates task and index to `done`. These steps will be exercised in Task 03.
+6. GitHub records human approval and merge; the merged PR already contains the
+   `done` tracking update. These steps will be exercised in Task 03.
 
 ## Technical baseline and remaining work
 
@@ -259,5 +265,10 @@ Later on the same date, the user approved a primary coordinator and separate
 implementer/reviewer agents, followed by explicit authorization to update this
 contract and configure the coordinator. This supersedes the original combined
 implementer/coordinator role; the two-round budget and manual merge remain intact.
+
+The user subsequently approved marking tasks `done` in the deliverable PR after
+agent work and review complete, with human acceptance/merge tracked in GitHub.
+This supersedes the original post-merge status update rule. Task 04's historical
+post-merge closure remains recorded as performed under the earlier rule.
 
 Reference: [official Codex subagent documentation](https://learn.chatgpt.com/docs/agent-configuration/subagents).

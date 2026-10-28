@@ -17,7 +17,7 @@ If `develop` does not exist yet, establish it from the agreed baseline before st
 2. Update `develop` from its remote, if configured, and create the feature branch from it.
 3. Implement and validate the change using the checks in [AGENTS.md](../AGENTS.md).
 4. Publish the feature branch and open a pull request targeting `develop`. Follow the [development workflow contract](development-workflow.md) for separate review, corrections, and evidence.
-5. Present the reviewed PR to the user. The user reviews and manually merges it into `develop`; agents never merge PRs. Keep the task `in_progress` until that merge is verified.
+5. Include the task/index `done` update in the PR once implementation, required checks, and independent review are complete. Ensure final review covers that update. Present it as ready for human acceptance, with approval and merge pending in GitHub. The user reviews and manually merges it into `develop`; agents never merge PRs. No post-merge status commit is required.
 
 ## Releases and tags
 

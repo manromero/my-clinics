@@ -43,7 +43,8 @@ agreed workflow to a reviewable PR and manual user merge.
 - Blockers cause corrections and revalidation before final handoff.
 - Missing evidence, scope ambiguities, and the correction-round limit produce
   the agreed user handoff instead of an unsupported clean result.
-- Task status remains `in_progress` while human approval/merge is pending.
+- The ready PR includes task/index `done` updates covered by final review; human
+  approval and merge remain pending in GitHub. Blocked work stays `in_progress`.
 - The user performs the manual merge; the resulting task notes record it.
 
 ## Validation
