@@ -75,6 +75,12 @@ must state the resulting behavior, scope, acceptance-criteria coverage, validati
 results, and material limitations. Include the task link and current head commit.
 A draft PR can expose blocked work, but must not imply readiness for merge.
 
+For visual changes, include a `Visual evidence` section in the PR description
+with screenshots displayed inline: at least one desktop capture of each changed
+screen, plus a narrow/mobile capture when responsive behavior applies. Follow the
+[capture requirements](#visual-pr-evidence) below. For changes with no visual
+impact, state that visual evidence is not applicable.
+
 Do not force-push, alter branch protections, change repository merge settings, or
 perform release operations as part of an ordinary assignment. Route such needs
 to the user. Merge strategy and branch protections remain separate decisions.
@@ -112,6 +118,30 @@ the implementer's assertions alone are insufficient. Address all perspectives:
   mobile against Alexandria and the relevant Stitch references. Record viewport
   dimensions, screenshots, commit, and observed gaps. For other work, explain why
   visual review does not apply.
+
+### Visual PR evidence
+
+Capture the running application after implementing the change, using the browser
+or screenshot tools available in the session. Use representative states that show
+the delivered behavior; add error, empty, focus or before/after captures only when
+they help assess the change. Screenshots supplement interaction checks.
+
+- The implementer supplies desktop and, when applicable, mobile screenshots. The
+  coordinator ensures they appear inline in the PR before ready delivery; a link
+  to a report alone is insufficient. Attach images to GitHub or use durable image
+  URLs pinned to a commit. Local paths and temporary session URLs are insufficient.
+- Label each image with the screen/state, actual viewport and captured source
+  commit. If image dimensions differ from the viewport, record both. Refresh
+  affected captures after visual corrections; do not present an older UI as the
+  current result.
+- The reviewer checks the images against the running result and relevant design
+  references. Record who captured them and who performed live interactions;
+  disclose unavailable tools rather than implying independent browser checks.
+- Keep only useful delivery evidence. Remove throwaway fixtures, duplicate
+  captures and temporary scripts after validation. Preserve historical evidence
+  through PR attachments or immutable commit links, updating any affected links.
+
+### Findings and validation
 
 Each finding has an identifier, classification, file/line or screen location,
 concrete problem, impact, supporting evidence, and a way to verify correction.

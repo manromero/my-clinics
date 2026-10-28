@@ -7,6 +7,14 @@ claims or additional operational requirements. The source contract and coordinat
 notes are retained at commit `0f2c20bd79b5feb08227ea9ec677a60114b37453`.
 Execution events and review evidence are in the [validation report](workflow-validation.md).
 
+After PR #4 merged, the user requested removal of temporary test artifacts. The
+fixtures, exercise assignment and six captures were removed from the current
+tree; historical links resolve to immutable commit
+`9f9d3c4aea998a013db46524d54f57682235d25a`. The accepted decisions, task records
+and validation reports remain as milestone history. The user also approved the
+visual-PR screenshot requirement in the operational contract and direct delivery
+of this documentation/cleanup change to `develop`, without a separate review.
+
 ## Role configuration and acceptance notes
 
 The contract opened with this status note before relocation:
@@ -156,7 +164,7 @@ preserve the running result. Initial review used report head
 coordinator published route removal and the actual fixture correction in commit
 `23cfb67f767cf9d2d0de4c26e68360f8f614dbe8`, then observed the known temporary
 URL return 404 in a fresh local browser tab and stopped the dev server. The
-[retirement capture](evidence/workflow-route-removed.jpg) records that local
+[retirement capture](https://github.com/manromero/my-clinics/blob/9f9d3c4aea998a013db46524d54f57682235d25a/docs/milestones/milestone-00-development-workflow/evidence/workflow-route-removed.jpg) records that local
 observation; it is not a deployment or active-endpoint claim. The same native
 reviewer independently verified the correction/removal at evidence head
 `ecf50f1eb612edab8cc78aa81e2c477a44b8fb68` and closed B01. That review opened

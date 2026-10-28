@@ -7,6 +7,11 @@ Runtime checks below were performed on uncommitted artifacts over that base.
 Committed delivery and reviewed heads are recorded separately in the PR; the
 runtime results must not be misrepresented as tests run against a later commit.
 
+After the global exercise was merged in PR #4, the user authorized cleanup of
+temporary fixtures. Their historical task/scenarios link below points to immutable
+commit `9f9d3c4aea998a013db46524d54f57682235d25a`. Commands and file paths in
+this report record past validation and are not current checkout instructions.
+
 ## Configuration and boundaries
 
 The project-scoped definition is [`.codex/agents/reviewer.toml`](../../../.codex/agents/reviewer.toml).
@@ -96,7 +101,7 @@ behavior evidence or Task 03's full workflow exercise.
 
 ## Native runtime verification
 
-Use the [fixture task and scenarios](../../../validation-fixtures/reviewer/README.md).
+Use the [fixture task and scenarios](https://github.com/manromero/my-clinics/blob/9f9d3c4aea998a013db46524d54f57682235d25a/validation-fixtures/reviewer/README.md).
 The coordinator ran fresh `codex -C <repository> -c features.apps=false debug prompt-input`
 and found the exact native reviewer description. It then used a normal persisted
 `codex -C <repository> -c features.apps=false -a never exec --sandbox read-only --json`

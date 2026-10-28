@@ -35,7 +35,7 @@ Product ambiguities, scope changes, and unresolved review disagreements return
 to the user. The approved limit is two automatic correction rounds after the
 initial review. See the [development workflow contract](../../development-workflow.md)
 for everyday handoffs, evidence and escalation; the
-[exercise](workflow-exercise.md), [validation report](workflow-validation.md) and
+[exercise](https://github.com/manromero/my-clinics/blob/9f9d3c4aea998a013db46524d54f57682235d25a/docs/milestones/milestone-00-development-workflow/workflow-exercise.md), [validation report](workflow-validation.md) and
 [history](workflow-history.md) preserve the milestone-specific demonstration.
 
 ## Submilestones and tasks

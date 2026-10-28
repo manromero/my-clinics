@@ -6,6 +6,12 @@ publication and review events supersede their provisional observations. Task 03
 and the milestone index own task status; GitHub owns PR approval and merge state.
 This report does not act as a live status summary.
 
+After PR #4 was merged, the user authorized removal of the throwaway fixtures,
+exercise assignment and local screenshot files. Those artifacts remain available
+at immutable commit `9f9d3c4aea998a013db46524d54f57682235d25a`; links below point
+to that archive. Paths and commands in historical results describe the validation
+at the time, not files or tests that remain in the current checkout.
+
 ## Closing review and delivery record
 
 After root publication of round 2 commit
@@ -42,7 +48,7 @@ self-referencing commit identifier here.
   `ecf50f1eb612edab8cc78aa81e2c477a44b8fb68`.
 - [PR #4](https://github.com/manromero/my-clinics/pull/4) was opened as a draft
   targeting `develop`; its evolving approval/merge state is recorded in GitHub.
-- Scope: [approved exercise](workflow-exercise.md) and
+- Scope: [approved exercise](https://github.com/manromero/my-clinics/blob/9f9d3c4aea998a013db46524d54f57682235d25a/docs/milestones/milestone-00-development-workflow/workflow-exercise.md) and
   [Task 03](<task 03 - validate workflow.md>).
 - Runtime: Node `v24.14.0`, pnpm `11.25.0`, Next.js `16.4.3`.
 
@@ -165,13 +171,13 @@ source commit `67215644845c514ccac788f8dd59113358d0e21e`, not the later report h
 | Browser console    | Captured error log list was empty                                                                                               |
 | Visual observation | Visible card/content, no horizontal overflow, serif heading, tonal rounded surfaces, blue gradient action; mobile actions stack |
 
-| Evidence                                                               | State                        | Image dimensions |
-| ---------------------------------------------------------------------- | ---------------------------- | ---------------- |
-| [Desktop pending](evidence/workflow-desktop-pending.jpg)               | Initial state                | 1440×858         |
-| [Desktop completed](evidence/workflow-desktop-completed.jpg)           | Disabled primary             | 1440×858         |
-| [Desktop keyboard focus](evidence/workflow-desktop-keyboard-focus.jpg) | Visible focus                | 1440×858         |
-| [Mobile pending](evidence/workflow-mobile-pending.jpg)                 | Fresh load / stacked actions | 390×843          |
-| [Mobile completed](evidence/workflow-mobile-completed.jpg)             | Completed state              | 390×843          |
+| Evidence                                                                                                                                                                                                       | State                        | Image dimensions |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ---------------- |
+| [Desktop pending](https://github.com/manromero/my-clinics/blob/9f9d3c4aea998a013db46524d54f57682235d25a/docs/milestones/milestone-00-development-workflow/evidence/workflow-desktop-pending.jpg)               | Initial state                | 1440×858         |
+| [Desktop completed](https://github.com/manromero/my-clinics/blob/9f9d3c4aea998a013db46524d54f57682235d25a/docs/milestones/milestone-00-development-workflow/evidence/workflow-desktop-completed.jpg)           | Disabled primary             | 1440×858         |
+| [Desktop keyboard focus](https://github.com/manromero/my-clinics/blob/9f9d3c4aea998a013db46524d54f57682235d25a/docs/milestones/milestone-00-development-workflow/evidence/workflow-desktop-keyboard-focus.jpg) | Visible focus                | 1440×858         |
+| [Mobile pending](https://github.com/manromero/my-clinics/blob/9f9d3c4aea998a013db46524d54f57682235d25a/docs/milestones/milestone-00-development-workflow/evidence/workflow-mobile-pending.jpg)                 | Fresh load / stacked actions | 390×843          |
+| [Mobile completed](https://github.com/manromero/my-clinics/blob/9f9d3c4aea998a013db46524d54f57682235d25a/docs/milestones/milestone-00-development-workflow/evidence/workflow-mobile-completed.jpg)             | Completed state              | 390×843          |
 
 Viewport overrides were reset after testing. The comparison used Alexandria and
 the activity Stitch reference as visual language, not a product-screen replica.
@@ -300,7 +306,7 @@ application source matches the exercise base. The root coordinator opened the kn
 temporary URL in a fresh supported browser tab after publication; it displayed
 `404` and `This page could not be found.`. The prior tab had been cleaned up, so
 no stale-tab observation was treated as evidence. See
-[retired route](evidence/workflow-route-removed.jpg). The dev server was then
+[retired route](https://github.com/manromero/my-clinics/blob/9f9d3c4aea998a013db46524d54f57682235d25a/docs/milestones/milestone-00-development-workflow/evidence/workflow-route-removed.jpg). The dev server was then
 stopped; screenshots remain as historical evidence of the temporary UI.
 
 ### Retained native reviewer recheck at the round 1 evidence head

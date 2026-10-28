@@ -103,6 +103,13 @@ checks, review conclusion, rounds used, optional suggestions, limitations, and
 any concrete decision needed. Readiness requires completed required validation
 and no unresolved blockers; it is not a guarantee that no defects exist.
 
+For visual work, ensure the PR description displays desktop screenshots and
+mobile screenshots when responsive behavior applies, with state, viewport and
+source commit labels. Follow the contract's
+[visual evidence requirements](../development-workflow.md#visual-pr-evidence),
+including refreshed captures after visual corrections, attribution of live checks
+and removal of throwaway test artifacts before delivery.
+
 Before ready delivery, mark task and index `done` in the feature branch after
 required checks and independent review pass. Include that tracking commit in final
 review. Explicitly report human approval and manual merge as pending; GitHub tracks

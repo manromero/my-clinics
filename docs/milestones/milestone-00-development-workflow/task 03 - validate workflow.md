@@ -106,7 +106,7 @@ existing visual-reference files so required application checks can pass.
 
 - Branch: `feature/validate-workflow`, from updated `origin/develop`.
 - Base: `1aa5a3f2c547b19b54f867112b6a64dea9f02b60`.
-- Scope and criteria: [global exercise assignment](workflow-exercise.md).
+- Scope and criteria: [global exercise assignment](https://github.com/manromero/my-clinics/blob/9f9d3c4aea998a013db46524d54f57682235d25a/docs/milestones/milestone-00-development-workflow/workflow-exercise.md).
 - Readiness: approved three-role workflow, native definitions and GitHub access
   available; no product decisions missing. Normal usage is available again.
 - References: `AGENTS.md`, operational contract, coordinator/native role files,
