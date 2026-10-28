@@ -12,6 +12,8 @@ agreed workflow to a reviewable PR and manual user merge.
 - Use the representative task or exercise validated in Task 00.
 - Exercise assignment, implementation, required checks, PR creation targeting
   `develop`, and separate review.
+- Exercise coordinator readiness checks, branch setup, sourced task context,
+  sequential delegation, correction counting, and ready/blocked final delivery.
 - Demonstrate a blocking finding, a correction, and revalidation; use an exercise
   fixture rather than introducing defects into product changes.
 - Demonstrate scope-question escalation and bounded correction rounds.
@@ -27,12 +29,15 @@ agreed workflow to a reviewable PR and manual user merge.
 
 - [Task 01 — Configure implementer](<task 01 - configure implementer.md>).
 - [Task 02 — Configure reviewer](<task 02 - configure reviewer.md>).
+- [Task 04 — Configure coordinator](<task 04 - configure coordinator.md>).
 - User validation of the representative exercise and any external actions it
   requires under the workflow contract.
 
 ## Acceptance criteria
 
-- The agreed workflow runs with two separate roles and preserves task scope.
+- The agreed workflow runs with three separate roles and preserves task scope.
+- The final review after correction round 2 leads to coordinator delivery or
+  escalation, never a third automatic correction.
 - A PR targeting `develop` contains a clear change and validation description.
 - Code, functional, and applicable visual reviews produce verifiable results.
 - Blockers cause corrections and revalidation before final handoff.

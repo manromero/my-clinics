@@ -37,7 +37,7 @@ See the [Tailwind CSS guide for Next.js](https://tailwindcss.com/docs/installati
 
 - [Agent instructions](AGENTS.md)
 - [Git workflow](docs/git-workflow.md): `develop` → feature branch → `develop` → `main`, followed by a release tag on `main`.
-- [Development workflow contract](docs/development-workflow.md): task intake, implementer and separate reviewer roles, two correction rounds, evidence, and manual user merge. Role configuration is pending Milestone 00.
+- [Development workflow contract](docs/development-workflow.md): coordinator intake and delivery, separate implementer and reviewer, two correction rounds, evidence, and manual user merge. Coordinator configuration is tracked in Milestone 00 Task 04; delegated roles remain pending.
 - [Architecture and shared components](docs/architecture.md): application organization and shared component conventions.
 - [Requirements](docs/requirements.md): confirmed scope, business rules, and acceptance criteria.
 - [Milestones and tasks](docs/milestones/readme.md): validated milestones, task definitions, and progress tracking.

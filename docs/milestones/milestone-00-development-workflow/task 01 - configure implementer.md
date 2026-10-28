@@ -12,16 +12,19 @@ workflow contract from [Task 00](<task 00 - define workflow.md>).
 - Create the role instructions and configuration agreed in Task 00.
 - Require reading the assigned task, project instructions, requirements, and
   relevant architecture and design references before implementation.
-- Follow the project Git workflow from `develop`, preserving unrelated work.
+- Receive the coordinator's prepared branch and execution context, based on
+  `develop`, and preserve unrelated work without creating another assignment branch.
 - Implement only the assigned scope and run the checks appropriate to the change.
 - Open a PR targeting `develop`, describing the result, acceptance-criteria
   coverage, checks, and material limitations.
-- Address blocking findings and hand corrected work back to the reviewer.
-- Update task progress and status according to the shared rules.
+- Return implementation evidence and blocking corrections to the coordinator,
+  which dispatches review and owns the two-round correction budget.
+- Supply progress evidence to the coordinator, which owns task/index tracking.
 
 ## Dependencies
 
-Task 00 is complete and its configuration decisions have been validated.
+Task 00 is complete, the three-role revision is approved, and
+[Task 04 — Configure coordinator](<task 04 - configure coordinator.md>) is complete.
 
 ## Acceptance criteria
 
@@ -29,7 +32,8 @@ Task 00 is complete and its configuration decisions have been validated.
 - Product ambiguities and scope changes return to the user.
 - Failed or unavailable checks are reported accurately.
 - Changes following review trigger the required revalidation.
-- The implementer hands off to the reviewer and never merges its PR.
+- The implementer hands off to the coordinator for independent review and never
+  merges its PR or takes over coordination.
 
 ## Validation
 
@@ -39,5 +43,5 @@ links; run any configuration checks supported by that tooling.
 
 ## Progress notes
 
-Not started. Task 00 was accepted by the user on 2026-10-28; its dependency is
-satisfied. Implement the role against the approved workflow contract.
+Not started. Task 00 is accepted; awaiting Task 04 under the approved three-role
+revision. Configure a delegated implementer receiving a ready task and branch.
