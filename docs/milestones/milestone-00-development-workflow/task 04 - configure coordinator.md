@@ -73,3 +73,5 @@ Full delegated role loading and the real workflow exercise remain Tasks 01–03.
   53 local Markdown links with referenced heading anchors, and `git diff --check`.
   Application checks are not applicable to this configuration/documentation change.
 - Delivery remains subject to human review and manual merge into `develop`.
+- Delivery: [PR #1](https://github.com/manromero/my-clinics/pull/1), targeting
+  `develop`. Remains `in_progress` while human review and manual merge are pending.
