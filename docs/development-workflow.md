@@ -3,8 +3,10 @@
 Status: workflow decisions and documentation accepted by the user on 2026-10-28.
 Task 00 is complete. The user subsequently approved a coordinator, implementer,
 and reviewer. Coordinator configuration is complete in Task 04; native implementer
-configuration is delivered through Task 01, with reviewer configuration and the
-full execution exercise remaining Tasks 02–03 of
+configuration is delivered through Task 01. Task 02 provides the native reviewer;
+its [validation report](milestones/milestone-00-development-workflow/reviewer-validation.md)
+separates local checks from native installation and runtime verification. The full
+execution exercise remains Task 03 of
 [Milestone 00](milestones/milestone-00-development-workflow/readme.md).
 
 ## Assignment and readiness
@@ -36,14 +38,19 @@ and manages final PR delivery. Follow its [role instructions](agents/coordinator
 activated through repository `AGENTS.md` in Task 04.
 
 Separate implementer and reviewer agents receive focused assignments and their own
-context. Only the implementer edits application code, runs implementation checks,
+context. Start fresh agents for each task with selected context, excluding unrelated
+conversation; reuse the same implementer and reviewer during that task's correction
+and re-review rounds. Do not carry task agents over to another assignment.
+Only the implementer edits application code, runs implementation checks,
 and creates the PR; the reviewer independently reports findings and evidence.
 The coordinator preserves those conclusions and does not replace either role.
 Use sequential handoffs and one writer at a time in a shared checkout.
 
 Project-scoped delegated role instructions are versioned under `.codex/agents/`.
 Task 01 provides the native [`implementer`](../.codex/agents/implementer.toml);
-Task 02 will add the reviewer. Select the configured role when dispatching rather
+Task 02 provides the native [`reviewer`](../.codex/agents/reviewer.toml), with actual
+loading and behavior evidence recorded in its validation report.
+Select the configured role when dispatching rather
 than relying on a generic worker's name. Verify actual loading; file existence alone is insufficient.
 If native loading is unavailable, obtain agreement on explicit-instruction fallback
 before claiming configuration complete. Bootstrap review of coordinator setup may
@@ -255,10 +262,14 @@ environment. `main` was the default branch; both branches were unprotected, all
 three merge methods were enabled, and there were no open PRs.
 
 These are observations, not permanent guarantees. Recheck access and remote state
-when starting work. No test PR has been created, and branch protection, merge
-strategy, and role loading have not been configured or validated. GitHub API and
-push access are established; full validation follows coordinator setup (Task 04)
-and delegated role configuration (Tasks 01–02), with the exercise in Task 03.
+when starting work. At that baseline, no test PR had been created, and branch
+protection, merge strategy and role loading had not been configured or validated.
+The [coordinator](milestones/milestone-00-development-workflow/coordinator-validation.md)
+and [implementer](milestones/milestone-00-development-workflow/implementer-validation.md)
+records describe subsequent loading checks. Task 02's
+[reviewer report](milestones/milestone-00-development-workflow/reviewer-validation.md)
+records native installation and runtime checks; full workflow validation remains
+the exercise in Task 03.
 
 The user approved coordination, the two-round limit, evidence locations, and the
 representative exercise on 2026-10-28. Merge strategy and branch protections remain

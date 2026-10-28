@@ -1,6 +1,6 @@
 # Task 02 — Configure reviewer
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -47,6 +47,47 @@ distinguishes them and rechecks a correction. Validate links and formatting.
 
 ## Progress notes
 
-Not started. Tasks 00 and 04 are complete; dependencies are satisfied under the
-approved three-role revision. Configure independent review with handoff through
-the coordinator.
+Started after coordinator readiness checks and verification of Task 01's merge.
+
+- A fresh native implementer created the definition and fixture. Its sandbox
+  rejected native-path writes; the coordinator installed the exact staged TOML
+  through approved escalation and verified its SHA-256. The duplicate was removed.
+- Native discovery and actual native reviewer launch succeeded. One fresh reviewer
+  independently reproduced the initial blocker, rechecked the corrected artifact,
+  separated optional feedback, explained visual N/A, and respected both policy
+  simulations. The same reviewer was retained throughout this task's handoffs.
+- [Validation evidence](reviewer-validation.md) records commands, native role and
+  session receipts, results, limitations, and the distinction between fixture
+  scenarios and actual implementation correction rounds (0).
+- Changed-file formatting, installed TOML parsing, ESLint, and 76 local Markdown
+  links/heading anchors passed. Global formatting still reports five unchanged
+  visual references; they are outside this task and were preserved.
+- Independent bootstrap configuration review found no blockers after verifying
+  the native receipts and directly checking the definition and fixtures. The
+  native final-review continuation was interrupted by CLI quota before a verdict;
+  it is not represented as a passing native review.
+- Delivery: [PR #3](https://github.com/manromero/my-clinics/pull/3), targeting
+  `develop`. Agent work is complete; human approval and manual merge remain pending
+  in GitHub. The `done` update is included in final tracking review and this PR.
+- Implementation correction rounds used: 0. The coordinator repaired the staging
+  link and evidence wording before the first completed configuration review;
+  fixture transitions were simulations, not implementation correction rounds.
+
+## Execution context
+
+- Readiness: the user assigned Task 02; scope and acceptance criteria are defined.
+  Tasks 00/04 are complete, and PR #2 was verified merged into `develop`.
+- Branch: `feature/configure-reviewer`, from updated `origin/develop`.
+- Base commit: `b1c474d14758afcf1565304dde1afdc234e3ed7c`.
+- References: `AGENTS.md`, workflow contract, coordinator role, native implementer,
+  and official Codex custom-agent documentation.
+- Target: native `.codex/agents/reviewer.toml`, inherited settings, three review
+  perspectives, concrete blocking/optional findings, current-head evidence, and
+  coordinator handoff without edits, merge, or automatic third correction.
+- Include fresh agents with selected context per task; retain those agents for
+  that task's correction/review rounds. Do not inherit unrelated conversation.
+- Validation: native discovery/launch and a bounded fixture with a known blocker,
+  optional finding, and corrected version; check missing evidence and round limits.
+  Fixtures are outside production routes. No product/UI changes are assigned.
+- Tracking: coordinator owns task/index; `done` is included in final reviewed PR
+  before human acceptance. Correction rounds used: 0.

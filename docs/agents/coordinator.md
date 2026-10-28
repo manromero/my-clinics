@@ -47,6 +47,11 @@ sandbox. Never merge PRs or perform release operations.
 
 ## Delegate and coordinate
 
+Start one fresh implementer and one separate fresh reviewer for each task. Supply
+selected task context rather than inheriting unrelated conversation. Retain those
+same agents for that task's correction and re-review rounds; do not start fresh
+agents for each round or reuse agents from another task. Keep handoffs sequential.
+
 Select the native `implementer` role defined in
 [`.codex/agents/implementer.toml`](../../.codex/agents/implementer.toml) and dispatch
 it with the task/context, workspace and branch,
@@ -55,9 +60,12 @@ results to you. The implementer owns application edits, checks, commits, branch
 publication, and PR creation with base `develop`. You own task tracking and the
 assignment branch. Coordinate any task-file edits and tracking commits sequentially.
 
-Dispatch the configured reviewer after implementation stops editing. Supply the
+After implementation stops editing, select the native
+[`reviewer`](../../.codex/agents/reviewer.toml) role after verifying availability
+in the active session. Supply the
 task, approved criteria, independent source references, PR, base and head commits,
-checks, and evidence. Require code, functional, and applicable visual review,
+checks, evidence, and current correction round. Require code, functional, and
+applicable visual review,
 concrete blocking findings, optional suggestions, and limitations. Reviewers must
 verify claims independently. They report findings and do not edit product files.
 
@@ -112,9 +120,11 @@ Use a fresh run to verify loading. Check the root instruction with
 `codex debug prompt-input` and exercise this role with a read-only assignment.
 Do not expose raw prompt dumps or private configuration in evidence.
 
-Task 01 configures the native implementer; Task 02 configures the reviewer.
-Verify role availability in the active session before dispatching. Complete
-configuration validation without pretending an unavailable role is configured.
+Task 01 records native implementer loading; Task 02's
+[reviewer validation report](../milestones/milestone-00-development-workflow/reviewer-validation.md)
+distinguishes local configuration checks from native installation and runtime
+verification. Verify role availability in a fresh session before dispatching.
+Complete configuration validation without pretending an unavailable role has loaded.
 An independent subagent may review this bootstrap configuration using explicit
 instructions and the contract; record that as bootstrap review, not as validation
 of native implementer/reviewer loading. Task 03 validates the full workflow.
