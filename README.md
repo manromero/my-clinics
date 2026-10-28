@@ -38,17 +38,20 @@ See the [Tailwind CSS guide for Next.js](https://tailwindcss.com/docs/installati
 - [Agent instructions](AGENTS.md)
 - [Git workflow](docs/git-workflow.md): `develop` → feature branch → `develop` → `main`, followed by a release tag on `main`.
 - [Architecture and shared components](docs/architecture.md): application organization and shared component conventions.
+- [Requirements](docs/requirements.md): confirmed scope, business rules, and acceptance criteria.
+- [Screens](docs/screens.md): proposed screens, functionality, forms, navigation, and links to the Google Stitch visual references.
+- [Alexandria design guidance](docs/screens/alexandria/DESIGN.md): visual language used by the reference screens in `docs/screens/`.
 
 All project documentation is maintained in English.
 
-The reference spreadsheet is kept in the parent directory, outside the application source. Excel files are excluded from Git.
+The reference spreadsheet is kept in `docs/`, alongside the [requirements specification](docs/requirements.md). Excel files are excluded from Git.
 
 ## Initial scope
 
-1. Manage clinics and percentages by activity type.
+1. Manage clinics, each with a default percentage and active/inactive state.
 2. Record activity with percentage-based fees or direct amounts.
 3. Display a monthly summary by clinic.
 
-These modules have not been implemented yet. Invoicing, amount reconciliation, and AI integration are planned for later iterations.
+These modules have not been implemented yet. Their behavior is defined in the requirements and screens documents above.
 
 See the [official Next.js installation guide](https://nextjs.org/docs/app/getting-started/installation).

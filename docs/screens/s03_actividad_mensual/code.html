@@ -1,0 +1,570 @@
+<!DOCTYPE html><html lang="es" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_standard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&amp;family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"surface-variant":"#e3e2e3","surface-container-low":"#f5f3f4","on-tertiary-fixed-variant":"#524600","on-surface-variant":"#434653","primary-container":"#3366cc","secondary-fixed-dim":"#c2c7cc","primary-fixed":"#d9e2ff","surface-container-highest":"#e3e2e3","on-secondary-fixed-variant":"#42474b","on-tertiary-fixed":"#211b00","secondary":"#5a5f63","inverse-surface":"#303031","on-primary":"#ffffff","tertiary-fixed":"#f9e37a","on-surface":"#1b1c1d","surface-dim":"#dbdadb","on-primary-fixed-variant":"#00419d","secondary-fixed":"#dfe3e8","inverse-on-surface":"#f2f0f1","primary-fixed-dim":"#b1c5ff","tertiary-fixed-dim":"#dcc661","outline":"#737784","surface-tint":"#2259bf","inverse-primary":"#b1c5ff","on-primary-container":"#e7ebff","surface-bright":"#faf9fa","primary":"#094cb2","error":"#ba1a1a","surface-container-high":"#e9e8e9","surface-container":"#efedee","on-tertiary":"#ffffff","on-secondary":"#ffffff","on-background":"#1b1c1d","on-tertiary-container":"#4a3f00","surface":"#faf9fa","tertiary-container":"#bfab49","outline-variant":"#c3c6d5","error-container":"#ffdad6","on-secondary-container":"#606569","secondary-container":"#dfe3e8","surface-container-lowest":"#ffffff","background":"#faf9fa","on-secondary-fixed":"#171c20","on-error-container":"#93000a","on-primary-fixed":"#001946","tertiary":"#6d5e00","on-error":"#ffffff"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{},"fontFamily":{"headline":["Noto Serif"],"display":["Noto Serif"],"body":["Inter"],"label":["Public Sans"]},"fontSize":{}}}}</script></head><body class="bg-surface font-body text-on-surface antialiased"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-6"><div class="flex items-center gap-3 shrink-0"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-on-primary shadow-sm"><span class="material-symbols-outlined text-[22px]">dentistry</span></div><div class="flex flex-col"><span class="text-lg font-headline font-bold tracking-tight text-on-surface leading-none">MyClinics</span><span class="text-[11px] font-label font-medium text-on-surface-variant tracking-normal mt-1">Gestión de clínicas y actividad dental</span></div></div><nav class="hidden xl:flex items-center gap-1.5 bg-surface-container-low px-2 py-1.5 rounded-xl" data-active-classes="bg-surface-container text-primary font-semibold shadow-sm"><a aria-current="page" class="px-3.5 py-1.5 rounded-lg transition-all duration-150 bg-surface-container text-primary font-semibold shadow-sm" data-path="actividad" href="#">Actividad</a><a class="px-3.5 py-1.5 text-xs font-label font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all duration-150" data-path="resumen" href="#">Resumen</a><a class="px-3.5 py-1.5 text-xs font-label font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all duration-150" data-path="clinicas" href="#">Clínicas</a><a class="px-3.5 py-1.5 text-xs font-label font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all duration-150" data-path="ajustes" href="#">Ajustes</a></nav><div class="flex items-center gap-4 shrink-0"><div class="hidden md:flex flex-col text-right"><div class="flex items-center justify-end gap-1.5"><span class="text-xs font-semibold text-on-surface tracking-tight font-body">Dra. Ana Hurtado</span><span class="px-1.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed text-[10px] font-label font-medium tracking-wide">Europe/Madrid</span></div><span class="text-[11px] text-on-surface-variant font-label">ana.odontologia@gmail.com</span></div><a class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-label font-medium text-error hover:bg-error-container hover:text-on-error-container transition-all duration-150" data-path="login" href="#"><span class="material-symbols-outlined text-[16px]">logout</span>Cerrar sesión</a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-20 bg-surface min-h-[calc(100vh-140px)]"><div class="flex flex-col w-full">
+<div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 py-8 flex flex-col gap-8">
+<!-- Top Bar: Period Switcher, Clinic Filter & Editorial Header -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-2">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="text-[11px] font-label font-bold tracking-widest uppercase text-tertiary">Libro de Registro Profesional</span>
+<span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+<span class="text-[11px] font-label font-medium text-on-surface-variant">Ejercicio Fiscal 2026</span>
+</div>
+<h1 class="text-3xl sm:text-4xl font-headline font-bold text-on-surface tracking-tight leading-tight">
+          Actividad Mensual
+        </h1>
+<p class="text-xs sm:text-sm font-body text-secondary max-w-xl">
+          Registro detallado de honorarios devengados, actos clínicos con concepto libre y repercusión de retenciones profesionales.
+        </p>
+</div>
+<!-- Controls: Month & Clinic Filter -->
+<div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto"><div class="inline-flex items-center bg-surface-container-low p-1 rounded-xl shadow-sm"><button class="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" id="btnPrevMonth" title="Mes anterior"><span class="material-symbols-outlined text-[18px]">chevron_left</span></button><div class="px-3 flex items-center gap-2"><span class="material-symbols-outlined text-[17px] text-primary">calendar_month</span><span class="text-xs font-label font-bold tracking-wide text-on-surface uppercase">Octubre 2026</span></div><button class="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" id="btnNextMonth" title="Mes siguiente"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button></div><div class="relative inline-flex items-center flex-1 sm:flex-initial"><label class="sr-only" for="filterClinicSelect">Filtrar por clínica</label><div class="flex items-center bg-surface-container-low rounded-xl px-3 py-2 shadow-sm text-xs font-label font-medium text-on-surface w-full sm:w-auto"><span class="material-symbols-outlined text-[18px] text-on-surface-variant mr-2">storefront</span><select class="bg-transparent text-xs font-label font-semibold text-on-surface focus:outline-none cursor-pointer pr-6 appearance-none w-full" id="filterClinicSelect"><option value="all">Todas las clínicas</option><option value="Gran Vía">Clínica Gran Vía (30%)</option><option value="Norte">Dental Norte (25%)</option><option value="Alcorcón">Alcorcón Dental (35%)</option><option value="Montecarmelo">Montecarmelo (28%)</option><option value="San Jerónimo">Dental San Jerónimo (Inactiva)</option></select><span class="material-symbols-outlined text-[16px] text-on-surface-variant pointer-events-none -ml-4">arrow_drop_down</span></div></div><a class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-surface-container-high hover:bg-surface-dim text-primary hover:text-on-primary-fixed-variant text-xs font-label font-semibold transition-all duration-150 shadow-sm w-full sm:w-auto" data-path="resumen" href="#"><span class="">Ver Resumen de Octubre</span><span class="material-symbols-outlined text-[16px]">arrow_forward</span></a></div>
+</div>
+<!-- Quick Metric Cards with Architectural Balance -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"><div class="bg-surface-container-lowest p-4 sm:p-5 rounded-xl flex flex-col justify-between shadow-sm relative overflow-hidden"><div class="flex items-center justify-between"><span class="text-[11px] font-label font-semibold uppercase tracking-wider text-secondary">Facturación Total</span><span class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">receipt_long</span></span></div><div class="mt-3 sm:mt-4 flex flex-col"><div class="text-2xl font-headline font-bold text-on-surface tracking-tight" id="metricTotalFacturado">4.850,00 €</div><span class="text-[11px] font-label text-on-surface-variant mt-0.5">Base asistencial declarada</span></div><div class="w-full bg-surface-container h-1 rounded-full mt-3 overflow-hidden"><div class="bg-primary h-full w-[78%] rounded-full"></div></div></div><div class="bg-surface-container-lowest p-4 sm:p-5 rounded-xl flex flex-col justify-between shadow-sm"><div class="flex items-center justify-between"><span class="text-[11px] font-label font-semibold uppercase tracking-wider text-secondary">Ganancia Bruta</span><span class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary"><span class="material-symbols-outlined text-[18px]">account_balance_wallet</span></span></div><div class="mt-3 sm:mt-4 flex flex-col"><div class="text-2xl font-headline font-bold text-on-surface tracking-tight" id="metricGananciaBruta">1.425,50 €</div><span class="text-[11px] font-label text-on-surface-variant mt-0.5">Honorarios según porcentaje/pacto</span></div><div class="w-full bg-surface-container h-1 rounded-full mt-3 overflow-hidden"><div class="bg-primary-container h-full w-[65%] rounded-full"></div></div></div><div class="bg-surface-container-lowest p-4 sm:p-5 rounded-xl flex flex-col justify-between shadow-sm"><div class="flex items-center justify-between"><span class="text-[11px] font-label font-semibold uppercase tracking-wider text-secondary">IRPF Retenido (15%)</span><span class="w-8 h-8 rounded-lg bg-error-container/40 flex items-center justify-center text-error"><span class="material-symbols-outlined text-[18px]">gavel</span></span></div><div class="mt-3 sm:mt-4 flex flex-col"><div class="text-2xl font-headline font-bold text-error tracking-tight" id="metricIRPF">-213,83 €</div><span class="text-[11px] font-label text-on-surface-variant mt-0.5">Retención fiscal Modelo 130</span></div><div class="w-full bg-surface-container h-1 rounded-full mt-3 overflow-hidden"><div class="bg-error h-full w-[15%] rounded-full"></div></div></div><div class="bg-gradient-to-br from-primary to-primary-container p-4 sm:p-5 rounded-xl flex flex-col justify-between shadow-sm text-on-primary"><div class="flex items-center justify-between"><span class="text-[11px] font-label font-semibold uppercase tracking-wider text-on-primary-container">Neto a Cobrar</span><span class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-on-primary"><span class="material-symbols-outlined text-[18px]">payments</span></span></div><div class="mt-3 sm:mt-4 flex flex-col"><div class="text-2xl font-headline font-bold text-white tracking-tight" id="metricNetoCobrar">1.211,67 €</div><span class="text-[11px] font-label text-on-primary-container mt-0.5">Líquido estimado a percibir</span></div><div class="w-full bg-white/20 h-1 rounded-full mt-3 overflow-hidden"><div class="bg-white h-full w-full rounded-full"></div></div></div></div>
+<!-- Main Container: Inline Quick Addition & Chronological Journal -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden flex flex-col">
+<!-- SECTION: INLINE ROW ADDITION (TOP OF TABLE) -->
+<div class="bg-surface-container-low p-4 sm:p-6 flex flex-col gap-4">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<h2 class="text-sm font-label font-bold text-on-surface uppercase tracking-wide">
+              Añadir nueva actividad rápida
+            </h2>
+<span class="text-xs font-body text-secondary">• Registro directo en libro diario</span>
+</div>
+<span class="text-[11px] font-label text-on-surface-variant">Los cálculos de honorarios e IRPF se procesan en tiempo real</span>
+</div>
+<!-- Inline Entry Form -->
+<form class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end w-full" id="inlineActivityForm" onsubmit="event.preventDefault(); handleAddActivity();"><div class="flex flex-col gap-1 md:col-span-2"><label class="text-[11px] font-label font-semibold text-on-surface-variant" for="newFecha">Fecha</label><input class="w-full h-10 px-3 rounded-lg bg-surface-container-lowest text-xs font-body text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" id="newFecha" required="" type="date" value="2026-10-28"></div><div class="flex flex-col gap-1 md:col-span-2"><label class="text-[11px] font-label font-semibold text-on-surface-variant" for="newClinica">Clínica</label><select class="w-full h-10 px-3 rounded-lg bg-surface-container-lowest text-xs font-body text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm appearance-none cursor-pointer" id="newClinica" onchange="updateCalcPreview()" required=""><option data-rate="30" value="Gran Vía">Gran Vía (30%)</option><option data-rate="25" value="Norte">Dental Norte (25%)</option><option data-rate="35" value="Alcorcón">Alcorcón Dental (35%)</option><option data-rate="28" value="Montecarmelo">Montecarmelo (28%)</option></select></div><div class="flex flex-col gap-1 sm:col-span-2 md:col-span-3"><label class="text-[11px] font-label font-semibold text-on-surface-variant" for="newConcepto">Concepto (Texto Libre)</label><input class="w-full h-10 px-3.5 rounded-lg bg-surface-container-lowest text-xs font-body text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" id="newConcepto" placeholder="Ej. Endodoncia molar 16, Limpieza, Corona..." required="" type="text"></div><div class="flex flex-col gap-1 md:col-span-2"><label class="text-[11px] font-label font-semibold text-on-surface-variant" for="newImporte">Importe Bruto (€)</label><input class="w-full h-10 px-3 rounded-lg bg-surface-container-lowest text-xs font-body text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm font-semibold" id="newImporte" oninput="updateCalcPreview()" placeholder="0.00" required="" step="0.01" type="number" value="180.00"></div><div class="flex flex-col gap-1 md:col-span-3"><label class="text-[11px] font-label font-semibold text-on-surface-variant">Modo de cálculo</label><div class="h-10 p-1 bg-surface-container rounded-lg flex items-center text-xs font-label"><button class="flex-1 h-full rounded-md text-[11px] font-semibold transition-all bg-surface-container-lowest text-primary shadow-sm" id="togglePct" onclick="setCalcMode('pct')" type="button">Porcentaje (%)</button><button class="flex-1 h-full rounded-md text-[11px] font-medium text-on-surface-variant hover:text-on-surface transition-all" id="toggleFixed" onclick="setCalcMode('fixed')" type="button">Pacto directo</button></div></div><div class="col-span-1 sm:col-span-2 md:col-span-12 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-2 bg-surface-container-lowest p-3 rounded-xl mt-1 shadow-sm"><div class="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-label"><span class="text-[11px] uppercase tracking-wider text-secondary font-bold">Previsualización:</span><div class="flex items-center gap-1.5"><span class="text-on-surface-variant">Régimen:</span><span class="font-semibold text-on-surface" id="previewRegimen">30% (Gran Vía)</span></div><div class="flex items-center gap-1.5"><span class="text-on-surface-variant">Bruto profesional:</span><span class="font-bold text-primary font-body text-sm" id="previewBruto">54,00 €</span></div><div class="flex items-center gap-1.5"><span class="text-on-surface-variant">IRPF (15%):</span><span class="font-semibold text-error font-body" id="previewIRPF">-8,10 €</span></div><div class="flex items-center gap-1.5"><span class="text-on-surface-variant">Neto final:</span><span class="font-bold text-on-surface font-body text-sm" id="previewNeto">45,90 €</span></div></div><button class="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-primary to-primary-container hover:opacity-95 text-on-primary text-xs font-label font-bold tracking-wide transition-all shadow-sm shrink-0" type="submit"><span class="material-symbols-outlined text-[17px]">add_circle</span><span class="">+ Añadir actividad</span></button></div></form>
+</div>
+<!-- TABLE CONTAINER -->
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse" id="activityTable">
+<thead>
+<tr class="bg-surface-container-low/60 text-[11px] font-label font-bold text-secondary uppercase tracking-wider">
+<th class="py-3.5 px-4 sm:px-6" scope="col">Fecha</th>
+<th class="py-3.5 px-3" scope="col">Clínica</th>
+<th class="py-3.5 px-4 min-w-[200px]" scope="col">Concepto</th>
+<th class="py-3.5 px-3 text-right" scope="col">Importe Bruto</th>
+<th class="py-3.5 px-3 text-center" scope="col">Modo</th>
+<th class="py-3.5 px-3 text-right" scope="col">% Aplicado</th>
+<th class="py-3.5 px-3 text-right" scope="col">Ganancia Bruta</th>
+<th class="py-3.5 px-3 text-right" scope="col">IRPF (15%)</th>
+<th class="py-3.5 px-4 text-right" scope="col">Ganancia Neta</th>
+<th class="py-3.5 px-4 text-center" scope="col">Acciones</th>
+</tr>
+</thead>
+<tbody class="text-xs font-body divide-y-0" id="activityTbody">
+<!-- ROW 1: Standard Active Entry -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group" data-clinic="Gran Vía" data-id="act-1">
+<td class="py-4 px-4 sm:px-6 text-on-surface font-medium whitespace-nowrap">
+                28/10/2026
+              </td>
+<td class="py-4 px-3 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-label font-semibold bg-surface-container text-on-surface">
+                  Gran Vía
+                </span>
+</td>
+<td class="py-4 px-4 text-on-surface font-medium">
+                Endodoncia multirradicular molar 16 con reconstrucción
+              </td>
+<td class="py-4 px-3 text-right font-medium text-on-surface whitespace-nowrap">
+                240,00 €
+              </td>
+<td class="py-4 px-3 text-center whitespace-nowrap">
+<span class="text-[10px] font-label font-medium uppercase text-secondary">Porcentaje</span>
+</td>
+<td class="py-4 px-3 text-right text-secondary whitespace-nowrap">
+                30%
+              </td>
+<td class="py-4 px-3 text-right font-semibold text-primary whitespace-nowrap">
+                72,00 €
+              </td>
+<td class="py-4 px-3 text-right text-error whitespace-nowrap">
+                -10,80 €
+              </td>
+<td class="py-4 px-4 text-right font-bold text-on-surface whitespace-nowrap">
+                61,20 €
+              </td>
+<td class="py-4 px-4 text-center whitespace-nowrap">
+<div class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100">
+<button class="p-1 text-on-surface-variant hover:text-primary rounded transition-colors" onclick="editRow('act-1')" title="Editar actividad" type="button">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 text-on-surface-variant hover:text-error rounded transition-colors" onclick="confirmDeleteRow('act-1')" title="Eliminar actividad" type="button">
+<span class="material-symbols-outlined text-[17px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 2: Another Active Entry -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group bg-surface-container-lowest" data-clinic="Alcorcón" data-id="act-2">
+<td class="py-4 px-4 sm:px-6 text-on-surface font-medium whitespace-nowrap">
+                27/10/2026
+              </td>
+<td class="py-4 px-3 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-label font-semibold bg-surface-container text-on-surface">
+                  Alcorcón Dental
+                </span>
+</td>
+<td class="py-4 px-4 text-on-surface font-medium">
+                Corona sobre implante zirconio fresado cad-cam
+              </td>
+<td class="py-4 px-3 text-right font-medium text-on-surface whitespace-nowrap">
+                550,00 €
+              </td>
+<td class="py-4 px-3 text-center whitespace-nowrap">
+<span class="text-[10px] font-label font-medium uppercase text-secondary">Porcentaje</span>
+</td>
+<td class="py-4 px-3 text-right text-secondary whitespace-nowrap">
+                35%
+              </td>
+<td class="py-4 px-3 text-right font-semibold text-primary whitespace-nowrap">
+                192,50 €
+              </td>
+<td class="py-4 px-3 text-right text-error whitespace-nowrap">
+                -28,88 €
+              </td>
+<td class="py-4 px-4 text-right font-bold text-on-surface whitespace-nowrap">
+                163,62 €
+              </td>
+<td class="py-4 px-4 text-center whitespace-nowrap">
+<div class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100">
+<button class="p-1 text-on-surface-variant hover:text-primary rounded transition-colors" onclick="editRow('act-2')" title="Editar actividad" type="button">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 text-on-surface-variant hover:text-error rounded transition-colors" onclick="confirmDeleteRow('act-2')" title="Eliminar actividad" type="button">
+<span class="material-symbols-outlined text-[17px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 3: NEGATIVE ROW (GASTO LABORATORIO DEFECTUOSA) -->
+<tr class="bg-error-container/20 hover:bg-error-container/30 transition-colors group" data-clinic="Montecarmelo" data-id="act-3">
+<td class="py-4 px-4 sm:px-6 text-on-surface font-medium whitespace-nowrap">
+                25/10/2026
+              </td>
+<td class="py-4 px-3 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-label font-semibold bg-surface-container text-on-surface">
+                  Montecarmelo
+                </span>
+</td>
+<td class="py-4 px-4 text-error font-medium flex flex-wrap items-center gap-2">
+<span class="">Gasto laboratorio: corona circonio defectuosa y repetición</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-label font-bold bg-error-container text-on-error-container uppercase">
+                  Gasto negativo
+                </span>
+</td>
+<td class="py-4 px-3 text-right font-semibold text-error whitespace-nowrap">
+                -150,00 €
+              </td>
+<td class="py-4 px-3 text-center whitespace-nowrap">
+<span class="text-[10px] font-label font-medium uppercase text-error">Gasto directo</span>
+</td>
+<td class="py-4 px-3 text-right text-error whitespace-nowrap">
+                100%
+              </td>
+<td class="py-4 px-3 text-right font-bold text-error whitespace-nowrap">
+                -150,00 €
+              </td>
+<td class="py-4 px-3 text-right text-secondary whitespace-nowrap">
+                +22,50 €
+              </td>
+<td class="py-4 px-4 text-right font-bold text-error whitespace-nowrap">
+                -127,50 €
+              </td>
+<td class="py-4 px-4 text-center whitespace-nowrap">
+<div class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100">
+<button class="p-1 text-on-surface-variant hover:text-primary rounded transition-colors" onclick="editRow('act-3')" title="Editar gasto" type="button">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 text-on-surface-variant hover:text-error rounded transition-colors" onclick="confirmDeleteRow('act-3')" title="Eliminar gasto" type="button">
+<span class="material-symbols-outlined text-[17px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 4: Fixed pact (Pacto directo) -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group bg-surface-container-lowest" data-clinic="Norte" data-id="act-4">
+<td class="py-4 px-4 sm:px-6 text-on-surface font-medium whitespace-nowrap">
+                22/10/2026
+              </td>
+<td class="py-4 px-3 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-label font-semibold bg-surface-container text-on-surface">
+                  Dental Norte
+                </span>
+</td>
+<td class="py-4 px-4 text-on-surface font-medium">
+                Guardia y revisión postquirúrgica pacientes de ortognática
+              </td>
+<td class="py-4 px-3 text-right font-medium text-on-surface whitespace-nowrap">
+                300,00 €
+              </td>
+<td class="py-4 px-3 text-center whitespace-nowrap">
+<span class="text-[10px] font-label font-medium uppercase text-tertiary font-bold">Pacto Fijo</span>
+</td>
+<td class="py-4 px-3 text-right text-secondary whitespace-nowrap">
+                —
+              </td>
+<td class="py-4 px-3 text-right font-semibold text-primary whitespace-nowrap">
+                180,00 €
+              </td>
+<td class="py-4 px-3 text-right text-error whitespace-nowrap">
+                -27,00 €
+              </td>
+<td class="py-4 px-4 text-right font-bold text-on-surface whitespace-nowrap">
+                153,00 €
+              </td>
+<td class="py-4 px-4 text-center whitespace-nowrap">
+<div class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100">
+<button class="p-1 text-on-surface-variant hover:text-primary rounded transition-colors" onclick="editRow('act-4')" title="Editar actividad" type="button">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 text-on-surface-variant hover:text-error rounded transition-colors" onclick="confirmDeleteRow('act-4')" title="Eliminar actividad" type="button">
+<span class="material-symbols-outlined text-[17px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 5: HISTORICAL INACTIVE CLINIC ROW -->
+<tr class="bg-surface-container-low/40 hover:bg-surface-container-low/70 transition-colors group opacity-85" data-clinic="San Jerónimo" data-id="act-5">
+<td class="py-4 px-4 sm:px-6 text-on-surface font-medium whitespace-nowrap">
+                15/10/2026
+              </td>
+<td class="py-4 px-3 whitespace-nowrap">
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-label font-medium bg-surface-container-high text-secondary">
+<span class="">Dental San Jerónimo</span>
+<span class="text-[9px] font-bold text-error uppercase">(Inactiva)</span>
+</div>
+</td>
+<td class="py-4 px-4 text-on-surface-variant font-medium">
+                Tartrectomía profunda y curetaje por cuadrante inferior
+              </td>
+<td class="py-4 px-3 text-right font-medium text-secondary whitespace-nowrap">
+                110,00 €
+              </td>
+<td class="py-4 px-3 text-center whitespace-nowrap">
+<span class="text-[10px] font-label font-medium uppercase text-secondary">Porcentaje</span>
+</td>
+<td class="py-4 px-3 text-right text-secondary whitespace-nowrap">
+                25%
+              </td>
+<td class="py-4 px-3 text-right font-semibold text-secondary whitespace-nowrap">
+                27,50 €
+              </td>
+<td class="py-4 px-3 text-right text-error whitespace-nowrap">
+                -4,13 €
+              </td>
+<td class="py-4 px-4 text-right font-bold text-on-surface whitespace-nowrap">
+                23,37 €
+              </td>
+<td class="py-4 px-4 text-center whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<!-- Editable historically, but clinic selector disabled for reassignment -->
+<button class="p-1 text-on-surface-variant hover:text-primary rounded transition-colors" onclick="editRow('act-5', true)" title="Histórico: solo concepto/importe editable" type="button">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 text-on-surface-variant hover:text-error rounded transition-colors" onclick="confirmDeleteRow('act-5')" title="Eliminar apunte histórico" type="button">
+<span class="material-symbols-outlined text-[17px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 6: Standard Entry -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group bg-surface-container-lowest" data-clinic="Montecarmelo" data-id="act-6">
+<td class="py-4 px-4 sm:px-6 text-on-surface font-medium whitespace-nowrap">
+                10/10/2026
+              </td>
+<td class="py-4 px-3 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-label font-semibold bg-surface-container text-on-surface">
+                  Montecarmelo
+                </span>
+</td>
+<td class="py-4 px-4 text-on-surface font-medium">
+                Tratamiento periodontal conservador e instrucción higiénica
+              </td>
+<td class="py-4 px-3 text-right font-medium text-on-surface whitespace-nowrap">
+                190,00 €
+              </td>
+<td class="py-4 px-3 text-center whitespace-nowrap">
+<span class="text-[10px] font-label font-medium uppercase text-secondary">Porcentaje</span>
+</td>
+<td class="py-4 px-3 text-right text-secondary whitespace-nowrap">
+                28%
+              </td>
+<td class="py-4 px-3 text-right font-semibold text-primary whitespace-nowrap">
+                53,20 €
+              </td>
+<td class="py-4 px-3 text-right text-error whitespace-nowrap">
+                -7,98 €
+              </td>
+<td class="py-4 px-4 text-right font-bold text-on-surface whitespace-nowrap">
+                45,22 €
+              </td>
+<td class="py-4 px-4 text-center whitespace-nowrap">
+<div class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100">
+<button class="p-1 text-on-surface-variant hover:text-primary rounded transition-colors" onclick="editRow('act-6')" title="Editar actividad" type="button">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 text-on-surface-variant hover:text-error rounded transition-colors" onclick="confirmDeleteRow('act-6')" title="Eliminar actividad" type="button">
+<span class="material-symbols-outlined text-[17px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footnote & Fiscal Ledger Validation -->
+<div class="bg-surface-container-low px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-label text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary">verified_user</span>
+<span class="">Liquidación Odontológica exenta de IVA según Art. 20.Uno.3º de la Ley 37/1992</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-semibold text-on-surface" id="entriesCountLabel">6 registros mostrados</span>
+<span class="text-outline-variant">•</span>
+<button class="hover:text-primary font-medium flex items-center gap-1 transition-colors" onclick="exportCSVStub()" type="button">
+<span class="material-symbols-outlined text-[15px]">file_download</span>
+            Exportar CSV
+          </button>
+</div>
+</div>
+</div>
+<!-- Editorial Insights / Secondary Split Card: Performance per Clinic in October -->
+
+</div>
+<!-- Delete Confirmation Toast / Banner (Hidden initially) -->
+<div class="fixed inset-x-0 bottom-6 mx-auto max-w-md w-full px-4 z-50 pointer-events-none transition-all duration-300 opacity-0 transform translate-y-4" id="deleteConfirmModal">
+<div class="pointer-events-auto bg-inverse-surface text-inverse-on-surface p-4 rounded-xl shadow-xl flex items-center justify-between gap-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-[20px]">warning</span>
+<span class="text-xs font-label" id="deleteConfirmText">¿Eliminar este registro de actividad?</span>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<button class="px-2.5 py-1 text-xs font-label text-inverse-on-surface/80 hover:text-inverse-on-surface" onclick="cancelDeleteRow()" type="button">Cancelar</button>
+<button class="px-3 py-1 bg-error text-on-error rounded-lg text-xs font-label font-bold" id="btnExecuteDelete" type="button">Eliminar</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  let currentCalcMode = 'pct';
+  let rowToDeleteId = null;
+
+  function setCalcMode(mode) {
+    currentCalcMode = mode;
+    const btnPct = document.getElementById('togglePct');
+    const btnFixed = document.getElementById('toggleFixed');
+    if (mode === 'pct') {
+      btnPct.className = 'flex-1 h-full rounded-md text-[11px] font-semibold transition-all bg-surface-container-lowest text-primary shadow-sm';
+      btnFixed.className = 'flex-1 h-full rounded-md text-[11px] font-medium text-on-surface-variant hover:text-on-surface transition-all';
+    } else {
+      btnFixed.className = 'flex-1 h-full rounded-md text-[11px] font-semibold transition-all bg-surface-container-lowest text-primary shadow-sm';
+      btnPct.className = 'flex-1 h-full rounded-md text-[11px] font-medium text-on-surface-variant hover:text-on-surface transition-all';
+    }
+    updateCalcPreview();
+  }
+
+  function updateCalcPreview() {
+    const clinicaSelect = document.getElementById('newClinica');
+    const selectedOpt = clinicaSelect.options[clinicaSelect.selectedIndex];
+    const rate = parseFloat(selectedOpt.getAttribute('data-rate')) || 30;
+    const grossAmount = parseFloat(document.getElementById('newImporte').value) || 0;
+
+    let brutoEarned = 0;
+    const regimenElem = document.getElementById('previewRegimen');
+
+    if (currentCalcMode === 'pct') {
+      brutoEarned = grossAmount * (rate / 100);
+      regimenElem.textContent = rate + '% (' + clinicaSelect.value + ')';
+    } else {
+      brutoEarned = grossAmount; // In direct agreement, gross inputted is doctor's fee
+      regimenElem.textContent = 'Pacto pactado directo (' + clinicaSelect.value + ')';
+    }
+
+    const irpf = brutoEarned * 0.15;
+    const neto = brutoEarned - irpf;
+
+    const fmt = num => num.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+    document.getElementById('previewBruto').textContent = fmt(brutoEarned);
+    document.getElementById('previewIRPF').textContent = (irpf >= 0 ? '-' : '+') + fmt(Math.abs(irpf));
+    document.getElementById('previewNeto').textContent = fmt(neto);
+  }
+
+  function handleAddActivity() {
+    const fecha = document.getElementById('newFecha').value;
+    const clinica = document.getElementById('newClinica').value;
+    const concepto = document.getElementById('newConcepto').value.trim();
+    const importe = parseFloat(document.getElementById('newImporte').value) || 0;
+
+    if (!concepto) {
+      alert('Por favor, introduce un concepto para la actividad.');
+      return;
+    }
+
+    const clinicaSelect = document.getElementById('newClinica');
+    const selectedOpt = clinicaSelect.options[clinicaSelect.selectedIndex];
+    const rate = parseFloat(selectedOpt.getAttribute('data-rate')) || 30;
+
+    let gananciaBruta = 0;
+    let modoLabel = '';
+    let pctDisplay = '';
+
+    if (currentCalcMode === 'pct') {
+      gananciaBruta = importe * (rate / 100);
+      modoLabel = 'Porcentaje';
+      pctDisplay = rate + '%';
+    } else {
+      gananciaBruta = importe;
+      modoLabel = 'Pacto Fijo';
+      pctDisplay = '—';
+    }
+
+    const irpf = gananciaBruta * 0.15;
+    const gananciaNeta = gananciaBruta - irpf;
+    const isNegative = importe < 0 || gananciaBruta < 0;
+
+    const fmt = n => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+    // Format Date string DD/MM/YYYY
+    let fechaFormatted = fecha;
+    if (fecha.includes('-')) {
+      const parts = fecha.split('-');
+      fechaFormatted = parts[2] + '/' + parts[1] + '/' + parts[0];
+    }
+
+    const newId = 'act-' + Date.now();
+    const tbody = document.getElementById('activityTbody');
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-id', newId);
+    tr.setAttribute('data-clinic', clinica);
+    
+    if (isNegative) {
+      tr.className = 'bg-error-container/20 hover:bg-error-container/30 transition-colors group';
+    } else {
+      tr.className = 'hover:bg-surface-container-low/50 transition-colors group bg-surface-container-lowest';
+    }
+
+    tr.innerHTML = `
+      <td class="py-4 px-4 sm:px-6 text-on-surface font-medium whitespace-nowrap">${fechaFormatted}</td>
+      <td class="py-4 px-3 whitespace-nowrap">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-label font-semibold bg-surface-container text-on-surface">
+          ${clinica}
+        </span>
+      </td>
+      <td class="py-4 px-4 ${isNegative ? 'text-error font-semibold flex items-center gap-2' : 'text-on-surface font-medium'}">
+        <span>${concepto}</span>
+        ${isNegative ? '<span class="px-2 py-0.5 rounded text-[10px] font-label font-bold bg-error-container text-on-error-container uppercase">Gasto negativo</span>' : ''}
+      </td>
+      <td class="py-4 px-3 text-right font-medium ${isNegative ? 'text-error' : 'text-on-surface'} whitespace-nowrap">${fmt(importe)}</td>
+      <td class="py-4 px-3 text-center whitespace-nowrap">
+        <span class="text-[10px] font-label font-medium uppercase ${isNegative ? 'text-error' : (currentCalcMode === 'fixed' ? 'text-tertiary font-bold' : 'text-secondary')}">${modoLabel}</span>
+      </td>
+      <td class="py-4 px-3 text-right text-secondary whitespace-nowrap">${pctDisplay}</td>
+      <td class="py-4 px-3 text-right font-bold ${isNegative ? 'text-error' : 'text-primary'} whitespace-nowrap">${fmt(gananciaBruta)}</td>
+      <td class="py-4 px-3 text-right ${isNegative ? 'text-secondary' : 'text-error'} whitespace-nowrap">${isNegative ? '+' : '-'}${fmt(Math.abs(irpf))}</td>
+      <td class="py-4 px-4 text-right font-bold ${isNegative ? 'text-error' : 'text-on-surface'} whitespace-nowrap">${fmt(gananciaNeta)}</td>
+      <td class="py-4 px-4 text-center whitespace-nowrap">
+        <div class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100">
+          <button type="button" onclick="editRow('${newId}')" title="Editar actividad" class="p-1 text-on-surface-variant hover:text-primary rounded transition-colors">
+            <span class="material-symbols-outlined text-[17px]">edit</span>
+          </button>
+          <button type="button" onclick="confirmDeleteRow('${newId}')" title="Eliminar actividad" class="p-1 text-on-surface-variant hover:text-error rounded transition-colors">
+            <span class="material-symbols-outlined text-[17px]">delete</span>
+          </button>
+        </div>
+      </td>
+    `;
+
+    tbody.insertBefore(tr, tbody.firstChild);
+
+    // Reset Concept input & notify
+    document.getElementById('newConcepto').value = '';
+    recalcMetrics();
+  }
+
+  function editRow(rowId, isHistorical = false) {
+    const row = document.querySelector(`tr[data-id="${rowId}"]`);
+    if (!row) return;
+
+    if (isHistorical) {
+      const currentConcept = row.children[2].innerText.trim();
+      const updated = prompt('Editar apunte histórico (Clínica inactiva - solo concepto libre):', currentConcept);
+      if (updated && updated.trim()) {
+        row.children[2].innerText = updated.trim();
+      }
+      return;
+    }
+
+    const currentConcept = row.children[2].querySelector('span') ? row.children[2].querySelector('span').innerText : row.children[2].innerText.trim();
+    const updated = prompt('Editar concepto de la actividad:', currentConcept);
+    if (updated && updated.trim()) {
+      if (row.children[2].querySelector('span')) {
+        row.children[2].querySelector('span').innerText = updated.trim();
+      } else {
+        row.children[2].innerText = updated.trim();
+      }
+    }
+  }
+
+  function confirmDeleteRow(rowId) {
+    rowToDeleteId = rowId;
+    const modal = document.getElementById('deleteConfirmModal');
+    modal.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+    modal.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+
+    document.getElementById('btnExecuteDelete').onclick = function() {
+      const targetRow = document.querySelector(`tr[data-id="${rowToDeleteId}"]`);
+      if (targetRow) {
+        targetRow.remove();
+        recalcMetrics();
+      }
+      cancelDeleteRow();
+    };
+  }
+
+  function cancelDeleteRow() {
+    rowToDeleteId = null;
+    const modal = document.getElementById('deleteConfirmModal');
+    modal.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+    modal.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+  }
+
+  function recalcMetrics() {
+    const rows = document.querySelectorAll('#activityTbody tr');
+    document.getElementById('entriesCountLabel').innerText = rows.length + ' registros mostrados';
+  }
+
+  // Clinic filter handler
+  document.getElementById('filterClinicSelect').addEventListener('change', function(e) {
+    const val = e.target.value;
+    const rows = document.querySelectorAll('#activityTbody tr');
+    let visibleCount = 0;
+
+    rows.forEach(r => {
+      const rowClinic = r.getAttribute('data-clinic');
+      if (val === 'all' || (rowClinic && rowClinic.toLowerCase().includes(val.toLowerCase()))) {
+        r.style.display = '';
+        visibleCount++;
+      } else {
+        r.style.display = 'none';
+      }
+    });
+
+    document.getElementById('entriesCountLabel').innerText = visibleCount + ' registros mostrados';
+  });
+
+  function exportCSVStub() {
+    alert('Descargando archivo CSV: Actividad_Dra_Ana_Hurtado_Octubre_2026.csv');
+  }
+
+  // Initialize preview on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    updateCalcPreview();
+  });
+</script></main><footer class="w-full bg-surface-container-low mt-auto py-8"><div class="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-label text-on-surface-variant"><div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left"><p class="">© 2026 MyClinics • Dra. Ana Hurtado. Todos los derechos reservados.</p><span class="hidden sm:inline text-outline-variant">•</span><p class="text-[11px] text-secondary">Cumplimiento RGPD Sanitario y Gestión Fiscal Odontológica (IRPF/IVA Exento Art. 20 LIVA)</p></div><div class="flex items-center gap-5 text-xs"><a class="hover:text-primary transition-colors" data-path="aviso-legal" href="#">Aviso Legal</a><a class="hover:text-primary transition-colors" data-path="privacidad" href="#">Privacidad</a><a class="hover:text-primary transition-colors" data-path="terminos" href="#">Condiciones</a></div></div></footer>
+
+</body></html>

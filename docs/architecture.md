@@ -37,6 +37,11 @@ Start with route-local code for a small screen. Move reusable logic or UI into t
 
 ## Component reuse
 
+Before implementing UI, consult the [screen specification and visual references](screens.md#visual-design-references),
+including the Alexandria design guidance and the relevant Google Stitch HTML
+and screenshot. Adapt those references to the confirmed requirements and the
+project conventions in this document.
+
 Before creating a component, look for an existing component that covers the same interaction or visual pattern. Extend it with a focused prop or compose it when that keeps its purpose clear.
 
 Keep generic components independent of clinic, activity, or reporting rules. Both a reusable button and a reusable clinic selector belong directly in `src/lib/components`; their responsibilities can stay distinct without separate folders. Shared code should not import route files. Routes compose shared components and logic.
