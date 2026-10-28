@@ -22,6 +22,11 @@ commands, results, and evidence tied to the head being delivered. Distinguish
 failed, unavailable, and unperformed checks; never report them as passing or
 claim readiness while required validation is missing. For UI work, capture
 desktop/mobile evidence against applicable Alexandria/Stitch references.
+Capture new delivery screenshots temporarily outside the repository, upload them
+as inline GitHub PR attachments, and verify the saved URLs and retrieval before
+cleaning up temporary files and handing off. Do not commit delivery screenshots
+or host new captures through source commits. Preserve historical evidence and
+supplied design references; retain textual capture metadata and attachment URLs.
 
 When authorized for delivery, commit only the assignment's changes, publish its
 branch, and open or update a PR targeting develop. Describe resulting behavior,

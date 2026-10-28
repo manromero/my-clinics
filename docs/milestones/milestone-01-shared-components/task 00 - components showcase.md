@@ -27,7 +27,7 @@ The [milestone acceptance contract](readme.md#completion-contract-for-every-task
 - Add or update the component's interactive examples in [/components](<task 00 - components showcase.md>), covering the variants and states in this task. Foundations must appear as specimens; the showcase task provides the initial screen itself.
 - Include meaningful unit tests for the delivered public contract, semantics and interactions. No task is complete with screenshots alone, implementation-mirroring assertions or snapshots alone.
 - Capture graphical evidence from the running /components screen at desktop (for example 1440 x 900) and inspect mobile (for example 390 x 844). Include a mobile capture whenever layout, wrapping, controls or interaction presentation differs; if one capture suffices, explicitly record mobile inspection and why no separate image is needed. Label actual viewport, component/state, capturer and source commit. Capture focus/error/pending states when relevant.
-- Display evidence inline in the implementation PR using durable attachments or commit-pinned image URLs, following the [workflow evidence contract](../../development-workflow.md#visual-pr-evidence). Refresh affected captures after corrections. Check references for similarity, not just presence.
+- Display evidence inline in the implementation PR using verified GitHub attachments, following the [workflow evidence contract](../../development-workflow.md#visual-pr-evidence). Refresh affected captures after corrections. Check references for similarity, not just presence.
 - Keep all reusable components directly in src/lib/components, without subfolders. Route-only showcase scaffolding stays under src/app/components; shared non-UI helpers belong in src/lib.
 - Support Spanish labels, keyboard access, visible focus, readable contrast and narrow viewports. Keep generic UI free of authentication, persistence and clinic/calculation rules.
 
@@ -37,7 +37,7 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Planning merged in PR #5. Implementation assigned on 2026-10-29; human acceptance and manual merge of the implementation remain pending.
+Planning merged in PR #5. Implementation assigned and accepted by the user on 2026-10-29; PR #6 was merged into develop.
 
 ## Execution context
 
@@ -48,10 +48,14 @@ Planning merged in PR #5. Implementation assigned on 2026-10-29; human acceptanc
 
 ## Delivery and validation
 
-- Implementation PR: [#6](https://github.com/manromero/my-clinics/pull/6), targeting `develop`. Human acceptance and manual merge are pending.
+- Implementation PR: [#6](https://github.com/manromero/my-clinics/pull/6), merged into `develop` at `073f48a6fe84e262db0c6f2c7621041b928e5ae3`; human acceptance is complete.
 - Implementation/evidence head reviewed independently: `041231ca425804732063b010d6557ec343ac67ce`, against base `86d0a344a7e1e11f932237e5dd571a931615ae33`. Application/capture source: `89c5de0664b680ddce0d992f999bba29f8d667a3`.
 - Delivered `/components`: Spanish empty catalogue, stable section anchors, accessible headings and extensible route-local registration API. No later shared components or business behavior were introduced.
 - Implementer and separate reviewer each passed `pnpm test` (3 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build`, and `pnpm peers check`. Reviewer also passed `git diff --check`. Sandbox process restrictions required escalation; completed checks passed.
 - Both agents performed live desktop (1440 × 900) and mobile (390 × 844) checks: direct route, fragment navigation, keyboard activation, destination focus, visible focus and no horizontal overflow. The reviewer additionally verified the skip link. They compared the result with Alexandria and the applicable S02 HTML/PNG reference; exact fonts/theme remain Task 01.
 - [Visual evidence](../../evidence/components-showcase/readme.md) records capture source, viewports, image dimensions and implementer attribution; durable screenshots appear inline in the PR.
 - Independent review: no blocking findings, no optional suggestions, 0 correction rounds. Final tracking documentation is subject to corresponding format, link and consistency review before delivery.
+
+## Evidence storage follow-up
+
+The user requested GitHub PR attachments instead of tracked delivery screenshots. On 2026-10-29 the three captures were uploaded to PR #6, their persisted URLs and retrieval verified, and the working-tree JPEG copies removed in the focused follow-up branch. Task 00 remains done; its application implementation and review are unchanged. The workflow now requires temporary captures outside the repository, verified inline attachments, and cleanup before delivery.

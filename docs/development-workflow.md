@@ -126,10 +126,14 @@ or screenshot tools available in the session. Use representative states that sho
 the delivered behavior; add error, empty, focus or before/after captures only when
 they help assess the change. Screenshots supplement interaction checks.
 
-- The implementer supplies desktop and, when applicable, mobile screenshots. The
-  coordinator ensures they appear inline in the PR before ready delivery; a link
-  to a report alone is insufficient. Attach images to GitHub or use durable image
-  URLs pinned to a commit. Local paths and temporary session URLs are insufficient.
+- Capture delivery screenshots in a temporary directory outside the repository.
+  Do not commit new delivery screenshots or use source commits to host them.
+  Supplied design references and historical evidence remain untouched.
+- The implementer uploads desktop and, when applicable, mobile screenshots as
+  GitHub PR attachments. The coordinator verifies that the saved PR body displays
+  the attachment URLs inline before ready delivery; a link to a report alone is
+  insufficient. Verify attachment retrieval before deleting temporary captures.
+  Local paths and temporary session URLs are insufficient.
 - Label each image with the screen/state, actual viewport and captured source
   commit. If image dimensions differ from the viewport, record both. Refresh
   affected captures after visual corrections; do not present an older UI as the
@@ -137,9 +141,11 @@ they help assess the change. Screenshots supplement interaction checks.
 - The reviewer checks the images against the running result and relevant design
   references. Record who captured them and who performed live interactions;
   disclose unavailable tools rather than implying independent browser checks.
-- Keep only useful delivery evidence. Remove throwaway fixtures, duplicate
-  captures and temporary scripts after validation. Preserve historical evidence
-  through PR attachments or immutable commit links, updating any affected links.
+- Keep useful evidence as GitHub attachments and retain textual capture records
+  with those URLs. After upload and verification, remove temporary captures,
+  throwaway fixtures and scripts before ready delivery. Refresh attachments after
+  visual corrections while preserving review history. Do not delete historical
+  evidence or rewrite Git history as part of this cleanup.
 
 ### Findings and validation
 

@@ -57,8 +57,16 @@ the [Stitch screen references](screens.md#visual-design-references).
 Task 00 uses minimal local scaffolding and system fonts; Task 01 establishes
 the shared tokens and Noto Serif / Inter / Public Sans font loading.
 
-Store useful captures with the PR, using durable attachments or commit-pinned
-image URLs displayed inline. Record the actual viewport, image dimensions when
-different, state, source commit and capturer, plus who performed live interactions.
-Refresh captures after visual changes. See the
+Capture into a temporary directory outside the repository. Upload useful captures
+as GitHub PR attachments and verify the saved inline URLs and image retrieval
+before removing temporary files and delivering the PR. Do not commit new delivery
+screenshots or use source commits to host them. Retain textual evidence records
+with attachment URLs, actual viewport, image dimensions when different, state,
+source commit, capturer, and who performed live interactions. Refresh attachments
+after visual changes and preserve historical evidence and supplied references.
+For example, `gh pr edit <number> --body-file <temporary-body-file> --attach <capture>`
+uploads a capture; a matching local Markdown reference in the body is rewritten
+to its attachment URL. Repeat `--attach` for multiple files. See the
+[GitHub attachment documentation](https://docs.github.com/en/github-cli/github-cli/attaching-files-with-github-cli)
+and the
 [workflow evidence contract](development-workflow.md#visual-pr-evidence).

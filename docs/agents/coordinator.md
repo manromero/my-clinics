@@ -108,7 +108,11 @@ mobile screenshots when responsive behavior applies, with state, viewport and
 source commit labels. Follow the contract's
 [visual evidence requirements](../development-workflow.md#visual-pr-evidence),
 including refreshed captures after visual corrections, attribution of live checks
-and removal of throwaway test artifacts before delivery.
+and removal of throwaway test artifacts before delivery. Require captures in a
+temporary directory outside the repository and GitHub attachments displayed inline.
+Verify the saved PR attachment URLs and retrieval before temporary-file cleanup
+and ready handoff. Do not accept new delivery screenshots committed to the project
+or source commits used to host them; preserve historical evidence and design references.
 
 Before ready delivery, mark task and index `done` in the feature branch after
 required checks and independent review pass. Include that tracking commit in final

@@ -5,11 +5,11 @@ Captured and interacted with by the delegated implementer on 2026-10-29 using
 the in-app browser against `pnpm dev` at `http://127.0.0.1:3000/components`.
 The Next.js development indicator is visible in the captures.
 
-| Capture                          | Browser viewport | Image dimensions | State                                                                        |
-| -------------------------------- | ---------------- | ---------------- | ---------------------------------------------------------------------------- |
-| [Desktop](desktop.jpg)           | 1440 × 900       | 1424 × 1208      | Full-page empty catalogue                                                    |
-| [Mobile](mobile.jpg)             | 390 × 844        | 375 × 1505       | Full-page empty catalogue; navigation stacks above sections                  |
-| [Mobile focus](mobile-focus.jpg) | 390 × 844        | 375 × 811        | Keyboard activation of Controles y contenedores, destination heading focused |
+| Capture                                                                                         | Browser viewport | Image dimensions | State                                                                        |
+| ----------------------------------------------------------------------------------------------- | ---------------- | ---------------- | ---------------------------------------------------------------------------- |
+| [Desktop](https://github.com/user-attachments/assets/cf499a21-c6b7-4646-b35d-bd2c7962d1de)      | 1440 × 900       | 1424 × 1208      | Full-page empty catalogue                                                    |
+| [Mobile](https://github.com/user-attachments/assets/637be424-ceff-443f-8fa6-003040f666d7)       | 390 × 844        | 375 × 1505       | Full-page empty catalogue; navigation stacks above sections                  |
+| [Mobile focus](https://github.com/user-attachments/assets/7089fb17-19bb-470c-b266-804f0ecee9be) | 390 × 844        | 375 × 811        | Keyboard activation of Controles y contenedores, destination heading focused |
 
 Viewport dimensions were read from `window.innerWidth` / `innerHeight`.
 The browser screenshot exporter produces image dimensions different from the
@@ -37,4 +37,6 @@ passed. Tests cover initial state and accessible headings, keyboard-operable
 section links and destinations, and registration of a synthetic interactive
 example. Native fragment scrolling and CSS fidelity were checked in the browser.
 
-The separate reviewer independently inspected the running desktop/mobile result, the S02 HTML/PNG and Alexandria references, and these captures at head `041231ca425804732063b010d6557ec343ac67ce`. Required checks passed independently; review found no blocking or optional findings. Human acceptance and manual merge remain pending in PR #6.
+The separate reviewer independently inspected the running desktop/mobile result, the S02 HTML/PNG and Alexandria references, and these captures at head `041231ca425804732063b010d6557ec343ac67ce`. Required checks passed independently; review found no blocking or optional findings. The user accepted Task 00 and PR #6 was merged into develop at `073f48a6fe84e262db0c6f2c7621041b928e5ae3`.
+
+On 2026-10-29, the three captures were uploaded to PR #6 as GitHub attachments. The saved PR body and successful HTTP GET retrieval were verified before removing only the three tracked JPEG copies. Capture metadata and historical source commits are preserved; future delivery captures stay outside the repository.
