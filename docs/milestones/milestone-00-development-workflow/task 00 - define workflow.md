@@ -67,6 +67,10 @@ documentation links and formatting. Record decisions and unresolved questions.
   records, preserving the exercise evidence. This cleanup was agreed with the user.
 - Role loading and execution remain for Tasks 01–03. Merge strategy and branch
   protections are open decisions and do not block role configuration.
+- Subsequent user-approved revision: split the primary coordinator from delegated
+  implementer and reviewer roles. Configuration is tracked in new Task 04, before
+  Tasks 01/02 and validation in Task 03. Task 00 acceptance remains historical;
+  its original two-role design is superseded by the revised contract.
 - Validation: Prettier formatting passed for all changed documentation and the
   milestone task directory. Verified 37 local Markdown links, including referenced
   heading anchors, across the seven changed files. `git diff --check` passed.

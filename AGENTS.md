@@ -11,6 +11,15 @@ MyClinics is a web application for a dental professional to manage clinics, acti
 - Read the [Git workflow](docs/git-workflow.md) before creating branches, committing, merging, or tagging releases.
 - Follow the [development workflow contract](docs/development-workflow.md) for task intake, separate review, bounded corrections, evidence, and human acceptance. Role configuration is tracked in Milestone 00; the contract alone does not configure agents.
 
+## Workflow roles
+
+For user-assigned implementation work, the primary agent acts as coordinator: read
+and follow [the coordinator role](docs/agents/coordinator.md) before preparing or
+dispatching the task. The coordinator checks readiness, creates the branch,
+enriches task context, and delegates sequentially to separate implementer and
+reviewer subagents. Delegated agents keep their assigned role and must not start
+another coordination workflow. Informational questions do not start implementation.
+
 ## Validation
 
 For application changes, run `pnpm lint`, `pnpm typecheck`, and `pnpm format:check`. Run `pnpm build` for changes affecting the production build. For documentation-only changes, check formatting and links. Report checks that could not run.

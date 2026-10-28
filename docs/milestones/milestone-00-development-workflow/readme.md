@@ -1,18 +1,21 @@
 # Milestone 00 — Development workflow
 
 Scope, workflow decisions, and Task 00 documentation: accepted by the user.
-Task 00 is complete. Agent configuration and execution have not started.
+Task 00 is complete. The subsequently approved coordinator is being configured
+in Task 04; implementer/reviewer configuration and full execution remain pending.
 
 ## Objective
 
-Create a repeatable workflow in which the user assigns a validated task, an
-implementer develops it, and a separate reviewer checks it before the user
+Create a repeatable workflow in which a coordinator prepares a user-assigned task,
+an implementer develops it, and a separate reviewer checks it before the user
 reviews and manually merges its PR into `develop`.
 
 ## Confirmed workflow
 
 1. The user assigns a task with a validated scope and acceptance criteria.
-2. The implementer reads the task, project instructions, requirements, and
+2. The coordinator verifies readiness, resolves technical context, asks for missing
+   product decisions, and, when ready, creates the branch and enriches the task.
+   It then dispatches the implementer. The implementer reads the task, project instructions, requirements, and
    relevant screen references; implements the change; runs required checks;
    and opens a PR targeting `develop`.
 3. The reviewer evaluates code, functionality, and visual quality. For UI work,
@@ -20,8 +23,10 @@ reviews and manually merges its PR into `develop`.
    mobile. For other work, explain why visual review is not applicable.
 4. Findings distinguish blocking problems from optional improvements. Optional
    suggestions do not automatically expand the assigned scope.
-5. The implementer addresses blockers, and the reviewer checks the corrections.
-6. When no blockers remain, present the PR and validation summary to the user.
+5. The coordinator routes blockers through at most two implementation correction
+   rounds, each followed by reviewer verification. Optional findings wait for final delivery.
+6. The coordinator delivers the PR and evidence: ready if no blockers remain and
+   required checks passed, or blocked with a concrete decision after the round limit.
 7. The user reviews and manually merges the PR into `develop`.
 
 Product ambiguities, scope changes, and unresolved review disagreements return
@@ -31,23 +36,26 @@ for handoffs, evidence, escalation, and the representative exercise.
 
 ## Submilestones and tasks
 
-| Submilestone          | Task                                                               | Status    | Depends on                             |
-| --------------------- | ------------------------------------------------------------------ | --------- | -------------------------------------- |
-| Workflow definition   | [00 — Define workflow](<task 00 - define workflow.md>)             | `done`    | User acceptance recorded on 2026-10-28 |
-| Agent configuration   | [01 — Configure implementer](<task 01 - configure implementer.md>) | `pending` | Task 00                                |
-| Agent configuration   | [02 — Configure reviewer](<task 02 - configure reviewer.md>)       | `pending` | Task 00                                |
-| Workflow verification | [03 — Validate workflow](<task 03 - validate workflow.md>)         | `pending` | Tasks 01 and 02                        |
+| Submilestone          | Task                                                               | Status        | Depends on                               |
+| --------------------- | ------------------------------------------------------------------ | ------------- | ---------------------------------------- |
+| Workflow definition   | [00 — Define workflow](<task 00 - define workflow.md>)             | `done`        | User acceptance recorded on 2026-10-28   |
+| Agent configuration   | [04 — Configure coordinator](<task 04 - configure coordinator.md>) | `in_progress` | Task 00 and approved three-role revision |
+| Agent configuration   | [01 — Configure implementer](<task 01 - configure implementer.md>) | `pending`     | Task 04                                  |
+| Agent configuration   | [02 — Configure reviewer](<task 02 - configure reviewer.md>)       | `pending`     | Task 04                                  |
+| Workflow verification | [03 — Validate workflow](<task 03 - validate workflow.md>)         | `pending`     | Tasks 04, 01, and 02                     |
 
 Task statuses follow the [shared tracking rules](../readme.md#task-structure-and-status).
 The existence of these task files does not mean the agents are configured.
+Task identifiers are preserved; execution order is 00 → 04 → 01/02 → 03.
 
 ## Validated decisions and remaining work
 
 The user approved the following on 2026-10-28:
 
-- A task assignment starts the workflow. The main agent implements and coordinates
-  a separate reviewer, with project-scoped role instructions configured in Tasks
-  01 and 02 and their actual loading verified.
+- A task assignment starts the workflow. The revised design separates coordinator,
+  implementer, and reviewer. The primary coordinator is activated through
+  `AGENTS.md` in Task 04; delegated agents are configured in Tasks 01 and 02.
+  Verify actual instruction loading rather than file existence.
 - Two automatic correction rounds follow the initial review; remaining blockers
   return to the user with the current PR and evidence.
 - Task files record progress and decisions; PRs record detailed review and
@@ -57,12 +65,13 @@ The user approved the following on 2026-10-28:
 
 Task 00 is complete following user acceptance on 2026-10-28. Git push and GitHub CLI
 access have been verified, and remote `develop` has been created from `main`.
-Role configuration and the actual PR exercise remain pending. Merge strategy and
+Coordinator configuration is in progress; delegated roles and the actual workflow
+exercise remain pending. Merge strategy and
 branch protections are separate open decisions.
 
 ## Completion criteria
 
-- Both roles are configured according to a user-validated workflow contract.
+- All three roles are configured according to the revised user-validated contract.
 - A representative assignment demonstrates implementation, PR creation, review,
   corrections, and a final handoff to the user.
 - Reviews cover all applicable perspectives and cite supporting evidence.

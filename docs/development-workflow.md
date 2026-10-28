@@ -1,18 +1,20 @@
 # Development workflow contract
 
 Status: workflow decisions and documentation accepted by the user on 2026-10-28.
-Task 00 is complete. Role configuration and execution are pending
-Tasks 01–03 of [Milestone 00](milestones/milestone-00-development-workflow/readme.md).
+Task 00 is complete. The user subsequently approved a coordinator, implementer,
+and reviewer. Coordinator configuration is tracked in Task 04; delegated role
+configuration and execution remain Tasks 01–03 of
+[Milestone 00](milestones/milestone-00-development-workflow/readme.md).
 
 ## Assignment and readiness
 
 The user starts the workflow by identifying a milestone and task and requesting
-implementation with the implementer and reviewer workflow. That assignment
+implementation with the coordinator, implementer, and reviewer workflow. That assignment
 authorizes implementation, checks, branch publication, a PR targeting `develop`,
 review, and up to two correction rounds within the validated scope. Tool approval
 and authentication requirements still apply. Agents never merge PRs.
 
-Before implementation, the implementer confirms that the task provides:
+Before implementation, the coordinator confirms that the task provides:
 
 - The objective, included behavior, and explicit exclusions.
 - Verifiable acceptance criteria and expected validation.
@@ -22,23 +24,38 @@ Before implementation, the implementer confirms that the task provides:
 Read [AGENTS.md](../AGENTS.md), the assigned task, [requirements](requirements.md),
 [architecture](architecture.md), and applicable [screen references](screens.md).
 Missing information that changes product behavior or scope returns to the user.
-Routine technical choices remain with the implementer. Continue independent work
+Routine technical choices remain with the responsible agent. Continue independent work
 while awaiting a decision, without implementing the undecided behavior.
 
 ## Roles and coordination
 
-The main agent is the implementer and coordinator. A separate reviewer agent
-receives a focused assignment and its own context. Use sequential handoffs:
-implementation, review, corrections, and re-review. Only the implementer edits
-application files and task tracking; the reviewer reports findings and evidence.
-The implementer must preserve the reviewer's conclusions when recording them.
+The primary agent is the coordinator. It checks readiness, creates the assignment
+branch, enriches the task, delegates, counts correction rounds, maintains tracking,
+and manages final PR delivery. Follow its [role instructions](agents/coordinator.md),
+activated through repository `AGENTS.md` in Task 04.
 
-Project-scoped role instructions will be versioned under `.codex/agents/` in
-Tasks 01 and 02. Verify that the selected Codex tooling actually loads those
-instructions; file existence alone is not proof of configuration. If custom role
-loading is unavailable, report it and obtain agreement on an explicit-instruction
-fallback before claiming configuration is complete. A request not to edit is a
-role boundary, not a separate filesystem security boundary.
+Separate implementer and reviewer agents receive focused assignments and their own
+context. Only the implementer edits application code, runs implementation checks,
+and creates the PR; the reviewer independently reports findings and evidence.
+The coordinator preserves those conclusions and does not replace either role.
+Use sequential handoffs and one writer at a time in a shared checkout.
+
+Project-scoped delegated role instructions will be versioned under `.codex/agents/`
+in Tasks 01 and 02. Verify actual loading; file existence alone is insufficient.
+If native loading is unavailable, obtain agreement on explicit-instruction fallback
+before claiming configuration complete. Bootstrap review of coordinator setup may
+use a separate agent explicitly instructed with this contract; label it as such,
+without claiming delegated role configuration or full workflow validation.
+A request not to edit is a role boundary, not a separate security sandbox.
+
+If the task already exists, the coordinator preserves approved scope and criteria.
+If a file must be created, derive it from the approved user request and the shared
+task structure; do not invent product requirements. Missing scope decisions return
+to the user before implementation. When ready, record branch/base, relevant files,
+sourced technical findings, labeled hypotheses, validation considerations, open
+questions, and round count in a separate `Execution context` section. Context does
+not silently amend acceptance criteria. Blocked intake records the issue without
+creating an implementation branch or dispatching an implementer.
 
 The user owns product decisions, scope changes, unresolved review disagreements,
 final acceptance, and manual merge. The implementer may not replace an unfavorable
@@ -46,12 +63,12 @@ review with its own approval or treat optional suggestions as new requirements.
 
 ## Git and PR delivery
 
-Follow the [Git workflow](git-workflow.md). Preserve unrelated changes, update
+The coordinator follows the [Git workflow](git-workflow.md). Preserve unrelated changes, update
 `develop` from its remote, and create `feature/<short-description>` from that
 baseline. Use an isolated worktree if existing work prevents a clean assignment;
 do not reset or stash unrelated work without authorization.
 
-Publish the assigned branch and open a PR with base `develop`. Its description
+The implementer publishes the assigned branch and opens a PR with base `develop`. Its description
 must state the resulting behavior, scope, acceptance-criteria coverage, validation
 results, and material limitations. Include the task link and current head commit.
 A draft PR can expose blocked work, but must not imply readiness for merge.
@@ -62,15 +79,17 @@ to the user. Merge strategy and branch protections remain separate decisions.
 
 ## Handoff contract
 
-| Handoff                                   | Required input                                                                                   | Expected output                                                                                | Next responsible role |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- | --------------------- |
-| User to implementer                       | Validated task and references                                                                    | Readiness result, branch/base, and task marked `in_progress`                                   | Implementer           |
-| Implementer to reviewer                   | Task, scope, project rules, PR, base and head commit, checks, and evidence                       | Review of code, functionality, and visual quality with findings and limitations                | Reviewer              |
-| Reviewer to implementer                   | Commit reviewed, blocking findings, optional suggestions, and verification steps                 | Corrections within scope, new head commit, relevant revalidation, and response to each blocker | Implementer           |
-| Implementer to reviewer after corrections | Updated PR/head, addressed findings, new checks, and round count                                 | Rechecked findings and affected behavior, including remaining blockers                         | Reviewer              |
-| Agent to user on escalation               | Current state, evidence, attempted resolutions, impact, and a concrete question                  | Product/scope decision or direction to unblock the task                                        | User                  |
-| Implementer to user on delivery           | PR, reviewed head commit, criteria coverage, checks, review result, rounds used, and limitations | Human review and manual merge, or requested changes                                            | User                  |
-| User merge to implementer                 | Verified merge into `develop`                                                                    | Task and milestone tracking updated with merge evidence                                        | Implementer           |
+| Handoff                                    | Required input                                                                                         | Expected output                                                                      | Next responsible role |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | --------------------- |
+| User to coordinator                        | Task/request and approved references                                                                   | Readiness decision; when ready, branch/base and enriched task marked `in_progress`   | Coordinator           |
+| Coordinator to implementer                 | Ready task, execution context, workspace, branch, rules, and checks                                    | Implementation, PR to `develop`, head commit, checks, and evidence                   | Implementer           |
+| Implementer to coordinator                 | PR/head, implementation summary, checks, and limitations                                               | Recorded result and focused independent review assignment                            | Coordinator           |
+| Coordinator to reviewer                    | Task, source references, PR, base/head, checks, and evidence                                           | Independent code, functional, and applicable visual review                           | Reviewer              |
+| Reviewer to coordinator                    | Reviewed commit, blockers, optional findings, evidence, and verification steps                         | Recorded findings; correction assignment within remaining budget, or delivery        | Coordinator           |
+| Coordinator to implementer for corrections | Blockers, expected verification, current head, and round number                                        | Scoped fixes, new head, checks, and responses, returned to coordinator for re-review | Implementer           |
+| Coordinator to user on escalation          | Current state/PR, evidence, attempted resolutions, impact, and concrete question                       | Decision needed to continue                                                          | User                  |
+| Coordinator to user on delivery            | PR, reviewed head, criteria coverage, checks, review result, rounds, optional suggestions, limitations | Human review/manual merge, or direction for blocked work                             | User                  |
+| User merge to coordinator                  | Verified merge into `develop`                                                                          | Task and milestone updated with merge evidence                                       | Coordinator           |
 
 Every review identifies the exact head commit and base reviewed. Any subsequent
 code change requires review of the affected changes and behavior and appropriate
@@ -125,9 +144,13 @@ The maximum is **two automatic correction rounds after the initial review**:
 3. Correction round 2 and final re-review.
 
 A round is one batch of corrections followed by the reviewer's recheck; multiple
-findings in a batch do not consume separate rounds. Track the count in task notes
+findings in a batch do not consume separate rounds. The coordinator tracks the count in task notes
 and review records. Newly discovered blockers join the remaining budget; they do
 not reset it. If no blockers remain and required checks are complete, deliver.
+
+After each implementation/correction, the coordinator dispatches review. After
+the final review, it delivers either a ready PR or a blocked PR with evidence;
+there is no third automatic correction. A clean earlier review skips remaining rounds.
 
 If blockers remain after round 2, stop automatic corrections and hand the current
 PR and evidence to the user. Additional rounds require an explicit user decision.
@@ -151,7 +174,7 @@ not a reason to bypass review or silently restart the correction budget.
   review history when updating the description.
 - Attach or link screenshots and other visual evidence from the PR, identifying
   commit and viewport. Do not rely on transient chat output as the only record.
-- The implementer updates the task file and milestone index together, following
+- The coordinator updates the task file and milestone index together, following
   the [shared tracking rules](milestones/readme.md#task-structure-and-status).
 
 Use `in_progress` during implementation, review, blocking, and the wait for manual
@@ -195,10 +218,10 @@ exercise details are refined before Task 03 without changing this validated scop
 The following is a desk walkthrough, not an executed agent or PR exercise:
 
 1. The user assigns the demonstration task with criteria and references. The
-   implementer checks readiness, creates its feature branch from `develop`, and
-   updates task and index to `in_progress`.
+   coordinator checks readiness, creates the feature branch from `develop`, adds
+   execution context, updates task/index, and dispatches the implementer.
 2. The implementer supplies a PR, head commit, checks, and desktop/mobile evidence.
-   The reviewer independently checks the three perspectives at that commit.
+   The coordinator dispatches the reviewer to independently check that commit.
 3. A fixture interaction fails a criterion (blocking); a cosmetic preference is
    optional. Both have evidence and verification steps. The optional item does
    not enter implementation scope and waits for the final PR handoff without
@@ -209,7 +232,7 @@ The following is a desk walkthrough, not an executed agent or PR exercise:
 5. If a required check cannot run, the result stays incomplete. If behavior is
    ambiguous or a blocker is disputed, the user receives the concrete decision.
    If blockers persist through round 2, further corrections await user direction.
-6. After the user's merge is verified, the implementer records merge evidence and
+6. After the user's merge is verified, the coordinator records merge evidence and
    updates task and index to `done`. These steps will be exercised in Task 03.
 
 ## Technical baseline and remaining work
@@ -225,10 +248,16 @@ three merge methods were enabled, and there were no open PRs.
 These are observations, not permanent guarantees. Recheck access and remote state
 when starting work. No test PR has been created, and branch protection, merge
 strategy, and role loading have not been configured or validated. GitHub API and
-push access are established; the full workflow remains for Tasks 01–03.
+push access are established; full validation follows coordinator setup (Task 04)
+and delegated role configuration (Tasks 01–02), with the exercise in Task 03.
 
 The user approved coordination, the two-round limit, evidence locations, and the
 representative exercise on 2026-10-28. Merge strategy and branch protections remain
 open decisions and do not block writing or configuring the role instructions.
+
+Later on the same date, the user approved a primary coordinator and separate
+implementer/reviewer agents, followed by explicit authorization to update this
+contract and configure the coordinator. This supersedes the original combined
+implementer/coordinator role; the two-round budget and manual merge remain intact.
 
 Reference: [official Codex subagent documentation](https://learn.chatgpt.com/docs/agent-configuration/subagents).

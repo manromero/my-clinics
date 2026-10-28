@@ -18,15 +18,19 @@ quality using the validated contract from [Task 00](<task 00 - define workflow.m
   Stitch references on desktop and mobile; record visual evidence and gaps.
 - Classify findings as blocking problems or optional improvements, with location,
   impact, and evidence. Recheck fixes and report any remaining limitations.
-- Return blockers to the implementer and a clean, supported result to the user.
+- Return findings and reviewed commit to the coordinator, which routes corrections
+  and manages final delivery. Optional suggestions never interrupt the workflow.
 
 ## Dependencies
 
-Task 00 is complete and its configuration decisions have been validated.
+Task 00 is complete, the three-role revision is approved, and
+[Task 04 — Configure coordinator](<task 04 - configure coordinator.md>) is complete.
 
 ## Acceptance criteria
 
 - The reviewer is a separate agent from the implementer.
+- The reviewer receives assignments from the coordinator and reports evidence
+  back to it without editing product files or starting corrections itself.
 - All three review perspectives are addressed, with non-applicable checks
   explicitly explained.
 - The reviewer verifies evidence instead of relying only on the implementer's
@@ -43,5 +47,5 @@ distinguishes them and rechecks a correction. Validate links and formatting.
 
 ## Progress notes
 
-Not started. Task 00 was accepted by the user on 2026-10-28; its dependency is
-satisfied. Implement the role against the approved workflow contract.
+Not started. Task 00 is accepted; awaiting Task 04 under the approved three-role
+revision. Configure independent review with handoff through the coordinator.
