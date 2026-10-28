@@ -39,6 +39,7 @@ See the [Tailwind CSS guide for Next.js](https://tailwindcss.com/docs/installati
 - [Git workflow](docs/git-workflow.md): `develop` → feature branch → `develop` → `main`, followed by a release tag on `main`.
 - [Architecture and shared components](docs/architecture.md): application organization and shared component conventions.
 - [Requirements](docs/requirements.md): confirmed scope, business rules, and acceptance criteria.
+- [Milestones and tasks](docs/milestones/readme.md): validated milestones, task definitions, and progress tracking.
 - [Screens](docs/screens.md): proposed screens, functionality, forms, navigation, and links to the Google Stitch visual references.
 - [Alexandria design guidance](docs/screens/alexandria/DESIGN.md): visual language used by the reference screens in `docs/screens/`.
 
