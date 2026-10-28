@@ -37,7 +37,7 @@ See the [Tailwind CSS guide for Next.js](https://tailwindcss.com/docs/installati
 
 - [Agent instructions](AGENTS.md)
 - [Git workflow](docs/git-workflow.md): `develop` → feature branch → `develop` → `main`, followed by a release tag on `main`.
-- [Development workflow contract](docs/development-workflow.md): coordinator intake and delivery, separate implementer and reviewer, two correction rounds, evidence, and manual user merge. The coordinator is configured; [the native implementer](.codex/agents/implementer.toml) is delivered through Task 01. Reviewer configuration and the full workflow exercise remain pending.
+- [Development workflow contract](docs/development-workflow.md): coordinator intake and delivery, separate implementer and reviewer, two correction rounds, evidence, and manual user merge. Native definitions exist for the [implementer](.codex/agents/implementer.toml) and [reviewer](.codex/agents/reviewer.toml); see their milestone validation reports for actual loading evidence. Start fresh agents with selected context per task and reuse them for that task's correction/review rounds. The full workflow exercise remains Task 03.
 - [Architecture and shared components](docs/architecture.md): application organization and shared component conventions.
 - [Requirements](docs/requirements.md): confirmed scope, business rules, and acceptance criteria.
 - [Milestones and tasks](docs/milestones/readme.md): validated milestones, task definitions, and progress tracking.
