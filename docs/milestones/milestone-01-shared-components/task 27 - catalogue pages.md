@@ -34,7 +34,7 @@ Run `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, and `pnpm b
 
 - Ready: user request defines the migration scope; no unresolved product decisions.
 - Branch: `feature/components-pages`; refreshed develop base: `4c037f85f743e4890281ae98a08ed6bd6c680b25`. Clean checkout at intake.
-- Sources: `src/app/components`, `docs/components-catalogue.md`, `docs/visual-foundations.md`, `docs/button.md`, architecture, requirements, screens and Alexandria references.
+- Sources: `src/app/components`, `docs/components-catalogue.md`, `docs/visual-foundations.md`, architecture, requirements, screens and Alexandria references.
 - Existing catalogue embeds foundations and Button in three section groups. Preserve demonstrations while changing route composition; empty future groups may remain index scaffolding without invented pages.
 - Read relevant installed Next.js guides before code changes. Native implementer and reviewer role selection is available in this session.
 - Correction rounds used: 0.
@@ -42,3 +42,19 @@ Run `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, and `pnpm b
 ## Progress notes
 
 Delivered in [PR #10](https://github.com/manromero/my-clinics/pull/10). Index and dedicated foundations/Button routes preserve existing specimens and interactions. Implementer and independent reviewer passed all required checks (13 tests, lint, typecheck, formatting, build), documentation links and live desktop/mobile checks at 1440 × 1000 and 390 × 844. Reviewed implementation head: `d0bc14fef386d027de241ce73059f0b3a74eae59`. No blocking or optional findings; 0 correction rounds. Six inline PR screenshots were independently inspected and retrieved successfully by reviewer and coordinator. Detailed evidence remains in the PR. Final tracking changes receive documentation review. Human acceptance and manual merge remain pending.
+
+## Documentation follow-up
+
+The user approved simplifying documentation in the same PR and explicitly waived
+implementer/reviewer subagents for this follow-up. Removed the separate Button
+Markdown guide; usage guidance now lives in the component API comments alongside
+the existing interactive catalogue examples. Kept concise catalogue registration
+instructions and cross-cutting foundations decisions. Future components do not
+require a separate Markdown guide by default. This follow-up changes documentation
+and code comments only; the previous live visual evidence remains applicable.
+Coordinator validation and direct user acceptance apply to this follow-up; it has
+not received an additional independent agent review.
+
+Follow-up validation: repository formatting and diff whitespace checks passed; all
+seven local links and both referenced document anchors resolved. No references
+to the removed guide remain. Application behavior and styles are unchanged.
