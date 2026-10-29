@@ -1,6 +1,6 @@
 # Task 03 — Implement IconButton
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -8,7 +8,7 @@ Implement IconButton for the shared MyClinics visual system.
 
 ## Scope
 
-Provide compact icon-only actions with required accessible names, consistent touch targets, focus, disabled and pending states. Reuse Button behavior without leaking decorative icons into the accessible name.
+Provide compact icon-only actions with recommended accessible labels, consistent touch targets, focus, disabled and pending states. Missing labels must not interrupt rendering or emit runtime diagnostics. Reuse Button behavior without leaking decorative icons into the accessible name.
 
 ## Exclusions
 
@@ -84,3 +84,11 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Update public examples and meaningful tests for the revised contract, including continued rendering/activation and absence of component warnings/errors when labels are absent. Preserve existing valid-label, disabled/pending and native form behavior.
 - Continue on `feature/shared-icon-button` and PR #11, from reviewed head `8c93a6180ef78ee45668a95d5a178c838f201555`. Use the same implementer and reviewer. Correction round: 1 of 2; do not reset the task budget.
 - Validate affected behavior and required application checks. Refresh affected catalogue evidence for any changed explanatory text; integrated browser only. The coordinator can mechanically execute agent-selected live sequences if delegated browser access is still unavailable, with explicit attribution.
+
+## Amendment delivery and independent review
+
+- User-requested label recommendation delivered in [PR #11](https://github.com/manromero/my-clinics/pull/11), reviewed source `56dfe6f134169f6d488d0bea6f9733a17d0ed824`. `label` is optional; no throw, warning or fabricated fallback is emitted. Omitted, empty and whitespace-only labels preserve rendering and native activation. The current scope above incorporates the approved change.
+- Implementer and separate reviewer passed all required checks: 15 tests in two files, lint, typecheck, full formatting, production build and whitespace checks. The reviewer found no defects or optional suggestions.
+- Six refreshed desktop/mobile screenshots and a 14-state live record verify the recommendation text, keyboard activation, visible focus and pending/restored behavior. All six current inline GitHub attachments returned HTTP 200 JPEG and independently matched the inspected originals by SHA256. Current capture source and actual viewport/image dimensions are recorded in the PR; older evidence remains explicitly historical.
+- Browser operation/capture was mechanically performed by the coordinator under separate agent plans; the implementer and reviewer independently evaluated the evidence. Direct delegated browser access is not claimed. Temporary evidence is removed after retrieval verification.
+- Correction rounds used: 1 of 2. Task/index returned to `done` following the clean amendment review; final tracking review is recorded in the PR. Human acceptance and manual merge remain pending.
