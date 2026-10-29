@@ -92,6 +92,6 @@ This PR changes documentation only. No application code, dependencies or tests a
 
 ## Catalogue navigation follow-up
 
-| Task                                                                            | Status        | Direct dependencies |
-| ------------------------------------------------------------------------------- | ------------- | ------------------- |
-| [27 — Split the catalogue into dedicated pages](<task 27 - catalogue pages.md>) | `in_progress` | 00, 01, 02          |
+| Task                                                                            | Status | Direct dependencies |
+| ------------------------------------------------------------------------------- | ------ | ------------------- |
+| [27 — Split the catalogue into dedicated pages](<task 27 - catalogue pages.md>) | `done` | 00, 01, 02          |

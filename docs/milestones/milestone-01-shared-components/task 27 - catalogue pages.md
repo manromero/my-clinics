@@ -1,6 +1,6 @@
 # Task 27 — Split the catalogue into dedicated pages
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -41,4 +41,4 @@ Run `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, and `pnpm b
 
 ## Progress notes
 
-Implementation and independent review pending.
+Delivered in [PR #10](https://github.com/manromero/my-clinics/pull/10). Index and dedicated foundations/Button routes preserve existing specimens and interactions. Implementer and independent reviewer passed all required checks (13 tests, lint, typecheck, formatting, build), documentation links and live desktop/mobile checks at 1440 × 1000 and 390 × 844. Reviewed implementation head: `d0bc14fef386d027de241ce73059f0b3a74eae59`. No blocking or optional findings; 0 correction rounds. Six inline PR screenshots were independently inspected and retrieved successfully by reviewer and coordinator. Detailed evidence remains in the PR. Final tracking changes receive documentation review. Human acceptance and manual merge remain pending.
