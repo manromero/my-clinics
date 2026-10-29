@@ -1,6 +1,6 @@
 # Task 01 — Define and implement the Alexandria visual foundations
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -38,3 +38,16 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready. Task 00 is done and merged; approved scope and criteria remain unchanged.
+- Branch: `feature/alexandria-foundations`; base: `d48578cb16573674dede7261368261b0390133d6` (`origin/develop`). Isolated worktree for parallel assignments.
+- References: `docs/architecture.md`, `docs/requirements.md`, `docs/screens.md`, Alexandria DESIGN.md and S01-S04 HTML/PNG exports.
+- Relevant implementation: `src/app/globals.css`, root layout and route-local `src/app/components` catalogue; existing Vitest infrastructure from Task 00.
+- Verified: pnpm 11.25.0, Next 16.4.3, React 19.3.0 and Tailwind v4/PostCSS already selected. Read installed Next guides before framework edits.
+- Constraints: foundations only; no dependent controls or production screens. English documentation, Spanish UI; light appearance; preserve parallel work in other checkouts.
+- Validation: unit tests, lint, typecheck, formatting, build, rendered desktop/mobile inspection including fonts, contrast, focus and reduced motion; verified inline PR attachments.
+- Open questions: none at intake. Hypotheses: none required.
+- Native implementer/reviewer roles available in this session. Sequential implementation and independent review.
+- Correction rounds used: 0.
