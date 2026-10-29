@@ -1,6 +1,6 @@
 # Task 03 — Implement IconButton
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -38,3 +38,25 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready; Task 02 is done and merged, and the dedicated catalogue pages are available on updated develop.
+- Branch: `feature/shared-icon-button`; base: `c965c6d3d29e9787676fba8c051d0be8aa73d43e` (updated origin/develop). The checkout was clean before assignment.
+- Relevant sources: requirements, architecture, screens, Alexandria DESIGN.md, applicable S02-S04 HTML/PNG exports, visual-foundations.md and components-catalogue.md.
+- Verified findings: Button provides four variants, three sizes, native safe button type, disabled/pending handling and decorative icon wrappers. Reuse its behavior; the catalogue now has dedicated route-local specimen folders. Use the existing inline SVG icon strategy.
+- Constraints: IconButton only, with Spanish accessible names and examples; no ActionLink, domain behavior or dependent components. Keep documentation in English and reusable tests beside the component.
+- Validation: pnpm test, pnpm lint, pnpm typecheck, pnpm format:check and pnpm build; live desktop/mobile keyboard, activation, disabled/pending, focus and responsive inspection against references. Capture temporary evidence outside the repository, attach inline to the PR and verify retrieval before cleanup.
+- Native implementer and reviewer roles are exposed in the active session. Use separate sequential agents and only one writer at a time.
+- Open questions: none. Hypotheses: none required. Correction rounds used: 0.
+
+## Implementation and independent review
+
+- Delivery state: blocked; implementation remains uncommitted on the prepared branch. No push or implementation PR was created. Task and index remain `in_progress`; human acceptance and manual merge are pending.
+- Delivered working files: shared IconButton and eight unit cases, dedicated `/components/icon-button` specimens/page, catalogue index entry and catalogue guide update. IconButton composes Button with a required nonblank accessible label, decorative icons, variants, sizes and inherited native disabled/pending behavior. Examples include Spanish edit, delete and pagination actions.
+- Validation: targeted Prettier formatting passed. `pnpm test` failed before executing tests with sandbox `EPERM` on project realpath. Two escalation requests returned no results while pending and were interrupted. Tests, lint, typecheck, full format check and build remain unverified; no application check failure is inferred from the access error.
+- Browser limitation: the implementer attempted the integrated browser, which reported local browser use disabled in Work settings. Native browser inspection, live desktop/mobile interactions, screenshots and verified GitHub attachments were not performed.
+- Independent reviewer examined the uncommitted implementation against base/HEAD `c965c6d3d29e9787676fba8c051d0be8aa73d43e`. Bounded static review found no concrete code defect; tracked `git diff --check` passed. This does not validate a new committed head or untracked-file formatting.
+- Open blocker IB-R01: required automated validation missing. Resolve by successfully running `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm format:check` and `pnpm build` against the delivery head and recording results.
+- Open blocker IB-R02: live functional and visual validation missing. Resolve through desktop/mobile interaction and visual checks against Alexandria/Stitch, focus/pending captures with viewport/source metadata, and verified inline GitHub PR attachments.
+- Correction rounds used: 0. Optional findings: none. Resume with the same implementer/reviewer after execution access is available; preserve existing working files. Complete checks, publication, evidence and independent review before marking done.
