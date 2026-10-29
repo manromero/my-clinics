@@ -10,11 +10,12 @@ export type ButtonProps = ComponentPropsWithRef<"button"> & {
 
 const variants = {
   primary:
-    "bg-linear-to-r from-primary to-primary-container text-on-primary enabled:hover:brightness-95",
+    "bg-linear-to-r from-primary to-primary-container text-on-primary enabled:hover:brightness-90",
   secondary:
     "bg-surface-container-high text-primary enabled:hover:bg-surface-dim",
-  tertiary: "text-primary enabled:hover:underline underline-offset-4",
-  destructive: "bg-error text-on-primary enabled:hover:brightness-95",
+  tertiary:
+    "text-primary enabled:hover:bg-primary/10 enabled:hover:underline underline-offset-4",
+  destructive: "bg-error text-on-primary enabled:hover:brightness-90",
 };
 const sizes = {
   sm: "min-h-11 px-3 py-2 text-caption",
@@ -22,7 +23,7 @@ const sizes = {
   lg: "min-h-14 px-6 py-4 text-body",
 };
 
-/** A labelled native action. Icons are decorative; operation state belongs to the caller. */
+/** Native action button with variants and a pending state. */
 export function Button({
   variant = "primary",
   size = "md",
@@ -41,7 +42,7 @@ export function Button({
       type={type}
       disabled={disabled || pending}
       aria-busy={pending || props["aria-busy"]}
-      className={`inline-flex max-w-full items-center justify-center gap-2 rounded-lg font-label font-semibold transition-[background-color,filter] duration-(--duration-fast) ease-standard disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex max-w-full cursor-pointer items-center justify-center gap-2 rounded-lg font-label font-semibold transition-[background-color,filter] duration-(--duration-fast) ease-standard disabled:cursor-default disabled:opacity-60 ${variants[variant]} ${sizes[size]} ${className}`}
     >
       {pending ? (
         <svg

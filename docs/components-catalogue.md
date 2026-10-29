@@ -1,74 +1,43 @@
 # Components catalogue
 
-Open `/components` directly with `pnpm dev`. This public development catalogue
-uses synthetic content only and has no authentication or data-service dependency.
-The initial catalogue is deliberately empty. Its route-local scaffolding is not
-a reusable UI component; future shared components belong directly in
-`src/lib/components`.
+Run `pnpm dev` and open `/components`. The index links to dedicated foundations
+and component pages, using synthetic content without authentication or services.
+Group each shared component with its unit tests in `src/lib/components/<component>`.
+Keep page-specific specimens within `src/app/components/<slug>`; only scaffolding
+shared by catalogue pages stays at the catalogue root.
 
-## Registering examples
+## Adding a component page
 
-`src/app/components/catalogue.tsx` exports the route-local `CatalogueSection`
-type and `catalogueSections` registry. Each section has a stable unique `id`
-(the URL fragment), a Spanish `title`, a Spanish `description`, and `examples`.
-Each example has a unique section-local `id`, Spanish `title`, and ReactNode
-`content`. `Catalogue` accepts an optional readonly `sections` array for isolated
-tests; the route uses the registry by default. Preserve existing IDs when titles
-change so bookmarked anchors keep working.
+- Create `src/app/components/<slug>/page.tsx` with a stable lowercase English slug.
+  Add its Spanish title, description and link to `src/app/components/page.tsx`.
+  Only register implemented, approved components.
+- Keep the page a Server Component with descriptive metadata. Use the route-local
+  `Catalogue` renderer with `title`, `description` and `sections`. Each section has
+  a stable `id`, Spanish title and description, and examples with a section-local
+  `id`, title and ReactNode `content`. Preserve IDs used by fragment links.
+- Put stateful demonstrations in a route-local Client Component, as in
+  [ButtonSpecimen](../src/app/components/button/button-specimen.tsx). Show supported
+  variants and relevant disabled, pending, error and focus states.
 
-Add approved examples to the appropriate section's `examples` array. For example,
-after a future Button task implements its shared component:
+Existing routes: `/components/foundations` and `/components/button`. For example,
+foundations motion links to `/components/foundations#fundamentos-movimiento`.
 
-```tsx
-examples: [
-  {
-    id: "primary",
-    title: "Acción principal",
-    content: <Button>Acción de ejemplo</Button>,
-  },
-];
-```
+## Documentation and validation
 
-Use a route-local Client Component for stateful demonstrations and import that
-demo into the registry. Keep the page a Server Component. Include supported
-variants and relevant disabled, pending, error and focus states in each approved
-task. Do not add placeholder implementations of future components. The global
-empty message disappears once examples are registered; empty sections retain
-their own message.
+Follow the [component documentation guidance](architecture.md#component-documentation):
+use types and readable code for contracts, and this temporary catalogue for
+demonstrations. Keep reusable components free of references to these test pages.
+Cross-cutting design decisions belong in
+[visual foundations](visual-foundations.md).
 
-## Unit tests
+Do not add unit tests for catalogue pages or their specimens: validate these
+demonstrations in the running application. Keep unit tests for reusable components.
+Run `pnpm test` (or `pnpm test:watch`) for colocated `src/**/*.test.ts(x)` tests.
+Vitest provides jsdom, React Testing Library, jest-dom and user-event. Test public
+semantics and behavior; verify layout and native fragment scrolling live.
 
-Run `pnpm test` for a non-interactive Vitest run, or `pnpm test:watch` while editing.
-Tests are colocated as `src/**/*.test.ts(x)`. Vitest uses jsdom, React Testing
-Library, jest-dom assertions and user-event, with the same `@/` alias as the app.
-Automatic cleanup isolates tests. Test public semantics and user behavior;
-screenshots and class snapshots do not replace interactions. jsdom does not
-perform native fragment scrolling or layout: verify those in the live browser.
-Async Server Components require a different testing strategy; the catalogue is
-synchronous and can be rendered directly.
-
-## Visual evidence
-
-Capture the running `/components` route at desktop and narrow mobile viewports.
-Check section links by mouse/touch and keyboard, fragment deep links, visible
-focus, wrapping and horizontal overflow. Compare tonal surfaces, whitespace and
-restrained blue/gold accents with [Alexandria](screens/alexandria/DESIGN.md) and
-the [Stitch screen references](screens.md#visual-design-references).
-Task 00 uses minimal local scaffolding and system fonts; Task 01 establishes
-the shared tokens and Noto Serif / Inter / Public Sans font loading.
-
-Capture into a temporary directory outside the repository. Upload useful captures
-as GitHub PR attachments and verify the saved inline URLs and image retrieval
-before removing temporary files and delivering the PR. Do not commit new delivery
-screenshots or use source commits to host them. Retain textual evidence records in the PR,
-with attachment URLs, actual viewport, image dimensions when different, state,
-source commit, capturer, and who performed live interactions. Refresh attachments
-after visual changes and preserve historical evidence and supplied references.
-Keep only a validation summary and PR link in the task; do not add a separate
-`docs/evidence` report that duplicates the PR.
-For example, `gh pr edit <number> --body-file <temporary-body-file> --attach <capture>`
-uploads a capture; a matching local Markdown reference in the body is rewritten
-to its attachment URL. Repeat `--attach` for multiple files. See the
-[GitHub attachment documentation](https://docs.github.com/en/github-cli/github-cli/attaching-files-with-github-cli)
-and the
-[workflow evidence contract](development-workflow.md#visual-pr-evidence).
+Follow the [development workflow](development-workflow.md#review-and-evidence)
+for validation, desktop/mobile review and PR screenshot attachments. Check changed
+pages, index/return links, direct entry, fragments, keyboard focus and overflow
+against [Alexandria](screens/alexandria/DESIGN.md) and the
+[screen references](screens.md#visual-design-references).
