@@ -71,3 +71,20 @@ tests while retaining reusable Button tests. Architecture, agent instructions an
 milestone component-location guidance follow the new convention. Existing completed
 task results remain historical records. The user-authorized direct follow-up path
 continues without additional implementer/reviewer delegation. Validation passed: 6 reusable Button tests, lint, typecheck, formatting and production build. Live production checks verified index navigation, foundations motion replay and Button pending/completion after relocation. No rendering or style changes were introduced; earlier visual captures remain representative.
+
+## Button pointer and hover follow-up
+
+The user requested a pointer cursor for enabled buttons, the default cursor for
+disabled buttons, and clearer hover color feedback. Enabled primary/destructive
+buttons now darken to 90% brightness, secondary retains its tonal background shift,
+and tertiary gains a subtle primary tint alongside its underline. All hover
+feedback is enabled-only, uses the existing 150ms transition, and respects reduced
+motion. Pending uses native disabled behavior and therefore the default cursor.
+
+Coordinator validation passed: 6 Button tests, lint, typecheck, formatting and
+production build. Live checks verified computed pointer/default cursors, real hover
+on all four variants, absence of hover feedback while disabled/pending, simulation
+completion, and no horizontal overflow at 390 × 844. Updated desktop (1440 × 1000)
+and mobile (390 × 844) captures are recorded in PR #10; the earlier Button captures
+are historical. This follows the user-authorized direct correction path without
+additional subagent review. Human acceptance and manual merge remain pending.
