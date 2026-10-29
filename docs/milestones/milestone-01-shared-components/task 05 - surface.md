@@ -1,6 +1,6 @@
 # Task 05 — Implement Surface / Card
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -38,3 +38,15 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready. Task 01 is done on the fetched develop baseline; approved scope and criteria remain unchanged.
+- Branch: `feature/shared-surface`; base: `5db4a97b62b2102357cc26d07e9f88ac49687a3a` (`origin/develop`). Dedicated worktree isolates parallel assignments.
+- Relevant files: `src/lib/components/surface`, route-local `src/app/components/surface`, catalogue index, existing theme tokens in `src/app/globals.css` and Vitest infrastructure.
+- Sources: project architecture, requirements, screens, Alexandria DESIGN.md and applicable S01-S04 HTML/PNG references; installed Next.js documentation before framework edits.
+- Verified: Next 16.4.3, React 19.3.0, Tailwind v4/PostCSS, pnpm 11.25.0. Existing catalogue has dedicated component pages. Native implementer and reviewer roles are available in the session.
+- Constraints: Surface only; white, tonal and highlighted blue variants, responsive padding, composable header/content/actions and caller-selected semantics. English documentation and Spanish specimens. Preserve unrelated work and do not implement dependent tasks.
+- Validation: meaningful composition/semantics unit tests, lint, typecheck, format check, production build, live desktop/mobile checks and verified inline GitHub screenshot attachments. Capture outside the repository. Use an independent dev-server port for this worktree.
+- Open questions: none. Hypotheses: none required at intake.
+- Correction rounds used: 0. Implementation and independent review pending.
