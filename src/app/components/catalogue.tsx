@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-import { foundationExamples } from "./foundations";
-import { ButtonSpecimen } from "./button-specimen";
+import Link from "next/link";
 
 /** Route-local registration contract. IDs are stable URL fragments. */
 export type CatalogueSection = {
@@ -10,35 +9,14 @@ export type CatalogueSection = {
   examples: { id: string; title: string; content: ReactNode }[];
 };
 
-export const catalogueSections: CatalogueSection[] = [
-  {
-    id: "fundamentos",
-    title: "Fundamentos visuales",
-    description:
-      "Color, tipografía y espaciado que darán coherencia al sistema.",
-    examples: foundationExamples,
-  },
-  {
-    id: "controles",
-    title: "Controles y contenedores",
-    description:
-      "Acciones, campos y estados para las interacciones cotidianas.",
-    examples: [
-      { id: "button", title: "Button · Acciones", content: <ButtonSpecimen /> },
-    ],
-  },
-  {
-    id: "estructura",
-    title: "Estructura de pantalla",
-    description: "Navegación y composición compartida entre las pantallas.",
-    examples: [],
-  },
-];
-
 export function Catalogue({
-  sections = catalogueSections,
+  title,
+  description,
+  sections,
 }: {
-  sections?: readonly CatalogueSection[];
+  title: string;
+  description: string;
+  sections: readonly CatalogueSection[];
 }) {
   return (
     <div className="min-h-screen bg-surface text-on-surface [&_a]:rounded-sm [&_a]:underline-offset-4 [&_a:hover]:underline [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-4 [&_a:focus-visible]:outline-primary">
@@ -47,12 +25,12 @@ export function Catalogue({
           <p className="font-label text-label font-semibold">
             MyClinics · Catálogo
           </p>
-          <a
-            href="#catalogo"
+          <Link
+            href="/components"
             className="px-1 py-2 text-sm font-medium text-primary"
           >
-            Ir al catálogo
-          </a>
+            Volver al catálogo
+          </Link>
         </div>
       </header>
       <main
@@ -64,11 +42,10 @@ export function Catalogue({
           Biblioteca de interfaz
         </p>
         <h1 className="mt-4 font-headline text-headline sm:text-display">
-          Catálogo de componentes
+          {title}
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-7 text-on-surface-variant">
-          Un espacio para explorar las piezas de MyClinics, sus variantes y sus
-          estados a medida que se incorporen.
+          {description}
         </p>
         {sections.every((section) => section.examples.length === 0) && (
           <div className="mt-10 rounded-xl bg-surface-container p-6 sm:p-8">

@@ -3,7 +3,7 @@
 The public styling API is the semantic Tailwind theme in
 [src/app/globals.css](../src/app/globals.css). The light theme follows
 [Alexandria](screens/alexandria/DESIGN.md), using the shared S01–S04 palette.
-The [/components](../src/app/components/page.tsx) specimens demonstrate the contract.
+The [/components/foundations](../src/app/components/foundations/page.tsx) specimens demonstrate the contract.
 No component library is introduced: Tailwind v4 and native HTML are sufficient for
 foundations. Complex interaction primitives will be evaluated in their own tasks.
 

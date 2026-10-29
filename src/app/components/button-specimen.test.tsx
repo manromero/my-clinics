@@ -1,7 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import ComponentsPage from "./page";
+import ComponentsPage from "./button/page";
 
 describe("Button catalogue", () => {
   it("registers each variant and size and completes a pending operation", async () => {

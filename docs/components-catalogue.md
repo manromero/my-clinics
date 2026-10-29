@@ -2,39 +2,32 @@
 
 Open `/components` directly with `pnpm dev`. This public development catalogue
 uses synthetic content only and has no authentication or data-service dependency.
-The initial catalogue is deliberately empty. Its route-local scaffolding is not
-a reusable UI component; future shared components belong directly in
-`src/lib/components`.
+The index links to the dedicated `/components/foundations` and
+`/components/button` pages without embedding specimens. Each page opens directly
+and links back to the index. This route-local scaffolding is not a reusable UI
+component; shared components belong directly in `src/lib/components`.
 
-## Registering examples
+## Registering pages and examples
 
-`src/app/components/catalogue.tsx` exports the route-local `CatalogueSection`
-type and `catalogueSections` registry. Each section has a stable unique `id`
-(the URL fragment), a Spanish `title`, a Spanish `description`, and `examples`.
-Each example has a unique section-local `id`, Spanish `title`, and ReactNode
-`content`. `Catalogue` accepts an optional readonly `sections` array for isolated
-tests; the route uses the registry by default. Preserve existing IDs when titles
-change so bookmarked anchors keep working.
+Give each approved component its own `src/app/components/<slug>/page.tsx` route
+and add a Spanish title, description and link to the index in
+`src/app/components/page.tsx`. Use stable, lowercase English slugs, following
+`/components/button`. Do not create pages or implementations for pending components.
 
-Add approved examples to the appropriate section's `examples` array. For example,
-after a future Button task implements its shared component:
+Keep pages as Server Components with descriptive metadata. Use the route-local
+`Catalogue` renderer from `catalogue.tsx` for the heading, index return link,
+section navigation and examples. Pass a Spanish `title`, `description` and readonly
+`sections` array. `CatalogueSection` defines each section's stable unique `id`
+(URL fragment), Spanish title and description, and examples with section-local
+`id`, Spanish title and ReactNode content.
 
-```tsx
-examples: [
-  {
-    id: "primary",
-    title: "Acción principal",
-    content: <Button>Acción de ejemplo</Button>,
-  },
-];
-```
-
-Use a route-local Client Component for stateful demonstrations and import that
-demo into the registry. Keep the page a Server Component. Include supported
-variants and relevant disabled, pending, error and focus states in each approved
-task. Do not add placeholder implementations of future components. The global
-empty message disappears once examples are registered; empty sections retain
-their own message.
+The foundations page imports `foundationExamples`; the Button page composes
+`ButtonSpecimen`. Use a route-local Client Component for stateful demonstrations.
+Include supported variants and relevant disabled, pending, error and focus states
+within each approved task. Preserve existing section and example IDs when titles
+change. The existing foundations fragments now live under
+`/components/foundations` (for example, `#fundamentos-movimiento`); the Button
+fragment is `/components/button#controles-button`.
 
 ## Unit tests
 
@@ -49,7 +42,8 @@ synchronous and can be rendered directly.
 
 ## Visual evidence
 
-Capture the running `/components` route at desktop and narrow mobile viewports.
+Capture `/components` and every changed dedicated page at desktop and narrow
+mobile viewports. Verify index links, direct page entry and return navigation.
 Check section links by mouse/touch and keyboard, fragment deep links, visible
 focus, wrapping and horizontal overflow. Compare tonal surfaces, whitespace and
 restrained blue/gold accents with [Alexandria](screens/alexandria/DESIGN.md) and

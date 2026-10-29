@@ -2,7 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { colorFamilies } from "./foundations";
-import ComponentsPage from "./page";
+import ComponentsPage from "./foundations/page";
 
 describe("Alexandria foundations", () => {
   it("registers every palette role as a labelled specimen", () => {

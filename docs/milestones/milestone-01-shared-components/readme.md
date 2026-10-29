@@ -89,3 +89,9 @@ All 27 task files and index rows are done only after their implementation, unit 
 ## Planning delivery
 
 This PR changes documentation only. No application code, dependencies or tests are implemented here; graphical evidence belongs to the future UI tasks. Validate these definitions through formatting, local links/anchors, dependency-cycle and scope/coverage checks. Task status remains pending until execution is assigned.
+
+## Catalogue navigation follow-up
+
+| Task                                                                            | Status        | Direct dependencies |
+| ------------------------------------------------------------------------------- | ------------- | ------------------- |
+| [27 — Split the catalogue into dedicated pages](<task 27 - catalogue pages.md>) | `in_progress` | 00, 01, 02          |

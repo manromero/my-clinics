@@ -3,7 +3,7 @@
 Import `Button` and `ButtonProps` from `@/lib/components/button`.
 It renders a native `<button>` and can be composed in Server or Client Components.
 Interactive consumers must use a Client Component, as shown in the
-[showcase](../src/app/components/button-specimen.tsx).
+[showcase at `/components/button`](../src/app/components/button/page.tsx).
 
 | Prop                   | Contract                                                                                                                 |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------ |
