@@ -53,8 +53,9 @@ No component library has been selected. Evaluate one when defining the initial U
 ## Component documentation
 
 Let clear names, TypeScript types and readable implementation describe the API.
-Add brief code comments only to explain non-obvious decisions, constraints or
-workarounds; do not restate props, defaults or behavior already evident in code.
+An optional one-line comment may describe a component's purpose. Use additional
+comments only for non-obvious decisions, constraints or workarounds; do not list
+props, defaults or behavior already evident in code.
 Do not use component comments as usage manuals or add a Markdown guide per
 component by default.
 

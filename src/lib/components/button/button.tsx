@@ -23,6 +23,7 @@ const sizes = {
   lg: "min-h-14 px-6 py-4 text-body",
 };
 
+/** Native action button with variants and a pending state. */
 export function Button({
   variant = "primary",
   size = "md",
