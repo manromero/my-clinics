@@ -31,9 +31,7 @@ export const catalogueSections: CatalogueSection[] = [
     id: "estructura",
     title: "Estructura de pantalla",
     description: "Navegación y composición compartida entre las pantallas.",
-    examples: [
-      { id: "button", title: "Button · Acciones", content: <ButtonSpecimen /> },
-    ],
+    examples: [],
   },
 ];
 
