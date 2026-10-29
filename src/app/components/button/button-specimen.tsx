@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/lib/components/button";
+import { Button } from "@/lib/components/button/button";
 
 function PlusIcon() {
   return (

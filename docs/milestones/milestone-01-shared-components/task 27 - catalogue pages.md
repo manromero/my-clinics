@@ -58,3 +58,16 @@ not received an additional independent agent review.
 Follow-up validation: repository formatting and diff whitespace checks passed; all
 seven local links and both referenced document anchors resolved. No references
 to the removed guide remain. Application behavior and styles are unchanged.
+
+## Folder organization follow-up
+
+The user requested page-local specimens, one shared-component folder containing
+implementation and tests, and no unit tests for catalogue pages/specimens. This
+approved decision supersedes the original flat-folder and catalogue unit-test
+requirements. Button and its tests now live under `src/lib/components/button`;
+Button specimens live under `src/app/components/button`, and foundations/motion
+specimens under `src/app/components/foundations`. Removed catalogue/specimen unit
+tests while retaining reusable Button tests. Architecture, agent instructions and
+milestone component-location guidance follow the new convention. Existing completed
+task results remain historical records. The user-authorized direct follow-up path
+continues without additional implementer/reviewer delegation. Validation passed: 6 reusable Button tests, lint, typecheck, formatting and production build. Live production checks verified index navigation, foundations motion replay and Button pending/completion after relocation. No rendering or style changes were introduced; earlier visual captures remain representative.

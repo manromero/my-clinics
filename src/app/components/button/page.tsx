@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Catalogue } from "../catalogue";
-import { ButtonSpecimen } from "../button-specimen";
+import { ButtonSpecimen } from "./button-specimen";
 
 export const metadata: Metadata = {
   title: "Button · Acciones | MyClinics",

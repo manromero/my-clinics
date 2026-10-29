@@ -2,8 +2,9 @@
 
 Run `pnpm dev` and open `/components`. The index links to dedicated foundations
 and component pages, using synthetic content without authentication or services.
-Shared components belong directly in `src/lib/components`; catalogue scaffolding
-stays under `src/app/components`.
+Group each shared component with its unit tests in `src/lib/components/<component>`.
+Keep page-specific specimens within `src/app/components/<slug>`; only scaffolding
+shared by catalogue pages stays at the catalogue root.
 
 ## Adding a component page
 
@@ -15,7 +16,7 @@ stays under `src/app/components`.
   a stable `id`, Spanish title and description, and examples with a section-local
   `id`, title and ReactNode `content`. Preserve IDs used by fragment links.
 - Put stateful demonstrations in a route-local Client Component, as in
-  [ButtonSpecimen](../src/app/components/button-specimen.tsx). Show supported
+  [ButtonSpecimen](../src/app/components/button/button-specimen.tsx). Show supported
   variants and relevant disabled, pending, error and focus states.
 
 Existing routes: `/components/foundations` and `/components/button`. For example,
@@ -29,6 +30,8 @@ default. Add separate documentation only for decisions or instructions that code
 and examples cannot clearly express. Cross-cutting design decisions belong in
 [visual foundations](visual-foundations.md).
 
+Do not add unit tests for catalogue pages or their specimens: validate these
+demonstrations in the running application. Keep unit tests for reusable components.
 Run `pnpm test` (or `pnpm test:watch`) for colocated `src/**/*.test.ts(x)` tests.
 Vitest provides jsdom, React Testing Library, jest-dom and user-event. Test public
 semantics and behavior; verify layout and native fragment scrolling live.

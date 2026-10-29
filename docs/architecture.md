@@ -4,7 +4,7 @@
 
 - Use pnpm, Next.js App Router, TypeScript, and Tailwind CSS.
 - Reuse common components across screens.
-- Keep shared components directly in `src/lib/components`; introduce subfolders only when their volume makes them useful.
+- Group each shared component and its unit tests in `src/lib/components/<component>`.
 - Keep shared logic in `src/lib` and route-specific implementation close to its route.
 - Write project documentation in English.
 
@@ -12,7 +12,7 @@ The current application is a starter with code under `src/app` and the `@/*` imp
 
 ## Organization
 
-Keep routes and layouts in `src/app`. Treat `src/lib` as the application's shared library: reusable logic belongs there, and reusable components belong directly in `src/lib/components`. Keep implementation details used by one route close to that route.
+Keep routes and layouts in `src/app`. Treat `src/lib` as the application's shared library: reusable logic belongs there, and reusable components belong in their own folders under `src/lib/components`. Keep implementation details used by one route close to that route.
 
 ```text
 src/
@@ -24,7 +24,7 @@ src/
     components/
 ```
 
-Start with a flat `src/lib/components` directory. Add groups such as `clinics`, `ui`, or `layout` only when the number of components makes navigation difficult and the grouping has a clear purpose.
+Use one folder per shared component, for example `src/lib/components/button/button.tsx` with `button.test.tsx` beside it. Keep catalogue specimens in the corresponding `src/app/components/<slug>` folder. Catalogue pages and specimens are tested live rather than with unit tests; reusable components retain their unit tests.
 
 | Location                                          | Responsibility                                                       | Examples                                                    |
 | ------------------------------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------- |
@@ -44,7 +44,7 @@ project conventions in this document.
 
 Before creating a component, look for an existing component that covers the same interaction or visual pattern. Extend it with a focused prop or compose it when that keeps its purpose clear.
 
-Keep generic components independent of clinic, activity, or reporting rules. Both a reusable button and a reusable clinic selector belong directly in `src/lib/components`; their responsibilities can stay distinct without separate folders. Shared code should not import route files. Routes compose shared components and logic.
+Keep generic components independent of clinic, activity, or reporting rules. A reusable button and a reusable clinic selector each have their own folder under `src/lib/components`. Shared code should not import route files. Routes compose shared components and logic.
 
 Extract repeated patterns when their shared behavior is understood. Avoid a generic component with many unrelated flags just to combine screens that happen to look similar. Keep keyboard interaction, labels, focus behavior, and loading, empty, and error states consistent across consumers.
 
@@ -58,7 +58,7 @@ Use Tailwind CSS utilities for new UI and shared theme tokens for colors, typogr
 
 ## Rationale and references
 
-Next.js supports `src` and route-local code, and presents several organization strategies without requiring a single application architecture. Using `src/lib` for shared logic and a flat `src/lib/components` for shared UI is a project convention.
+Next.js supports `src` and route-local code, and presents several organization strategies without requiring a single application architecture. Using `src/lib` for shared logic and component folders under `src/lib/components` for shared UI is a project convention.
 
 - [Next.js: project structure and organization](https://nextjs.org/docs/app/getting-started/project-structure)
 - [Next.js: Server and Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components)

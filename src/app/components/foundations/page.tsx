@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Catalogue } from "../catalogue";
-import { foundationExamples } from "../foundations";
+import { foundationExamples } from "./foundations";
 
 export const metadata: Metadata = {
   title: "Fundamentos visuales | MyClinics",
