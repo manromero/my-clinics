@@ -1,6 +1,6 @@
 # Task 03 — Implement IconButton
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -67,3 +67,12 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Automated execution access is now available. Implementer passed `pnpm test` (14 tests in two files, including eight IconButton cases), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build` and `git diff --check` against the committed implementation. IB-R01 has passing implementation evidence, pending independent verification.
 - User requested the integrated browser exclusively. Fresh attempts, including after resetting the control session, returned `Browser is not available: iab`. No further Chrome use is authorized or planned. Live interactions, desktop/mobile comparison, captures and verified inline GitHub attachments remain missing; IB-R02 remains open.
 - Task and milestone index remain `in_progress`; PR is blocked for visual/functional validation. Human acceptance and manual merge are pending. Correction rounds used: 0. Independent review of the committed implementation and updated tracking follows.
+
+## Completed agent delivery
+
+- Ready for human review and manual merge in [PR #11](https://github.com/manromero/my-clinics/pull/11). Earlier blocked-state notes above are historical. Task and index are now `done`; human approval and manual merge remain pending.
+- Independently reviewed source: `9b4e3447a50fcaafeb55d7183b678f6b9a0a3211`, against base `c965c6d3d29e9787676fba8c051d0be8aa73d43e`. Implementer and separate reviewer passed all required automated checks, including 14 tests, lint, typecheck, full formatting and production build. IB-R01 is fixed and verified.
+- Integrated-browser desktop (1440 x 900) and mobile (390 x 844) validation covers native keyboard/click activation, required Spanish names, decorative icons, visible focus, 44/48/56 px targets, disabled/pending behavior, pagination boundaries, catalogue routes/fragments and absence of horizontal overflow. Six inline GitHub attachments preserve overview, focus and pending captures with actual image dimensions and source labels. Coordinator verified every attachment returns HTTP 200 as JPEG. IB-R02 is fixed and verified.
+- Attribution: delegated browser access remained unavailable even after root access recovered. The coordinator mechanically operated and captured the integrated browser under separate implementer and reviewer plans. The implementer compared the captures to references; the independent reviewer evaluated all six images and raw live records against Alexandria/S02-S04 and found no defects. Direct reviewer browser access is not claimed.
+- Attachment limitation: the reviewer independently retrieved and hash-matched five images; its fresh sixth retrieval was rejected and not retried. It verified the supplied coordinator/implementer HTTP 200, JPEG and 29,151-byte evidence against the inspected mobile-pending original, without claiming an independent sixth hash match.
+- Independent conclusion: no blockers or optional findings remain. Correction rounds used: 0; evidence completion required no product corrections. Final tracking review is retained in the PR; this administrative update does not change the captured UI.
