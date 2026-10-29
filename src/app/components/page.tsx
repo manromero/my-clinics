@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/icon-button",
+    title: "IconButton · Acciones con iconos",
+    description:
+      "Nombres accesibles, áreas táctiles y estados de acciones compactas.",
+  },
+  {
     href: "/components/foundations",
     title: "Fundamentos visuales",
     description: "Color, tipografía, superficies, espacio, foco y movimiento.",

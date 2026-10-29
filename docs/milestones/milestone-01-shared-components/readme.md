@@ -24,7 +24,7 @@ Include the basic UI and shared screen structure identified during discovery. Ex
 | [00 — Create the /components screen and unit-test infrastructure](<task 00 - components showcase.md>) | `done`    | —                   |
 | [01 — Define and implement the Alexandria visual foundations](<task 01 - visual foundations.md>)      | `done`    | 00                  |
 | [02 — Implement Button](<task 02 - button.md>)                                                        | `done`    | 01                  |
-| [03 — Implement IconButton](<task 03 - icon button.md>)                                               | `pending` | 02                  |
+| [03 — Implement IconButton](<task 03 - icon button.md>)                                               | `done`    | 02                  |
 | [04 — Implement ActionLink](<task 04 - action link.md>)                                               | `pending` | 01                  |
 | [05 — Implement Surface / Card](<task 05 - surface.md>)                                               | `pending` | 01                  |
 | [06 — Implement Badge](<task 06 - badge.md>)                                                          | `pending` | 01                  |

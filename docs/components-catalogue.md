@@ -19,7 +19,8 @@ shared by catalogue pages stays at the catalogue root.
   [ButtonSpecimen](../src/app/components/button/button-specimen.tsx). Show supported
   variants and relevant disabled, pending, error and focus states.
 
-Existing routes: `/components/foundations` and `/components/button`. For example,
+Existing routes: `/components/foundations`, `/components/button` and
+`/components/icon-button`. For example,
 foundations motion links to `/components/foundations#fundamentos-movimiento`.
 
 ## Documentation and validation
