@@ -1,6 +1,6 @@
 # Milestone 01 — Visual foundations and shared components
 
-Planning approved through PR #5 merged into develop. Task 00 was accepted by the user and merged through PR #6; other implementation tasks remain pending.
+Planning approved through PR #5 merged into develop. Task 00 was accepted by the user and merged through PR #6; Task 01 is complete and ready for human acceptance in PR #8; other implementation tasks remain pending.
 
 ## Objective
 
@@ -22,7 +22,7 @@ Include the basic UI and shared screen structure identified during discovery. Ex
 | Task                                                                                                  | Status    | Direct dependencies |
 | ----------------------------------------------------------------------------------------------------- | --------- | ------------------- |
 | [00 — Create the /components screen and unit-test infrastructure](<task 00 - components showcase.md>) | `done`    | —                   |
-| [01 — Define and implement the Alexandria visual foundations](<task 01 - visual foundations.md>)      | `pending` | 00                  |
+| [01 — Define and implement the Alexandria visual foundations](<task 01 - visual foundations.md>)      | `done`    | 00                  |
 | [02 — Implement Button](<task 02 - button.md>)                                                        | `pending` | 01                  |
 | [03 — Implement IconButton](<task 03 - icon button.md>)                                               | `pending` | 02                  |
 | [04 — Implement ActionLink](<task 04 - action link.md>)                                               | `pending` | 01                  |

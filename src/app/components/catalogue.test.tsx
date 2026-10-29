@@ -1,12 +1,19 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import ComponentsPage from "./page";
-import { Catalogue } from "./catalogue";
+
+import { Catalogue, catalogueSections } from "./catalogue";
 
 describe("components catalogue", () => {
   it("opens with a single page heading and an honest empty state", () => {
-    render(<ComponentsPage />);
+    render(
+      <Catalogue
+        sections={catalogueSections.map((section) => ({
+          ...section,
+          examples: [],
+        }))}
+      />,
+    );
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "Catálogo de componentes",
@@ -19,7 +26,14 @@ describe("components catalogue", () => {
 
   it("provides keyboard-operable links to labelled section destinations", async () => {
     const user = userEvent.setup();
-    render(<ComponentsPage />);
+    render(
+      <Catalogue
+        sections={catalogueSections.map((section) => ({
+          ...section,
+          examples: [],
+        }))}
+      />,
+    );
     await user.tab();
     expect(screen.getByRole("link", { name: "Ir al catálogo" })).toHaveFocus();
     const navigation = screen.getByRole("navigation", {
