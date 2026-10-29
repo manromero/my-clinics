@@ -88,3 +88,18 @@ completion, and no horizontal overflow at 390 × 844. Updated desktop (1440 × 1
 and mobile (390 × 844) captures are recorded in PR #10; the earlier Button captures
 are historical. This follows the user-authorized direct correction path without
 additional subagent review. Human acceptance and manual merge remain pending.
+
+## Component comment guidance follow-up
+
+Removed Button's explanatory comment block, including its reference to the
+temporary catalogue. The user clarified that catalogue pages will be removed
+after the component milestone. Architecture now defines the lasting convention:
+use readable code and types, comment only non-obvious reasoning or constraints,
+and keep demonstration references out of reusable components. Catalogue guidance
+and the milestone completion contract link to that single policy. This direct
+follow-up changes comments/documentation only; no behavior or visual output changes.
+
+Validation: repository formatting, diff whitespace and affected local links/anchor
+passed. No catalogue references remain under src/lib/components. Application checks
+were not repeated for comment/documentation-only changes; prior behavior checks
+and visual evidence remain applicable. No additional subagent review was performed.

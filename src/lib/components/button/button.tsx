@@ -23,17 +23,6 @@ const sizes = {
   lg: "min-h-14 px-6 py-4 text-body",
 };
 
-/**
- * A labelled native action; see /components/button for interactive examples.
- * Defaults to type="button"; use type="submit" explicitly for form submission.
- * Pending disables activation and sets aria-busy. The caller owns operation state
- * and supplies nearby live progress, success or failure feedback.
- * Disabled/pending buttons are omitted from sequential keyboard focus.
- * Icons must be decorative and noninteractive; keep visible text in children.
- * Use IconButton for icon-only actions. Do not nest links or controls in slots.
- * Interactive consumers need a Client Component. className supports composition;
- * preserve contrast, target size and focus styling when overriding styles.
- */
 export function Button({
   variant = "primary",
   size = "md",

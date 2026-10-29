@@ -65,6 +65,7 @@ Primary sources: [Tailwind theme variables](https://tailwindcss.com/docs/theme) 
 
 ## Completion contract for every task
 
+- Follow the [component documentation guidance](../../architecture.md#component-documentation): avoid redundant code comments and references from reusable components to the temporary catalogue.
 - Add or update the component's interactive examples in [/components](<task 00 - components showcase.md>), covering the variants and states in this task. Foundations must appear as specimens; the showcase task provides the initial screen itself.
 - Include meaningful unit tests for the delivered public contract, semantics and interactions. No task is complete with screenshots alone, implementation-mirroring assertions or snapshots alone.
 - Capture graphical evidence from the running /components screen at desktop (for example 1440 x 900) and inspect mobile (for example 390 x 844). Include a mobile capture whenever layout, wrapping, controls or interaction presentation differs; if one capture suffices, explicitly record mobile inspection and why no separate image is needed. Label actual viewport, component/state, capturer and source commit. Capture focus/error/pending states when relevant.

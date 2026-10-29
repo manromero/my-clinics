@@ -24,10 +24,10 @@ foundations motion links to `/components/foundations#fundamentos-movimiento`.
 
 ## Documentation and validation
 
-Use TypeScript types and concise code comments for component contracts, and the
-catalogue for usage examples. Do not create a Markdown file per component by
-default. Add separate documentation only for decisions or instructions that code
-and examples cannot clearly express. Cross-cutting design decisions belong in
+Follow the [component documentation guidance](architecture.md#component-documentation):
+use types and readable code for contracts, and this temporary catalogue for
+demonstrations. Keep reusable components free of references to these test pages.
+Cross-cutting design decisions belong in
 [visual foundations](visual-foundations.md).
 
 Do not add unit tests for catalogue pages or their specimens: validate these

@@ -50,6 +50,19 @@ Extract repeated patterns when their shared behavior is understood. Avoid a gene
 
 No component library has been selected. Evaluate one when defining the initial UI; do not assume Tailwind CSS requires a particular library.
 
+## Component documentation
+
+Let clear names, TypeScript types and readable implementation describe the API.
+Add brief code comments only to explain non-obvious decisions, constraints or
+workarounds; do not restate props, defaults or behavior already evident in code.
+Do not use component comments as usage manuals or add a Markdown guide per
+component by default.
+
+The `/components` catalogue is temporary development scaffolding intended for
+removal after the component milestone. Keep demonstration instructions there;
+reusable components must not reference its routes, specimens or tests, including
+in comments. Keep lasting cross-cutting guidance in project documentation.
+
 ## Next.js and styling
 
 Keep pages and layouts as Server Components by default. Add a Client Component boundary for state, event handlers, or browser APIs, close to the interactive part. Keep secrets and server data access out of client imports.
