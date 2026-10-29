@@ -5,13 +5,13 @@ export type IconButtonProps = Omit<
   ButtonProps,
   "children" | "startIcon" | "endIcon" | "aria-label" | "aria-labelledby"
 > & {
-  label: string;
+  label?: string;
   icon: ReactNode;
 };
 
 const widths = { sm: "w-11", md: "w-12", lg: "w-14" };
 
-/** Icon-only action with an explicit accessible name. */
+/** Icon-only action; a descriptive label is recommended for accessibility. */
 export function IconButton({
   label,
   icon,
@@ -20,10 +20,6 @@ export function IconButton({
   className = "",
   ...props
 }: IconButtonProps) {
-  if (!label.trim()) {
-    throw new Error("IconButton requires a nonblank label.");
-  }
-
   return (
     <Button
       {...props}

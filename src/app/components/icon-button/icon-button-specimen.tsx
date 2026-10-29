@@ -35,10 +35,11 @@ export function IconButtonSpecimen() {
   return (
     <div className="space-y-6">
       <p className="text-sm leading-6 text-on-surface-variant">
-        Cada botón requiere <code>label</code> e <code>icon</code>. Admite las
-        variantes y estados de Button; la variante predeterminada es terciaria.
-        Usa Tab para ver el foco e Intro o Espacio para activar. Estos ejemplos
-        no modifican datos.
+        Cada botón requiere <code>icon</code>. Se recomienda indicar un{" "}
+        <code>label</code> descriptivo para que la acción tenga un nombre
+        accesible. Admite las variantes y estados de Button; la variante
+        predeterminada es terciaria. Usa Tab para ver el foco e Intro o Espacio
+        para activar. Estos ejemplos no modifican datos.
       </p>
       <div className="flex flex-wrap gap-6">
         {(["primary", "secondary", "tertiary", "destructive"] as const).map(

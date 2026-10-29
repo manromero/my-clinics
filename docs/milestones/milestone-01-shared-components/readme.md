@@ -19,35 +19,35 @@ Include the basic UI and shared screen structure identified during discovery. Ex
 - Reusable basic controls and containers: Tasks 02-18.
 - Shared screen structure: Tasks 19-26.
 
-| Task                                                                                                  | Status    | Direct dependencies |
-| ----------------------------------------------------------------------------------------------------- | --------- | ------------------- |
-| [00 — Create the /components screen and unit-test infrastructure](<task 00 - components showcase.md>) | `done`    | —                   |
-| [01 — Define and implement the Alexandria visual foundations](<task 01 - visual foundations.md>)      | `done`    | 00                  |
-| [02 — Implement Button](<task 02 - button.md>)                                                        | `done`    | 01                  |
-| [03 — Implement IconButton](<task 03 - icon button.md>)                                               | `done`    | 02                  |
-| [04 — Implement ActionLink](<task 04 - action link.md>)                                               | `pending` | 01                  |
-| [05 — Implement Surface / Card](<task 05 - surface.md>)                                               | `pending` | 01                  |
-| [06 — Implement Badge](<task 06 - badge.md>)                                                          | `pending` | 01                  |
-| [07 — Implement FormField](<task 07 - form field.md>)                                                 | `pending` | 01                  |
-| [08 — Implement TextInput](<task 08 - text input.md>)                                                 | `pending` | 07                  |
-| [09 — Implement DecimalInput](<task 09 - decimal input.md>)                                           | `pending` | 07                  |
-| [10 — Implement DateInput](<task 10 - date input.md>)                                                 | `pending` | 07                  |
-| [11 — Implement Select](<task 11 - select.md>)                                                        | `pending` | 07                  |
-| [12 — Implement SegmentedControl](<task 12 - segmented control.md>)                                   | `pending` | 01                  |
-| [13 — Implement Alert / StatusMessage](<task 13 - alert.md>)                                          | `pending` | 02                  |
-| [14 — Implement LoadingState](<task 14 - loading state.md>)                                           | `pending` | 01                  |
-| [15 — Implement EmptyState](<task 15 - empty state.md>)                                               | `pending` | 02, 04, 05          |
-| [16 — Implement Dialog](<task 16 - dialog.md>)                                                        | `pending` | 02, 05              |
-| [17 — Implement FormPanel](<task 17 - form panel.md>)                                                 | `pending` | 16, 07, 13          |
-| [18 — Implement ConfirmDialog](<task 18 - confirm dialog.md>)                                         | `pending` | 16, 13              |
-| [19 — Implement Brand](<task 19 - brand.md>)                                                          | `pending` | 01                  |
-| [20 — Implement MainNavigation](<task 20 - main navigation.md>)                                       | `pending` | 04, 06              |
-| [21 — Implement UserIdentity](<task 21 - user identity.md>)                                           | `pending` | 01                  |
-| [22 — Implement UserMenu](<task 22 - user menu.md>)                                                   | `pending` | 03, 04, 13, 16, 21  |
-| [23 — Implement PageContainer](<task 23 - page container.md>)                                         | `pending` | 01                  |
-| [24 — Implement PageHeader](<task 24 - page header.md>)                                               | `pending` | 04, 06, 23          |
-| [25 — Implement AppHeader](<task 25 - app header.md>)                                                 | `pending` | 19, 20, 21, 22, 23  |
-| [26 — Implement AppFooter](<task 26 - app footer.md>)                                                 | `pending` | 04, 23              |
+| Task                                                                                                  | Status        | Direct dependencies |
+| ----------------------------------------------------------------------------------------------------- | ------------- | ------------------- |
+| [00 — Create the /components screen and unit-test infrastructure](<task 00 - components showcase.md>) | `done`        | —                   |
+| [01 — Define and implement the Alexandria visual foundations](<task 01 - visual foundations.md>)      | `done`        | 00                  |
+| [02 — Implement Button](<task 02 - button.md>)                                                        | `done`        | 01                  |
+| [03 — Implement IconButton](<task 03 - icon button.md>)                                               | `in_progress` | 02                  |
+| [04 — Implement ActionLink](<task 04 - action link.md>)                                               | `pending`     | 01                  |
+| [05 — Implement Surface / Card](<task 05 - surface.md>)                                               | `pending`     | 01                  |
+| [06 — Implement Badge](<task 06 - badge.md>)                                                          | `pending`     | 01                  |
+| [07 — Implement FormField](<task 07 - form field.md>)                                                 | `pending`     | 01                  |
+| [08 — Implement TextInput](<task 08 - text input.md>)                                                 | `pending`     | 07                  |
+| [09 — Implement DecimalInput](<task 09 - decimal input.md>)                                           | `pending`     | 07                  |
+| [10 — Implement DateInput](<task 10 - date input.md>)                                                 | `pending`     | 07                  |
+| [11 — Implement Select](<task 11 - select.md>)                                                        | `pending`     | 07                  |
+| [12 — Implement SegmentedControl](<task 12 - segmented control.md>)                                   | `pending`     | 01                  |
+| [13 — Implement Alert / StatusMessage](<task 13 - alert.md>)                                          | `pending`     | 02                  |
+| [14 — Implement LoadingState](<task 14 - loading state.md>)                                           | `pending`     | 01                  |
+| [15 — Implement EmptyState](<task 15 - empty state.md>)                                               | `pending`     | 02, 04, 05          |
+| [16 — Implement Dialog](<task 16 - dialog.md>)                                                        | `pending`     | 02, 05              |
+| [17 — Implement FormPanel](<task 17 - form panel.md>)                                                 | `pending`     | 16, 07, 13          |
+| [18 — Implement ConfirmDialog](<task 18 - confirm dialog.md>)                                         | `pending`     | 16, 13              |
+| [19 — Implement Brand](<task 19 - brand.md>)                                                          | `pending`     | 01                  |
+| [20 — Implement MainNavigation](<task 20 - main navigation.md>)                                       | `pending`     | 04, 06              |
+| [21 — Implement UserIdentity](<task 21 - user identity.md>)                                           | `pending`     | 01                  |
+| [22 — Implement UserMenu](<task 22 - user menu.md>)                                                   | `pending`     | 03, 04, 13, 16, 21  |
+| [23 — Implement PageContainer](<task 23 - page container.md>)                                         | `pending`     | 01                  |
+| [24 — Implement PageHeader](<task 24 - page header.md>)                                               | `pending`     | 04, 06, 23          |
+| [25 — Implement AppHeader](<task 25 - app header.md>)                                                 | `pending`     | 19, 20, 21, 22, 23  |
+| [26 — Implement AppFooter](<task 26 - app footer.md>)                                                 | `pending`     | 04, 23              |
 
 Dependencies are implementation prerequisites, not just suggested reading. Tasks 02-26 also transitively depend on Tasks 00 and 01. Numeric order is safe for sequential execution; independent tasks can be selected once their listed dependencies are complete. Task 00 must use minimal route-local scaffolding so it does not depend on the components it will later exhibit. Task 01 restyles that scaffolding and adds foundation specimens.
 

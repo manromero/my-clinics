@@ -1,6 +1,6 @@
 # Task 03 — Implement IconButton
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -76,3 +76,11 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Attribution: delegated browser access remained unavailable even after root access recovered. The coordinator mechanically operated and captured the integrated browser under separate implementer and reviewer plans. The implementer compared the captures to references; the independent reviewer evaluated all six images and raw live records against Alexandria/S02-S04 and found no defects. Direct reviewer browser access is not claimed.
 - Attachment limitation: the reviewer independently retrieved and hash-matched five images; its fresh sixth retrieval was rejected and not retried. It verified the supplied coordinator/implementer HTTP 200, JPEG and 29,151-byte evidence against the inspected mobile-pending original, without claiming an independent sixth hash match.
 - Independent conclusion: no blockers or optional findings remain. Correction rounds used: 0; evidence completion required no product corrections. Final tracking review is retained in the PR; this administrative update does not change the captured UI.
+
+## User-requested amendment — label recommendation
+
+- Reopened after human PR review. The user explicitly changed the label contract: accessible labels are recommended; missing labels must not throw or emit a warning. This decision supersedes the earlier required/nonblank-label wording and rejection behavior in the original scope and delivery notes.
+- Keep `label` optional in the public TypeScript API. Render and preserve native behavior when the label is omitted, empty or whitespace-only, without adding a fabricated generic name or runtime diagnostics. Decorative icons remain hidden from accessible naming.
+- Update public examples and meaningful tests for the revised contract, including continued rendering/activation and absence of component warnings/errors when labels are absent. Preserve existing valid-label, disabled/pending and native form behavior.
+- Continue on `feature/shared-icon-button` and PR #11, from reviewed head `8c93a6180ef78ee45668a95d5a178c838f201555`. Use the same implementer and reviewer. Correction round: 1 of 2; do not reset the task budget.
+- Validate affected behavior and required application checks. Refresh affected catalogue evidence for any changed explanatory text; integrated browser only. The coordinator can mechanically execute agent-selected live sequences if delegated browser access is still unavailable, with explicit attribution.

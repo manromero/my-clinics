@@ -11,7 +11,7 @@ const icon = (
 );
 
 describe("IconButton", () => {
-  it("uses the required Spanish name and activates by click, Enter and Space", async () => {
+  it("uses the supplied Spanish name and activates by click, Enter and Space", async () => {
     const user = userEvent.setup();
     const click = vi.fn();
     render(<IconButton label="Editar ejemplo" icon={icon} onClick={click} />);
@@ -25,11 +25,46 @@ describe("IconButton", () => {
     expect(click).toHaveBeenCalledTimes(3);
   });
 
-  it.each(["", "   "])("rejects a blank accessible label %j", (label) => {
-    expect(() => render(<IconButton label={label} icon={icon} />)).toThrow(
-      "IconButton requires a nonblank label.",
-    );
-  });
+  it.each([undefined, "", "   "])(
+    "renders and activates without diagnostics or a fabricated name for label %j",
+    async (label) => {
+      const user = userEvent.setup();
+      const click = vi.fn();
+      const continueAction = vi.fn();
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const error = vi.spyOn(console, "error").mockImplementation(() => {});
+      try {
+        render(
+          <main>
+            <h1>Página del ejemplo</h1>
+            <IconButton
+              {...(label === undefined ? {} : { label })}
+              icon={icon}
+              onClick={click}
+            />
+            <button onClick={continueAction}>Continuar</button>
+          </main>,
+        );
+        const button = screen.getByRole("button", { name: "" });
+        expect(button).toHaveAccessibleName("");
+        await user.tab();
+        expect(button).toHaveFocus();
+        await user.keyboard("{Enter} ");
+        await user.click(button);
+        expect(click).toHaveBeenCalledTimes(3);
+        expect(
+          screen.getByRole("heading", { name: "Página del ejemplo" }),
+        ).toBeVisible();
+        await user.click(screen.getByRole("button", { name: "Continuar" }));
+        expect(continueAction).toHaveBeenCalledOnce();
+        expect(warn).not.toHaveBeenCalled();
+        expect(error).not.toHaveBeenCalled();
+      } finally {
+        warn.mockRestore();
+        error.mockRestore();
+      }
+    },
+  );
 
   it.each([
     { disabled: true },
