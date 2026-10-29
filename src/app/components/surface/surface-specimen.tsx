@@ -28,14 +28,19 @@ export function SurfaceSpecimen() {
             </>
           }
           actions={
-            <Button
-              variant="secondary"
-              aria-expanded={expanded}
-              aria-controls="surface-long-content"
-              onClick={() => setExpanded(!expanded)}
-            >
-              {expanded ? "Mostrar texto breve" : "Probar texto largo"}
-            </Button>
+            <>
+              <Button
+                variant="secondary"
+                aria-expanded={expanded}
+                aria-controls="surface-long-content"
+                onClick={() => setExpanded(!expanded)}
+              >
+                {expanded ? "Mostrar texto breve" : "Probar texto largo"}
+              </Button>
+              <Button variant="secondary" onClick={() => setCount(count + 1)}>
+                Acción complementaria
+              </Button>
+            </>
           }
         >
           <p id="surface-long-content" className="leading-7">
