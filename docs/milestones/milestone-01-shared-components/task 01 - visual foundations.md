@@ -51,3 +51,13 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Open questions: none at intake. Hypotheses: none required.
 - Native implementer/reviewer roles available in this session. Sequential implementation and independent review.
 - Correction rounds used: 0.
+
+## Implementation and independent review
+
+- Implementation PR: [#8](https://github.com/manromero/my-clinics/pull/8), draft; approval and manual merge pending.
+- Reviewed base: `d48578cb16573674dede7261368261b0390133d6`; implementation head: `9e2ac1a4bdf197c364ea3b93a294ecbc5a7e3df9`.
+- Delivered semantic theme, self-hosted Noto Serif/Inter/Public Sans, six foundation specimen groups, keyboard motion replay and documented visual API.
+- Implementer and independent reviewer each passed `pnpm test` (6 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check` and `pnpm build`. Both inspected desktop 1440 x 900 and mobile 390 x 844: fonts load, keyboard focus/replay works and there is no horizontal overflow. Status contrast passes. Detailed evidence is recorded in the PR.
+- Initial independent review found no product defects or optional suggestions. R01 remains open: required inline GitHub screenshot attachments are missing because the available browser is signed out. Temporary captures are preserved outside the repository; the PR remains draft and task/index remain `in_progress`.
+- Reduced-motion CSS was independently inspected; live preference emulation is unavailable and is recorded as a validation limitation.
+- Correction rounds used: 0. Attachment access is an infrastructure blocker; user login or an explicit evidence-contract decision is required to complete delivery.
