@@ -43,14 +43,18 @@ describe("Alexandria foundations", () => {
     const button = screen.getByRole("button", { name: "Repetir muestra" });
     button.focus();
     await user.keyboard("{Enter}");
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Muestra reproducida 1 vez.",
-    );
+    expect(
+      within(
+        screen.getByRole("region", { name: "Fundamentos visuales" }),
+      ).getByRole("status"),
+    ).toHaveTextContent("Muestra reproducida 1 vez.");
     expect(button).toHaveFocus();
     await user.keyboard(" ");
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Muestra reproducida 2 veces.",
-    );
+    expect(
+      within(
+        screen.getByRole("region", { name: "Fundamentos visuales" }),
+      ).getByRole("status"),
+    ).toHaveTextContent("Muestra reproducida 2 veces.");
     expect(screen.getAllByText("El contenido encuentra su lugar")).toHaveLength(
       1,
     );

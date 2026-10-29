@@ -1,6 +1,6 @@
 # Task 02 — Implement Button
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -38,3 +38,14 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready; Tasks 00 and 01 are done and merged into develop.
+- Branch: `feature/shared-button`; base: `964974991f218371541dc52492d3ba00d4efb845` (updated origin/develop). Dedicated worktree isolates parallel assignments.
+- References: architecture, requirements, screens, Alexandria DESIGN.md, S01-S04 HTML/PNG, and Task 01 visual-system documentation and tokens.
+- Relevant files: shared Button under src/lib/components; route-local catalogue under src/app/components; existing Vitest setup. Preserve the established foundation API.
+- Constraints: Button only; no dependent controls or production screens. Spanish UI, English documentation; read installed Next.js guides before framework changes.
+- Validation: pnpm test, lint, typecheck, format:check, build; live desktop/mobile interactions and visual comparison; temporary screenshots outside the repository and verified inline GitHub PR attachments. The previous task used gh pr edit --attach successfully.
+- Native implementer and reviewer roles are available in this session; sequential handoffs and one writer per checkout.
+- Open questions: none. Hypotheses: none required. Correction rounds used: 0.

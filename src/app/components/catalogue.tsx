@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { foundationExamples } from "./foundations";
+import { ButtonSpecimen } from "./button-specimen";
 
 /** Route-local registration contract. IDs are stable URL fragments. */
 export type CatalogueSection = {
@@ -22,13 +23,17 @@ export const catalogueSections: CatalogueSection[] = [
     title: "Controles y contenedores",
     description:
       "Acciones, campos y estados para las interacciones cotidianas.",
-    examples: [],
+    examples: [
+      { id: "button", title: "Button · Acciones", content: <ButtonSpecimen /> },
+    ],
   },
   {
     id: "estructura",
     title: "Estructura de pantalla",
     description: "Navegación y composición compartida entre las pantallas.",
-    examples: [],
+    examples: [
+      { id: "button", title: "Button · Acciones", content: <ButtonSpecimen /> },
+    ],
   },
 ];
 
