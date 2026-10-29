@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/surface",
+    title: "Surface · Contenedores",
+    description:
+      "Superficies blancas, tonales y destacadas con composición flexible.",
+  },
+  {
     href: "/components/icon-button",
     title: "IconButton · Acciones con iconos",
     description:
