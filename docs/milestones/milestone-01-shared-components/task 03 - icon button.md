@@ -60,3 +60,10 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Open blocker IB-R01: required automated validation missing. Resolve by successfully running `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm format:check` and `pnpm build` against the delivery head and recording results.
 - Open blocker IB-R02: live functional and visual validation missing. Resolve through desktop/mobile interaction and visual checks against Alexandria/Stitch, focus/pending captures with viewport/source metadata, and verified inline GitHub PR attachments.
 - Correction rounds used: 0. Optional findings: none. Resume with the same implementer/reviewer after execution access is available; preserve existing working files. Complete checks, publication, evidence and independent review before marking done.
+
+## Resumed validation and draft delivery
+
+- Implementation PR: [#11](https://github.com/manromero/my-clinics/pull/11), draft targeting `develop`. Application head: `de7b7a181c733e9198aef1f9367cbdedcdf0cf11`; base: `c965c6d3d29e9787676fba8c051d0be8aa73d43e`. Earlier uncommitted-state notes above describe the initial blocked attempt.
+- Automated execution access is now available. Implementer passed `pnpm test` (14 tests in two files, including eight IconButton cases), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build` and `git diff --check` against the committed implementation. IB-R01 has passing implementation evidence, pending independent verification.
+- User requested the integrated browser exclusively. Fresh attempts, including after resetting the control session, returned `Browser is not available: iab`. No further Chrome use is authorized or planned. Live interactions, desktop/mobile comparison, captures and verified inline GitHub attachments remain missing; IB-R02 remains open.
+- Task and milestone index remain `in_progress`; PR is blocked for visual/functional validation. Human acceptance and manual merge are pending. Correction rounds used: 0. Independent review of the committed implementation and updated tracking follows.
