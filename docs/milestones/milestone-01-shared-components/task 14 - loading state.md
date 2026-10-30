@@ -1,6 +1,6 @@
 # Task 14 — Implement LoadingState
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -37,4 +37,27 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+Implemented in [PR #22](https://github.com/manromero/my-clinics/pull/22). Required checks and independent code, functionality and visual review passed with no blockers or optional findings. Agent work is complete; human acceptance and manual merge remain pending. Task and index are updated together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready. Task 01 is complete; approved scope and acceptance criteria remain unchanged.
+- Branch: `feature/loading-state`; base: `f0a1452caa2d5f0299dbaa8597d1f496bcc8d4ce` (`origin/develop`, fetched at intake). Isolated managed worktree for parallel assignments; preserve all other checkouts.
+- References: `docs/requirements.md`, `docs/architecture.md`, `docs/screens.md`, Alexandria DESIGN.md, and applicable S01-S04 HTML/PNG exports. Existing semantic tokens and catalogue composition govern implementation.
+- Relevant files: new shared `src/lib/components/loading-state` component/tests; route-local `src/app/components/loading-state` examples; catalogue index registration in `src/app/components/page.tsx`.
+- Verified: foundation dependency is done; current develop already provides a dedicated catalogue page per component, Vitest infrastructure, and shared Button. pnpm 11.25.0, Next 16.4.3, React 19.3.0 and Tailwind v4/PostCSS are selected. Read installed Next guides before code changes.
+- Constraints: loading feedback only; visible Spanish text, announced status, explicit busy-region association, compact/content-region examples, reduced motion and optional decoration; no fake percentages or business screens. Do not implement later tasks or alter unrelated task status.
+- Validation: meaningful component unit tests; pnpm test, lint, typecheck, format:check, build; live desktop/mobile interaction and visual review; verified inline GitHub screenshot attachments captured outside the repository. Existing gh CLI supports PR attachment upload through `gh pr edit --attach` (see Task 01 evidence).
+- Native implementer and reviewer roles are available in this session; use separate agents and sequential handoffs. Only one checkout writer at a time.
+- Open questions: none. Hypotheses: no product assumptions required; select a focused component API within approved scope.
+- Correction rounds used: 0.
+
+## Implementation and independent review
+
+- PR: [#22](https://github.com/manromero/my-clinics/pull/22), targeting `develop`. Implementation and independently reviewed head: `67e0e98c731bbe54ba1c4340bcaf968df5baac6e`; base recorded above.
+- Delivered reusable LoadingState with visible Spanish text, persistent polite/atomic announcements, compact and region presentation, optional spinner/skeleton/text-only decoration, external busy-region association, and motion preference support. Dedicated interactive catalogue examples cover loading/completion and keyboard control; five new semantic unit tests cover the public contract.
+- Implementer and separate reviewer each passed `pnpm test` (16 files, 111 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build`, and `git diff --check`.
+- Both independently inspected the live production catalogue at desktop 1440 x 900 and mobile 390 x 844 against Alexandria and relevant S02-S04 references: keyboard completion/restart, decoration variants, persistent status changes, busy true/false, visible focus, wrapping and no horizontal overflow. Reviewer found no blockers or optional suggestions.
+- PR displays three inline desktop/mobile pending/completed GitHub attachments labeled with source commit, state, capturer and viewport/image dimensions. Implementer, reviewer and coordinator independently verified retrieval (HTTP 200 image/jpeg); reviewer opened all three and compared them to the running application. Detailed evidence remains in the PR; temporary implementation captures were removed after verification.
+- Limitations: no auditory screen-reader session or live reduced-motion emulation. Announcements were checked via tests and DOM. Reviewer independently verified compiled CSS gates animation under no-preference and disables it under reduce; these disclosed limitations are nonblocking.
+- Correction rounds used: 0. No outstanding blockers or optional findings. Final tracking changes require administrative review; human approval and manual merge remain pending.

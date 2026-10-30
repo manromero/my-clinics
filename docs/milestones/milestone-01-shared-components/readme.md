@@ -35,7 +35,7 @@ Include the basic UI and shared screen structure identified during discovery. Ex
 | [11 — Implement Select](<task 11 - select.md>)                                                        | `done`    | 07                  |
 | [12 — Implement SegmentedControl](<task 12 - segmented control.md>)                                   | `done`    | 01                  |
 | [13 — Implement Alert / StatusMessage](<task 13 - alert.md>)                                          | `done`    | 02                  |
-| [14 — Implement LoadingState](<task 14 - loading state.md>)                                           | `pending` | 01                  |
+| [14 — Implement LoadingState](<task 14 - loading state.md>)                                           | `done`    | 01                  |
 | [15 — Implement EmptyState](<task 15 - empty state.md>)                                               | `pending` | 02, 04, 05          |
 | [16 — Implement Dialog](<task 16 - dialog.md>)                                                        | `pending` | 02, 05              |
 | [17 — Implement FormPanel](<task 17 - form panel.md>)                                                 | `pending` | 16, 07, 13          |
