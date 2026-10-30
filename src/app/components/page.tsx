@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/segmented-control",
+    title: "SegmentedControl · Selección exclusiva",
+    description:
+      "Opciones de formulario agrupadas, teclado y estados desactivados.",
+  },
+  {
     href: "/components/select",
     title: "Select · Selección",
     description:

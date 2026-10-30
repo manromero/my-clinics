@@ -33,7 +33,7 @@ Include the basic UI and shared screen structure identified during discovery. Ex
 | [09 — Implement DecimalInput](<task 09 - decimal input.md>)                                           | `done`    | 07                  |
 | [10 — Implement DateInput](<task 10 - date input.md>)                                                 | `done`    | 07                  |
 | [11 — Implement Select](<task 11 - select.md>)                                                        | `done`    | 07                  |
-| [12 — Implement SegmentedControl](<task 12 - segmented control.md>)                                   | `pending` | 01                  |
+| [12 — Implement SegmentedControl](<task 12 - segmented control.md>)                                   | `done`    | 01                  |
 | [13 — Implement Alert / StatusMessage](<task 13 - alert.md>)                                          | `pending` | 02                  |
 | [14 — Implement LoadingState](<task 14 - loading state.md>)                                           | `pending` | 01                  |
 | [15 — Implement EmptyState](<task 15 - empty state.md>)                                               | `pending` | 02, 04, 05          |
