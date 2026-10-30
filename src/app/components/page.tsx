@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/text-input",
+    title: "TextInput · Entrada de texto",
+    description:
+      "Edición, adornos decorativos, errores y estados de campos de texto.",
+  },
+  {
     href: "/components/form-field",
     title: "Primitivas de campo",
     description:
