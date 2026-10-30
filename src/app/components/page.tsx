@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 const pages = [
   {
     href: "/components/form-field",
-    title: "FormField · Campos de formulario",
+    title: "Primitivas de campo",
     description:
       "Etiquetas, campos obligatorios y opcionales, ayuda y errores accesibles.",
   },

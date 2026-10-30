@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Catalogue } from "../catalogue";
-import { FormFieldSpecimen } from "./form-field-specimen";
+import { FieldPrimitivesSpecimen } from "./form-field-specimen";
 
 export const metadata: Metadata = {
-  title: "FormField · Campos de formulario | MyClinics",
+  title: "Primitivas de campo | MyClinics",
   description:
     "Etiquetas, indicaciones, ayuda y errores asociados a cada control.",
 };
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <Catalogue
-      title="FormField · Campos de formulario"
+      title="Primitivas de campo"
       description="Una etiqueta clara y la información necesaria para completar cada campo, con asociaciones accesibles y espacio para leer."
       sections={[
         {
@@ -22,8 +22,8 @@ export default function Page() {
           examples: [
             {
               id: "form-field",
-              title: "Composición accesible",
-              content: <FormFieldSpecimen />,
+              title: "FieldLabel, FieldRequirement, FieldHelp y FieldError",
+              content: <FieldPrimitivesSpecimen />,
             },
           ],
         },
