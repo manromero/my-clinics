@@ -14,6 +14,12 @@ const pages = [
       "Enlaces de texto, navegación con apariencia de botón e iconos opcionales.",
   },
   {
+    href: "/components/surface",
+    title: "Surface · Contenedores",
+    description:
+      "Superficies blancas, tonales y destacadas con composición flexible.",
+  },
+  {
     href: "/components/icon-button",
     title: "IconButton · Acciones con iconos",
     description:

@@ -1,6 +1,6 @@
 # Task 05 — Implement Surface / Card
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -37,4 +37,27 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+Implemented in [PR #13](https://github.com/manromero/my-clinics/pull/13). Required validation and independent review passed. Agent work is complete; human approval and manual merge remain pending.
+
+## Execution context
+
+- Readiness: ready. Task 01 is done on the fetched develop baseline; approved scope and criteria remain unchanged.
+- Branch: `feature/shared-surface`; base: `5db4a97b62b2102357cc26d07e9f88ac49687a3a` (`origin/develop`). Dedicated worktree isolates parallel assignments.
+- Relevant files: `src/lib/components/surface`, route-local `src/app/components/surface`, catalogue index, existing theme tokens in `src/app/globals.css` and Vitest infrastructure.
+- Sources: project architecture, requirements, screens, Alexandria DESIGN.md and applicable S01-S04 HTML/PNG references; installed Next.js documentation before framework edits.
+- Verified: Next 16.4.3, React 19.3.0, Tailwind v4/PostCSS, pnpm 11.25.0. Existing catalogue has dedicated component pages. Native implementer and reviewer roles are available in the session.
+- Constraints: Surface only; white, tonal and highlighted blue variants, responsive padding, composable header/content/actions and caller-selected semantics. English documentation and Spanish specimens. Preserve unrelated work and do not implement dependent tasks.
+- Validation: meaningful composition/semantics unit tests, lint, typecheck, format check, production build, live desktop/mobile checks and verified inline GitHub screenshot attachments. Capture outside the repository. Use an independent dev-server port for this worktree.
+- Open questions: none. Hypotheses: none required at intake.
+- Correction rounds used: 0. Implementation and independent review completed without blockers.
+
+## Implementation and independent review
+
+- Implementation PR: [#13](https://github.com/manromero/my-clinics/pull/13), targeting `develop`; human acceptance and manual merge pending.
+- Reviewed base: `5db4a97b62b2102357cc26d07e9f88ac49687a3a`; implementation head: `521d899c6a23ef9d70222ab19fce03b1c5328a20`. Final tracking changes receive a separate administrative recheck in the same PR.
+- Delivered a typed Surface API with white, tonal and highlighted variants, optional header/content/actions composition, caller-selected semantic elements, responsive padding and inherited contrast/focus treatment. Spanish interactive examples are available at `/components/surface`.
+- Implementer and independent reviewer each passed `pnpm test` (23 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check` and `pnpm build`.
+- Both independently inspected desktop 1440 x 900 and mobile 390 x 844: long unbroken text wraps without horizontal overflow; actions wrap on mobile; keyboard activation, focus, catalogue navigation and padding work. Reviewer verified relevant text contrast above 4.5:1 and similarity against Alexandria and S02/S04 references.
+- Implementer captured desktop/mobile evidence; reviewer performed separate live interactions and visual inspection. Inline GitHub attachments in the PR were independently retrieved successfully by coordinator and reviewer. Detailed capture metadata and evidence remain in the PR. Temporary implementation captures were removed.
+- Initial independent review: passed with no blocking or optional findings. Browser access initially failed during review and recovered; all required live checks completed. No unresolved validation limitations.
+- Correction rounds used: 0. Task/index are done; human approval and manual merge remain pending.
