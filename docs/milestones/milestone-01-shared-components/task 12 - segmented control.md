@@ -1,6 +1,6 @@
 # Task 12 — Implement SegmentedControl
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -38,3 +38,26 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready; Task 01 foundations are available in the updated remote develop baseline. Approved scope and acceptance criteria above remain unchanged.
+- Workspace: isolated worktree for Task 12; other concurrent assignments must remain untouched.
+- Branch: `feature/shared-segmented-control`.
+- Base: `68a0d4171ae2f140f0d56da27f2c8e61af08aa29` (`origin/develop`).
+- Relevant sources: `docs/architecture.md`, `docs/components-catalogue.md`, `docs/visual-foundations.md`, `docs/screens.md`, Alexandria guidance, S02 clinic and S03 activity HTML/PNG references. S03 contains the percentage/direct segmented presentation.
+- Verified context: Next.js 16.4.3, React 19.3.0, pnpm 11.25.0, Vitest and Testing Library are established. Dedicated catalogue pages and semantic theme tokens already exist. Read installed Next.js guides before editing.
+- Constraints: generic exclusive form choices with radio semantics; Spanish examples for active/inactive and percentage/direct; no navigation/tabs, domain logic or persistence. Keep component tests colocated and validate specimens live.
+- Validation: meaningful unit tests, lint, typecheck, format check, build, desktop/mobile live interaction and visual inspection against supplied references. Delivery captures must be temporary outside the repository and attached inline to the PR with verified retrieval.
+- Parallel execution: use this worktree, a dedicated server port and dedicated temporary evidence paths; preserve other checkouts and browser sessions. Shared catalogue index/documentation changes may need conflict resolution during later integration.
+- Open product questions: none. Hypotheses: none required for intake.
+- Correction rounds used: 0 of 2.
+- Human approval and manual merge remain pending after agent delivery.
+
+## Implementation and validation
+
+- Implementer delivered the shared native-radio SegmentedControl, colocated behavioral tests, a dedicated Spanish interactive catalogue page and catalogue index entry.
+- Automated validation reported by implementer: `pnpm test` passed (14 files, 96 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check` and `pnpm build` passed. Build generated the segmented-control catalogue route.
+- Infrastructure: the original external worktree required inaccessible subagent approvals. It was relocated with authorization inside the writable workspace under an ignored local tools directory; dependencies were reinstalled successfully. This is a local execution arrangement, not a product change.
+- Blocking validation: live desktop/mobile interactions, visual review and verified inline GitHub screenshot attachments remain unperformed. Primary-thread Computer Use explicitly returned "Computer Use was not approved to use Google Chrome". No further UI access was attempted after that denial.
+- Delivery must remain a draft PR and task/index `in_progress` until required browser validation and evidence are complete. Independent review is pending. Correction rounds used: 0 of 2.
