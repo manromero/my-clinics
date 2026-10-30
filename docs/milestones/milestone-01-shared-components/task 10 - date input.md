@@ -1,6 +1,6 @@
 # Task 10 — Implement DateInput
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -38,3 +38,15 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready. Task 07 field primitives are done and merged through PR #14; TextInput and DecimalInput are also available as implementation references. Approved scope is unchanged.
+- Branch: `feature/shared-date-input`; base: `176fa0f5449be86c348d83cd7090f05c72e437ba` (`origin/develop`, fetched at intake). Dedicated managed worktree isolates concurrent assignments.
+- References: architecture, requirements (calendar-date storage and Spanish presentation), screens, Alexandria, and applicable S02/S03 HTML/PNG exports. Read installed Next.js guides before framework edits.
+- Relevant files: field primitive folders, TextInput for established semantics and styles, `src/app/components/catalogue.tsx`, route-local catalogue specimens, theme tokens and Vitest setup.
+- Verified: pnpm 11.25.0, Next 16.4.3, React 19.3.0; native implementer and reviewer roles are available in the active session. Calendar dates must remain date strings, independent of timezones. Native date controls are the initial technical approach; browser-localized presentation must remain separate from storage.
+- Constraints: DateInput only, no date-prefill or business behavior. Preserve other assignments and worktrees; sequential single writer here. English documentation, Spanish examples, accessible field semantics, caller-owned validation policy.
+- Validation: meaningful unit tests for date changes, empty/invalid input, native constraints and field semantics; lint, typecheck, formatting, production build, live desktop/mobile behavior and native picker inspection where available, design comparison, and verified inline GitHub screenshot attachments. Disclose differences and unavailable real-device environments.
+- Open questions: none. Hypotheses: none required; implementer selects a focused API using repository conventions.
+- Correction rounds used: 0.

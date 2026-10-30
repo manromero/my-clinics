@@ -8,6 +8,11 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/date-input",
+    title: "DateInput · Fechas",
+    description: "Fechas de calendario, límites y estados con selector nativo.",
+  },
+  {
     href: "/components/decimal-input",
     title: "DecimalInput · Decimales",
     description:
