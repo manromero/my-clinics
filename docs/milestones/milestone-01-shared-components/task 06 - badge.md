@@ -1,6 +1,6 @@
 # Task 06 — Implement Badge
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -37,7 +37,7 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+Implementation and independent review are complete in [PR #15](https://github.com/manromero/my-clinics/pull/15). Task and milestone index are done; human approval and manual merge remain pending. Final tracking changes are included in the same PR and its administrative review.
 
 ## Execution context
 
@@ -51,3 +51,15 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Native implementer and reviewer roles are available in this session; sequential handoffs, one writer at a time.
 - Open questions: none. Hypotheses: none required.
 - Correction rounds used: 0.
+
+## Implementation and independent review
+
+- PR: [#15](https://github.com/manromero/my-clinics/pull/15), targeting `develop`.
+- Reviewed base: `96fc35d17d0417a60267824972efe66a1791664a`; implementation head: `f35f461405f7554d39c9455fb856f71442ed1d17`.
+- Delivered five compact Badge variants with required descriptive text and optional decorative dot/icon, meaningful component tests, interactive Spanish specimens at `/components/badge` and catalogue registration. No business logic or dependent controls.
+- Implementer and independent reviewer each passed `pnpm test` (5 files, 37 tests, including 8 Badge cases), `pnpm lint`, `pnpm typecheck`, `pnpm format:check` and `pnpm build`. Frozen dependency installation left the lockfile unchanged.
+- Both inspected desktop 1440 x 900 and mobile 390 x 844 against Alexandria and S02-S04 HTML/PNG references. Keyboard activation, focus, optional decoration, static state, long-label wrapping and catalogue navigation pass; mobile has no horizontal overflow. Reviewer measured all five text contrasts above 4.5:1.
+- Five inline GitHub attachments in the PR include viewport, state, capturer and source commit labels. Implementer, coordinator and reviewer verified saved URLs return HTTP 200 JPEGs. Detailed evidence and checks remain in the PR; captures were stored outside the repository.
+- Initial independent review: clean, no blockers or optional findings. Correction rounds used: 0. Final administrative tracking recheck is recorded in the PR.
+- Limitations: browser inspection ran in a background tab because subagent visibility is unsupported; live interactions and captures succeeded. No screen-reader session was performed; semantic and decorative accessibility were checked through tests and live inspection.
+- Human acceptance and manual merge are pending. Agents have not merged the PR.
