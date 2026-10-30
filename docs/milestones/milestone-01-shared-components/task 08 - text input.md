@@ -1,6 +1,6 @@
 # Task 08 — Implement TextInput
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -38,3 +38,15 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready. Task 07 field primitives are complete and merged in the fetched develop baseline. Approved scope and acceptance criteria remain unchanged.
+- Branch: `feature/shared-text-input`; base: `669c8b34754fce76b10c14ba3f602422327ac21d` (`origin/develop`). A dedicated managed worktree isolates this assignment from parallel tasks.
+- References: `docs/architecture.md`, `docs/requirements.md`, `docs/screens.md`, Alexandria, applicable S02/S03 HTML and PNG exports, and installed Next.js documentation before framework edits.
+- Relevant files: shared field primitives; new `src/lib/components/text-input/`; route-local `src/app/components/text-input/`; catalogue index and semantic theme tokens.
+- Verified findings: Task 07 replaced the FormField wrapper with FieldLabel, FieldRequirement, FieldHelp and FieldError. TextInput composes these primitives and owns stable/generated IDs, native required state, descriptions and invalid state. pnpm 11.25.0, Next 16.4.3 and React 19.3.0 are declared. Native implementer/reviewer roles are available in this session.
+- Constraints: only TextInput and its catalogue examples/tests; preserve unrelated work and other task statuses; one writer in this worktree; English documentation and Spanish examples. Do not implement dependent controls or business behavior.
+- Validation: meaningful unit tests, lint, typecheck, format check, production build, live desktop/mobile interaction and design inspection, verified inline GitHub screenshot attachments. Capture outside the repository and retain evidence metadata in the PR. GitHub access must be rechecked outside restricted execution before treating the initial authentication failure as conclusive.
+- Open questions: none. Hypotheses: no product assumptions required.
+- Correction rounds used: 0.
