@@ -1,6 +1,6 @@
 # Task 08 — Implement TextInput
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -50,3 +50,14 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Validation: meaningful unit tests, lint, typecheck, format check, production build, live desktop/mobile interaction and design inspection, verified inline GitHub screenshot attachments. Capture outside the repository and retain evidence metadata in the PR. GitHub access must be rechecked outside restricted execution before treating the initial authentication failure as conclusive.
 - Open questions: none. Hypotheses: no product assumptions required.
 - Correction rounds used: 0.
+
+## Implementation and independent review
+
+- Delivered in [PR #16](https://github.com/manromero/my-clinics/pull/16), targeting `develop`. Human acceptance and manual merge remain pending.
+- Base reviewed: `669c8b34754fce76b10c14ba3f602422327ac21d`; implementation head reviewed: `ce05ee25b00ad36893caeb94c72f5e99e04952af`. The final tracking-only commit receives a separate administrative review recorded in the PR.
+- TextInput composes the field primitives, forwards native text props/events/ref and controlled/uncontrolled values, owns stable/generated IDs and accessible label/descriptions/required/invalid state, and supports inert decorative adornments. Route-local Spanish specimens at `/components/text-input` cover editing, errors and recovery, focus, long values, disabled and read-only controls.
+- Implementer and independent reviewer each passed `pnpm test` (51 tests / 10 files), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build` and diff checks. Reviewer verified 44 local documentation links/anchors.
+- Both independently checked live desktop (1440 x 900) and mobile (390 x 844) behavior and visuals against Alexandria and S02/S03 HTML/PNG references. Label/ref focus, typing, change/blur, error recovery and description cleanup, keyboard navigation, disabled/read-only behavior and long-value internal scrolling passed without horizontal page overflow. Reviewer observed no browser warnings/errors.
+- Four inline GitHub JPEG attachments and detailed viewport, image dimensions, source commit and capturer metadata are preserved in the PR. Implementer, reviewer and coordinator verified authenticated retrieval (HTTP 200, image/jpeg). Temporary captures/downloads were removed after verification.
+- Independent review: no blockers or optional findings. Correction rounds used: 0. No required check was omitted. Automated screen-reader announcement testing was not performed; browser semantics and keyboard interactions were verified.
+- Infrastructure: restricted Git/GitHub operations required approved escalation. Reviewer attachment retrieval via Python failed after redirect; authenticated PowerShell retrieval resolved this limitation. Parallel tasks remain isolated in other worktrees.
