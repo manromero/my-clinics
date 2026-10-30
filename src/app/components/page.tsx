@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/select",
+    title: "Select · Selección",
+    description:
+      "Selección única, opciones agrupadas y estados con selector nativo.",
+  },
+  {
     href: "/components/date-input",
     title: "DateInput · Fechas",
     description: "Fechas de calendario, límites y estados con selector nativo.",
