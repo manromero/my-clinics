@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/action-link",
+    title: "ActionLink · Navegación",
+    description:
+      "Enlaces de texto, navegación con apariencia de botón e iconos opcionales.",
+  },
+  {
     href: "/components/surface",
     title: "Surface · Contenedores",
     description:
