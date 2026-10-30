@@ -8,6 +8,11 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/loading-state",
+    title: "LoadingState · Carga",
+    description: "Texto anunciado, regiones ocupadas y movimiento reducido.",
+  },
+  {
     href: "/components/alert",
     title: "Alert · Mensajes",
     description:
