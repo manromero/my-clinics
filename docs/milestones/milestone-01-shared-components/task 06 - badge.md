@@ -1,6 +1,6 @@
 # Task 06 — Implement Badge
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -38,3 +38,16 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready. Tasks 00 and 01 are complete in the fetched integration baseline; approved scope and acceptance criteria remain unchanged.
+- Branch: `feature/shared-badge`; base: `96fc35d17d0417a60267824972efe66a1791664a` (`origin/develop`). Dedicated worktree isolates parallel assignments.
+- References: `docs/requirements.md`, `docs/architecture.md`, `docs/screens.md`, `docs/visual-foundations.md`, Alexandria DESIGN.md and applicable S02-S04 HTML/PNG exports.
+- Relevant files: `src/app/globals.css`, `src/app/components/catalogue.tsx`, catalogue index, new `src/lib/components/badge` and route-local `src/app/components/badge` specimens.
+- Verified findings: semantic status/tertiary/surface tokens and Vitest infrastructure already exist. Catalogue pages are separated by component. S02 uses compact rounded clinic-state labels and count labels; Alexandria governs typography and tonal treatments. Static active badges must not copy the prototype pulse animation.
+- Constraints: generic presentation only, Spanish examples, English documentation, no business logic or dependent controls. Preserve other branches and worktrees. Read installed Next.js guides before writing framework code.
+- Validation: meaningful Badge unit tests, full unit suite, lint, typecheck, formatting and build; live desktop/mobile catalogue and keyboard checks; comparison with references; verified inline GitHub PR attachments captured outside the repository.
+- Native implementer and reviewer roles are available in this session; sequential handoffs, one writer at a time.
+- Open questions: none. Hypotheses: none required.
+- Correction rounds used: 0.
