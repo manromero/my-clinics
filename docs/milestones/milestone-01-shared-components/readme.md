@@ -27,7 +27,7 @@ Include the basic UI and shared screen structure identified during discovery. Ex
 | [03 — Implement IconButton](<task 03 - icon button.md>)                                               | `done`        | 02                  |
 | [04 — Implement ActionLink](<task 04 - action link.md>)                                               | `done`        | 01                  |
 | [05 — Implement Surface / Card](<task 05 - surface.md>)                                               | `done`        | 01                  |
-| [06 — Implement Badge](<task 06 - badge.md>)                                                          | `pending`     | 01                  |
+| [06 — Implement Badge](<task 06 - badge.md>)                                                          | `done`        | 01                  |
 | [07 — Implement field primitives](<task 07 - form field.md>)                                          | `in_progress` | 01                  |
 | [08 — Implement TextInput](<task 08 - text input.md>)                                                 | `pending`     | 07                  |
 | [09 — Implement DecimalInput](<task 09 - decimal input.md>)                                           | `pending`     | 07                  |

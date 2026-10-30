@@ -14,6 +14,12 @@ const pages = [
       "Etiquetas, campos obligatorios y opcionales, ayuda y errores accesibles.",
   },
   {
+    href: "/components/badge",
+    title: "Badge · Etiquetas",
+    description:
+      "Estados, recuentos y avisos compactos con decoración opcional.",
+  },
+  {
     href: "/components/action-link",
     title: "ActionLink · Navegación",
     description:
