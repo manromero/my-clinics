@@ -1,6 +1,6 @@
 # Task 07 — Implement field primitives
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -69,3 +69,13 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Remove the unused wrapper/API, keep route-local specimens, colocate each primitive and tests under its own shared component folder. Keep the existing catalogue URL unless a change is necessary. Update dependency wording to refer to field primitives, without implementing future inputs.
 - Readiness: ready. No unresolved product questions or new dependencies. Validation remains unit tests, lint, typecheck, format, build, live desktop/mobile interactions and renewed verified inline GitHub attachments.
 - Reuse the original implementer and independent reviewer. Correction rounds used remain 0; this is a user-approved scope revision, not a reset of review history.
+
+## Revised implementation and independent review
+
+- Approved revision delivered in [PR #14](https://github.com/manromero/my-clinics/pull/14). Base: `006cb1c6463e27db86192f1fe17f3795df65d0ac`; reviewed implementation head: `7c9a816e143fc094e7819acdad7a7adcf5850e1a`. The wrapper delivery above is historical and superseded.
+- Replaced FormField with independent FieldLabel, FieldRequirement, FieldHelp and FieldError components, each with colocated unit tests. Native props and refs are supported; route-local compositions explicitly own IDs, required/invalid state, descriptions and validation. Future input implementations remain outside this task.
+- Merged current develop into the feature branch and resolved catalogue/index conflicts while preserving Badge, its catalogue entry and Task 06 completion. GitHub reports PR #14 mergeable without conflicts.
+- Implementer and independent reviewer each passed tests (45 tests / 9 files), lint, typecheck, formatting, production build and diff checks. Reviewer also checked 81 local documentation links/anchors.
+- Coordinator captured fresh desktop (1440 x 900) and mobile (390 x 844) evidence and verified interactions. Reviewer independently inspected current attachments against Alexandria and S02/S03 references. Five inline current GitHub PNG attachments are recorded in the PR and verified by implementer, coordinator and reviewer using existing GitHub authentication (HTTP 200); anonymous retrieval returns 404.
+- Reviewer-directed live verification: the reviewer prescribed scenarios; the coordinator operated the browser because the reviewer runtime had no available browsers; the reviewer independently analyzed fresh screenshots and raw DOM observations. Label focus, Tab navigation, valid/error transitions, whitespace rejection, acceptance of zero, description cleanup and catalogue navigation passed. Mobile client/scroll widths were both 375px. Browser warning/error logs were empty.
+- Independent review concluded no blockers or optional findings. Correction rounds used remain 0. Screen-reader announcement testing was not performed. Final tracking-only review is recorded in the PR before handoff; human acceptance and manual merge remain pending.
