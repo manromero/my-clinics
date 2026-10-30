@@ -1,6 +1,6 @@
 # Task 11 — Implement Select
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -38,3 +38,15 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready. Task 07 field primitives and Tasks 00/01 are complete in the fetched develop baseline. Approved scope and criteria remain unchanged.
+- Branch: `feature/shared-select`; base: `10304dedea0e25ea75c8cd03bf09cee65892144e` (`origin/develop`). Dedicated managed worktree isolates this assignment from parallel tasks.
+- Relevant files: new `src/lib/components/select/` and route-local `src/app/components/select/`, catalogue index, existing field primitives, TextInput/DateInput conventions, theme tokens and Vitest setup.
+- Sources: architecture, requirements, screens, Alexandria, applicable S03/S04 select HTML and PNG references, and installed Next.js guides before framework edits.
+- Verified: Task 07 now provides FieldLabel, FieldRequirement, FieldHelp and FieldError. Final controls own stable/generated IDs, native required state, descriptions and invalid state internally. Prefer a native single-select and reuse those primitives. No new dependency is expected.
+- Constraints: generic single selection only; no domain selectors or production business screens. Preserve other worktrees and changes. One writer at a time here. Native implementer and reviewer roles are available in this session.
+- Validation: meaningful component unit tests; pnpm test, lint, typecheck, format:check and build; live desktop/mobile keyboard and selection checks; reference comparison; verified inline GitHub PR attachments captured outside the repository.
+- Open questions: none. Hypotheses: none needed; implementer chooses a focused native-compatible API aligned with existing controls.
+- Correction rounds used: 0.
