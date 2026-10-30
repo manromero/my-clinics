@@ -1,6 +1,6 @@
 # Task 12 — Implement SegmentedControl
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -37,7 +37,7 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+Implemented in PR #20. Required automated checks and independent review are complete; the initial visual-evidence blocker was resolved through explicitly authorized Chrome headless validation. Agent work is done and ready for human acceptance and manual merge. The records below preserve initial limitations and their final resolution.
 
 ## Execution context
 
@@ -54,7 +54,7 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Correction rounds used: 0 of 2.
 - Human approval and manual merge remain pending after agent delivery.
 
-## Implementation and validation
+## Initial implementation and validation (historical)
 
 - Implementer delivered the shared native-radio SegmentedControl, colocated behavioral tests, a dedicated Spanish interactive catalogue page and catalogue index entry.
 - Automated validation reported by implementer: `pnpm test` passed (14 files, 96 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check` and `pnpm build` passed. Build generated the segmented-control catalogue route.
@@ -62,7 +62,7 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Blocking validation: live desktop/mobile interactions, visual review and verified inline GitHub screenshot attachments remain unperformed. Primary-thread Computer Use explicitly returned "Computer Use was not approved to use Google Chrome". No further UI access was attempted after that denial.
 - Delivery must remain a draft PR and task/index `in_progress` until required browser validation and evidence are complete. Independent review is pending. Correction rounds used: 0 of 2.
 
-## Independent review and draft delivery
+## Initial independent review and draft delivery (historical)
 
 - Draft implementation PR: [#20](https://github.com/manromero/my-clinics/pull/20).
 - Separate native reviewer inspected base `68a0d4171ae2f140f0d56da27f2c8e61af08aa29` through implementation head `0aa71c937a019672dfc4b73db179a41c63b49acd`; no concrete code defects and no optional suggestions were identified.
@@ -72,3 +72,14 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Correction rounds used: 0 of 2; no application correction was requested for an infrastructure limitation.
 - Outcome: blocked draft delivery, task/index remain `in_progress`; human acceptance and manual merge pending. No merge performed.
 - Publication limitation: coordinator executed Git staging, commit, push and PR creation from the implementer's explicit handoff because delegated approvals were not completing. Application changes and validation were performed by the implementer and independently verified by the reviewer.
+
+## Final visual validation and ready delivery
+
+- The user explicitly authorized Chrome headless after integrated-browser access was unavailable. Application code remained unchanged.
+- Captured source: `bdc1a051796f4c20be2aac5ddbab07e57cede022`. Coordinator executed the implementer-authored browser script against the production build: 18 checks passed across desktop 1440 × 900 and mobile 390 × 844, including keyboard, pointer, disabled states, visible focus, navigation and overflow checks. No browser errors were recorded.
+- Three inline GitHub PR attachments show desktop selection/disabled states, mobile stacking and desktop keyboard focus. Actual viewport and full-page image dimensions, state, source commit and capture attribution are recorded in [PR #20](https://github.com/manromero/my-clinics/pull/20). All attachment URLs returned HTTP 200, and downloaded SHA256 hashes matched the original captures.
+- The same independent reviewer inspected all delivery images and additional review captures against Alexandria and S02/S03, and authored separate headless spot-checks executed by the coordinator. Both viewport checks passed, including keyboard entry/return, fonts, 44px controls, visible focus, no horizontal overflow and enabled text/focus contrast.
+- **R12-01 — Fixed and independently verified** at the captured source commit. Earlier blocked/open statements above are historical and superseded by this result. No blockers or optional findings remain.
+- Attribution: implementer prepared the main browser checks; coordinator executed browser interactions/captures and attachment upload/retrieval; reviewer independently inspected the evidence and authored/reviewed extra checks.
+- No application correction rounds were needed; correction rounds used remain 0 of 2. Restoring missing infrastructure/evidence did not change product code.
+- Task and milestone index are `done`, ready for human review and manual merge. Final administrative tracking changes require the reviewer's consistency/format/link check. Human approval and manual merge remain pending; agents did not merge.
