@@ -1,6 +1,6 @@
 # Task 15 — Implement EmptyState
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -39,7 +39,7 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+Implemented in [PR #23](https://github.com/manromero/my-clinics/pull/23). Required validation, independent application review and attachment verification passed. Agent work is complete; human acceptance and manual merge remain pending.
 
 ## Execution context
 
@@ -60,6 +60,6 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Delivered domain-neutral EmptyState composing Surface, Button and ActionLink, with title, explanation, optional decorative icon, callback or navigation action, heading level and named/described semantics. Spanish catalogue specimens cover no records, no matching results, navigation and no action.
 - Implementer and independent reviewer each passed `pnpm test` (17 files, 115 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build` and diff whitespace checks. Frozen install passed for the implementer.
 - Both independently inspected live desktop 1440 x 900 and mobile 390 x 844 against Alexandria and S02-S04 references. Keyboard Enter/Space callbacks, Tab focus, link destination and catalogue roundtrip passed; no horizontal overflow observed.
-- Review found no application defects. Open blocker T15-B1: required desktop/mobile screenshots are not uploaded as inline GitHub attachments and retrieval is unverified. Captures remain temporarily outside the repository. Native Chrome access hung during implementation; the coordinator alternative also timed out waiting for app approval. PR remains draft and task/index remain `in_progress` until evidence is published and independently verified.
+- Review found no application defects. T15-B1 is fixed and independently verified: fresh Chrome headless desktop/mobile captures from source `5ed24b75f5a2471ef2e10f063f2dc022365a7fbc` are displayed inline as GitHub attachments in the PR. Coordinator uploaded through `gh pr edit --attach`; coordinator and reviewer retrieved both successfully (HTTP 200 PNG). Reviewer confirmed byte-for-byte matches with the reviewed captures. Viewports are 1440 x 900 and 390 x 844; full-page image dimensions are 1440 x 2026 and 390 x 2519. Previous native Chrome access failures are resolved by this CLI delivery path. Detailed capture metadata and review history remain in the PR.
 - Optional T15-O1: the specimen counter displays “1 veces”; singular wording is a possible follow-up, not a blocking requirement.
-- Correction rounds used: 0. No automatic correction round was spent on the infrastructure blocker. Human acceptance and manual merge remain pending. Detailed validation and capture metadata belong to the PR.
+- Correction rounds used: 0. No code corrections were required. Task/index are done for agent delivery; final administrative review covers this tracking update. Human acceptance and manual merge remain pending. Detailed validation and capture metadata belong to the PR.
