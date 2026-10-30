@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/alert",
+    title: "Alert · Mensajes",
+    description:
+      "Ayuda, avisos y resultados de operaciones con reintento opcional.",
+  },
+  {
     href: "/components/segmented-control",
     title: "SegmentedControl · Selección exclusiva",
     description:
