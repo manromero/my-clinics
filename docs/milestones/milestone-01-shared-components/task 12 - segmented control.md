@@ -61,3 +61,14 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Infrastructure: the original external worktree required inaccessible subagent approvals. It was relocated with authorization inside the writable workspace under an ignored local tools directory; dependencies were reinstalled successfully. This is a local execution arrangement, not a product change.
 - Blocking validation: live desktop/mobile interactions, visual review and verified inline GitHub screenshot attachments remain unperformed. Primary-thread Computer Use explicitly returned "Computer Use was not approved to use Google Chrome". No further UI access was attempted after that denial.
 - Delivery must remain a draft PR and task/index `in_progress` until required browser validation and evidence are complete. Independent review is pending. Correction rounds used: 0 of 2.
+
+## Independent review and draft delivery
+
+- Draft implementation PR: [#20](https://github.com/manromero/my-clinics/pull/20).
+- Separate native reviewer inspected base `68a0d4171ae2f140f0d56da27f2c8e61af08aa29` through implementation head `0aa71c937a019672dfc4b73db179a41c63b49acd`; no concrete code defects and no optional suggestions were identified.
+- Reviewer independently passed `pnpm test` (14 files, 96 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build` (17 pages) and `git diff --check base...head`.
+- Code and automated functionality review passed. Visual styling was compared at source level with Alexandria and S02/S03 references only; this is not a rendered visual pass.
+- **R12-01 — Blocking, open:** live catalogue keyboard/pointer and navigation checks, actual desktop/mobile visual inspection and viewport records, screenshots and verified inline GitHub attachments remain missing after Chrome access was denied. Complete those authorized checks and request independent re-review of the captured source commit before readiness.
+- Correction rounds used: 0 of 2; no application correction was requested for an infrastructure limitation.
+- Outcome: blocked draft delivery, task/index remain `in_progress`; human acceptance and manual merge pending. No merge performed.
+- Publication limitation: coordinator executed Git staging, commit, push and PR creation from the implementer's explicit handoff because delegated approvals were not completing. Application changes and validation were performed by the implementer and independently verified by the reviewer.
