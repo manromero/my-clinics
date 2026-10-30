@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/empty-state",
+    title: "EmptyState · Estados vacíos",
+    description:
+      "Sin registros, sin coincidencias y un siguiente paso opcional.",
+  },
+  {
     href: "/components/loading-state",
     title: "LoadingState · Carga",
     description: "Texto anunciado, regiones ocupadas y movimiento reducido.",

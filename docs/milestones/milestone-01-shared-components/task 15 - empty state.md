@@ -1,6 +1,6 @@
 # Task 15 — Implement EmptyState
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -40,3 +40,15 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready; Tasks 02, 04 and 05 are complete on the fetched develop baseline. Approved scope and acceptance criteria remain unchanged.
+- Branch: `feature/shared-empty-state`; base: `1876d2ee0520805052331ec26f2cfc7df69116de` (`origin/develop`). A dedicated worktree isolates parallel assignments.
+- Relevant files: existing Button, ActionLink and Surface components; semantic theme in `src/app/globals.css`; catalogue index and route-local specimens under `src/app/components/empty-state`; reusable component and tests under `src/lib/components/empty-state`.
+- Sources: requirements, architecture, screens, Alexandria DESIGN.md and applicable S02-S04 HTML/PNG exports. Read installed Next.js documentation before framework code changes.
+- Verified: pnpm 11.25.0, Next 16.4.3, React 19.3.0, Tailwind v4/PostCSS and Vitest infrastructure. Native implementer and reviewer roles are available in this session.
+- Constraints: domain-neutral title, explanation, optional decorative icon and contextual action/link; examples for no records, no matching results and no action. No production business screens or dependent tasks. Spanish UI and English documentation. Preserve parallel work and use a distinct server port.
+- Validation: meaningful unit tests; lint, typecheck, format:check and build; live keyboard, callback and destination checks; desktop/mobile visual review and verified inline GitHub attachment evidence. Capture outside the repository and clean temporary artifacts after verified upload.
+- Open questions: none. Hypotheses: none required.
+- Correction rounds used: 0. Separate sequential implementation and independent review; human acceptance and manual merge remain pending.
