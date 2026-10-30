@@ -1,6 +1,6 @@
 # Task 09 — Implement DecimalInput
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -38,3 +38,15 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready. Task 07 field primitives are complete in the fetched develop baseline; Task 08 TextInput is also merged and available for composition. Approved scope and criteria are unchanged.
+- Branch: `feature/shared-decimal-input`; base: `016d34a81f92bb06faeabc6e368f919c41f4a6f5` (`origin/develop`). Dedicated managed worktree isolates parallel assignments.
+- References: `docs/architecture.md`, `docs/requirements.md`, `docs/screens.md`, Alexandria, applicable S02/S03 HTML and PNG exports, and installed Next.js documentation before framework edits.
+- Relevant files: `src/lib/components/text-input/`, field primitives, new `src/lib/components/decimal-input/`, route-local `src/app/components/decimal-input/`, catalogue index and semantic theme tokens.
+- Verified findings: field primitives replace the old FormField wrapper. TextInput already owns accessible IDs, descriptions, labels and native text states. Reuse or compose existing controls when suitable. pnpm 11.25.0, Next 16.4.3 and React 19.3.0 are declared. Native implementer and reviewer roles are available in this session.
+- Constraints: preserve raw editing strings, explicit zero and signed values; accept Spanish decimal input with at most two decimal places; report invalid input without silent rounding/coercion. Define a focused typed raw/parsed contract. Consumer-configured sign/range restrictions only; no financial calculations or business screens. Preserve unrelated files and task statuses; one writer in this worktree. English documentation and Spanish specimens.
+- Validation: meaningful unit tests, lint, typecheck, formatting, production build, live desktop/mobile interactions, design comparison, and verified inline GitHub screenshot attachments. Capture temporarily outside the repository. Existing workflow history records `gh pr edit --attach` support. Use approved escalation when restricted Git/GitHub or new-worktree writes require it.
+- Open questions: none. Hypotheses: no product assumptions required; routine public API details are implementer decisions within approved criteria.
+- Correction rounds used: 0.

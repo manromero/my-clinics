@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/decimal-input",
+    title: "DecimalInput · Decimales",
+    description:
+      "Importes y porcentajes, edición con coma, precisión y límites configurables.",
+  },
+  {
     href: "/components/text-input",
     title: "TextInput · Entrada de texto",
     description:
