@@ -8,7 +8,7 @@ Implement TextInput for the shared MyClinics visual system.
 
 ## Scope
 
-Provide a native text input compatible with FormField, value/defaultValue and standard events, placeholder, disabled, read-only and invalid states. Support optional decorative leading/trailing adornments without replacing labels.
+Provide a native text input composed from the field primitives, owning stable/generated control IDs, label/description associations and required/invalid state, value/defaultValue and standard events, placeholder, disabled, read-only and invalid states. Support optional decorative leading/trailing adornments without replacing labels.
 
 ## Exclusions
 
@@ -16,7 +16,7 @@ No production business-screen implementation, persistence, authentication integr
 
 ## Dependencies
 
-- [Task 07 — Implement FormField](<task 07 - form field.md>) must be complete.
+- [Task 07 — Implement field primitives](<task 07 - form field.md>) must be complete.
 
 The [milestone acceptance contract](readme.md#completion-contract-for-every-task) also applies.
 

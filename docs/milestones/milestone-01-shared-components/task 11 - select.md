@@ -16,7 +16,7 @@ No production business-screen implementation, persistence, authentication integr
 
 ## Dependencies
 
-- [Task 07 — Implement FormField](<task 07 - form field.md>) must be complete.
+- [Task 07 — Implement field primitives](<task 07 - form field.md>) must be complete.
 
 The [milestone acceptance contract](readme.md#completion-contract-for-every-task) also applies.
 

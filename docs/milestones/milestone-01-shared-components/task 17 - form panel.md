@@ -17,7 +17,7 @@ No production business-screen implementation, persistence, authentication integr
 ## Dependencies
 
 - [Task 16 — Implement Dialog](<task 16 - dialog.md>) must be complete.
-- [Task 07 — Implement FormField](<task 07 - form field.md>) must be complete.
+- [Task 07 — Implement field primitives](<task 07 - form field.md>) must be complete.
 - [Task 13 — Implement Alert / StatusMessage](<task 13 - alert.md>) must be complete.
 
 The [milestone acceptance contract](readme.md#completion-contract-for-every-task) also applies.

@@ -1,14 +1,14 @@
-# Task 07 — Implement FormField
+# Task 07 — Implement field primitives
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
-Implement FormField for the shared MyClinics visual system.
+Implement small composable field primitives for the shared MyClinics visual system.
 
 ## Scope
 
-Compose a visible label, required/optional indication, help text and field error. Provide stable control/description associations and support caller-supplied control IDs. Keep validation policy outside the component.
+Deliver FieldLabel, FieldRequirement, FieldHelp and FieldError as small presentation and semantic primitives. Replace the FormField render-function wrapper. Consumers explicitly compose these primitives with native controls and associate labels/descriptions through supplied IDs. Future input components own stable/generated IDs, native required status, aria-describedby and aria-invalid internally; do not implement those dependent tasks now. Keep validation policy outside the primitives.
 
 ## Exclusions
 
@@ -23,7 +23,7 @@ The [milestone acceptance contract](readme.md#completion-contract-for-every-task
 ## Acceptance criteria
 
 - Deliver the scope above with a documented, focused public API and examples of supported variants.
-- Test label association, help/error descriptions, required indication and invalid-state propagation. Show required, optional and error examples.
+- Test label activation and native attribute forwarding, required/optional indication, help/error semantics and composition with caller-owned IDs and invalid state. Demonstrate required, optional and interactive error compositions, including description removal without stale references. No render-function API or context layer is needed.
 - Add or update the component's interactive examples in [/components](<task 00 - components showcase.md>), covering the variants and states in this task. Foundations must appear as specimens; the showcase task provides the initial screen itself.
 - Include meaningful unit tests for the delivered public contract, semantics and interactions. No task is complete with screenshots alone, implementation-mirroring assertions or snapshots alone.
 - Capture graphical evidence from the running /components screen at desktop (for example 1440 x 900) and inspect mobile (for example 390 x 844). Include a mobile capture whenever layout, wrapping, controls or interaction presentation differs; if one capture suffices, explicitly record mobile inspection and why no separate image is needed. Label actual viewport, component/state, capturer and source commit. Capture focus/error/pending states when relevant.
@@ -61,3 +61,11 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Five inline GitHub screenshot attachments and detailed capture metadata are saved in the PR. Implementer, reviewer and coordinator verified retrieval (HTTP 200, image/png). Temporary implementation captures were removed after verification.
 - Initial independent review: no blockers or optional findings. Correction rounds used: 0. Tracking-only final recheck is recorded in the PR before delivery.
 - Tool limitation: visible browser tabs are unavailable in subagent threads; hidden in-app browser tabs supported the live interactions and captures. No required validation was omitted.
+
+## Approved revision after initial delivery
+
+- User approved replacing the FormField wrapper with FieldLabel, FieldRequirement, FieldHelp and FieldError, for composition inside future final inputs. The objective, scope and specific acceptance criterion above now reflect this decision; prior delivery records are historical and do not validate the revision.
+- Reopened Task 07 and index to `in_progress`. Reuse existing branch/worktree and PR #14. Integrate fetched `origin/develop` at `006cb1c6463e27db86192f1fe17f3795df65d0ac`, including merged Badge PR #15; preserve both catalogue entries and task statuses when resolving conflicts. No force push or PR merge.
+- Remove the unused wrapper/API, keep route-local specimens, colocate each primitive and tests under its own shared component folder. Keep the existing catalogue URL unless a change is necessary. Update dependency wording to refer to field primitives, without implementing future inputs.
+- Readiness: ready. No unresolved product questions or new dependencies. Validation remains unit tests, lint, typecheck, format, build, live desktop/mobile interactions and renewed verified inline GitHub attachments.
+- Reuse the original implementer and independent reviewer. Correction rounds used remain 0; this is a user-approved scope revision, not a reset of review history.
