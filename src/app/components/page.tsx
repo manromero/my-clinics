@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/badge",
+    title: "Badge · Etiquetas",
+    description:
+      "Estados, recuentos y avisos compactos con decoración opcional.",
+  },
+  {
     href: "/components/action-link",
     title: "ActionLink · Navegación",
     description:
