@@ -1,6 +1,6 @@
 # Task 16 — Implement Dialog
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -37,7 +37,7 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Implemented a controlled native Dialog and interactive catalogue covering both sizes, short/scrollable content, initial focus and dismissal policy. Component tests and live Chrome focus, keyboard, background interaction and responsive checks are complete; detailed results and screenshots accompany the implementation PR. Independent review, human acceptance and manual merge remain pending. Status remains `in_progress`; the coordinator owns review and tracking updates under the [tracking rules](../readme.md#task-structure-and-status).
+Implemented a controlled native Dialog and interactive catalogue covering both sizes, short/scrollable content, initial focus and dismissal policy. Component tests and live Chrome focus, keyboard, background interaction and responsive checks are complete; detailed results and screenshots accompany the implementation PR. Independent code, functional and desktop/mobile visual review passed without blockers or optional findings. Agent work is complete; human acceptance and manual merge remain pending under the [tracking rules](../readme.md#task-structure-and-status).
 
 ## Execution context
 
@@ -53,3 +53,14 @@ Implemented a controlled native Dialog and interactive catalogue covering both s
 - Hypotheses: none relied upon for readiness.
 - Correction rounds used: 0 of 2.
 - Human acceptance and manual merge remain pending after agent delivery.
+
+## Delivery and independent review
+
+- Implementation PR: [#24](https://github.com/manromero/my-clinics/pull/24), targeting `develop`.
+- Implementation head independently reviewed: `21dde5e83d22edb6ff142e6575f8df27616fa215`; base recorded above.
+- Implementer and reviewer each passed `pnpm test` (18 files / 120 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build` and diff checks.
+- Independent live Chrome review verified controlled lifecycle, accessible name/description, initial focus, background focus rejection, keyboard boundaries, Escape/restoration, backdrop versus drag policy, explicit exit and all eight size/content/viewport combinations. Desktop 1440 × 900 and narrow CSS 390 × 844 showed readable wrapping, internal scrolling and reachable actions.
+- Nine permanent inline PR screenshots were independently retrieved as valid PNGs with expected dimensions; representative downloads were visually inspected against Alexandria and applicable S02/S03 direction. Detailed capture and attachment metadata are in the PR.
+- Review conclusion: no blockers and no optional findings. Correction rounds used: 0 of 2.
+- Limitations: Chrome-only validation, narrow CSS viewport without touch emulation, no physical phone or assistive-technology announcement testing. Native browser/document keyboard stops do not permit focus on background controls. GitHub-page rendering was unavailable; image downloads were verified.
+- This final documentation/status update is submitted for corresponding independent review. Human approval and manual merge remain pending in GitHub; no merge was performed.
