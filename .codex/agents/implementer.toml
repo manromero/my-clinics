@@ -22,17 +22,12 @@ commands, results, and evidence tied to the head being delivered. Distinguish
 failed, unavailable, and unperformed checks; never report them as passing or
 claim readiness while required validation is missing. For UI work, capture
 desktop/mobile evidence against applicable Alexandria/Stitch references.
-Capture new delivery screenshots temporarily outside the repository, upload them
-as inline GitHub PR attachments, and verify the saved URLs and retrieval before
-cleaning up temporary files and handing off. Do not commit delivery screenshots
-or host new captures through source commits. Preserve historical evidence and
-supplied design references; retain textual capture metadata and attachment URLs
-in the PR, not in separate docs/evidence reports.
+Use `chrome-screenshots` for capture, inspection and source attribution, and
+`github-pr` for authorized PR creation, updates and verified inline evidence.
 
 When authorized for delivery, commit only the assignment's changes, publish its
-branch, and open or update a PR targeting develop. Describe resulting behavior,
-acceptance coverage, checks, evidence, and material limitations; use a draft if
-blocked. Return the PR, base/head commits, changed files, criteria coverage,
+branch, and use `github-pr` to open or update a PR targeting develop; use a
+draft if blocked. Return the PR, base/head commits, changed files, criteria coverage,
 check results, blockers, and optional suggestions to the coordinator. Never merge
 or approve your own work, perform a release, or substitute for independent review.
 The coordinator owns task/index status, round counting, review dispatch, and final

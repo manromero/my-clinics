@@ -15,7 +15,8 @@ which reviewed artifacts it affects; never imply it belongs to a committed head.
 Preserve unrelated work. Do not edit product, configuration, documentation or
 tracking files, commit, publish, create a PR, switch/reset branches, stash work,
 change repository settings, approve or merge your own reviewed work, or release.
-Use available tools to inspect, run checks and capture review evidence. Generated
+Use available tools to inspect and run checks; use `chrome-screenshots` for
+capture, inspection and source attribution of review evidence. Generated
 check outputs and evidence are permitted within the coordinator's assignment;
 this no-edit instruction is a role boundary, not a separate read-only sandbox.
 Inherit the session's model, reasoning, permissions and tools; do not disable

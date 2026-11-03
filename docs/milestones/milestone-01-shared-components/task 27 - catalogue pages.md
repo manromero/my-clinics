@@ -28,7 +28,7 @@ Tasks 00, 01 and 02 are implemented and merged into develop.
 
 ## Validation
 
-Run `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, and `pnpm build`. Verify live navigation and desktop/mobile presentation on all three routes. Follow the workflow contract for independent review and inline GitHub PR screenshot attachments.
+Run `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, and `pnpm build`. Verify live navigation and desktop/mobile presentation on all three routes. Follow the workflow contract for independent review; use `chrome-screenshots` for captures and `github-pr` for PR evidence.
 
 ## Execution context
 

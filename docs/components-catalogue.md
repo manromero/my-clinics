@@ -38,7 +38,8 @@ Vitest provides jsdom, React Testing Library, jest-dom and user-event. Test publ
 semantics and behavior; verify layout and native fragment scrolling live.
 
 Follow the [development workflow](development-workflow.md#review-and-evidence)
-for validation, desktop/mobile review and PR screenshot attachments. Check changed
+for validation and desktop/mobile review. Use `chrome-screenshots` for captures
+and `github-pr` for authorized PR evidence publication. Check changed
 pages, index/return links, direct entry, fragments, keyboard focus and overflow
 against [Alexandria](screens/alexandria/DESIGN.md) and the
 [screen references](screens.md#visual-design-references).

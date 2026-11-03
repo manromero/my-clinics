@@ -70,16 +70,13 @@ The coordinator follows the [Git workflow](git-workflow.md). Preserve unrelated 
 baseline. Use an isolated worktree if existing work prevents a clean assignment;
 do not reset or stash unrelated work without authorization.
 
-The implementer publishes the assigned branch and opens a PR with base `develop`. Its description
-must state the resulting behavior, scope, acceptance-criteria coverage, validation
-results, and material limitations. Include the task link and current head commit.
-A draft PR can expose blocked work, but must not imply readiness for merge.
+The implementer publishes the assigned branch and uses `github-pr` to create or
+update its PR targeting `develop`, including behavior, scope, acceptance coverage,
+checks and limitations. A draft PR can expose blocked work without implying readiness.
 
-For visual changes, include a `Visual evidence` section in the PR description
-with screenshots displayed inline: at least one desktop capture of each changed
-screen, plus a narrow/mobile capture when responsive behavior applies. Follow the
-[capture requirements](#visual-pr-evidence) below. For changes with no visual
-impact, state that visual evidence is not applicable.
+For visual changes, follow the [role and skill routing](#visual-pr-evidence) below.
+Require desktop evidence of each changed screen and mobile evidence when responsive
+behavior applies; task-specific visual criteria remain authoritative.
 
 Do not force-push, alter branch protections, change repository merge settings, or
 perform release operations as part of an ordinary assignment. Route such needs
@@ -121,32 +118,11 @@ the implementer's assertions alone are insufficient. Address all perspectives:
 
 ### Visual PR evidence
 
-Capture the running application after implementing the change, using the browser
-or screenshot tools available in the session. Use representative states that show
-the delivered behavior; add error, empty, focus or before/after captures only when
-they help assess the change. Screenshots supplement interaction checks.
-
-- Capture delivery screenshots in a temporary directory outside the repository.
-  Do not commit new delivery screenshots or use source commits to host them.
-  Supplied design references and historical evidence remain untouched.
-- The implementer uploads desktop and, when applicable, mobile screenshots as
-  GitHub PR attachments. The coordinator verifies that the saved PR body displays
-  the attachment URLs inline before ready delivery; a link to a report alone is
-  insufficient. Verify attachment retrieval before deleting temporary captures.
-  Local paths and temporary session URLs are insufficient.
-- Label each image with the screen/state, actual viewport and captured source
-  commit. If image dimensions differ from the viewport, record both. Refresh
-  affected captures after visual corrections; do not present an older UI as the
-  current result.
-- The reviewer checks the images against the running result and relevant design
-  references. Record who captured them and who performed live interactions;
-  disclose unavailable tools rather than implying independent browser checks.
-- Keep useful evidence as GitHub attachments and retain textual capture records
-  with those URLs in the PR. Do not create separate `docs/evidence` reports.
-  After upload and verification, remove temporary captures,
-  throwaway fixtures and scripts before ready delivery. Refresh attachments after
-  visual corrections while preserving review history. Do not delete historical
-  evidence or rewrite Git history as part of this cleanup.
+Implementers and reviewers use `chrome-screenshots` for capture, inspection and
+source attribution. The implementer uses `github-pr` for publication and verified
+inline attachments; the reviewer does not publish. The coordinator verifies the
+saved PR evidence and limitations before ready delivery. Preserve independent
+live interaction checks and comparison with the task's design references.
 
 ### Findings and validation
 
