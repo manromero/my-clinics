@@ -1,6 +1,6 @@
 # Task 17 — Implement FormPanel
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -38,4 +38,30 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+Implemented FormPanel and its interactive catalogue in an isolated worktree. Required checks and independent code, functional and visual review passed. Agent work is complete; human acceptance and manual merge remain pending.
+
+## Execution context
+
+- Readiness: ready. Tasks 16, 07 and 13 are done and available on the fetched baseline; Dialog was integrated through PR #24.
+- Branch: `feature/shared-form-panel`; base: `origin/develop` at `2968b2b9385c9bd0d73a8a872eca7554c0c08c55`.
+- Workspace: isolated task17-form-panel worktree; preserve other task worktrees and keep one writer at a time here.
+- References: requirements, architecture, screens/shared interaction rules, Alexandria, and S02/S03 HTML and PNG exports. Reference content does not add domain behavior.
+- Verified building blocks: controlled native Dialog with actions and initial focus, Button with pending support, Alert with explicit announcements, field primitives and controlled inputs; dedicated catalogue routes and Vitest/Testing Library are established.
+- Keep caller ownership of values, validation and persistence. Compose panel/modal presentation without nested forms; verify keyboard submit, duplicate prevention, error/retry value retention, cancellation, initial focus and restoration. Routine public API and pending dismissal choices remain within scope and must be demonstrated.
+- Read relevant installed Next.js guides before code changes. Use pnpm 11.25.0 and existing semantic theme tokens.
+- Required validation: meaningful shared-component unit tests, pnpm test, lint, typecheck, format:check and build; live desktop/mobile success, failure/retry, pending, cancel and modal keyboard behavior. Use chrome-screenshots and github-pr for inspected screenshots and verified inline PR attachments.
+- Open product questions: none. Hypotheses: none relied upon for readiness.
+- Correction rounds used: 0 of 2.
+
+## Delivery and independent review
+
+- Implementation PR: [#25](https://github.com/manromero/my-clinics/pull/25), targeting `develop`.
+- Implementation head independently reviewed: `4f9ef8fcf7490557ef86eca36e94dae9d2f015bd`; base recorded above.
+- Delivered panel/modal presentation with title/description, native submit/cancel, caller-owned values/validation/persistence, pending guards and announced save errors without value loss. Catalogue examples simulate successful and failed saves and retry.
+- Implementer and independent reviewer passed `pnpm test` (19 files / 125 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build` (22 prerendered routes) and diff checks. Reviewer also checked 43 local documentation link targets.
+- Independent live Chrome checks passed native/custom validation and focused invalid input, Enter submission, duplicate prevention, pending edit/cancel/dismissal blocking, retained values on failure, retry/success, modal initial focus, Tab exclusion of background controls, cancellation and focus restoration.
+- Desktop 1440 x 900 and narrow CSS viewport 390 x 844 (DPR 1) were independently captured and inspected against Alexandria and S02/S03 HTML/PNG references. Error/pending content wraps and actions remain reachable without horizontal overflow.
+- Four permanent inline PR images were independently retrieved as PNGs, matched source captures by SHA256 and visually inspected. Detailed capture metadata and evidence remain in the PR; the implementer additionally verified rendered PR image loading.
+- Independent initial review: no blockers and no optional suggestions. Correction rounds used: 0 of 2.
+- Limitations: Chrome-only checks, narrow desktop CSS emulation without touch or physical-device testing. No required validation remains unavailable or unperformed.
+- Final task/index completion tracking is submitted for independent documentation review before delivery. Human approval and manual merge remain pending; no merge was performed.

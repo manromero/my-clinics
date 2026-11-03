@@ -38,7 +38,7 @@ Include the basic UI and shared screen structure identified during discovery. Ex
 | [14 — Implement LoadingState](<task 14 - loading state.md>)                                           | `done`    | 01                  |
 | [15 — Implement EmptyState](<task 15 - empty state.md>)                                               | `done`    | 02, 04, 05          |
 | [16 — Implement Dialog](<task 16 - dialog.md>)                                                        | `done`    | 02, 05              |
-| [17 — Implement FormPanel](<task 17 - form panel.md>)                                                 | `pending` | 16, 07, 13          |
+| [17 — Implement FormPanel](<task 17 - form panel.md>)                                                 | `done`    | 16, 07, 13          |
 | [18 — Implement ConfirmDialog](<task 18 - confirm dialog.md>)                                         | `pending` | 16, 13              |
 | [19 — Implement Brand](<task 19 - brand.md>)                                                          | `pending` | 01                  |
 | [20 — Implement MainNavigation](<task 20 - main navigation.md>)                                       | `pending` | 04, 06              |

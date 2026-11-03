@@ -8,6 +8,11 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/form-panel",
+    title: "FormPanel · Formularios",
+    description: "Panel y modal con guardado, cancelación y reintento.",
+  },
+  {
     href: "/components/dialog",
     title: "Dialog · Diálogos",
     description: "Foco modal, contenido desplazable y cierre configurable.",
