@@ -8,6 +8,11 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/dialog",
+    title: "Dialog · Diálogos",
+    description: "Foco modal, contenido desplazable y cierre configurable.",
+  },
+  {
     href: "/components/empty-state",
     title: "EmptyState · Estados vacíos",
     description:
