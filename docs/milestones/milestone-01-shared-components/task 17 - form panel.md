@@ -1,6 +1,6 @@
 # Task 17 — Implement FormPanel
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -38,7 +38,7 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Implementation started in an isolated worktree to preserve parallel assignments. Human acceptance and manual merge remain pending.
+Implemented FormPanel and its interactive catalogue in an isolated worktree. Required checks and independent code, functional and visual review passed. Agent work is complete; human acceptance and manual merge remain pending.
 
 ## Execution context
 
@@ -52,3 +52,16 @@ Implementation started in an isolated worktree to preserve parallel assignments.
 - Required validation: meaningful shared-component unit tests, pnpm test, lint, typecheck, format:check and build; live desktop/mobile success, failure/retry, pending, cancel and modal keyboard behavior. Use chrome-screenshots and github-pr for inspected screenshots and verified inline PR attachments.
 - Open product questions: none. Hypotheses: none relied upon for readiness.
 - Correction rounds used: 0 of 2.
+
+## Delivery and independent review
+
+- Implementation PR: [#25](https://github.com/manromero/my-clinics/pull/25), targeting `develop`.
+- Implementation head independently reviewed: `4f9ef8fcf7490557ef86eca36e94dae9d2f015bd`; base recorded above.
+- Delivered panel/modal presentation with title/description, native submit/cancel, caller-owned values/validation/persistence, pending guards and announced save errors without value loss. Catalogue examples simulate successful and failed saves and retry.
+- Implementer and independent reviewer passed `pnpm test` (19 files / 125 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build` (22 prerendered routes) and diff checks. Reviewer also checked 43 local documentation link targets.
+- Independent live Chrome checks passed native/custom validation and focused invalid input, Enter submission, duplicate prevention, pending edit/cancel/dismissal blocking, retained values on failure, retry/success, modal initial focus, Tab exclusion of background controls, cancellation and focus restoration.
+- Desktop 1440 x 900 and narrow CSS viewport 390 x 844 (DPR 1) were independently captured and inspected against Alexandria and S02/S03 HTML/PNG references. Error/pending content wraps and actions remain reachable without horizontal overflow.
+- Four permanent inline PR images were independently retrieved as PNGs, matched source captures by SHA256 and visually inspected. Detailed capture metadata and evidence remain in the PR; the implementer additionally verified rendered PR image loading.
+- Independent initial review: no blockers and no optional suggestions. Correction rounds used: 0 of 2.
+- Limitations: Chrome-only checks, narrow desktop CSS emulation without touch or physical-device testing. No required validation remains unavailable or unperformed.
+- Final task/index completion tracking is submitted for independent documentation review before delivery. Human approval and manual merge remain pending; no merge was performed.
