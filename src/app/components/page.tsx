@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/brand",
+    title: "Brand · Identidad",
+    description:
+      "Marca dental, presentación completa y compacta, y navegación opcional.",
+  },
+  {
     href: "/components/confirm-dialog",
     title: "ConfirmDialog · Confirmaciones",
     description: "Confirmación segura, eliminación, espera y reintento.",

@@ -1,6 +1,6 @@
 # Task 19 — Implement Brand
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -37,3 +37,17 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready. Task 01 and the catalogue infrastructure are done in the fetched develop baseline. Approved scope and acceptance criteria remain unchanged.
+- Workspace: isolated managed worktree for Task 19; preserve parallel assignments and avoid shared development-server ports.
+- Branch: `feature/shared-brand`; base: `0cbcfc968c97ca236b5e3afe858026449af9598a` (`origin/develop`, fetched at intake).
+- References: `docs/requirements.md`, `docs/architecture.md`, `docs/screens.md`, Alexandria DESIGN.md, and S01-S04 HTML/PNG exports. Each export header uses the dentistry mark, MyClinics name and Spanish description.
+- Relevant files: `src/app/globals.css`, `src/app/components/page.tsx`, route-local catalogue composition and existing shared components/tests. Add Brand and unit tests together under `src/lib/components/brand`, with specimens under `src/app/components/brand`.
+- Verified stack: pnpm 11.25.0, Next 16.4.3, React 19.3.0, Tailwind v4/PostCSS and Vitest. Read installed Next guides before code changes; follow existing foundations and icon handling instead of introducing an icon framework.
+- Constraints: Brand only; no production header or dependent components, authentication or personal details. Spanish interface, English documentation. Only one agent writes this checkout at a time.
+- Validation: meaningful public-contract unit tests, lint, typecheck, format check, production build, live catalogue interactions, desktop/mobile and keyboard-focus inspection against the references, verified inline PR evidence through the required skills.
+- Native implementer and reviewer roles are available in this session. Sequential implementation and independent review; no additional agents needed.
+- Open questions: none. Hypotheses: none required at intake.
+- Correction rounds used: 0.
