@@ -91,7 +91,10 @@ export function DialogSpecimen() {
           API: open y onOpenChange controlan la apertura. title es obligatorio;
           description, children y actions componen el contenido. size admite sm
           y md (predeterminado). initialFocusRef elige un elemento enfocable del
-          contenido; por defecto se enfoca el título para empezar a leer.
+          contenido; por defecto, el navegador enfoca el primer control
+          disponible (Cerrar diálogo en este ejemplo). El título no recibe foco.
+          Si no hay controles disponibles, el foco permanece en el diálogo
+          nativo.
         </p>
         <p>
           dismissible es true por defecto: Escape, el botón Cerrar diálogo y una

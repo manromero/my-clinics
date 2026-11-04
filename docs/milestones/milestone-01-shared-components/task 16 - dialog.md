@@ -1,6 +1,6 @@
 # Task 16 — Implement Dialog
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -64,3 +64,16 @@ Implemented a controlled native Dialog and interactive catalogue covering both s
 - Review conclusion: no blockers and no optional findings. Correction rounds used: 0 of 2.
 - Limitations: Chrome-only validation, narrow CSS viewport without touch emulation, no physical phone or assistive-technology announcement testing. Native browser/document keyboard stops do not permit focus on background controls. GitHub-page rendering was unavailable; image downloads were verified.
 - This final documentation/status update is submitted for corresponding independent review. Human approval and manual merge remain pending in GitHub; no merge was performed.
+
+## Post-merge initial-focus correction
+
+- User feedback after merging PR #24: initial focus must move to the first focusable control; the title must not be focusable. This supersedes the original title-focus default.
+- Readiness: ready; focused correction to the existing initial-focus contract, without business scope changes or new dependencies.
+- Branch: `feature/dialog-initial-focus`; base `origin/develop` at `e70d7da30632b80329f09ed1bef25b62805aa89b`. Reuse the clean isolated Dialog worktree.
+- Scope: remove the heading focus target, use the first available interactive control by default, preserve valid explicit initial-focus overrides, modal containment, dismissal and focus restoration. Ensure safe behavior without focusable controls without making the heading focusable.
+- Relevant files: shared Dialog/tests and route-local Dialog catalogue specimens. Update documentation and tests currently asserting title focus.
+- Validation: component tests, lint, typecheck, formatting, build; independent live Chrome desktop/mobile keyboard/focus review and refreshed screenshots using chrome-screenshots/github-pr.
+- Resumed on 2026-11-04 after PR #25 (FormPanel) merged. Include the new modal FormPanel consumer in regression validation; preserve its separate task status and implementation.
+- Open questions: none. No hypotheses required for readiness.
+- Correction budget retained: 0 of 2 automatic review correction rounds used; this user-requested post-merge change does not reset the budget.
+- Previous implementation/review records above remain historical. Task/index reopened while this correction is validated. Human acceptance/manual merge of the correction remain pending.
