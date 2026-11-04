@@ -1,6 +1,6 @@
 # Task 20 — Implement MainNavigation
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -59,3 +59,27 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Technical choice to resolve during implementation: focused active-route API and
   wrapping layout or accessible mobile disclosure. No unresolved product questions.
 - Correction rounds used: 0 of 2.
+
+## Delivery and review
+
+- Implementation PR: [#29](https://github.com/manromero/my-clinics/pull/29), targeting `develop`.
+- Implemented four fixed Spanish navigation destinations, explicit active selection
+  with current-page semantics, keyboard focus, narrow wrapping layout, optional
+  long labels and interactive catalogue examples.
+- Implementation head reviewed: `03c1652c32554dcc11ea7a1c75061c7bae37f4f4`.
+- Independent reviewer: no blocking findings. Code, functional and visual review
+  passed against the approved task, Alexandria and S02-S04 references.
+- Both implementer and reviewer passed `pnpm test` (22 files, 150 tests),
+  `pnpm lint`, `pnpm typecheck`, `pnpm format:check` and `pnpm build` (25 static pages).
+- Desktop 1440 × 900 and narrow 390 × 844 live checks covered keyboard order,
+  Enter activation, current-page updates, visible focus, target size and long-label
+  wrapping without overflow. Four inline PR images were retrieved and inspected
+  independently; PNG dimensions and SHA256 matched the original captures.
+- Correction rounds used: 0 of 2. No unresolved blockers.
+- Optional observation: existing catalogue anchor styling changes unfocused corner
+  radii. This is outside the component contract and does not prevent acceptance.
+- Limitations: narrow CSS viewport was emulated without touch; GitHub's rendered
+  PR layout was not separately inspected. Evidence metadata and detailed review
+  results remain in the PR.
+- This tracking-only completion update is subject to focused final review before
+  handoff. Human acceptance and manual merge remain pending in GitHub.
