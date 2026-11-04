@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/main-navigation",
+    title: "MainNavigation · Navegación principal",
+    description:
+      "Cuatro destinos, página actual, teclado y distribución adaptable.",
+  },
+  {
     href: "/components/brand",
     title: "Brand · Identidad",
     description:

@@ -1,6 +1,6 @@
 # Task 20 — Implement MainNavigation
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -38,3 +38,24 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready; Tasks 04 and 06 are done on the fetched develop baseline.
+- Workspace: isolated task worktree to support concurrent assignments.
+- Branch: `feature/main-navigation`.
+- Base: `origin/develop` at `c79f38e8a4412cb6ea30e934af8256942abaaf56`.
+- Sources: approved task and milestone completion contract; `docs/architecture.md`,
+  `docs/requirements.md`, `docs/screens.md`, Alexandria, and S02-S04 HTML/PNG references.
+- Verified destinations: `/activity`, `/summary`, `/clinics`, `/settings`, with
+  Spanish labels Actividad, Resumen, Clínicas and Ajustes.
+- Relevant implementation: existing ActionLink, Badge, theme tokens, and dedicated
+  catalogue routes. Inspect their current APIs before choosing composition.
+- Constraints: no business routes, authentication, persistence or dependent tasks;
+  preserve concurrent work and keep edits limited to this assignment.
+- Validation: meaningful component tests; live catalogue keyboard, active-state and
+  narrow-layout checks; lint, typecheck, format:check, build; desktop/mobile
+  screenshots compared with references and inline PR evidence.
+- Technical choice to resolve during implementation: focused active-route API and
+  wrapping layout or accessible mobile disclosure. No unresolved product questions.
+- Correction rounds used: 0 of 2.
