@@ -8,6 +8,11 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/confirm-dialog",
+    title: "ConfirmDialog · Confirmaciones",
+    description: "Confirmación segura, eliminación, espera y reintento.",
+  },
+  {
     href: "/components/form-panel",
     title: "FormPanel · Formularios",
     description: "Panel y modal con guardado, cancelación y reintento.",
