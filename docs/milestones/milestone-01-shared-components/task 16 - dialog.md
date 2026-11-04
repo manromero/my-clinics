@@ -1,6 +1,6 @@
 # Task 16 — Implement Dialog
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -77,3 +77,14 @@ Implemented a controlled native Dialog and interactive catalogue covering both s
 - Open questions: none. No hypotheses required for readiness.
 - Correction budget retained: 0 of 2 automatic review correction rounds used; this user-requested post-merge change does not reset the budget.
 - Previous implementation/review records above remain historical. Task/index reopened while this correction is validated. Human acceptance/manual merge of the correction remain pending.
+
+### Correction delivery
+
+- Correction PR: [#26](https://github.com/manromero/my-clinics/pull/26), targeting `develop` after merged PR #25.
+- Implementation head independently reviewed: `4d24d905df9de3c2f841c045c749ae96b3e10911`; correction base recorded above.
+- Result: title is not focusable. Default initial focus reaches the first available interactive control, including long non-dismissible dialogs with unavailable leading controls. Without available controls the native dialog container holds focus; valid explicit initial-focus overrides remain supported.
+- Implementer and reviewer each passed 19 test files / 130 tests, lint, typecheck, formatting, production build and diff checks. Independent desktop 1440 × 900 and narrow CSS 390 × 844 Chrome review verified the corrected focus contract, modal safety/restoration, scroll handling and FormPanel pending/error regressions.
+- Eight inline PR PNG attachments were independently retrieved with correct type/dimensions and representative visual inspection. Capture metadata and detailed validation remain in the PR.
+- Independent review conclusion: no blockers or optional findings; correction rounds retained at 0 of 2. Final tracking changes require corresponding documentation review.
+- Limitations: Chrome-only, narrow CSS without touch/device testing, no physical phone or assistive-technology announcements; GitHub inline rendering unavailable, downloaded image evidence verified.
+- Task/index are done for this correction. Human acceptance and manual merge of PR #26 remain pending; no merge performed by agents. Prior delivery notes remain historical.
