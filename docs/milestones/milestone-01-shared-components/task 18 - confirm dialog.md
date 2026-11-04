@@ -1,6 +1,6 @@
 # Task 18 — Implement ConfirmDialog
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -37,4 +37,20 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+Implementation started in an isolated managed worktree to protect parallel assignments. Required validation, independent review and PR delivery are pending.
+
+## Execution context
+
+- Readiness: ready. Tasks 16 (Dialog) and 13 (Alert) are done and merged on the baseline; PR #26 also fixes Dialog initial focus and is included.
+- Branch: `feature/shared-confirm-dialog`; base: `48bae0d3ed78d14187da82d9eef27796b1575423` from freshly fetched `origin/develop`.
+- Workspace: dedicated managed task18-confirm-dialog worktree; do not edit the primary checkout or other assignment worktrees.
+- Approved scope: compose Dialog for generic confirmation, destructive and pending variants, caller-owned failure feedback, safe destructive initial focus and duplicate confirmation prevention. Synthetic record details stay in route-local specimens. No production domain behavior.
+- Sources: requirements, architecture, screens/shared interaction rules and S03 deletion flow, Alexandria DESIGN.md and applicable S02/S03 HTML/PNG exports. Compare actual references; exports do not expand product scope.
+- Verified building blocks: controlled native Dialog with initialFocusRef, dismissible policy and focus return; Button with destructive/pending behavior; Alert with explicit announcement semantics; dedicated catalogue registration and FormPanel composition pattern.
+- Relevant files: src/lib/components/dialog, button, alert and form-panel; src/app/components catalogue and route-local specimens; src/app/globals.css.
+- Framework baseline: Next 16.4.3, React 19.3.0, pnpm 11.25.0. Read relevant installed Next guides before code changes. Reuse existing primitives and theme.
+- Required validation: meaningful component tests (cancel/confirm, pending duplicate prevention, rejection feedback, focus restoration), pnpm test, lint, typecheck, format:check and build; live keyboard, desktop/mobile and pending/error checks. Use chrome-screenshots and github-pr skills for inspected and verified permanent inline evidence.
+- Native implementer and reviewer roles are available in this session; handoffs are sequential, with one writer in this checkout.
+- Open product questions: none. Hypotheses: none required.
+- Correction rounds used: 0 of 2.
+- Human approval and manual merge remain pending after agent delivery.
