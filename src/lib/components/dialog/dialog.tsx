@@ -34,7 +34,7 @@ export function Dialog({
   initialFocusRef,
 }: DialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const descriptionId = useId();
   const backdropPress = useRef(false);
@@ -46,8 +46,23 @@ export function Dialog({
     const previousOverflow = document.body.style.overflow;
     dialog.showModal();
     document.body.style.overflow = "hidden";
+    // Chrome can initially focus the scrolling region ahead of its controls.
+    if (document.activeElement === bodyRef.current) {
+      const walker = document.createTreeWalker(dialog, NodeFilter.SHOW_ELEMENT);
+      let focused = false;
+      while (walker.nextNode()) {
+        const control = walker.currentNode;
+        if (!(control instanceof HTMLElement) || control.tabIndex < 0) continue;
+        control.focus();
+        if (document.activeElement === control) {
+          focused = true;
+          break;
+        }
+      }
+      if (!focused) dialog.focus();
+    }
     const initial = initialFocusRef?.current;
-    (initial && dialog.contains(initial) ? initial : titleRef.current)?.focus();
+    if (initial && dialog.contains(initial)) initial.focus();
     return () => {
       dialog.close();
       document.body.style.overflow = previousOverflow;
@@ -98,12 +113,7 @@ export function Dialog({
       <div className="flex max-h-[calc(100dvh-2rem)] flex-col">
         <header className="flex shrink-0 items-start gap-4 px-6 pt-6 pb-4 sm:px-8 sm:pt-8">
           <div className="min-w-0 flex-1 wrap-anywhere">
-            <h2
-              ref={titleRef}
-              id={titleId}
-              tabIndex={-1}
-              className="rounded-sm font-headline text-title focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
-            >
+            <h2 id={titleId} className="font-headline text-title">
               {title}
             </h2>
             {description && (
@@ -134,7 +144,10 @@ export function Dialog({
             />
           )}
         </header>
-        <div className="min-h-0 overflow-y-auto overscroll-contain px-6 py-4 leading-7 wrap-anywhere sm:px-8">
+        <div
+          ref={bodyRef}
+          className="min-h-0 overflow-y-auto overscroll-contain px-6 py-4 leading-7 wrap-anywhere sm:px-8"
+        >
           {children}
         </div>
         {actions && (

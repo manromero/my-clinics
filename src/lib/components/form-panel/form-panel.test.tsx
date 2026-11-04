@@ -178,6 +178,10 @@ describe("FormPanel", () => {
     const opener = screen.getByRole("button", { name: "Abrir" });
     await user.click(opener);
     expect(ref.current).toHaveFocus();
+    const title = screen.getByRole("heading", { name: "Editar" });
+    expect(title).not.toHaveAttribute("tabindex");
+    title.focus();
+    expect(ref.current).toHaveFocus();
     fireEvent(
       screen.getByRole("dialog"),
       new Event("cancel", { cancelable: true }),

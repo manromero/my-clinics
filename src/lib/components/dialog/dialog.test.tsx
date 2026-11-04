@@ -1,15 +1,18 @@
-import { createRef, useState } from "react";
+import { createRef, useState, type RefObject } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Dialog } from "./dialog";
 
-// jsdom has no modal top layer. Browser focus containment/inertness is checked live.
+// jsdom has no modal top layer or native initial-focus algorithm. Check both live in Chrome.
+let nativeInitialFocus: HTMLElement | null = null;
 beforeEach(() => {
+  nativeInitialFocus = null;
   Object.defineProperty(HTMLDialogElement.prototype, "showModal", {
     configurable: true,
     value: function (this: HTMLDialogElement) {
       this.setAttribute("open", "");
+      nativeInitialFocus?.focus();
     },
   });
   Object.defineProperty(HTMLDialogElement.prototype, "close", {
@@ -47,16 +50,21 @@ function Example({ dismissible = true }: { dismissible?: boolean }) {
 }
 
 describe("Dialog", () => {
-  it("opens with an accessible name/description, focuses its title, and restores the opener on explicit close", async () => {
+  it("preserves native initial focus, names the dialog, keeps the title unfocusable, and restores the opener", async () => {
     const user = userEvent.setup();
     render(<Example />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     const opener = screen.getByRole("button", { name: "Abrir" });
+    nativeInitialFocus = screen.getByLabelText("Cerrar diálogo");
     await user.click(opener);
     expect(
       screen.getByRole("dialog", { name: "Información" }),
     ).toHaveAccessibleDescription("Revisa el contenido.");
-    expect(screen.getByRole("heading", { name: "Información" })).toHaveFocus();
+    expect(nativeInitialFocus).toHaveFocus();
+    const title = screen.getByRole("heading", { name: "Información" });
+    expect(title).not.toHaveAttribute("tabindex");
+    title.focus();
+    expect(nativeInitialFocus).toHaveFocus();
     expect(document.body.style.overflow).toBe("hidden");
     await user.click(screen.getByRole("button", { name: "Terminar" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -150,4 +158,110 @@ describe("Dialog", () => {
     expect(document.body.style.overflow).toBe("auto");
     document.body.style.overflow = "";
   });
+});
+
+describe("Dialog initial-focus overrides", () => {
+  it.each(["disabled", "nonfocusable", "outside"])(
+    "retains native focus for a %s override",
+    (kind) => {
+      const ref = createRef<HTMLElement>();
+      const { rerender } = render(
+        <>
+          <button
+            ref={
+              kind === "outside"
+                ? (ref as RefObject<HTMLButtonElement>)
+                : undefined
+            }
+          >
+            Outside
+          </button>
+          <Dialog
+            open={false}
+            onOpenChange={() => {}}
+            title="Información"
+            initialFocusRef={ref}
+          >
+            {kind === "disabled" ? (
+              <button ref={ref as RefObject<HTMLButtonElement>} disabled>
+                Unavailable
+              </button>
+            ) : kind === "nonfocusable" ? (
+              <p ref={ref as RefObject<HTMLParagraphElement>}>Text</p>
+            ) : null}
+          </Dialog>
+        </>,
+      );
+      nativeInitialFocus = screen.getByLabelText("Cerrar diálogo");
+      rerender(
+        <>
+          <button
+            ref={
+              kind === "outside"
+                ? (ref as RefObject<HTMLButtonElement>)
+                : undefined
+            }
+          >
+            Outside
+          </button>
+          <Dialog
+            open
+            onOpenChange={() => {}}
+            title="Información"
+            initialFocusRef={ref}
+          >
+            {kind === "disabled" ? (
+              <button ref={ref as RefObject<HTMLButtonElement>} disabled>
+                Unavailable
+              </button>
+            ) : kind === "nonfocusable" ? (
+              <p ref={ref as RefObject<HTMLParagraphElement>}>Text</p>
+            ) : null}
+          </Dialog>
+        </>,
+      );
+      expect(nativeInitialFocus).toHaveFocus();
+      expect(screen.getByRole("heading")).not.toHaveAttribute("tabindex");
+    },
+  );
+
+  it("opens safely without controls while leaving the title out of the focus order", () => {
+    render(
+      <Dialog open dismissible={false} onOpenChange={() => {}} title="En curso">
+        <p>Espera un momento.</p>
+      </Dialog>,
+    );
+    expect(screen.getByRole("dialog", { name: "En curso" })).toHaveAttribute(
+      "open",
+    );
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading")).not.toHaveAttribute("tabindex");
+  });
+});
+
+it("moves native scroll-region focus to the first available control without focusing the heading", () => {
+  const content = (open: boolean) => (
+    <Dialog
+      open={open}
+      dismissible={false}
+      onOpenChange={() => {}}
+      title="Revisar"
+      actions={<button>Terminar</button>}
+    >
+      <p>Contenido largo</p>
+      <fieldset disabled>
+        <input aria-label="No disponible" />
+      </fieldset>
+      <input aria-label="Primera opción" />
+      <button>Otra opción</button>
+    </Dialog>
+  );
+  const { rerender } = render(content(false));
+  const scrollRegion = screen.getByText("Contenido largo").parentElement!;
+  // Model the browser choosing its focusable scroll region, not a control search.
+  scrollRegion.tabIndex = -1;
+  nativeInitialFocus = scrollRegion;
+  rerender(content(true));
+  expect(screen.getByRole("textbox", { name: "Primera opción" })).toHaveFocus();
+  expect(screen.getByRole("heading")).not.toHaveAttribute("tabindex");
 });
