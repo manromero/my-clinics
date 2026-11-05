@@ -41,7 +41,7 @@ export default function Page() {
           navigation={{
             label: "Recursos de la demostración",
             links: [
-              { href: "#api", label: "Uso del componente" },
+              { href: "/components/action-link", label: "Ejemplos de enlaces" },
               { href: "/components/foundations", label: "Fundamentos" },
               { href: "/components", label: "Índice de componentes" },
             ],
@@ -49,7 +49,7 @@ export default function Page() {
         />
       </section>
       <PageContainer as="section" aria-labelledby="api">
-        <h2 id="api" tabIndex={-1} className="font-headline text-2xl">
+        <h2 id="api" className="font-headline text-2xl">
           API
         </h2>
         <div className="mt-3 max-w-2xl space-y-3 text-sm leading-6 text-on-surface-variant">
