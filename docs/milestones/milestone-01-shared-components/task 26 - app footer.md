@@ -1,6 +1,6 @@
 # Task 26 — Implement AppFooter
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -34,6 +34,24 @@ The [milestone acceptance contract](readme.md#completion-contract-for-every-task
 ## Validation
 
 Run the unit-test command established by Task 00 (once available), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, and `pnpm build` for route, theme, font, dependency or production-build changes. Validate interactions in the running showcase as well as unit tests. Independently review code, behavior and visual evidence against [Alexandria](../../screens/alexandria/DESIGN.md), the [screen references](../../screens.md#visual-design-references), and applicable S01-S04 HTML/PNG files. Record command results and limitations, not assumed passes.
+
+## Execution context
+
+- Readiness: approved scope and acceptance criteria are in place. ActionLink (04)
+  and PageContainer (23) are complete on the refreshed `origin/develop`.
+- Assignment: `feature/app-footer` from `d5bee989de58f0962f6fe212c008bfe4c6a603fd`
+  in an isolated worktree for parallel milestone work.
+- Reuse the shared PageContainer gutters and ActionLink navigation treatment.
+  Follow the dedicated catalogue route pattern used by the existing AppHeader.
+- S01 HTML shows a compact centered identity on a low tonal surface. S02–S04
+  show the same surface with Public Sans metadata and grouped links that stack
+  on narrow screens. Compare the supplied PNGs where the footer is visible.
+  Use synthetic Spanish content for the specimens.
+- Validate semantic footer, caller-provided content and destinations, omitted
+  slots, narrow wrapping, and keyboard access with visible focus. Run the full
+  unit suite, lint, typecheck, formatting and production build. Inspect the
+  running catalogue at desktop and mobile widths and record the source commit.
+- Open questions: none. Correction rounds used: 0.
 
 ## Progress notes
 

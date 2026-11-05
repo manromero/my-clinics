@@ -8,6 +8,11 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/app-footer",
+    title: "AppFooter · Pie de aplicación",
+    description: "Identidad, información y enlaces adaptables.",
+  },
+  {
     href: "/components/app-header",
     title: "AppHeader · Cabecera de aplicación",
     description:
