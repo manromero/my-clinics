@@ -126,7 +126,7 @@ export function UserMenu({
           )}
           <Button
             variant="tertiary"
-            className="text-error aria-disabled:cursor-default aria-disabled:opacity-60"
+            className="text-error! aria-disabled:cursor-default aria-disabled:opacity-60"
             aria-disabled={signOutPending}
             aria-busy={signOutPending}
             onClick={() => {
