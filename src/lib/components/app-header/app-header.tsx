@@ -18,8 +18,9 @@ export type AppHeaderProps = { brandHref?: string } & (
 export function AppHeader(props: AppHeaderProps) {
   const signedIn = props.variant === "signed-in";
 
+  // Keep the header blur separate so the account panel can blur the page.
   return (
-    <header className="relative z-10 bg-surface/90 shadow-[0_1px_8px_rgb(26_27_32/0.04)] backdrop-blur-xl">
+    <header className="relative z-10 shadow-[0_1px_8px_rgb(26_27_32/0.04)] before:absolute before:inset-0 before:-z-10 before:bg-surface/90 before:backdrop-blur-xl">
       <PageContainer
         className={
           signedIn
