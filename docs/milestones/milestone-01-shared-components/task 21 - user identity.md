@@ -1,6 +1,6 @@
 # Task 21 — Implement UserIdentity
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -36,7 +36,7 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+Implementation and independent review are complete. Task and milestone index are done; human approval and manual merge remain pending in the implementation PR.
 
 ## Execution context
 
@@ -50,3 +50,14 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Native implementer and reviewer roles are available in the active session. Sequential handoffs with one writer in this worktree.
 - Open questions: none. Hypotheses: none required for intake; routine presentation/API choices remain with the implementer.
 - Correction rounds used: 0.
+
+## Implementation and independent review
+
+- Implementation PR: [#30](https://github.com/manromero/my-clinics/pull/30), targeting `develop`. Human approval and manual merge are pending.
+- Reviewed base: `7d2a4b950142445158e197b74b4d5fbe75fc75f1`; implementation head: `40b7099863a441759cc920073bb33daee04c85e9`.
+- Delivered props-driven full/compact UserIdentity, optional email/timezone, avatar initials fallback and failed-image recovery, accessible identity metadata, long-text wrapping, seven focused component tests and interactive Spanish catalogue examples.
+- Implementer and independent reviewer each passed `pnpm test` (23 files, 157 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check` and `pnpm build`.
+- Both verified live desktop 1440 x 900 and narrow 390 x 844 at DPR 1, including keyboard/focus, optional metadata, compact mode, avatar failure/recovery and no horizontal overflow. Reviewer independently compared captured output with Alexandria and S02-S04 HTML/PNG references; no scoped visual gaps were found.
+- Four inline PR screenshots include default, focus/fallback, long narrow content and compact narrow presentation. Saved assets were independently retrieved as HTTP 200 PNGs with matching dimensions; the implementer also verified byte equality and rendered GitHub images. Detailed metadata and evidence remain in the PR.
+- Initial independent review: no blockers or optional suggestions. Correction rounds used: 0. Final tracking-only commit is included in the same PR and receives an administrative recheck before delivery.
+- Limitations: narrow desktop metrics were used without touch emulation; no screen-reader session was performed. These are disclosed in the PR; semantic and live accessibility checks passed.
