@@ -44,7 +44,7 @@ Include the basic UI and shared screen structure identified during discovery. Ex
 | [20 — Implement MainNavigation](<task 20 - main navigation.md>)                                       | `done`    | 04, 06              |
 | [21 — Implement UserIdentity](<task 21 - user identity.md>)                                           | `done`    | 01                  |
 | [22 — Implement UserMenu](<task 22 - user menu.md>)                                                   | `done`    | 03, 04, 13, 16, 21  |
-| [23 — Implement PageContainer](<task 23 - page container.md>)                                         | `pending` | 01                  |
+| [23 — Implement PageContainer](<task 23 - page container.md>)                                         | `done`    | 01                  |
 | [24 — Implement PageHeader](<task 24 - page header.md>)                                               | `pending` | 04, 06, 23          |
 | [25 — Implement AppHeader](<task 25 - app header.md>)                                                 | `pending` | 19, 20, 21, 22, 23  |
 | [26 — Implement AppFooter](<task 26 - app footer.md>)                                                 | `pending` | 04, 23              |
