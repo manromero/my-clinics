@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/page-container",
+    title: "PageContainer · Marco de página",
+    description:
+      "Ancho compartido, márgenes adaptables y composición semántica.",
+  },
+  {
     href: "/components/user-menu",
     title: "UserMenu · Cuenta",
     description:
