@@ -51,8 +51,26 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
   slots, narrow wrapping, and keyboard access with visible focus. Run the full
   unit suite, lint, typecheck, formatting and production build. Inspect the
   running catalogue at desktop and mobile widths and record the source commit.
-- Open questions: none. Correction rounds used: 0.
+- Open questions: none. Correction rounds used: 1.
 
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+- Implemented the semantic, responsive AppFooter with caller-supplied identity,
+  optional metadata and links, and compact and link-rich Spanish examples at
+  `/components/app-footer`.
+- Round 0 reviewed `b9931a99ad21a70ec3334704a814ac6c5bc7c17d`. AF-01
+  reproduced a catalogue fragment link that scrolled without moving keyboard
+  focus. The correction uses an existing catalogue route.
+- Round 1 independently reviewed `5090741ea7256a791873d9554f1be583cb9507d1`
+  against the assignment base. AF-01 was fixed and verified. Enter opened the
+  ActionLink catalogue, and the next Tab visibly focused its first control.
+  No further code, functional, visual, or optional findings.
+- Implementation and independent review passed `pnpm test` (185 tests in 28
+  files), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build`,
+  and diff whitespace checks. Chrome evidence was inspected at 1440 × 900,
+  390 × 844, and 320 × 844 CSS pixels, DPR 1, against Alexandria and S01–S04.
+  Mobile verification used CSS viewport overrides.
+- AF-02 remains open. Automatic approval review denied the corrected branch
+  push, PR creation, and inline screenshot upload. The local correction and
+  captures are ready. Delivery requires explicit authorization to send them to
+  the repository on GitHub, followed by verification of the saved PR and assets.
