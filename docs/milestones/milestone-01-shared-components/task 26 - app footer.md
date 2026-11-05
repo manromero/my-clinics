@@ -1,6 +1,6 @@
 # Task 26 — Implement AppFooter
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -70,7 +70,9 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
   and diff whitespace checks. Chrome evidence was inspected at 1440 × 900,
   390 × 844, and 320 × 844 CSS pixels, DPR 1, against Alexandria and S01–S04.
   Mobile verification used CSS viewport overrides.
-- AF-02 remains open. Automatic approval review denied the corrected branch
-  push, PR creation, and inline screenshot upload. The local correction and
-  captures are ready. Delivery requires explicit authorization to send them to
-  the repository on GitHub, followed by verification of the saved PR and assets.
+- AF-02 resolved. The user explicitly authorized the corrected branch push, PR
+  creation, and screenshot upload after the initial automatic approval denials.
+  [PR #35](https://github.com/manromero/my-clinics/pull/35) contains three inline
+  Chrome captures. The implementer and coordinator retrieved each saved PNG and
+  verified its dimensions and SHA-256 against the inspected local capture.
+- Human approval and manual merge are pending.
