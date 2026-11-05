@@ -8,6 +8,11 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/page-header",
+    title: "PageHeader · Cabeceras",
+    description: "Títulos, contexto opcional y acciones o filtros adaptables.",
+  },
+  {
     href: "/components/page-container",
     title: "PageContainer · Marco de página",
     description:
