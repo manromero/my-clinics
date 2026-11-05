@@ -1,6 +1,6 @@
 # Task 26 — Implement AppFooter
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -35,6 +35,44 @@ The [milestone acceptance contract](readme.md#completion-contract-for-every-task
 
 Run the unit-test command established by Task 00 (once available), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, and `pnpm build` for route, theme, font, dependency or production-build changes. Validate interactions in the running showcase as well as unit tests. Independently review code, behavior and visual evidence against [Alexandria](../../screens/alexandria/DESIGN.md), the [screen references](../../screens.md#visual-design-references), and applicable S01-S04 HTML/PNG files. Record command results and limitations, not assumed passes.
 
+## Execution context
+
+- Readiness: approved scope and acceptance criteria are in place. ActionLink (04)
+  and PageContainer (23) are complete on the refreshed `origin/develop`.
+- Assignment: `feature/app-footer` from `d5bee989de58f0962f6fe212c008bfe4c6a603fd`
+  in an isolated worktree for parallel milestone work.
+- Reuse the shared PageContainer gutters and ActionLink navigation treatment.
+  Follow the dedicated catalogue route pattern used by the existing AppHeader.
+- S01 HTML shows a compact centered identity on a low tonal surface. S02–S04
+  show the same surface with Public Sans metadata and grouped links that stack
+  on narrow screens. Compare the supplied PNGs where the footer is visible.
+  Use synthetic Spanish content for the specimens.
+- Validate semantic footer, caller-provided content and destinations, omitted
+  slots, narrow wrapping, and keyboard access with visible focus. Run the full
+  unit suite, lint, typecheck, formatting and production build. Inspect the
+  running catalogue at desktop and mobile widths and record the source commit.
+- Open questions: none. Correction rounds used: 1.
+
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+- Implemented the semantic, responsive AppFooter with caller-supplied identity,
+  optional metadata and links, and compact and link-rich Spanish examples at
+  `/components/app-footer`.
+- Round 0 reviewed `b9931a99ad21a70ec3334704a814ac6c5bc7c17d`. AF-01
+  reproduced a catalogue fragment link that scrolled without moving keyboard
+  focus. The correction uses an existing catalogue route.
+- Round 1 independently reviewed `5090741ea7256a791873d9554f1be583cb9507d1`
+  against the assignment base. AF-01 was fixed and verified. Enter opened the
+  ActionLink catalogue, and the next Tab visibly focused its first control.
+  No further code, functional, visual, or optional findings.
+- Implementation and independent review passed `pnpm test` (185 tests in 28
+  files), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build`,
+  and diff whitespace checks. Chrome evidence was inspected at 1440 × 900,
+  390 × 844, and 320 × 844 CSS pixels, DPR 1, against Alexandria and S01–S04.
+  Mobile verification used CSS viewport overrides.
+- AF-02 resolved. The user explicitly authorized the corrected branch push, PR
+  creation, and screenshot upload after the initial automatic approval denials.
+  [PR #35](https://github.com/manromero/my-clinics/pull/35) contains three inline
+  Chrome captures. The implementer and coordinator retrieved each saved PNG and
+  verified its dimensions and SHA-256 against the inspected local capture.
+- Human approval and manual merge are pending.
