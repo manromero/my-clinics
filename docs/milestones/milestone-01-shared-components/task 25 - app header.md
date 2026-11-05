@@ -1,6 +1,6 @@
 # Task 25 — Implement AppHeader
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -50,4 +50,7 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+- Delivered public and signed-in AppHeader presentations and an interactive specimen at `/components/app-header`. Sign-out behavior and account state come from the caller.
+- Implementation and independent review passed `pnpm test` (182 tests across 27 files), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, and `pnpm build` on implementation commit `6415711b49d0ee11e4365c5e898f17f46f752f22`.
+- Independent Chrome review at 1440 × 900 and 390 × 844 confirmed both presentations, active navigation, keyboard focus and dismissal, and sign-out pending, failure, and retry. Additional width checks covered 320 and 1024 CSS pixels. The narrow checks used CSS viewport overrides. The PR contains the captured desktop and mobile states and comparison with Alexandria and S01–S04.
+- No blocking or optional findings. Correction rounds used: 0. Human approval and manual merge are pending in [PR #34](https://github.com/manromero/my-clinics/pull/34).
