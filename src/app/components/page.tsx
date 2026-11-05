@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/user-menu",
+    title: "UserMenu · Cuenta",
+    description:
+      "Acciones de cuenta, teclado, espera y reintento en escritorio y móvil.",
+  },
+  {
     href: "/components/user-identity",
     title: "UserIdentity · Identidad personal",
     description:

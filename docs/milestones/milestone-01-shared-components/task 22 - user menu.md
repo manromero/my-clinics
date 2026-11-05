@@ -1,6 +1,6 @@
 # Task 22 — Implement UserMenu
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -40,4 +40,31 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+Implementation, required checks and independent code, functional and visual review are complete. UserMenu and its interactive catalogue examples are ready for human acceptance in PR #31. Task and index are synchronized under the [tracking rules](../readme.md#task-structure-and-status); human approval and manual merge remain pending.
+
+## Execution context
+
+- Readiness: ready. Direct dependencies 03, 04, 13, 16 and 21 are done and present on the fetched integration baseline.
+- Workspace: isolated task22-user-menu worktree to protect parallel assignments; only one writer operates here at a time.
+- Branch: `feature/shared-user-menu`.
+- Base: `origin/develop` at `698d0606436be23113918eef6b8d8a1838ab61aa`.
+- References: project workflow, architecture, requirements, screens/shared interaction rules, Alexandria and applicable S02-S04 HTML/PNG account identity references. References guide appearance without adding authentication or production routes.
+- Existing building blocks: IconButton, ActionLink, Dialog, Alert and UserIdentity; semantic theme tokens, dedicated catalogue routes and Vitest/Testing Library.
+- Implementation must inspect relevant installed Next.js guides before code changes. Choose a focused accessible disclosure/menu API and document its keyboard behavior in the catalogue. Sign-out and its pending/failure state remain caller-owned, without session integration.
+- Required validation: meaningful shared-component unit tests; pnpm test, lint, typecheck, format:check and build; independent live desktop/mobile keyboard, opening/closing, callback, duplicate prevention, failure and focus-return checks. Use chrome-screenshots for evidence and github-pr for verified inline attachments.
+- Open product questions: none. Routine API and responsive presentation decisions remain within approved scope.
+- Hypotheses: none relied upon for readiness.
+- Correction rounds used: 0 of 2.
+- Human acceptance and manual merge remain pending after agent delivery.
+
+## Delivery and independent review
+
+- Implementation PR: [#31](https://github.com/manromero/my-clinics/pull/31), targeting `develop`.
+- Base: `698d0606436be23113918eef6b8d8a1838ab61aa`; implementation head independently reviewed: `abe5e7e022c7b9c38911df8158993d7fa6c9f8f7`.
+- Delivered full/compact UserMenu using UserIdentity, optional caller-supplied account link, caller-owned sign-out/pending/failure feedback, accessible disclosure keyboard behavior, focus return, meaningful component tests and interactive Spanish catalogue examples. No authentication/session integration or business screens.
+- Implementer and reviewer each passed `pnpm test` (24 files, 163 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check` and `pnpm build` (27 static pages). Reviewer also checked task documentation links.
+- Independent live Chrome review passed Enter/Space, Tab/Shift+Tab, Escape/explicit-close focus return, outside-pointer/Tab-out dismissal, callback, pending duplicate prevention, failure/retry and simulated success. Desktop 1440 x 900 and mobile 390 x 844 CSS pixels at DPR 1 passed visual comparison with Alexandria and S02-S04 HTML/PNG; both mobile variants retained actions without horizontal overflow and touch invoked sign-out.
+- Six inline PR screenshots cover desktop focus/pending/error and mobile full/compact/error. Implementer retrieved exact matching PNGs; reviewer independently retrieved and visually inspected all six assets. Detailed source attribution, capture metadata and checks remain in the PR.
+- Initial independent review: no blockers or optional findings. Correction rounds used: 0 of 2. Final tracking-only changes are included in the PR and receive an administrative recheck before delivery.
+- Limitations: Chrome mobile/touch emulation retains desktop browser identity; no physical-device or screen-reader audit. GitHub page rendering was not separately inspected; saved inline image content was retrieved and verified. Real session behavior is outside scope.
+- Human approval and manual merge remain pending. No merge performed by agents.
