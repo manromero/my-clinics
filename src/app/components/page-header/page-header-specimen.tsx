@@ -4,7 +4,6 @@ import { useState } from "react";
 import { PageHeader } from "@/lib/components/page-header/page-header";
 import { PageContainer } from "@/lib/components/page-container/page-container";
 import { Button } from "@/lib/components/button/button";
-import { ActionLink } from "@/lib/components/action-link/action-link";
 import { Badge } from "@/lib/components/badge/badge";
 import { Select } from "@/lib/components/select/select";
 
@@ -16,8 +15,10 @@ export function PageHeaderSpecimen() {
     <>
       <PageContainer
         as="section"
+        id="clinic-example"
         aria-labelledby="clinic-title"
-        className="bg-surface-container-lowest"
+        tabIndex={-1}
+        className="bg-surface-container-lowest focus-visible:outline-offset-[-4px]"
       >
         <PageHeader
           title="Gestión de clínicas y centros de colaboración profesional"
@@ -39,9 +40,12 @@ export function PageHeaderSpecimen() {
           }
           actions={
             <>
-              <ActionLink href="#api" variant="secondary">
+              <a
+                href="#api"
+                className="inline-flex min-h-12 max-w-full items-center justify-center rounded-lg bg-surface-container-high px-5 py-3 font-label text-label font-semibold text-primary transition-colors duration-(--duration-fast) ease-standard hover:bg-surface-dim"
+              >
                 Consultar API
-              </ActionLink>
+              </a>
               <Button
                 onClick={() =>
                   setNotice(
@@ -76,9 +80,12 @@ export function PageHeaderSpecimen() {
           description="Una composición con filtros propios del ejemplo. Cambia el periodo para actualizar el encabezado, sin cargar ni guardar datos."
           metadata={<Badge>{period}</Badge>}
           actions={
-            <ActionLink href="#clinic-title">
+            <a
+              href="#clinic-example"
+              className="inline-flex min-h-11 max-w-full items-center justify-center rounded-lg py-2 font-label text-label font-semibold text-primary underline underline-offset-4 hover:decoration-2"
+            >
               Volver al ejemplo de clínicas
-            </ActionLink>
+            </a>
           }
           filters={
             <div className="w-full sm:w-72">

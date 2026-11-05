@@ -34,6 +34,7 @@ export default function Page() {
           id="api"
           aria-labelledby="api-title"
           tabIndex={-1}
+          className="focus-visible:outline-offset-[-4px]"
         >
           <h2 id="api-title" className="font-headline text-title">
             API y uso
@@ -51,7 +52,12 @@ export default function Page() {
             al ancho disponible; no gestiona sus datos. Acepta className y
             atributos HTML y ARIA del header.
           </p>
-          <pre className="mt-6 overflow-x-auto rounded-xl bg-surface-container p-4 text-sm">
+          <pre
+            role="region"
+            aria-label="Ejemplo de código"
+            tabIndex={0}
+            className="mt-6 overflow-x-auto rounded-xl bg-surface-container p-4 text-sm"
+          >
             <code>
               {
                 '<PageHeader\n  title="Resumen mensual"\n  headingLevel={2}\n  titleId="summary-title"\n  metadata={<Badge>Octubre 2026</Badge>}\n  actions={<ActionLink href="/activity">Ver actividad</ActionLink>}\n  filters={periodControl}\n/>'
