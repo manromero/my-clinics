@@ -1,6 +1,6 @@
 # Task 24 — Implement PageHeader
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -38,7 +38,7 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+Planning was approved in Milestone 01. Implementation and independent review are complete; human acceptance and manual merge remain pending in GitHub.
 
 ## Execution context
 
@@ -52,4 +52,13 @@ Definition proposed in the Milestone 01 planning PR; implementation has not star
 - Constraints: no production screens, domain filters, persistence or authentication; no dependent tasks. Read installed Next.js guides before code. Use pnpm 11.25.0 and preserve the lockfile. Dependencies must be installed in this worktree.
 - Validation: meaningful heading-level, optional content and action-composition unit tests; full tests, lint, typecheck, format check and build. Live clinic-like/monthly-like long-text examples, keyboard focus, actions/filters and overflow at desktop/mobile. Use chrome-screenshots and github-pr with saved inline evidence.
 - Open questions: none. API and responsive details are routine choices within approved scope.
-- Correction rounds used: 0 of 2.
+- Correction rounds used: 1 of 2.
+
+## Delivery and independent review
+
+- Implementation PR: [#33](https://github.com/manromero/my-clinics/pull/33), targeting `develop`.
+- Delivered a serif PageHeader with native heading levels, optional context, responsive action and filter slots, colocated contract tests and interactive Spanish catalogue specimens. No production screen or business logic was added.
+- Initial independent review of `81310316c6965cc10e862d30f9a1d86a4425d27e` found PH-01: keyboard activation of two catalogue fragment links scrolled without moving focus. Round 1 moved focus to the named destinations with native links and visible focus indicators. The independent reviewer verified the fix at `26c4a869d8e310a0bf6b30cf43e987cfc01f40fe`; the following Tab proceeds from each destination.
+- At the corrected application head, implementer and reviewer independently passed `pnpm test` (177 tests in 26 files), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build` (29 static pages), and `git diff --check`.
+- Live Chrome review covered navigation, heading hierarchy, long title wrapping, action feedback, optional content, period filtering, visible keyboard focus and no horizontal page overflow at desktop and narrow widths. The PR records ten verified inline captures at 1440 × 900 and 390 × 844, comparison with Alexandria and S02–S04, and source commits. Narrow captures verify CSS layout without touch emulation.
+- No open blockers or optional findings. Human approval and manual merge are pending. Final administrative tracking is subject to independent verification before delivery.
