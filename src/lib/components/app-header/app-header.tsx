@@ -40,7 +40,7 @@ export function AppHeader(props: AppHeaderProps) {
           <>
             <MainNavigation
               currentHref={props.currentHref}
-              className="col-start-1 row-start-2 justify-self-center lg:col-start-2 lg:row-start-1"
+              className="col-start-1 row-start-2 justify-self-center max-sm:[&_a]:px-2.5 lg:col-start-2 lg:row-start-1"
             />
             <div className="col-start-1 row-start-1 w-full max-w-sm min-w-0 justify-self-end lg:col-start-3">
               <UserMenu {...props.account} variant="responsive" />

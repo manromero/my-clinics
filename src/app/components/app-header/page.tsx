@@ -43,17 +43,16 @@ export default function Page() {
         <div className="mt-3 max-w-2xl space-y-3 text-sm leading-6 text-on-surface-variant">
           <p>
             <code>variant=&quot;public&quot;</code> muestra la marca y el
-            distintivo de acceso profesional.
+            distintivo de acceso profesional.{" "}
             <code>variant=&quot;signed-in&quot;</code> añade los cuatro destinos
-            y el menú de cuenta.
-            <code> brandHref</code> convierte la marca en enlace en ambas
-            variantes.
+            y el menú de cuenta. <code>brandHref</code> convierte la marca en
+            enlace en ambas variantes.
           </p>
           <p>
             <code>currentHref</code> identifica el destino actual.{" "}
-            <code>account</code> recibe
-            <code> identity</code>, <code>onSignOut</code> y, de forma opcional,
-            <code> accountLink</code>, <code>signOutPending</code> y{" "}
+            <code>account</code> recibe <code>identity</code>,{" "}
+            <code>onSignOut</code> y, de forma opcional,{" "}
+            <code>accountLink</code>, <code>signOutPending</code> y{" "}
             <code>signOutError</code>. El consumidor controla la acción y
             comunica su estado.
           </p>
