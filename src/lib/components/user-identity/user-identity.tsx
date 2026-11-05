@@ -8,7 +8,7 @@ export type UserIdentityProps = {
   email?: string;
   avatarSrc?: string;
   timezone?: string;
-  variant?: "full" | "compact";
+  variant?: "full" | "compact" | "responsive";
 };
 
 export function UserIdentity({
@@ -61,7 +61,15 @@ export function UserIdentity({
           fallback
         )}
       </span>
-      <div className={variant === "compact" ? "sr-only" : "min-w-0"}>
+      <div
+        className={
+          variant === "compact"
+            ? "sr-only"
+            : variant === "responsive"
+              ? "min-w-0 max-lg:sr-only"
+              : "min-w-0"
+        }
+      >
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span
             id={`${id}-name`}

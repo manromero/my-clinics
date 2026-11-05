@@ -15,7 +15,7 @@ function trigger() {
 }
 
 describe("UserMenu", () => {
-  it.each(["full", "compact"] as const)(
+  it.each(["full", "compact", "responsive"] as const)(
     "exposes %s identity and native account actions through a disclosure",
     async (variant) => {
       const user = userEvent.setup();

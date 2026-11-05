@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/app-header",
+    title: "AppHeader · Cabecera de aplicación",
+    description:
+      "Cabecera pública, navegación y acciones de cuenta adaptables.",
+  },
+  {
     href: "/components/page-header",
     title: "PageHeader · Cabeceras",
     description: "Títulos, contexto opcional y acciones o filtros adaptables.",
