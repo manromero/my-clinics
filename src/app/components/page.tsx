@@ -8,6 +8,12 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/user-identity",
+    title: "UserIdentity · Identidad personal",
+    description:
+      "Nombre, correo, avatar y zona horaria en formato completo o compacto.",
+  },
+  {
     href: "/components/main-navigation",
     title: "MainNavigation · Navegación principal",
     description:

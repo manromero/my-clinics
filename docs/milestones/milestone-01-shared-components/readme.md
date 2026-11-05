@@ -42,7 +42,7 @@ Include the basic UI and shared screen structure identified during discovery. Ex
 | [18 — Implement ConfirmDialog](<task 18 - confirm dialog.md>)                                         | `done`    | 16, 13              |
 | [19 — Implement Brand](<task 19 - brand.md>)                                                          | `done`    | 01                  |
 | [20 — Implement MainNavigation](<task 20 - main navigation.md>)                                       | `done`    | 04, 06              |
-| [21 — Implement UserIdentity](<task 21 - user identity.md>)                                           | `pending` | 01                  |
+| [21 — Implement UserIdentity](<task 21 - user identity.md>)                                           | `done`    | 01                  |
 | [22 — Implement UserMenu](<task 22 - user menu.md>)                                                   | `pending` | 03, 04, 13, 16, 21  |
 | [23 — Implement PageContainer](<task 23 - page container.md>)                                         | `pending` | 01                  |
 | [24 — Implement PageHeader](<task 24 - page header.md>)                                               | `pending` | 04, 06, 23          |
