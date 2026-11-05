@@ -46,7 +46,7 @@ Include the basic UI and shared screen structure identified during discovery. Ex
 | [22 — Implement UserMenu](<task 22 - user menu.md>)                                                   | `done`    | 03, 04, 13, 16, 21  |
 | [23 — Implement PageContainer](<task 23 - page container.md>)                                         | `done`    | 01                  |
 | [24 — Implement PageHeader](<task 24 - page header.md>)                                               | `done`    | 04, 06, 23          |
-| [25 — Implement AppHeader](<task 25 - app header.md>)                                                 | `pending` | 19, 20, 21, 22, 23  |
+| [25 — Implement AppHeader](<task 25 - app header.md>)                                                 | `done`    | 19, 20, 21, 22, 23  |
 | [26 — Implement AppFooter](<task 26 - app footer.md>)                                                 | `pending` | 04, 23              |
 
 Dependencies are implementation prerequisites, not just suggested reading. Tasks 02-26 also transitively depend on Tasks 00 and 01. Numeric order is safe for sequential execution; independent tasks can be selected once their listed dependencies are complete. Task 00 must use minimal route-local scaffolding so it does not depend on the components it will later exhibit. Task 01 restyles that scaffolding and adds foundation specimens.

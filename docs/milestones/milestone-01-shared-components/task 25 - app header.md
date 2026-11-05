@@ -1,6 +1,6 @@
 # Task 25 — Implement AppHeader
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -38,6 +38,19 @@ The [milestone acceptance contract](readme.md#completion-contract-for-every-task
 
 Run the unit-test command established by Task 00 (once available), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, and `pnpm build` for route, theme, font, dependency or production-build changes. Validate interactions in the running showcase as well as unit tests. Independently review code, behavior and visual evidence against [Alexandria](../../screens/alexandria/DESIGN.md), the [screen references](../../screens.md#visual-design-references), and applicable S01-S04 HTML/PNG files. Record command results and limitations, not assumed passes.
 
+## Execution context
+
+- Readiness: Tasks 19–23 are marked done on the integration base and their shared components are present. The Task 00 catalogue and Vitest scripts are available.
+- Branch: `feature/app-header` from `develop` at `7476740df79bab37215716727fc6bc3eda14162e`. Use the isolated task worktree for parallel milestone work.
+- Reuse the existing `Brand`, `MainNavigation`, `UserMenu` (which renders `UserIdentity`), and `PageContainer`. `UserMenu` already supports supplied sign-out, pending/error feedback, and keyboard dismissal. `MainNavigation` accepts the active destination and wraps its links.
+- Keep the interactive specimen in `src/app/components/app-header` and register it in the existing catalogue. Compare the public presentation with S01 and the signed-in presentation with S02–S04 and Alexandria.
+- Verify active navigation, account focus and dismissal, and supplied sign-out behavior live at desktop and narrow widths. Inspect the account menu for clipping or horizontal overflow when open. Record unit tests, lint, typecheck, format, production build and inline Chrome evidence in the PR.
+- Layout hypothesis to verify live: keep brand and account together on narrow widths and allow navigation to wrap underneath. No unresolved product questions.
+- Correction rounds used: 0.
+
 ## Progress notes
 
-Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+- Delivered public and signed-in AppHeader presentations and an interactive specimen at `/components/app-header`. Sign-out behavior and account state come from the caller.
+- Implementation and independent review passed `pnpm test` (182 tests across 27 files), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, and `pnpm build` on implementation commit `6415711b49d0ee11e4365c5e898f17f46f752f22`.
+- Independent Chrome review at 1440 × 900 and 390 × 844 confirmed both presentations, active navigation, keyboard focus and dismissal, and sign-out pending, failure, and retry. Additional width checks covered 320 and 1024 CSS pixels. The narrow checks used CSS viewport overrides. The PR contains the captured desktop and mobile states and comparison with Alexandria and S01–S04.
+- No blocking or optional findings. Correction rounds used: 0. Human approval and manual merge are pending in [PR #34](https://github.com/manromero/my-clinics/pull/34).

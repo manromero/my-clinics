@@ -12,7 +12,7 @@ import {
 
 export type UserMenuProps = {
   identity: Omit<UserIdentityProps, "variant">;
-  variant?: "full" | "compact";
+  variant?: UserIdentityProps["variant"];
   accountLink?: { href: string; label: string };
   onSignOut: () => void;
   signOutPending?: boolean;
