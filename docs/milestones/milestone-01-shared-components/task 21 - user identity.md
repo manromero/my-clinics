@@ -1,6 +1,6 @@
 # Task 21 — Implement UserIdentity
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -37,3 +37,16 @@ Run the unit-test command established by Task 00 (once available), `pnpm lint`, 
 ## Progress notes
 
 Definition proposed in the Milestone 01 planning PR; implementation has not started. Human approval is pending merge. At execution, record branch/base, readiness, scoped references, tests, screenshots, review findings, correction rounds and implementation PR. Update this status and the milestone index together under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready. Task 01 is done; approved scope and acceptance criteria are unchanged.
+- Branch: `feature/user-identity`; base: `7d2a4b950142445158e197b74b4d5fbe75fc75f1` (`origin/develop`, fetched at intake). Dedicated worktree isolates concurrent assignments.
+- References: `docs/requirements.md`, `docs/architecture.md`, `docs/screens.md`, `docs/screens/alexandria/DESIGN.md`, S02-S04 HTML/PNG header identities; S05 has no export.
+- Relevant files: `src/lib/components/user-identity`, route-local `src/app/components/user-identity`, catalogue index `src/app/components/page.tsx`, and existing semantic tokens in `src/app/globals.css`.
+- Verified: existing catalogue uses dedicated component pages and route-local specimens. pnpm 11.25.0, Next 16.4.3, React 19.3.0 and Tailwind v4 are established. Displayed reference identity is sample content only.
+- Constraints: props-driven identity presentation only; full and compact forms, optional email/timezone and avatar fallback. No authentication, user menu, production header or dependent tasks. English documentation and Spanish UI. Preserve other worktrees and avoid shared development ports.
+- Validation: meaningful component unit tests; lint, typecheck, format:check and build; live catalogue interactions, desktop/mobile captures and reference comparison using chrome-screenshots; PR inline evidence using github-pr. Read applicable installed Next guides before code changes.
+- Native implementer and reviewer roles are available in the active session. Sequential handoffs with one writer in this worktree.
+- Open questions: none. Hypotheses: none required for intake; routine presentation/API choices remain with the implementer.
+- Correction rounds used: 0.
