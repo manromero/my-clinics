@@ -173,30 +173,45 @@ it("cancels edits, retains changes after failure, and saves deactivation and rea
   ).not.toBeInTheDocument();
 });
 
-it("confirms with the saved name and keeps the edit draft when deletion is canceled", async () => {
-  const user = userEvent.setup();
-  render(<ClinicsPreview initialClinics={[clinic]} />);
-  await user.click(
-    await screen.findByRole("button", { name: `Editar ${clinic.name}` }),
-  );
-  const name = screen.getByRole("textbox", { name: "Nombre de la clínica" });
-  await user.type(name, " Centro");
-  const deleteButton = screen.getByRole("button", { name: "Eliminar clínica" });
-  await user.click(deleteButton);
-  const confirm = screen.getByRole("dialog", { name: "Eliminar clínica" });
-  expect(confirm).toHaveAccessibleDescription(
-    `¿Quieres eliminar «${clinic.name}»? Esta acción es permanente.`,
-  );
-  const cancel = within(confirm).getByRole("button", { name: "Cancelar" });
-  expect(cancel).toHaveFocus();
-  await user.click(cancel);
-  expect(deleteButton).toHaveFocus();
-  expect(name).toHaveValue(`${clinic.name} Centro`);
-  await user.click(screen.getByRole("button", { name: "Cancelar" }));
-  expect(
-    screen.getByRole("heading", { name: clinic.name }),
-  ).toBeInTheDocument();
-});
+it.each([
+  { scenario: "short name", savedName: clinic.name },
+  {
+    scenario: "long name",
+    savedName:
+      "Clínica de Odontología y Cirugía Bucal de la Alameda y el Centro Histórico "
+        .repeat(20)
+        .trim(),
+  },
+])(
+  "confirms with the full saved name and preserves the draft on cancel ($scenario)",
+  async ({ savedName }) => {
+    const user = userEvent.setup();
+    render(
+      <ClinicsPreview initialClinics={[{ ...clinic, name: savedName }]} />,
+    );
+    await user.click(
+      await screen.findByRole("button", { name: `Editar ${savedName}` }),
+    );
+    const name = screen.getByRole("textbox", { name: "Nombre de la clínica" });
+    await user.type(name, " Centro");
+    const deleteButton = screen.getByRole("button", {
+      name: "Eliminar clínica",
+    });
+    await user.click(deleteButton);
+    const confirm = screen.getByRole("dialog", { name: "Eliminar clínica" });
+    expect(confirm).toHaveAccessibleDescription("Esta acción es permanente.");
+    expect(within(confirm).getByText(savedName)).toBeVisible();
+    const cancel = within(confirm).getByRole("button", { name: "Cancelar" });
+    expect(cancel).toHaveFocus();
+    await user.click(cancel);
+    expect(deleteButton).toHaveFocus();
+    expect(name).toHaveValue(`${savedName} Centro`);
+    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    expect(
+      screen.getByRole("heading", { name: savedName }),
+    ).toBeInTheDocument();
+  },
+);
 
 it("explains why a linked clinic cannot be deleted and still allows deactivation", async () => {
   const user = userEvent.setup();

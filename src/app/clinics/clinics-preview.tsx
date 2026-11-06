@@ -250,14 +250,19 @@ function ClinicForm({
         <ConfirmDialog
           open
           title="Eliminar clínica"
-          description={`¿Quieres eliminar «${clinic.name}»? Esta acción es permanente.`}
+          description="Esta acción es permanente."
           destructive
           confirmLabel="Eliminar clínica"
           pendingLabel="Eliminando…"
           error={deleteError}
           onOpenChange={() => setDeleteStage("return")}
           onConfirm={deleteClinic}
-        />
+        >
+          <p className="text-sm leading-6 text-on-surface-variant">
+            Clínica que se eliminará
+            <strong className="block text-on-surface">{clinic.name}</strong>
+          </p>
+        </ConfirmDialog>
       )}
     </>
   );

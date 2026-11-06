@@ -53,8 +53,18 @@ mobile widths, including deletion of the last clinic.
   the deletion behavior. Supabase integration and real activity records are out of scope.
 - Validate the source rule and UI behavior with tests, then exercise the running
   edit and confirmation flows on desktop and mobile. Capture evidence for the PR.
-- Open questions: none. Correction rounds used: 0.
+- Open questions: none. Correction rounds used: 1.
 
 ## Progress notes
 
-Implementation assigned.
+Implemented in [PR #38](https://github.com/manromero/my-clinics/pull/38).
+Implementation and initial independent review of
+`9363e51ecc10c0fe905bbbab1755e45604dc591a` passed `pnpm lint`,
+`pnpm typecheck`, `pnpm format:check`, `pnpm build`, and `pnpm test`
+(212 tests). Both roles exercised the standard deletion flows in Chrome at
+1440 × 900 and 390 × 844.
+
+The initial review found one blocker (CD-01). A long clinic name displaced
+the title and beginning of the name outside the visible confirmation dialog
+at the narrow viewport. Round 1 addresses this case and requires independent
+re-verification.
