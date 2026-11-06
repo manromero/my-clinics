@@ -32,12 +32,17 @@ beforeEach(() => {
       },
     },
   });
+  Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+    configurable: true,
+    value() {},
+  });
 });
 
 afterEach(() => {
   cleanup();
   Reflect.deleteProperty(HTMLDialogElement.prototype, "showModal");
   Reflect.deleteProperty(HTMLDialogElement.prototype, "close");
+  Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
 });
 
 it("retries the initial load under Strict Mode", async () => {
@@ -150,6 +155,9 @@ it("cancels edits, retains changes after failure, and saves deactivation and rea
   const editUpdated = await screen.findByRole("button", {
     name: `Editar ${clinic.name} Centro`,
   });
+  expect(editUpdated).toHaveFocus();
+  const updatedCard = within(screen.getByRole("listitem"));
+  expect(updatedCard.getByRole("status")).toHaveTextContent("Clínica guardada");
   expect(
     screen.getByText("Todas las clínicas están inactivas"),
   ).toBeInTheDocument();

@@ -194,9 +194,10 @@ export function ClinicsPreview({
   > | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [selection, setSelection] = useState<Clinic | "new" | null>(null);
-  const [saved, setSaved] = useState<Clinic>();
+  const [saved, setSaved] = useState<{ clinic: Clinic; created: boolean }>();
   const createButton = useRef<HTMLButtonElement>(null);
   const restoreCreateFocus = useRef(false);
+  const editConfirmation = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let current = true;
@@ -213,6 +214,7 @@ export function ClinicsPreview({
       restoreCreateFocus.current = false;
       createButton.current.focus();
     }
+    editConfirmation.current?.scrollIntoView({ block: "nearest" });
   }, [saved]);
 
   const clinics = load?.status === "loaded" ? load.clinics : [];
@@ -224,13 +226,13 @@ export function ClinicsPreview({
 
   function saveClinic(clinic: Clinic) {
     restoreCreateFocus.current = clinics.length === 0;
-    const updated =
-      selection === "new"
-        ? [...clinics, clinic]
-        : clinics.map((entry) => (entry.id === clinic.id ? clinic : entry));
+    const created = selection === "new";
+    const updated = created
+      ? [...clinics, clinic]
+      : clinics.map((entry) => (entry.id === clinic.id ? clinic : entry));
     setLoad({ status: "loaded", clinics: updated });
     setSelection(null);
-    setSaved(clinic);
+    setSaved({ clinic, created });
   }
 
   return (
@@ -247,9 +249,9 @@ export function ClinicsPreview({
           )
         }
       />
-      {saved && (
+      {saved?.created && (
         <Alert title="Clínica guardada" variant="success" announcement="polite">
-          Se guardaron los cambios de {saved.name}.
+          Se guardaron los cambios de {saved.clinic.name}.
         </Alert>
       )}
       {load === null ? (
@@ -319,6 +321,17 @@ export function ClinicsPreview({
                       </Button>
                     </div>
                   </div>
+                  {saved && !saved.created && saved.clinic.id === clinic.id && (
+                    <Alert
+                      ref={editConfirmation}
+                      title="Clínica guardada"
+                      variant="success"
+                      announcement="polite"
+                      className="mt-3 scroll-m-4"
+                    >
+                      Se guardaron los cambios.
+                    </Alert>
+                  )}
                 </Surface>
               </li>
             ))}
