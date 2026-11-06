@@ -1,4 +1,4 @@
-# Task 02 — Set up Supabase and define the clinic database contract
+# Task 03 — Set up Supabase and define the clinic database contract
 
 Status: `pending`
 
@@ -13,11 +13,12 @@ Set up Supabase for development and document environment variables, migration
 commands, and Google provider configuration. Define the clinic schema and access
 rules in a versioned migration. Keep environment secrets and the authorized
 account configuration out of version control. The Clinics UI continues to use
-the in-memory data source until Task 03.
+the in-memory data source until Task 04.
 
 ## Dependencies
 
 - [Task 01](<task 01 - clinic interactions.md>).
+- [Task 02](<task 02 - delete clinics.md>) completes the in-memory interaction phase.
 - [Clinic requirements](../../requirements.md#clinics) and
   [access requirements](../../requirements.md#access-and-devices).
 
@@ -32,8 +33,9 @@ the in-memory data source until Task 03.
   to the contract from Task 01.
 - Row-level security and database permissions allow the configured authorized
   identity to list, insert, and update clinics. Anonymous sessions and other
-  authenticated identities cannot read or write clinic data. Deletion is outside
-  the application contract.
+  authenticated identities cannot read or write clinic data. This migration
+  does not grant clinic deletion. [Task 02](<task 02 - delete clinics.md>) covers
+  deletion in memory until real activity links can be checked.
 
 ## Validation
 

@@ -1,0 +1,46 @@
+# Task 02 — Validate clinic deletion with an in-memory data source
+
+Status: `pending`
+
+## Objective
+
+Let Ana remove a clinic that has no recorded activity while preserving any
+clinic linked to activity history.
+
+## Scope
+
+Add an `Eliminar clínica` action to the edit form, separate from `Guardar`.
+Use the shared confirmation dialog and extend the in-memory clinic contract with
+a delete operation. Use synthetic activity links to exercise eligibility without
+building the Activity screen. Persistent deletion belongs to the work that
+connects the rule to real activity records. Keep the action unavailable on the
+Supabase-backed screen until that rule can be enforced by the data source.
+
+## Dependencies
+
+- [Task 01](<task 01 - clinic interactions.md>).
+- [S02 — Clinics](../../screens.md#s02--clinics) and the shared confirmation dialog.
+
+## Acceptance criteria
+
+- An active or inactive clinic is eligible for deletion only if it has no
+  linked activity in any month. If activity exists, explain why deletion is
+  unavailable and keep deactivation available.
+- Confirming identifies the clinic by name. Canceling leaves it unchanged.
+  Successful deletion removes it from the list and shows confirmation. Deleting
+  the last clinic shows the empty state.
+- The data source checks eligibility at deletion time and distinguishes linked
+  activity from other failures. While deletion is in progress, prevent repeated
+  submissions. On failure, retain the clinic and show feedback that allows retry
+  when the failure is recoverable.
+
+## Validation
+
+Follow the [milestone validation](readme.md#delivery-and-validation). Test
+eligibility, successful deletion, cancellation, linked activity, and retry.
+Verify the edit and confirmation flows on the running screen at desktop and
+mobile widths, including deletion of the last clinic.
+
+## Progress notes
+
+Implementation pending assignment.

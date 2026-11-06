@@ -1,4 +1,4 @@
-# Task 03 — Connect Clinics to Supabase
+# Task 04 — Connect Clinics to Supabase
 
 Status: `pending`
 
@@ -19,7 +19,7 @@ Monthly Activity belongs to a later milestone.
 ## Dependencies
 
 - [Task 01](<task 01 - clinic interactions.md>) and
-  [Task 02](<task 02 - supabase clinic contract.md>).
+  [Task 03](<task 03 - supabase clinic contract.md>).
 - [S01 — Sign-in and S02 — Clinics](../../screens.md#s01--sign-in).
 - A development or test environment with Google sign-in and an authorized test
   account available for end-to-end verification.
