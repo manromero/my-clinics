@@ -11,6 +11,8 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ConfirmDialog } from "./confirm-dialog";
 
+const scrollIntoView = vi.fn();
+
 beforeEach(() => {
   Object.defineProperty(HTMLDialogElement.prototype, "showModal", {
     configurable: true,
@@ -24,6 +26,10 @@ beforeEach(() => {
       this.removeAttribute("open");
     },
   });
+  Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+    configurable: true,
+    value: scrollIntoView,
+  });
   vi.stubGlobal("PointerEvent", MouseEvent);
 });
 afterEach(() => {
@@ -31,6 +37,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
   Reflect.deleteProperty(HTMLDialogElement.prototype, "showModal");
   Reflect.deleteProperty(HTMLDialogElement.prototype, "close");
+  Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
+  scrollIntoView.mockClear();
 });
 function Example({
   confirm = () => {},
@@ -116,7 +124,7 @@ describe("ConfirmDialog", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(opener).toHaveFocus();
   });
-  it("retains the decision and caller-owned rejection feedback, and allows a successful retry", async () => {
+  it("scrolls rejection feedback into view and allows a successful retry", async () => {
     const user = userEvent.setup();
     const confirm = vi
       .fn()
@@ -124,12 +132,19 @@ describe("ConfirmDialog", () => {
       .mockResolvedValueOnce(undefined);
     render(<Example confirm={confirm} />);
     await user.click(screen.getByRole("button", { name: "Abrir" }));
+    expect(scrollIntoView).not.toHaveBeenCalled();
     await user.click(screen.getByRole("button", { name: "Eliminar" }));
     expect(screen.getByRole("alert")).toHaveTextContent(
       "No se ha eliminado. Inténtalo de nuevo.",
     );
     expect(screen.getByRole("dialog")).toHaveAttribute("open");
     expect(screen.getByText(/240,00/)).toBeVisible();
+    expect(scrollIntoView).toHaveBeenCalledExactlyOnceWith({
+      block: "nearest",
+    });
+    expect(scrollIntoView.mock.contexts[0]).toContainElement(
+      screen.getByRole("alert"),
+    );
     await user.click(screen.getByRole("button", { name: "Eliminar" }));
     expect(confirm).toHaveBeenCalledTimes(2);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();

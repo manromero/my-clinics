@@ -1,6 +1,6 @@
 # Task 02 — Validate clinic deletion with an in-memory data source
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -41,6 +41,51 @@ eligibility, successful deletion, cancellation, linked activity, and retry.
 Verify the edit and confirmation flows on the running screen at desktop and
 mobile widths, including deletion of the last clinic.
 
+## Execution context
+
+- Ready. Task 01 was merged in [PR #37](https://github.com/manromero/my-clinics/pull/37).
+  Branch `feature/clinic-deletion` starts from `develop` at
+  `bb88ed57e9646b7f924d20a3037578e8d16b7f25`.
+- The `/clinics` preview, clinic contract, in-memory adapter, and existing
+  tests live in `src/app/clinics`. The shared `ConfirmDialog` supports destructive
+  actions, cancellation, and pending and error feedback.
+- Follow S02 and the Alexandria and Stitch references. The approved task supplies
+  the deletion behavior. Supabase integration and real activity records are out of scope.
+- Validate the source rule and UI behavior with tests, then exercise the running
+  edit and confirmation flows on desktop and mobile. Capture evidence for the PR.
+- Open questions: none. Correction rounds used: 2.
+
 ## Progress notes
 
-Implementation pending assignment.
+Implemented in [PR #38](https://github.com/manromero/my-clinics/pull/38).
+Implementation and initial independent review of
+`9363e51ecc10c0fe905bbbab1755e45604dc591a` passed `pnpm lint`,
+`pnpm typecheck`, `pnpm format:check`, `pnpm build`, and `pnpm test`
+(212 tests). Both roles exercised the standard deletion flows in Chrome at
+1440 × 900 and 390 × 844.
+
+The initial review found one blocker (CD-01). A long clinic name displaced
+the title and beginning of the name outside the visible confirmation dialog
+at the narrow viewport. Round 1 re-review of
+`8c27ed0f87d1fa1512b6d8d147151be8ce46c67d` verified that the full name could
+be read by scrolling while the title and actions stayed visible. All required
+checks and 213 tests passed. The re-review found a second blocker (CD-02).
+A recoverable failure placed the retry message below the visible area when
+the same long name filled the dialog body.
+
+Round 2 re-review of `1b7636b5de0dad5d9053e84c00ef9a701660d7c6` verified
+both fixes. The retry message became visible when deletion failed at either
+end of the long name, and retry succeeded. The standard deletion flows and
+shared confirmation examples passed in Chrome at 1440 × 900 and 390 × 844.
+`pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build`, and
+`pnpm test` (213 tests) passed. The PR contains visual evidence. No blocking
+or optional findings remain.
+
+The user requested a filled red `Eliminar clínica` button with white text in
+the edit form during PR review. Reuse the shared destructive variant and
+refresh desktop and mobile evidence. Independent review of
+`08d0afb109ce221fac9eb3f1cae9a1221bb6ca16` verified the filled button and
+confirmation and cancellation behavior at both widths. All required checks and
+213 tests passed. The existing correction count is retained.
+
+Human approval and manual merge into `develop` are pending.

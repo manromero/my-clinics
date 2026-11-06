@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Alert } from "../alert/alert";
 import { Button } from "../button/button";
 import { Dialog } from "../dialog/dialog";
@@ -37,9 +37,17 @@ export function ConfirmDialog({
   pendingLabel = "Procesando…",
 }: ConfirmDialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
   const inFlight = useRef(false);
   const [confirming, setConfirming] = useState(false);
   const busy = pending || confirming;
+
+  useEffect(() => {
+    if (open && error && !busy) {
+      errorRef.current?.scrollIntoView({ block: "nearest" });
+    }
+  }, [open, error, busy]);
+
   async function confirm() {
     if (!open || pending || inFlight.current) return;
     inFlight.current = true;
@@ -88,6 +96,7 @@ export function ConfirmDialog({
         {children}
         {error && (
           <Alert
+            ref={errorRef}
             title="No se pudo completar la acción"
             variant="error"
             announcement="assertive"
