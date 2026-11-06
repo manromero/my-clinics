@@ -1,6 +1,6 @@
 # Milestone 01 — Visual foundations and shared components
 
-Planning approved through PR #5 merged into develop. Task 00 was accepted by the user and merged through PR #6; Task 01 is complete and ready for human acceptance in PR #8; other implementation tasks remain pending.
+Complete. Planning was approved through PR #5, and all 28 task PRs (Tasks 00–27) are merged into `develop`.
 
 ## Objective
 
@@ -84,11 +84,7 @@ Screens are visual direction, not new requirements. Inactive clinics remain edit
 
 ## Completion criteria
 
-All 27 task files and index rows are done only after their implementation, unit tests, showcase examples, required checks and independent review pass. The catalogue demonstrates all delivered variants and applicable error/loading/empty states; the visual system remains similar to Alexandria and S01-S04 at desktop and mobile. Human acceptance and manual merge are tracked in each implementation PR.
-
-## Planning delivery
-
-This PR changes documentation only. No application code, dependencies or tests are implemented here; graphical evidence belongs to the future UI tasks. Validate these definitions through formatting, local links/anchors, dependency-cycle and scope/coverage checks. Task status remains pending until execution is assigned.
+All 28 task files and index rows are done only after their implementation, unit tests, showcase examples, required checks and independent review pass. The catalogue demonstrates all delivered variants and applicable error/loading/empty states; the visual system remains similar to Alexandria and S01-S04 at desktop and mobile. Human acceptance and manual merge are tracked in each implementation PR.
 
 ## Catalogue navigation follow-up
 
