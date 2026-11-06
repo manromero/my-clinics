@@ -1,6 +1,6 @@
 # Task 02 — Validate clinic deletion with an in-memory data source
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -71,4 +71,14 @@ at the narrow viewport. Round 1 re-review of
 be read by scrolling while the title and actions stayed visible. All required
 checks and 213 tests passed. The re-review found a second blocker (CD-02).
 A recoverable failure placed the retry message below the visible area when
-the same long name filled the dialog body. Round 2 addresses this case.
+the same long name filled the dialog body.
+
+Round 2 re-review of `1b7636b5de0dad5d9053e84c00ef9a701660d7c6` verified
+both fixes. The retry message became visible when deletion failed at either
+end of the long name, and retry succeeded. The standard deletion flows and
+shared confirmation examples passed in Chrome at 1440 × 900 and 390 × 844.
+`pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build`, and
+`pnpm test` (213 tests) passed. The PR contains visual evidence. No blocking
+or optional findings remain.
+
+Human approval and manual merge into `develop` are pending.
