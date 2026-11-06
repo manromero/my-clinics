@@ -120,7 +120,9 @@ it("cancels edits, retains changes after failure, and saves deactivation and rea
   await user.click(dialog.getByRole("radio", { name: "Inactiva" }));
   await user.click(dialog.getByRole("button", { name: "Cancelar" }));
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  expect(screen.getByRole("heading", { name: clinic.name })).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", { name: clinic.name }),
+  ).toBeInTheDocument();
   expect(screen.getByText("Activa", { exact: true })).toBeInTheDocument();
 
   await user.click(edit);
