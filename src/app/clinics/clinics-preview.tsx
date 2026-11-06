@@ -1,23 +1,27 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Alert } from "@/lib/components/alert/alert";
 import { Badge } from "@/lib/components/badge/badge";
 import { Button } from "@/lib/components/button/button";
 import { DecimalInput } from "@/lib/components/decimal-input/decimal-input";
 import { EmptyState } from "@/lib/components/empty-state/empty-state";
 import { FormPanel } from "@/lib/components/form-panel/form-panel";
+import { LoadingState } from "@/lib/components/loading-state/loading-state";
 import { PageContainer } from "@/lib/components/page-container/page-container";
 import { PageHeader } from "@/lib/components/page-header/page-header";
 import { SegmentedControl } from "@/lib/components/segmented-control/segmented-control";
 import { Surface } from "@/lib/components/surface/surface";
 import { TextInput } from "@/lib/components/text-input/text-input";
-
-export type SampleClinic = {
-  id: string;
-  name: string;
-  percentage: number;
-  active: boolean;
-};
+import {
+  parseClinicPercentage,
+  type Clinic,
+  type ClinicSource,
+} from "./clinic-source";
+import {
+  createMemoryClinicSource,
+  type ClinicFailure,
+} from "./memory-clinic-source";
 
 const percentageFormat = new Intl.NumberFormat("es-ES", {
   minimumFractionDigits: 2,
@@ -49,25 +53,91 @@ function ClinicIcon() {
 
 function ClinicForm({
   clinic,
+  source,
   onCancel,
+  onSaved,
 }: {
-  clinic?: SampleClinic;
+  clinic?: Clinic;
+  source: ClinicSource;
   onCancel: () => void;
+  onSaved: (clinic: Clinic) => void;
 }) {
   const nameInput = useRef<HTMLInputElement>(null);
+  const percentageInput = useRef<HTMLInputElement>(null);
+  const submitting = useRef(false);
+  const [pending, setPending] = useState(false);
+  const [saveError, setSaveError] = useState<string>();
+  const [errors, setErrors] = useState<{ name?: string; percentage?: string }>(
+    {},
+  );
   const [percentage, setPercentage] = useState(
     clinic ? percentageFormat.format(clinic.percentage) : "",
   );
+
+  const nameError = "Introduce el nombre de la clínica.";
+  const percentageError =
+    "Introduce un porcentaje entre 0 y 100 con hasta dos decimales.";
+
+  useEffect(() => {
+    if (pending) return;
+    if (errors.name) nameInput.current?.focus();
+    else if (errors.percentage) percentageInput.current?.focus();
+  }, [errors, pending]);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    if (submitting.current) return;
+    const data = new FormData(event.currentTarget);
+    const name = String(data.get("name") ?? "").trim();
+    const parsed = parseClinicPercentage(percentage);
+    setSaveError(undefined);
+    setErrors({
+      name: name ? undefined : nameError,
+      percentage: parsed.status === "valid" ? undefined : percentageError,
+    });
+    if (!name || parsed.status !== "valid") return;
+
+    submitting.current = true;
+    setPending(true);
+    const details = { name, percentage: Number(parsed.decimal) };
+    const result = clinic
+      ? await source.update(clinic.id, {
+          ...details,
+          active: data.get("state") === "active",
+        })
+      : await source.create(details);
+    submitting.current = false;
+    setPending(false);
+
+    switch (result.status) {
+      case "saved":
+        onSaved(result.clinic);
+        break;
+      case "duplicate-name":
+        setErrors({ name: "Ya existe una clínica con ese nombre." });
+        break;
+      case "invalid":
+        setErrors({
+          [result.field]: result.field === "name" ? nameError : percentageError,
+        });
+        break;
+      case "failed":
+        setSaveError(
+          "Tus cambios siguen en el formulario. Vuelve a pulsar Guardar para reintentar.",
+        );
+        break;
+    }
+  }
 
   return (
     <FormPanel
       presentation="modal"
       open
       title={clinic ? "Editar clínica" : "Nueva clínica"}
-      description="Vista previa. Los cambios de este formulario no se guardan."
       initialFocusRef={nameInput}
       onCancel={onCancel}
-      onSubmit={() => {}}
+      onSubmit={submit}
+      pending={pending}
+      error={saveError}
       noValidate
     >
       <TextInput
@@ -76,9 +146,11 @@ function ClinicForm({
         name="name"
         defaultValue={clinic?.name}
         placeholder="Ej. Clínica Dental Alameda"
+        error={errors.name}
         required
       />
       <DecimalInput
+        ref={percentageInput}
         label="Porcentaje por defecto"
         name="percentage"
         value={percentage}
@@ -86,6 +158,7 @@ function ClinicForm({
         adornment="%"
         placeholder="Ej. 28,50"
         help="Entre 0 y 100 %. Los cambios se aplican a las actividades nuevas."
+        error={errors.percentage}
         required
       />
       <div className="space-y-2">
@@ -94,10 +167,12 @@ function ClinicForm({
           name="state"
           options={clinicStates}
           defaultValue={clinic?.active === false ? "inactive" : "active"}
+          disabled={!clinic}
         />
         <p className="text-label text-on-surface-variant">
-          Desactivar una clínica conserva su actividad anterior e impide
-          registrar nuevas actividades en ella.
+          {clinic
+            ? "Desactivar una clínica conserva su actividad anterior e impide registrar nuevas actividades en ella."
+            : "Las clínicas nuevas se crean activas."}
         </p>
       </div>
     </FormPanel>
@@ -105,12 +180,60 @@ function ClinicForm({
 }
 
 export function ClinicsPreview({
-  clinics,
+  initialClinics,
+  failure,
 }: {
-  clinics: readonly SampleClinic[];
+  initialClinics: readonly Clinic[];
+  failure?: ClinicFailure;
 }) {
-  const [selection, setSelection] = useState<SampleClinic | "new" | null>(null);
-  const openCreate = () => setSelection("new");
+  const [source] = useState(() =>
+    createMemoryClinicSource(initialClinics, { failure }),
+  );
+  const [load, setLoad] = useState<Awaited<
+    ReturnType<ClinicSource["list"]>
+  > | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const [selection, setSelection] = useState<Clinic | "new" | null>(null);
+  const [saved, setSaved] = useState<{ clinic: Clinic; created: boolean }>();
+  const createButton = useRef<HTMLButtonElement>(null);
+  const restoreCreateFocus = useRef(false);
+  const editConfirmation = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let current = true;
+    void source.list().then((result) => {
+      if (current) setLoad(result);
+    });
+    return () => {
+      current = false;
+    };
+  }, [source, attempt]);
+
+  useEffect(() => {
+    if (restoreCreateFocus.current && createButton.current) {
+      restoreCreateFocus.current = false;
+      createButton.current.focus();
+    }
+    editConfirmation.current?.scrollIntoView({ block: "nearest" });
+  }, [saved]);
+
+  const clinics = load?.status === "loaded" ? load.clinics : [];
+
+  function openForm(selection: Clinic | "new") {
+    setSaved(undefined);
+    setSelection(selection);
+  }
+
+  function saveClinic(clinic: Clinic) {
+    restoreCreateFocus.current = clinics.length === 0;
+    const created = selection === "new";
+    const updated = created
+      ? [...clinics, clinic]
+      : clinics.map((entry) => (entry.id === clinic.id ? clinic : entry));
+    setLoad({ status: "loaded", clinics: updated });
+    setSelection(null);
+    setSaved({ clinic, created });
+  }
 
   return (
     <PageContainer as="main" className="flex-1 space-y-8">
@@ -120,15 +243,44 @@ export function ClinicsPreview({
         description="Consulta tus clínicas y sus porcentajes por defecto. Los cambios de porcentaje se aplican a las actividades nuevas."
         actions={
           clinics.length > 0 && (
-            <Button onClick={openCreate}>Nueva clínica</Button>
+            <Button ref={createButton} onClick={() => openForm("new")}>
+              Nueva clínica
+            </Button>
           )
         }
       />
-      {clinics.length > 0 ? (
+      {saved?.created && (
+        <Alert title="Clínica guardada" variant="success" announcement="polite">
+          Se guardaron los cambios de {saved.clinic.name}.
+        </Alert>
+      )}
+      {load === null ? (
+        <LoadingState label="Cargando clínicas…" variant="region" />
+      ) : load.status === "failed" ? (
+        <Alert
+          title="No se pudieron cargar las clínicas"
+          variant="error"
+          announcement="assertive"
+          action={{
+            label: "Reintentar",
+            onClick: () => {
+              setLoad(null);
+              setAttempt((current) => current + 1);
+            },
+          }}
+        >
+          Vuelve a intentarlo para consultar tus clínicas.
+        </Alert>
+      ) : clinics.length > 0 ? (
         <section aria-labelledby="clinics-list" className="space-y-4">
           <h2 id="clinics-list" className="font-headline text-title">
             Todas las clínicas
           </h2>
+          {clinics.every((clinic) => !clinic.active) && (
+            <Alert title="Todas las clínicas están inactivas">
+              Edita una clínica para volver a activarla.
+            </Alert>
+          )}
           <ul className="space-y-3">
             {clinics.map((clinic) => (
               <li key={clinic.id}>
@@ -142,7 +294,7 @@ export function ClinicsPreview({
                     </span>
                     <div className="min-w-0 space-y-1">
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                        <h3 className="font-headline text-lg font-semibold">
+                        <h3 className="min-w-0 font-headline text-lg font-semibold wrap-anywhere">
                           {clinic.name}
                         </h3>
                         <Badge
@@ -163,12 +315,23 @@ export function ClinicsPreview({
                       <Button
                         variant="secondary"
                         aria-label={`Editar ${clinic.name}`}
-                        onClick={() => setSelection(clinic)}
+                        onClick={() => openForm(clinic)}
                       >
                         Editar
                       </Button>
                     </div>
                   </div>
+                  {saved && !saved.created && saved.clinic.id === clinic.id && (
+                    <Alert
+                      ref={editConfirmation}
+                      title="Clínica guardada"
+                      variant="success"
+                      announcement="polite"
+                      className="mt-3 scroll-m-4"
+                    >
+                      Se guardaron los cambios.
+                    </Alert>
+                  )}
                 </Surface>
               </li>
             ))}
@@ -179,13 +342,15 @@ export function ClinicsPreview({
           icon={<ClinicIcon />}
           title="Aún no hay clínicas"
           explanation="Añade una clínica para preparar el registro de actividad."
-          action={{ label: "Nueva clínica", onClick: openCreate }}
+          action={{ label: "Nueva clínica", onClick: () => openForm("new") }}
         />
       )}
       {selection && (
         <ClinicForm
           clinic={selection === "new" ? undefined : selection}
+          source={source}
           onCancel={() => setSelection(null)}
+          onSaved={saveClinic}
         />
       )}
     </PageContainer>

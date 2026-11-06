@@ -1,6 +1,6 @@
 # Task 01 — Implement clinic interactions with an in-memory data source
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -38,6 +38,40 @@ Follow the [milestone validation](readme.md#delivery-and-validation). Test the
 contract, boundary values, duplicate handling, and save and cancel behavior.
 Verify the interactive success and retry paths in the running screen.
 
+## Execution context
+
+- Ready. Task 00 was merged in PR #36. Branch `feature/clinic-interactions`
+  starts from `develop` at `1ed8254f30776eb44bac1187105d9f9b831f7d1d`.
+- `src/app/clinics/page.tsx` selects the sample data and supports
+  `/clinics?preview=empty`. Its client component currently presents the list and
+  form with a placeholder submit handler. Reuse the shared components and keep
+  clinic-specific code close to the route.
+- Follow the clinic requirements, S02, Alexandria, and the Stitch export.
+  Use synthetic scenarios to exercise empty and all-inactive data and recoverable
+  load and save failures. Verify the scenarios through the running screen and
+  record how to reproduce them in the PR.
+- Run `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build`, and
+  `pnpm test`. Capture desktop and mobile evidence and attach it to the PR
+  targeting `develop`. GitHub access and the merged prerequisite were verified.
+- No open product decisions. Correction rounds used: 1.
+
 ## Progress notes
 
-Implementation pending assignment.
+Delivered in [PR #37](https://github.com/manromero/my-clinics/pull/37). `/clinics`
+supports creating, editing, deactivating, and reactivating clinics in memory.
+The PR documents the preview routes for empty, all-inactive, load-failure, and
+save-failure scenarios. A fresh page load starts a new in-memory session.
+
+The initial independent review of `c213257501eaf68b3b96dc9c9a001eb29d07a74f`
+found that the edit confirmation could be offscreen after saving a clinic far
+down the list (M02.01-R01). Round 1 moved the confirmation beside the edited
+clinic and brought it into view while preserving focus on Editar.
+
+Implementation and independent re-review of `6105140871d4f6e06eb488cfbb33837fe953740f`
+passed `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build`, and
+`pnpm test` (205 tests). Independent Chrome checks at 1440 × 900 and 390 × 844
+covered the save, cancel, validation, state change, and retry flows and verified
+that M02.01-R01 is fixed. The PR contains visual evidence and the optional
+keyboard focus suggestion (M02.01-O01). No blocking findings remain.
+
+Human approval and manual merge into `develop` are pending.

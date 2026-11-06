@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { AppFooter } from "@/lib/components/app-footer/app-footer";
 import { AppHeader } from "@/lib/components/app-header/app-header";
-import { ClinicsPreview, type SampleClinic } from "./clinics-preview";
+import { ClinicsPreview } from "./clinics-preview";
+import type { Clinic } from "./clinic-source";
 
 export const metadata: Metadata = {
   title: "Clínicas | MyClinics",
 };
 
-const sampleClinics: readonly SampleClinic[] = [
+const sampleClinics: readonly Clinic[] = [
   {
     id: "alameda",
     name: "Clínica Dental Alameda",
@@ -27,11 +28,26 @@ export default async function ClinicsPage({
   searchParams,
 }: PageProps<"/clinics">) {
   const { preview } = await searchParams;
+  const scenario = typeof preview === "string" ? preview : undefined;
+  const initialClinics =
+    scenario === "empty"
+      ? []
+      : scenario === "all-inactive"
+        ? sampleClinics.map((clinic) => ({ ...clinic, active: false }))
+        : sampleClinics;
+  const failure =
+    scenario === "load-error" || scenario === "save-error"
+      ? scenario
+      : undefined;
 
   return (
     <div className="flex min-h-dvh flex-col">
       <AppHeader variant="public" />
-      <ClinicsPreview clinics={preview === "empty" ? [] : sampleClinics} />
+      <ClinicsPreview
+        key={scenario}
+        initialClinics={initialClinics}
+        failure={failure}
+      />
       <AppFooter
         identity="MyClinics"
         metadata="Vista previa con datos de ejemplo"
