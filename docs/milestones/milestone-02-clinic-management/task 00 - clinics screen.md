@@ -1,6 +1,6 @@
 # Task 00 — Build the Clinics screen with sample data
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -37,6 +37,35 @@ Clinic writes, the data contract, and authentication belong to later tasks.
 Follow the [milestone validation](readme.md#delivery-and-validation). Compare the
 running list, empty state, and form with S02 and Alexandria on desktop and mobile.
 
+## Execution context
+
+- Ready. Milestone 01 is complete and integrated. The task criteria define the
+  preview behavior and exclude clinic writes, a data contract, and authentication.
+- Branch `feature/clinics-screen` starts from `develop` at
+  `775e440aa1c9b330cb9eeeaa412d430350cd2ead`.
+- Use route-local code in `src/app/clinics` and the shell and controls in
+  `src/lib/components`. The root layout already sets Spanish and loads the
+  Alexandria fonts. There is no existing Clinics route.
+- S02 and Alexandria guide card hierarchy, state labels, percentage formatting,
+  and the form. The Stitch export also contains controls beyond the approved
+  task scope. Verify the populated and empty list and both form modes live,
+  including keyboard open and dismissal. Capture desktop and mobile evidence
+  and attach it to the PR targeting `develop`.
+- GitHub CLI authentication and screenshot attachment support were verified.
+  No open product decisions. Correction rounds used: 0.
+
 ## Progress notes
 
-Implementation pending assignment.
+Delivered in [PR #36](https://github.com/manromero/my-clinics/pull/36).
+Open `/clinics` for the populated preview and `/clinics?preview=empty` for the
+empty state. The form uses the shared dialog. Saving from the preview leaves
+the sample records intact.
+
+Implementation and independent review passed `pnpm lint`, `pnpm typecheck`,
+`pnpm format:check`, `pnpm build`, and `pnpm test` (185 tests). Independent
+review of `7a12c90a3ad91447a201acb2c714c4066edec6d0` verified the list, empty
+state, create and edit defaults, keyboard and focus behavior, and responsive
+layout against S02 and Alexandria at 1440 × 900 and 390 × 844. The PR contains
+the visual evidence. No findings and zero correction rounds.
+
+Human approval and manual merge into `develop` are pending.
