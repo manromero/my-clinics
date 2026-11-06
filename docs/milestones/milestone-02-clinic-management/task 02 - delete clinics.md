@@ -53,7 +53,7 @@ mobile widths, including deletion of the last clinic.
   the deletion behavior. Supabase integration and real activity records are out of scope.
 - Validate the source rule and UI behavior with tests, then exercise the running
   edit and confirmation flows on desktop and mobile. Capture evidence for the PR.
-- Open questions: none. Correction rounds used: 1.
+- Open questions: none. Correction rounds used: 2.
 
 ## Progress notes
 
@@ -66,5 +66,9 @@ Implementation and initial independent review of
 
 The initial review found one blocker (CD-01). A long clinic name displaced
 the title and beginning of the name outside the visible confirmation dialog
-at the narrow viewport. Round 1 addresses this case and requires independent
-re-verification.
+at the narrow viewport. Round 1 re-review of
+`8c27ed0f87d1fa1512b6d8d147151be8ce46c67d` verified that the full name could
+be read by scrolling while the title and actions stayed visible. All required
+checks and 213 tests passed. The re-review found a second blocker (CD-02).
+A recoverable failure placed the retry message below the visible area when
+the same long name filled the dialog body. Round 2 addresses this case.
