@@ -1,6 +1,6 @@
 # Task 00 — Build the Clinics screen with sample data
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -56,4 +56,16 @@ running list, empty state, and form with S02 and Alexandria on desktop and mobil
 
 ## Progress notes
 
-Implementation assigned.
+Delivered in [PR #36](https://github.com/manromero/my-clinics/pull/36).
+Open `/clinics` for the populated preview and `/clinics?preview=empty` for the
+empty state. The form uses the shared dialog. Saving from the preview leaves
+the sample records intact.
+
+Implementation and independent review passed `pnpm lint`, `pnpm typecheck`,
+`pnpm format:check`, `pnpm build`, and `pnpm test` (185 tests). Independent
+review of `7a12c90a3ad91447a201acb2c714c4066edec6d0` verified the list, empty
+state, create and edit defaults, keyboard and focus behavior, and responsive
+layout against S02 and Alexandria at 1440 × 900 and 390 × 844. The PR contains
+the visual evidence. No findings and zero correction rounds.
+
+Human approval and manual merge into `develop` are pending.
