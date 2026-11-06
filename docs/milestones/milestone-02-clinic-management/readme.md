@@ -25,12 +25,12 @@ connect the same workflow to Supabase.
 
 ## Task index
 
-| Task                                                                                                    | Status    | Direct dependencies |
-| ------------------------------------------------------------------------------------------------------- | --------- | ------------------- |
-| [00 — Build the Clinics screen with sample data](<task 00 - clinics screen.md>)                         | `pending` | Milestone 01        |
-| [01 — Implement clinic interactions with an in-memory data source](<task 01 - clinic interactions.md>)  | `pending` | 00                  |
-| [02 — Set up Supabase and define the clinic database contract](<task 02 - supabase clinic contract.md>) | `pending` | 01                  |
-| [03 — Connect Clinics to Supabase](<task 03 - connect clinics.md>)                                      | `pending` | 01, 02              |
+| Task                                                                                                    | Status        | Direct dependencies |
+| ------------------------------------------------------------------------------------------------------- | ------------- | ------------------- |
+| [00 — Build the Clinics screen with sample data](<task 00 - clinics screen.md>)                         | `in_progress` | Milestone 01        |
+| [01 — Implement clinic interactions with an in-memory data source](<task 01 - clinic interactions.md>)  | `pending`     | 00                  |
+| [02 — Set up Supabase and define the clinic database contract](<task 02 - supabase clinic contract.md>) | `pending`     | 01                  |
+| [03 — Connect Clinics to Supabase](<task 03 - connect clinics.md>)                                      | `pending`     | 01, 02              |
 
 ## Delivery and validation
 
