@@ -1,6 +1,6 @@
 # Task 02 — Validate clinic deletion with an in-memory data source
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -83,6 +83,9 @@ or optional findings remain.
 
 The user requested a filled red `Eliminar clínica` button with white text in
 the edit form during PR review. Reuse the shared destructive variant and
-refresh desktop and mobile evidence. The existing correction count is retained.
+refresh desktop and mobile evidence. Independent review of
+`08d0afb109ce221fac9eb3f1cae9a1221bb6ca16` verified the filled button and
+confirmation and cancellation behavior at both widths. All required checks and
+213 tests passed. The existing correction count is retained.
 
 Human approval and manual merge into `develop` are pending.
