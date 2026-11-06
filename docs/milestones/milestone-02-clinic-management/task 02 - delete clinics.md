@@ -1,6 +1,6 @@
 # Task 02 — Validate clinic deletion with an in-memory data source
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -41,6 +41,20 @@ eligibility, successful deletion, cancellation, linked activity, and retry.
 Verify the edit and confirmation flows on the running screen at desktop and
 mobile widths, including deletion of the last clinic.
 
+## Execution context
+
+- Ready. Task 01 was merged in [PR #37](https://github.com/manromero/my-clinics/pull/37).
+  Branch `feature/clinic-deletion` starts from `develop` at
+  `bb88ed57e9646b7f924d20a3037578e8d16b7f25`.
+- The `/clinics` preview, clinic contract, in-memory adapter, and existing
+  tests live in `src/app/clinics`. The shared `ConfirmDialog` supports destructive
+  actions, cancellation, and pending and error feedback.
+- Follow S02 and the Alexandria and Stitch references. The approved task supplies
+  the deletion behavior. Supabase integration and real activity records are out of scope.
+- Validate the source rule and UI behavior with tests, then exercise the running
+  edit and confirmation flows on desktop and mobile. Capture evidence for the PR.
+- Open questions: none. Correction rounds used: 0.
+
 ## Progress notes
 
-Implementation pending assignment.
+Implementation assigned.

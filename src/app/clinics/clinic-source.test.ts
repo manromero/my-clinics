@@ -123,4 +123,59 @@ describe("in-memory clinic source", () => {
       status: "failed",
     });
   });
+
+  it.each([true, false])(
+    "deletes a clinic without linked activity when active is %s",
+    async (active) => {
+      const source = createMemoryClinicSource([{ ...clinic, active }], {
+        delay: 0,
+      });
+      expect(source.deletion.hasLinkedActivity(clinic.id)).toBe(false);
+      expect(await source.deletion.remove(clinic.id)).toEqual({
+        status: "deleted",
+      });
+      expect(await source.list()).toEqual({ status: "loaded", clinics: [] });
+    },
+  );
+
+  it("rechecks activity at deletion time and preserves the clinic even after deactivation", async () => {
+    const activeClinic = { ...clinic, active: true };
+    const linkedClinicIds = new Set<string>();
+    const source = createMemoryClinicSource([activeClinic], {
+      delay: 0,
+      linkedClinicIds,
+    });
+    expect(source.deletion.hasLinkedActivity(clinic.id)).toBe(false);
+    const deleting = source.deletion.remove(clinic.id);
+    linkedClinicIds.add(clinic.id);
+    expect(await deleting).toEqual({ status: "linked-activity" });
+    expect(await source.update(clinic.id, clinic)).toEqual({
+      status: "saved",
+      clinic,
+    });
+    expect(await source.deletion.remove(clinic.id)).toEqual({
+      status: "linked-activity",
+    });
+    expect(await source.list()).toEqual({
+      status: "loaded",
+      clinics: [clinic],
+    });
+  });
+
+  it("preserves the clinic on a recoverable deletion failure and allows retry", async () => {
+    const source = createMemoryClinicSource([clinic], {
+      delay: 0,
+      failure: "delete-error",
+    });
+    expect(await source.deletion.remove(clinic.id)).toEqual({
+      status: "failed",
+    });
+    expect(await source.list()).toEqual({
+      status: "loaded",
+      clinics: [clinic],
+    });
+    expect(await source.deletion.remove(clinic.id)).toEqual({
+      status: "deleted",
+    });
+  });
 });

@@ -5,12 +5,20 @@ import {
   type ClinicSource,
 } from "./clinic-source";
 
-export type ClinicFailure = "load-error" | "save-error";
+export type ClinicFailure = "load-error" | "save-error" | "delete-error";
 
 export function createMemoryClinicSource(
   initialClinics: readonly Clinic[],
-  { failure, delay = 500 }: { failure?: ClinicFailure; delay?: number } = {},
-): ClinicSource {
+  {
+    failure,
+    delay = 500,
+    linkedClinicIds = new Set<string>(),
+  }: {
+    failure?: ClinicFailure;
+    delay?: number;
+    linkedClinicIds?: ReadonlySet<string>;
+  } = {},
+): ClinicSource & Required<Pick<ClinicSource, "deletion">> {
   const clinics = new Map(
     initialClinics.map((clinic) => [clinic.id, { ...clinic }]),
   );
@@ -19,6 +27,7 @@ export function createMemoryClinicSource(
   let loading: ReturnType<ClinicSource["list"]> | undefined;
 
   const wait = () => new Promise<void>((resolve) => setTimeout(resolve, delay));
+  const hasLinkedActivity = (id: string) => linkedClinicIds.has(id);
 
   async function list(): ReturnType<ClinicSource["list"]> {
     await wait();
@@ -77,5 +86,19 @@ export function createMemoryClinicSource(
     },
     create: (details) => save({ ...details, active: true }),
     update: (id, changes) => save(changes, id),
+    deletion: {
+      hasLinkedActivity,
+      async remove(id) {
+        await wait();
+        if (!clinics.has(id)) return { status: "failed" };
+        if (hasLinkedActivity(id)) return { status: "linked-activity" };
+        if (pendingFailure === "delete-error") {
+          pendingFailure = undefined;
+          return { status: "failed" };
+        }
+        clinics.delete(id);
+        return { status: "deleted" };
+      },
+    },
   };
 }

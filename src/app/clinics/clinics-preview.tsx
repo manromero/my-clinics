@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Alert } from "@/lib/components/alert/alert";
 import { Badge } from "@/lib/components/badge/badge";
 import { Button } from "@/lib/components/button/button";
+import { ConfirmDialog } from "@/lib/components/confirm-dialog/confirm-dialog";
 import { DecimalInput } from "@/lib/components/decimal-input/decimal-input";
 import { EmptyState } from "@/lib/components/empty-state/empty-state";
 import { FormPanel } from "@/lib/components/form-panel/form-panel";
@@ -56,15 +57,24 @@ function ClinicForm({
   source,
   onCancel,
   onSaved,
+  onDeleted,
 }: {
   clinic?: Clinic;
   source: ClinicSource;
   onCancel: () => void;
   onSaved: (clinic: Clinic) => void;
+  onDeleted: (clinic: Clinic) => void;
 }) {
   const nameInput = useRef<HTMLInputElement>(null);
   const percentageInput = useRef<HTMLInputElement>(null);
   const submitting = useRef(false);
+  const deleteButton = useRef<HTMLButtonElement>(null);
+  const linkedActivityMessage = useRef<HTMLParagraphElement>(null);
+  const [deleteStage, setDeleteStage] = useState<"edit" | "confirm" | "return">(
+    "edit",
+  );
+  const [deleteError, setDeleteError] = useState<string>();
+  const [deleteBlocked, setDeleteBlocked] = useState(false);
   const [pending, setPending] = useState(false);
   const [saveError, setSaveError] = useState<string>();
   const [errors, setErrors] = useState<{ name?: string; percentage?: string }>(
@@ -77,6 +87,9 @@ function ClinicForm({
   const nameError = "Introduce el nombre de la clínica.";
   const percentageError =
     "Introduce un porcentaje entre 0 y 100 con hasta dos decimales.";
+  const deletion = source.deletion;
+  const hasLinkedActivity =
+    deleteBlocked || (clinic && deletion?.hasLinkedActivity(clinic.id));
 
   useEffect(() => {
     if (pending) return;
@@ -85,7 +98,7 @@ function ClinicForm({
   }, [errors, pending]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
-    if (submitting.current) return;
+    if (submitting.current || deleteStage === "confirm") return;
     const data = new FormData(event.currentTarget);
     const name = String(data.get("name") ?? "").trim();
     const parsed = parseClinicPercentage(percentage);
@@ -128,66 +141,142 @@ function ClinicForm({
     }
   }
 
+  async function deleteClinic() {
+    if (!clinic || !deletion) return;
+    setDeleteError(undefined);
+    const result = await deletion
+      .remove(clinic.id)
+      .catch(() => ({ status: "failed" }) as const);
+
+    switch (result.status) {
+      case "deleted":
+        onDeleted(clinic);
+        break;
+      case "linked-activity":
+        setDeleteBlocked(true);
+        setDeleteStage("return");
+        break;
+      case "failed":
+        setDeleteError(
+          "La clínica se conserva. Vuelve a pulsar Eliminar clínica para reintentar.",
+        );
+        break;
+    }
+  }
+
   return (
-    <FormPanel
-      presentation="modal"
-      open
-      title={clinic ? "Editar clínica" : "Nueva clínica"}
-      initialFocusRef={nameInput}
-      onCancel={onCancel}
-      onSubmit={submit}
-      pending={pending}
-      error={saveError}
-      noValidate
-    >
-      <TextInput
-        ref={nameInput}
-        label="Nombre de la clínica"
-        name="name"
-        defaultValue={clinic?.name}
-        placeholder="Ej. Clínica Dental Alameda"
-        error={errors.name}
-        required
-      />
-      <DecimalInput
-        ref={percentageInput}
-        label="Porcentaje por defecto"
-        name="percentage"
-        value={percentage}
-        onValueChange={setPercentage}
-        adornment="%"
-        placeholder="Ej. 28,50"
-        help="Entre 0 y 100 %. Los cambios se aplican a las actividades nuevas."
-        error={errors.percentage}
-        required
-      />
-      <div className="space-y-2">
-        <SegmentedControl
-          label="Estado de la clínica"
-          name="state"
-          options={clinicStates}
-          defaultValue={clinic?.active === false ? "inactive" : "active"}
-          disabled={!clinic}
+    <>
+      {/* Keep the draft mounted while only one modal is open. */}
+      <FormPanel
+        presentation="modal"
+        open={deleteStage !== "confirm"}
+        title={clinic ? "Editar clínica" : "Nueva clínica"}
+        initialFocusRef={
+          deleteStage === "return"
+            ? hasLinkedActivity
+              ? linkedActivityMessage
+              : deleteButton
+            : nameInput
+        }
+        onCancel={onCancel}
+        onSubmit={submit}
+        pending={pending}
+        error={saveError}
+        noValidate
+      >
+        <TextInput
+          ref={nameInput}
+          label="Nombre de la clínica"
+          name="name"
+          defaultValue={clinic?.name}
+          placeholder="Ej. Clínica Dental Alameda"
+          error={errors.name}
+          required
         />
-        <p className="text-label text-on-surface-variant">
-          {clinic
-            ? "Desactivar una clínica conserva su actividad anterior e impide registrar nuevas actividades en ella."
-            : "Las clínicas nuevas se crean activas."}
-        </p>
-      </div>
-    </FormPanel>
+        <DecimalInput
+          ref={percentageInput}
+          label="Porcentaje por defecto"
+          name="percentage"
+          value={percentage}
+          onValueChange={setPercentage}
+          adornment="%"
+          placeholder="Ej. 28,50"
+          help="Entre 0 y 100 %. Los cambios se aplican a las actividades nuevas."
+          error={errors.percentage}
+          required
+        />
+        <div className="space-y-2">
+          <SegmentedControl
+            label="Estado de la clínica"
+            name="state"
+            options={clinicStates}
+            defaultValue={clinic?.active === false ? "inactive" : "active"}
+            disabled={!clinic}
+          />
+          <p className="text-label text-on-surface-variant">
+            {clinic
+              ? "Desactivar una clínica conserva su actividad anterior e impide registrar nuevas actividades en ella."
+              : "Las clínicas nuevas se crean activas."}
+          </p>
+        </div>
+        {clinic && deletion && (
+          <div className="rounded-lg bg-surface-container-low p-4">
+            {hasLinkedActivity ? (
+              <p
+                ref={linkedActivityMessage}
+                tabIndex={-1}
+                className="text-label text-on-surface-variant"
+              >
+                Esta clínica tiene actividad registrada y no se puede eliminar.
+              </p>
+            ) : (
+              <Button
+                ref={deleteButton}
+                variant="tertiary"
+                className="text-error! enabled:hover:bg-error/10!"
+                onClick={() => {
+                  if (submitting.current) return;
+                  setDeleteError(undefined);
+                  setDeleteStage("confirm");
+                }}
+              >
+                Eliminar clínica
+              </Button>
+            )}
+          </div>
+        )}
+      </FormPanel>
+      {clinic && deleteStage === "confirm" && (
+        <ConfirmDialog
+          open
+          title="Eliminar clínica"
+          description={`¿Quieres eliminar «${clinic.name}»? Esta acción es permanente.`}
+          destructive
+          confirmLabel="Eliminar clínica"
+          pendingLabel="Eliminando…"
+          error={deleteError}
+          onOpenChange={() => setDeleteStage("return")}
+          onConfirm={deleteClinic}
+        />
+      )}
+    </>
   );
 }
 
 export function ClinicsPreview({
   initialClinics,
+  linkedClinicIds,
   failure,
 }: {
   initialClinics: readonly Clinic[];
+  linkedClinicIds?: readonly string[];
   failure?: ClinicFailure;
 }) {
   const [source] = useState(() =>
-    createMemoryClinicSource(initialClinics, { failure }),
+    createMemoryClinicSource(initialClinics, {
+      failure,
+      linkedClinicIds: new Set(linkedClinicIds),
+    }),
   );
   const [load, setLoad] = useState<Awaited<
     ReturnType<ClinicSource["list"]>
@@ -195,9 +284,11 @@ export function ClinicsPreview({
   const [attempt, setAttempt] = useState(0);
   const [selection, setSelection] = useState<Clinic | "new" | null>(null);
   const [saved, setSaved] = useState<{ clinic: Clinic; created: boolean }>();
+  const [deleted, setDeleted] = useState<Clinic>();
   const createButton = useRef<HTMLButtonElement>(null);
   const restoreCreateFocus = useRef(false);
   const editConfirmation = useRef<HTMLDivElement>(null);
+  const deleteConfirmation = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let current = true;
@@ -217,11 +308,25 @@ export function ClinicsPreview({
     editConfirmation.current?.scrollIntoView({ block: "nearest" });
   }, [saved]);
 
+  useEffect(() => {
+    if (deleted) deleteConfirmation.current?.focus();
+  }, [deleted]);
+
   const clinics = load?.status === "loaded" ? load.clinics : [];
 
   function openForm(selection: Clinic | "new") {
     setSaved(undefined);
+    setDeleted(undefined);
     setSelection(selection);
+  }
+
+  function removeClinic(clinic: Clinic) {
+    setLoad({
+      status: "loaded",
+      clinics: clinics.filter((entry) => entry.id !== clinic.id),
+    });
+    setSelection(null);
+    setDeleted(clinic);
   }
 
   function saveClinic(clinic: Clinic) {
@@ -252,6 +357,17 @@ export function ClinicsPreview({
       {saved?.created && (
         <Alert title="Clínica guardada" variant="success" announcement="polite">
           Se guardaron los cambios de {saved.clinic.name}.
+        </Alert>
+      )}
+      {deleted && (
+        <Alert
+          ref={deleteConfirmation}
+          tabIndex={-1}
+          title="Clínica eliminada"
+          variant="success"
+          announcement="polite"
+        >
+          Se eliminó {deleted.name}.
         </Alert>
       )}
       {load === null ? (
@@ -351,6 +467,7 @@ export function ClinicsPreview({
           source={source}
           onCancel={() => setSelection(null)}
           onSaved={saveClinic}
+          onDeleted={removeClinic}
         />
       )}
     </PageContainer>

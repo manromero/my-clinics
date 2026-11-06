@@ -36,7 +36,9 @@ export default async function ClinicsPage({
         ? sampleClinics.map((clinic) => ({ ...clinic, active: false }))
         : sampleClinics;
   const failure =
-    scenario === "load-error" || scenario === "save-error"
+    scenario === "load-error" ||
+    scenario === "save-error" ||
+    scenario === "delete-error"
       ? scenario
       : undefined;
 
@@ -46,6 +48,7 @@ export default async function ClinicsPage({
       <ClinicsPreview
         key={scenario}
         initialClinics={initialClinics}
+        linkedClinicIds={["alameda"]}
         failure={failure}
       />
       <AppFooter

@@ -172,3 +172,86 @@ it("cancels edits, retains changes after failure, and saves deactivation and rea
     screen.queryByText("Todas las clínicas están inactivas"),
   ).not.toBeInTheDocument();
 });
+
+it("confirms with the saved name and keeps the edit draft when deletion is canceled", async () => {
+  const user = userEvent.setup();
+  render(<ClinicsPreview initialClinics={[clinic]} />);
+  await user.click(
+    await screen.findByRole("button", { name: `Editar ${clinic.name}` }),
+  );
+  const name = screen.getByRole("textbox", { name: "Nombre de la clínica" });
+  await user.type(name, " Centro");
+  const deleteButton = screen.getByRole("button", { name: "Eliminar clínica" });
+  await user.click(deleteButton);
+  const confirm = screen.getByRole("dialog", { name: "Eliminar clínica" });
+  expect(confirm).toHaveAccessibleDescription(
+    `¿Quieres eliminar «${clinic.name}»? Esta acción es permanente.`,
+  );
+  const cancel = within(confirm).getByRole("button", { name: "Cancelar" });
+  expect(cancel).toHaveFocus();
+  await user.click(cancel);
+  expect(deleteButton).toHaveFocus();
+  expect(name).toHaveValue(`${clinic.name} Centro`);
+  await user.click(screen.getByRole("button", { name: "Cancelar" }));
+  expect(
+    screen.getByRole("heading", { name: clinic.name }),
+  ).toBeInTheDocument();
+});
+
+it("explains why a linked clinic cannot be deleted and still allows deactivation", async () => {
+  const user = userEvent.setup();
+  render(
+    <ClinicsPreview initialClinics={[clinic]} linkedClinicIds={[clinic.id]} />,
+  );
+  const edit = await screen.findByRole("button", {
+    name: `Editar ${clinic.name}`,
+  });
+  await user.click(edit);
+  expect(screen.queryByRole("button", { name: "Eliminar clínica" })).toBeNull();
+  expect(screen.getByText(/tiene actividad registrada/)).toBeInTheDocument();
+  await user.click(screen.getByRole("radio", { name: "Inactiva" }));
+  await user.click(screen.getByRole("button", { name: "Guardar" }));
+  expect(await screen.findByText("Clínica guardada")).toBeInTheDocument();
+  await user.click(edit);
+  expect(screen.queryByRole("button", { name: "Eliminar clínica" })).toBeNull();
+  expect(screen.getByRole("radio", { name: "Inactiva" })).toBeChecked();
+});
+
+it("blocks repeat confirmation, preserves the clinic on failure and shows the empty state on retry", async () => {
+  const user = userEvent.setup();
+  render(
+    <ClinicsPreview
+      initialClinics={[{ ...clinic, active: false }]}
+      failure="delete-error"
+    />,
+  );
+  await user.click(
+    await screen.findByRole("button", { name: `Editar ${clinic.name}` }),
+  );
+  await user.click(screen.getByRole("button", { name: "Eliminar clínica" }));
+  const confirm = within(
+    screen.getByRole("dialog", { name: "Eliminar clínica" }),
+  );
+  await user.dblClick(
+    confirm.getByRole("button", { name: "Eliminar clínica" }),
+  );
+  expect(confirm.getByRole("button", { name: "Eliminando…" })).toBeDisabled();
+  expect(confirm.getByRole("button", { name: "Cancelar" })).toBeDisabled();
+  expect(await confirm.findByRole("alert")).toHaveTextContent(
+    "La clínica se conserva",
+  );
+  expect(
+    screen.getByRole("heading", { name: clinic.name }),
+  ).toBeInTheDocument();
+  await user.click(confirm.getByRole("button", { name: "Eliminar clínica" }));
+  expect(
+    await screen.findByRole("heading", { name: "Aún no hay clínicas" }),
+  ).toBeInTheDocument();
+  expect(screen.getByRole("status")).toHaveTextContent(
+    `Se eliminó ${clinic.name}.`,
+  );
+  expect(
+    screen.getByRole("group", { name: "Clínica eliminada" }),
+  ).toHaveFocus();
+  expect(screen.queryByRole("dialog")).toBeNull();
+});

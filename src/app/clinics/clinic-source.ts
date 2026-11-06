@@ -10,12 +10,20 @@ export type ClinicSaveResult =
   | { status: "invalid"; field: keyof ClinicDetails }
   | { status: "duplicate-name" | "failed" };
 
+type ClinicDeletion = {
+  hasLinkedActivity(id: string): boolean;
+  remove(id: string): Promise<{
+    status: "deleted" | "linked-activity" | "failed";
+  }>;
+};
+
 export type ClinicSource = {
   list(): Promise<
     { status: "loaded"; clinics: readonly Clinic[] } | { status: "failed" }
   >;
   create(details: ClinicDetails): Promise<ClinicSaveResult>;
   update(id: string, changes: ClinicChanges): Promise<ClinicSaveResult>;
+  deletion?: ClinicDeletion;
 };
 
 export function parseClinicPercentage(raw: string) {

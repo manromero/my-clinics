@@ -27,13 +27,13 @@ connect the same workflow to Supabase.
 
 ## Task index
 
-| Task                                                                                                    | Status    | Direct dependencies |
-| ------------------------------------------------------------------------------------------------------- | --------- | ------------------- |
-| [00 — Build the Clinics screen with sample data](<task 00 - clinics screen.md>)                         | `done`    | Milestone 01        |
-| [01 — Implement clinic interactions with an in-memory data source](<task 01 - clinic interactions.md>)  | `done`    | 00                  |
-| [02 — Validate clinic deletion with an in-memory data source](<task 02 - delete clinics.md>)            | `pending` | 01                  |
-| [03 — Set up Supabase and define the clinic database contract](<task 03 - supabase clinic contract.md>) | `pending` | 01, 02              |
-| [04 — Connect Clinics to Supabase](<task 04 - connect clinics.md>)                                      | `pending` | 01, 03              |
+| Task                                                                                                    | Status        | Direct dependencies |
+| ------------------------------------------------------------------------------------------------------- | ------------- | ------------------- |
+| [00 — Build the Clinics screen with sample data](<task 00 - clinics screen.md>)                         | `done`        | Milestone 01        |
+| [01 — Implement clinic interactions with an in-memory data source](<task 01 - clinic interactions.md>)  | `done`        | 00                  |
+| [02 — Validate clinic deletion with an in-memory data source](<task 02 - delete clinics.md>)            | `in_progress` | 01                  |
+| [03 — Set up Supabase and define the clinic database contract](<task 03 - supabase clinic contract.md>) | `pending`     | 01, 02              |
+| [04 — Connect Clinics to Supabase](<task 04 - connect clinics.md>)                                      | `pending`     | 01, 03              |
 
 ## Delivery and validation
 
