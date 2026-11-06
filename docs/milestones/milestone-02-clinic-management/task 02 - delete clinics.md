@@ -1,6 +1,6 @@
 # Task 02 — Validate clinic deletion with an in-memory data source
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -80,5 +80,9 @@ shared confirmation examples passed in Chrome at 1440 × 900 and 390 × 844.
 `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build`, and
 `pnpm test` (213 tests) passed. The PR contains visual evidence. No blocking
 or optional findings remain.
+
+The user requested a filled red `Eliminar clínica` button with white text in
+the edit form during PR review. Reuse the shared destructive variant and
+refresh desktop and mobile evidence. The existing correction count is retained.
 
 Human approval and manual merge into `develop` are pending.

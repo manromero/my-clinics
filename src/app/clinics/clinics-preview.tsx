@@ -232,8 +232,7 @@ function ClinicForm({
             ) : (
               <Button
                 ref={deleteButton}
-                variant="tertiary"
-                className="text-error! enabled:hover:bg-error/10!"
+                variant="destructive"
                 onClick={() => {
                   if (submitting.current) return;
                   setDeleteError(undefined);
