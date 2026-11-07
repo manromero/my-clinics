@@ -103,7 +103,7 @@ with relations as (
     and not exists (select 1 from pg_depend d where d.classid='pg_type'::regclass
                     and d.objid=t.oid and d.deptype='e')
   union all
-  select 'default_acl', pg_get_userbyid(a.defaclrole) || ':' || a.defaclobjtype,
+  select 'default_acl', pg_get_userbyid(a.defaclrole) || ':' || a.defaclobjtype::text,
     to_jsonb(a.defaclacl)
   from pg_default_acl a where a.defaclnamespace='public'::regnamespace
   union all

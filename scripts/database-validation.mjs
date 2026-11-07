@@ -49,8 +49,11 @@ async function api(path, method = "GET", body) {
   });
   // Never emit response bodies: management responses can contain credentials.
   if (!response.ok) {
+    const sqlState = path.endsWith("/database/query")
+      ? (await response.text()).match(/ERROR:\s+([A-Z0-9]{5}):/)?.[1]
+      : undefined;
     const error = new Error(
-      `Management API ${method} ${path}: HTTP ${response.status}`,
+      `Management API ${method} ${path}: HTTP ${response.status}${sqlState ? ` SQLSTATE ${sqlState}` : ""}`,
     );
     error.status = response.status;
     throw error;
@@ -294,7 +297,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main().catch((error) => {
     // SQL/CLI error messages may contain environment values. Keep logs redacted.
     console.error(
-      error instanceof assert.AssertionError
+      error instanceof assert.AssertionError ||
+        error.message.startsWith("Management API ")
         ? error.message.split("\n")[0]
         : `Database validation failed (${error.name}); inspect stage logs and disposable cleanup`,
     );
