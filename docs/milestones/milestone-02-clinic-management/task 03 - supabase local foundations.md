@@ -1,6 +1,6 @@
 # Task 03 — Establish reproducible hosted Supabase foundations
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -66,7 +66,17 @@ result. UI evidence is unnecessary for infrastructure work.
 
 ## Progress notes
 
-Assigned on 2026-11-07. Implementation and independent review are in progress.
+Delivered on 2026-11-07 in [PR #39](https://github.com/manromero/my-clinics/pull/39).
+Required checks and independent review passed at implementation head
+`316fc0cac12d56e85343376d49bea055d7e0aabc`, with no blocking findings and zero
+correction rounds. Final tracking changes receive a focused documentation review.
+Human acceptance and manual merge remain pending.
+
+Optional review observation R-OPT1: committed-range `git diff --check` reports
+CRLF-related whitespace on final lines in four Supabase scaffolding files.
+This does not block acceptance; the implementation's clean working-tree diff
+check does not establish a clean committed-range diff check. Detailed evidence
+and review limitations are preserved in the PR.
 
 ## Execution context
 
@@ -97,4 +107,9 @@ Assigned on 2026-11-07. Implementation and independent review are in progress.
   secret/runtime paths. Production build is not affected; no UI capture applies.
 - Initial registry/query certificate failures resolved with system CA trust
   (`NODE_USE_SYSTEM_CA=1`), without bypassing TLS verification.
-- Correction rounds used: 0. Coordinator owns final tracking and review records.
+- Independent review repeated frozen install, lint, typecheck, formatting, local
+  link/secret checks, file-only migration creation/cleanup and hosted read-only
+  baseline inspection successfully. No application/UI changes require build or
+  visual capture. Dashboard/Data API state remains user-confirmed evidence.
+- Correction rounds used: 0. Final tracking review and human acceptance are
+  recorded separately; no remote writes were performed.
