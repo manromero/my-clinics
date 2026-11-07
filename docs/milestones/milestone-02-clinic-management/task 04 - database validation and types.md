@@ -4,7 +4,7 @@ Status: `pending`
 
 ## Objective
 
-Detect unreproducible schema changes and stale TypeScript types locally and in CI
+Detect unreproducible schema changes and stale TypeScript types on disposable hosted targets and in CI
 before business tables are introduced.
 
 ## Scope
@@ -21,8 +21,12 @@ data and expected changes. A disposable test-only schema/fixture can demonstrate
 this infrastructure without adding a production business entity. Document how
 future tasks extend that check with their actual schema and data.
 
-Keep all execution local or in disposable CI environments, using synthetic data.
-No remote schema changes, authentication or UI integration belong here.
+Use separately authorized disposable hosted databases/branches with synthetic data
+for replay, parity, upgrade and CI checks. No Docker/local database runtime or
+shared-development deployment automation is allowed. Target creation, replay and
+cleanup writes require explicit target authorization. Authentication/app integration
+belong to later tasks. Define a remote-only schema/history reconciliation method;
+CLI declarative sync cannot use a remote shadow target in the pinned version.
 
 ## Dependencies
 
@@ -32,7 +36,7 @@ No remote schema changes, authentication or UI integration belong here.
 
 - Documented pnpm scripts and CI replay the committed migrations into a clean
   database and fail on migration errors or unexplained declarative/history drift.
-- Types are generated deterministically from the replayed local schema; validation
+- Types are generated deterministically from the replayed hosted validation schema; validation
   fails when the committed types differ, without silently rewriting them to pass.
 - An upgrade scenario proves that a subsequent migration preserves existing
   synthetic data; a clean reset alone is insufficient evidence.
@@ -44,7 +48,7 @@ No remote schema changes, authentication or UI integration belong here.
 ## Validation
 
 Follow [milestone validation](readme.md#delivery-and-validation). Run clean replay,
-parity, database tests, type generation/freshness and upgrade checks locally and
+parity, database tests, type generation/freshness and upgrade checks on authorized disposable hosted targets and
 record the CI result for the delivered head. Record negative-control failures and
 cleanup. Distinguish unavailable CI/runtime checks from successful checks. Visual
 review does not apply.

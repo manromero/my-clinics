@@ -18,7 +18,7 @@ and client bundles. After sign-in, open Clinics; monthly activity navigation
 belongs to a later milestone.
 
 This is the mandatory gate before real data or public use. Earlier tasks establish
-only local synthetic-data behavior and do not satisfy access requirements. Document
+only hosted development synthetic-data behavior and do not satisfy access requirements. Document
 configuration and the manual remote procedure; remote mutations require a separately
 authorized, explicitly verified target, rather than automatic deployment in CI.
 

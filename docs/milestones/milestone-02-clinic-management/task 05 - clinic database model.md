@@ -14,8 +14,9 @@ percentages and an active state that defaults to active. Preserve the semantics 
 the existing in-memory contract when mapping database outcomes in later tasks.
 
 Definitive authorization, Google identity, RLS and database permissions are deferred
-to the final security task, not abandoned. Use only an isolated local environment
-with fake data; this task does not authorize remote or public use. UI integration,
+to the final security task, not abandoned. Use only the verified hosted development environment
+with fake data and Data API disabled; remote writes require explicit target review
+and authorization. This task does not authorize public use. UI integration,
 activity features and persistent clinic deletion are outside this task.
 
 ## Dependencies
@@ -48,7 +49,7 @@ validation with existing synthetic data. No UI capture is required.
 
 ## Progress boundary
 
-The model is a local foundation only. Passing these checks is not evidence of
+The model is a hosted development foundation only. Passing these checks is not evidence of
 Ana-only access or permission to use real data before the final security gate.
 
 ## Progress notes

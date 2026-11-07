@@ -10,7 +10,7 @@ Persist clinic edits and state changes without losing recoverable form state.
 
 Extend the existing repository, service and server entry point with updates and
 connect the edit form, including active state. Retain the in-memory preview under
-the same service. Use local synthetic data only. Persistent deletion is separately
+the same service. Use hosted development synthetic data only, with Data API disabled. Persistent deletion is separately
 scoped; authentication, authorization, RLS and permissions remain the final gate.
 
 ## Dependencies
@@ -39,7 +39,7 @@ scoped; authentication, authorization, RLS and permissions remain the final gate
 
 Follow [milestone validation](readme.md#delivery-and-validation). Test updates,
 normalization, percentage bounds/precision, conflicts, missing records, cancellation
-and failure/retry with local Supabase. Run database/type checks and preview
+and failure/retry with hosted development Supabase. Run database/type checks and preview
 regressions as applicable. Verify edit, deactivate, reactivate, cancel and retry
 on desktop/mobile against S02 and capture evidence. Run application checks and
 production build. Security acceptance remains pending the final task.

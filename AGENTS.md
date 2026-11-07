@@ -22,6 +22,8 @@ another coordination workflow. Informational questions do not start implementati
 
 ## Validation
 
+For database work, follow [Supabase instructions](supabase/AGENTS.md).
+
 For application changes, run `pnpm lint`, `pnpm typecheck`, and `pnpm format:check`. Run `pnpm build` for changes affecting the production build. For documentation-only changes, check formatting and links. Report checks that could not run.
 
 <!-- BEGIN:nextjs-agent-rules -->
