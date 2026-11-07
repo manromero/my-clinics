@@ -15,6 +15,12 @@ pnpm dev
 
 Open [localhost:3000](http://localhost:3000).
 
+## Hosted database development
+
+Follow the [Supabase setup guide](docs/supabase.md). Database development uses
+hosted development projects with synthetic data; Docker and a local Supabase
+runtime are not required. The application is not connected to Supabase yet.
+
 ## Styling
 
 Tailwind CSS runs through `@tailwindcss/postcss` in `postcss.config.mjs` and is imported in `src/app/globals.css`. Add utility classes directly to components; source detection is automatic, so no `tailwind.config.js` is needed for the current setup. The home page includes a responsive example card.

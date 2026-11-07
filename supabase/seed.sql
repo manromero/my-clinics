@@ -1,0 +1,3 @@
+-- Empty synthetic baseline. No business tables or records exist in Task 03.
+-- Seeding is disabled in config.toml. Do not apply this file to a hosted project.
+-- Future tasks add deterministic synthetic records after their schema is reviewed.

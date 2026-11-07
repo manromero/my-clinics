@@ -4,7 +4,7 @@ Status: `pending`
 
 ## Objective
 
-Deliver the first complete vertical slice from the Clinics screen to local
+Deliver the first complete vertical slice from the Clinics screen to hosted development
 Supabase while establishing the required boundary for all later operations.
 
 ## Scope
@@ -21,13 +21,16 @@ contract. Neither UI nor server entry points call repositories directly.
 Move the existing in-memory implementation behind the same service and repository
 boundary, preserving its synthetic preview scenarios and completed behavior. Keep
 this layering focused; do not introduce an additional application framework.
+Keep Data API disabled until Task 09; select and verify a server-only connection
+compatible with that restriction when this task is assigned. Do not enable the API
+or weaken the security gate to make the integration pass.
 Keep credentials and privileged client setup in server-only modules, outside client
 imports and bundles. Read the relevant installed Next.js documentation first.
 
 Connect persistent listing only. Keep unsupported persistent create, edit, state
 change and delete actions unavailable until their respective tasks. Separate
 in-memory previews clearly so no persistent screen reports a successful write that
-only changed memory. Local synthetic data only; authentication remains the final
+only changed memory. Hosted development synthetic data only; authentication remains the final
 gate before real data or public use.
 
 ## Dependencies
@@ -40,7 +43,7 @@ gate before real data or public use.
 
 ## Acceptance criteria
 
-- The local persistent list shows active and inactive clinics with correct names,
+- The hosted development persistent list shows active and inactive clinics with correct names,
   percentages and Spanish statuses through the complete approved layer sequence.
 - Domain/service contracts do not expose Supabase DTOs or SDK errors. Database
   mapping and load failures have explicit tested outcomes.
@@ -56,7 +59,7 @@ gate before real data or public use.
 
 Follow [milestone validation](readme.md#delivery-and-validation). Test service and
 repository behavior, DTO/domain and error mapping, and the Supabase list integration
-against local synthetic data. Review imports and client bundles for server secrets.
+against hosted development synthetic data. Review imports and client bundles for server secrets.
 Run existing preview regressions. Verify live persistent list states and retry on
 desktop/mobile against S02, Alexandria and Stitch; capture evidence. Run production
 build and application checks. This is not a security acceptance check.

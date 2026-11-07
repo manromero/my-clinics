@@ -5,6 +5,7 @@ MyClinics is a web application for a dental professional to manage clinics, acti
 ## Project essentials
 
 - Use pnpm for dependencies and scripts; use the version declared in `package.json` and keep `pnpm-lock.yaml` as the lockfile.
+- Supabase development uses hosted databases and repository assets in `supabase/`; before database, integration or generated-type changes, read [database agent rules](supabase/AGENTS.md) and the [Supabase guide](docs/supabase.md).
 - Use Next.js App Router, TypeScript, and Tailwind CSS v4 via the PostCSS plugin.
 - Write all project documentation in English.
 - Group each shared component and its unit tests in `src/lib/components/<component>`. Keep catalogue specimens within their corresponding `src/app/components/<slug>` page folder; validate these demonstration pages live rather than with unit tests. Read [architecture and component guidance](docs/architecture.md) before adding UI or choosing where application code belongs.

@@ -1,31 +1,31 @@
-# Task 03 — Establish reproducible local Supabase foundations
+# Task 03 — Establish reproducible hosted Supabase foundations
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
-Make local database development reproducible before introducing business entities
-or connecting Clinics.
+Make hosted database development reproducible before introducing business entities
+or connecting Clinics, without Docker or a local database runtime.
 
 ## Scope
 
 Pin the Supabase CLI as a pnpm-managed development dependency and commit its
-lockfile resolution. Configure the local project, declarative schema directory,
-migration history and synthetic seed workflow. Document prerequisites, environment
-variables, local start/stop/reset, Studio access, and recovery from a clean clone.
-Use the official declarative-schema workflow for the pinned version; verify
-commands against its documentation rather than copying legacy CLI commands.
+lockfile resolution. Configure repository schema, migration and synthetic seed
+locations. Document hosted account/project setup, safe environment metadata,
+interactive authentication, explicit-target read-only connectivity and recovery
+from a clean clone. Keep the hosted Data API disabled before the final security gate.
 
-Create `supabase/AGENTS.md` for database-specific instructions and add only a
-minimal reference from root `AGENTS.md`. Define where declarative definitions,
-generated/reviewed migrations, seeds, tests and generated types belong, how they
-stay synchronized, and how agents distinguish local resets from remote changes.
-Document a manual remote migration procedure with target verification and review;
-do not automate or execute remote changes in this task.
+Create `supabase/AGENTS.md` and a minimal root reference. Preserve desired schema
+and reviewed migration history in Git. Verify the pinned CLI help against official
+documentation. If automatic declarative generation requires a local shadow database,
+record that limitation and author reviewed SQL migrations manually; do not promise
+an unsupported remote shadow option. Task 04 establishes remote-only parity checks.
 
-Do not add clinic tables, authentication, application integration or real data.
-All pre-security work is restricted to local development with synthetic data;
-there is no public or production use before the final security gate.
+Document a manual remote migration procedure with target verification, SQL review,
+preview and explicit write authorization. No remote mutation is performed here.
+Do not add business tables, authentication integration, app integration or real data.
+All pre-security data is synthetic in hosted development; public/production use
+remains prohibited before Task 09.
 
 ## Dependencies
 
@@ -36,26 +36,27 @@ there is no public or production use before the final security gate.
 
 ## Acceptance criteria
 
-- A clean clone can install the declared pnpm dependencies and reproduce the
-  local environment using the pinned CLI and documented runtime prerequisites.
-- Declarative schemas, migration history and seed configuration have explicit,
-  version-controlled locations; no business scaffolding tables are required.
-- Local start, Studio access, reset and stop are verified. Resetting twice
-  produces the same documented baseline without depending on manual Studio edits.
-- Secret values and local runtime artifacts are excluded from version control;
-  safe environment examples explain which values are local and server-only.
-- Database instructions describe the schema-to-migration review workflow and
-  local/remote distinction. The manual remote procedure makes its target and
-  potential destructive effects explicit and performs no remote mutation here.
+- A clean clone installs the pinned CLI with frozen dependencies; hosted project
+  setup and read-only connectivity are documented and verified when access exists.
+- Desired schemas, reviewed migration history, synthetic seed and future test/type
+  locations are explicit and version-controlled; no business tables are required.
+- Hosted development baseline and Studio access are inspected without mutation.
+  Missing access is reported as unavailable rather than a successful runtime check.
+- Secrets and generated artifacts are ignored; safe examples distinguish metadata
+  from CLI/server-only credentials and explain that no app keys are needed yet.
+- Database instructions describe the schema/migration review workflow and CLI
+  shadow-runtime limitation. The manual write procedure verifies the exact target
+  and destructive effects; it performs no remote changes in this task.
 
 ## Validation
 
-Follow [milestone validation](readme.md#delivery-and-validation). Record exact CLI,
-pnpm and runtime versions and actual clean-start/reset/Studio checks. Validate
-setup instructions from a fresh local state and inspect tracked files for secrets
-and generated runtime artifacts. Documentation formatting and links must pass.
-Report unavailable prerequisites explicitly; documentation alone does not prove
-that the environment runs. UI evidence is unnecessary for infrastructure work.
+Follow [milestone validation](readme.md#delivery-and-validation). Record Node,
+pnpm and CLI versions, frozen installation, CLI help/config and file-only migration
+checks, formatting, links, and secret/artifact inspection. Record actual hosted
+read-only connectivity, Studio/API setting and baseline results when access exists.
+Clean replay, repeated baseline reproduction, parity and upgrades belong to Task 04
+on authorized disposable hosted targets. Unavailable hosted checks block a ready
+result. UI evidence is unnecessary for infrastructure work.
 
 ## References
 
@@ -65,5 +66,63 @@ that the environment runs. UI evidence is unnecessary for infrastructure work.
 
 ## Progress notes
 
-Implementation pending assignment. Planning decision recorded on 2026-11-07;
-this task definition does not start implementation.
+Delivered on 2026-11-07 in [PR #39](https://github.com/manromero/my-clinics/pull/39).
+Required checks and independent review passed at implementation head
+`316fc0cac12d56e85343376d49bea055d7e0aabc`, with no blocking findings and zero
+correction rounds. Final tracking changes receive a focused documentation review.
+Human acceptance and manual merge remain pending.
+
+Optional review observation R-OPT1: committed-range `git diff --check` reports
+CRLF-related whitespace on final lines in four Supabase scaffolding files.
+This does not block acceptance; the implementation's clean working-tree diff
+check does not establish a clean committed-range diff check. Detailed evidence
+and review limitations are preserved in the PR.
+
+## Execution context
+
+- Approved scope adaptation, 2026-11-07: the user rejected all Docker/local
+  Supabase use and approved hosted development with synthetic data, Git-managed
+  schemas and manually reviewed migrations. Related Tasks 04-09 are amended only
+  for consistency; they are not assigned for implementation.
+- Branch: `feature/supabase-local-foundations` (original name retained).
+- Base: `98721e4f6930115b2d6ff8eab1041ca245578e2e` (`develop`).
+- Sources: task/milestone, requirements, architecture, development workflow,
+  official Supabase docs and actual CLI 3.0.0 help. Web reference flags differ
+  from installed CLI: use verified `--remote=<ref>`, not legacy examples.
+- Tooling: Node 24.14.0, pnpm 11.25.0, Supabase CLI 3.0.0.
+- Confirmed target: `lvqbrjybwstvdhaxyxyn`; user confirms new empty hosted
+  development project. Credentials must be entered locally, never in chat.
+- CLI declarative sync is local-only. Manual reviewed migration authoring is the
+  remote-only route; Task 04 must implement reconciliation and remote validation.
+- Remote mutation, real data, business entities, auth/app integration are excluded.
+- Hosted verification: authenticated read-only query passed on 2026-11-07 against
+  `my-clinics` (`lvqbrjybwstvdhaxyxyn`), PostgreSQL 17.11, role
+  `supabase_read_only_user`, with no `public` tables/views. CLI labels its platform
+  environment `production`; the user designated this new empty project for
+  development. No remote mutations were executed.
+- User confirmed Dashboard access and Data API disabled. This is user-provided
+  configuration evidence; the agent did not independently inspect that setting.
+- Checks passed: frozen dependency install, CLI version/help, file-only migration
+  creation/cleanup, lint, typecheck, format, local documentation links and ignored
+  secret/runtime paths. Production build is not affected; no UI capture applies.
+- Initial registry/query certificate failures resolved with system CA trust
+  (`NODE_USE_SYSTEM_CA=1`), without bypassing TLS verification.
+- Independent review repeated frozen install, lint, typecheck, formatting, local
+  link/secret checks, file-only migration creation/cleanup and hosted read-only
+  baseline inspection successfully. No application/UI changes require build or
+  visual capture. Dashboard/Data API state remains user-confirmed evidence.
+- Correction rounds used: 0. Final tracking review and human acceptance are
+  recorded separately; no remote writes were performed.
+
+## Documentation follow-up - 2026-11-07
+
+The user approved moving the single hosted management guide to docs/supabase.md,
+keeping database agent rules in supabase/AGENTS.md, and improving root discovery
+and architecture references. This changes documentation only. Reopened pending
+implementation and independent review; correction rounds remain 0.
+
+Follow-up implementation and independent review passed at
+2a3721a766f56a1a0dc506270593e734d6628a24: formatting, 51 local links and seven
+anchors passed, with no stale guide paths or new blockers. Task status returns
+to done; final tracking rereview and human acceptance remain separate. No
+application files or remote database state changed; correction rounds remain 0.

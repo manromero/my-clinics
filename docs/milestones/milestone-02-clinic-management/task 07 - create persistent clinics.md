@@ -10,7 +10,7 @@ Save new clinics through the established service boundary with recoverable error
 
 Extend the repository contract, Supabase implementation, service and server entry
 point with create, then connect the existing create form. Preserve synthetic preview
-support behind the same service. Use local fake data only. Editing, state changes,
+support behind the same service. Use hosted development fake data only, with Data API disabled. Editing, state changes,
 deletion and the final authentication/security gate belong to later tasks.
 
 ## Dependencies
@@ -35,7 +35,7 @@ deletion and the final authentication/security gate belong to later tasks.
 
 Follow [milestone validation](readme.md#delivery-and-validation). Test service and
 repository create behavior, validation boundaries, concurrent duplicate conflicts,
-cancellation, failure and retry against local Supabase. Run database/type checks and
+cancellation, failure and retry against hosted development Supabase. Run database/type checks and
 existing previews as applicable. Exercise create/save/cancel/error/retry and reload
 on desktop and mobile; compare S02 and capture evidence. Run application checks and
 production build. No real data or public deployment is authorized.
