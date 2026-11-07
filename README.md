@@ -17,7 +17,7 @@ Open [localhost:3000](http://localhost:3000).
 
 ## Hosted database development
 
-Follow the [Supabase setup guide](supabase/README.md). Database development uses
+Follow the [Supabase setup guide](docs/supabase.md). Database development uses
 hosted development projects with synthetic data; Docker and a local Supabase
 runtime are not required. The application is not connected to Supabase yet.
 

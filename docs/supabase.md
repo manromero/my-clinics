@@ -1,5 +1,9 @@
 # Hosted Supabase development
 
+Run all commands from the repository root. File paths below are repository-relative.
+For automated work, also follow the complementary
+[database agent rules](../supabase/AGENTS.md).
+
 ## Boundary and baseline
 
 Use hosted development projects with synthetic data only. No Docker, local
@@ -34,7 +38,7 @@ restriction when assigned; this task does not choose their implementation.
    URL. These identifiers are not passwords. Confirm this is development and
    contains no existing business/real data before any later write.
 6. Use hosted Table Editor/SQL Editor as Studio; no localhost Studio is needed.
-   Do not create tables manually. Run `check.sql` in SQL Editor for an initial
+   Do not create tables manually. Run `supabase/check.sql` in SQL Editor for an initial
    read-only baseline inspection. Save only redacted results and identifiers.
 
 An existing project containing data is not an empty baseline. Stop and plan an
@@ -55,7 +59,7 @@ The committed dependency pins Supabase CLI **3.0.0**. On 2026-11-07 its actual h
 uses `--remote=<ref>`; older CLI reference examples using `--linked` or `--db-url`
 do not match this binary. Recheck help before upgrading. `supabase init` was used
 only to establish the repository config; do not run it again over this checkout.
-`config.toml` declares schema/seed paths and safe tooling defaults. It does **not**
+`supabase/config.toml` declares schema/seed paths and safe tooling defaults. It does **not**
 turn off the hosted Data API; verify that separately in the Dashboard.
 
 Authenticate interactively on your own workstation:
@@ -96,8 +100,8 @@ are unverified. There is no automated linking or remote write script here.
 
 ## 4. Schema and reviewed migrations
 
-The locations and ownership rules are in [AGENTS.md](AGENTS.md). Edit desired SQL
-in `schemas/` first, then create a migration file on disk:
+Edit desired SQL in `supabase/schemas/` first, then create a reviewed incremental
+migration in `supabase/migrations/` on disk:
 
 ```powershell
 pnpm supabase migration new describe_change
@@ -107,7 +111,9 @@ Author its SQL manually and review it alongside the desired schema. Do not run t
 schema definition files directly against an existing database. Migrations describe
 incremental changes and data preservation; desired definitions describe the end
 state. No no-op migration is needed for the current empty application baseline.
-The seed is comment-only and disabled; it must not be applied remotely by default.
+`supabase/seed.sql` is comment-only and disabled; it must not be applied remotely
+by default. Database tests will live in `supabase/tests/`; Task 04 will introduce
+generated types at `src/lib/supabase/database.types.ts`.
 
 CLI 3.0.0 `db schema declarative sync --help` reports **Local only**, needs a shadow
 database, and offers no remote/shadow URL flag. `--no-apply` prevents application
@@ -160,7 +166,7 @@ This procedure documents future work; Task 03 does not authorize remote mutation
    Read the hosted confirmation and verify its target again. Do not pass `--yes`,
    include seeds/roles, push config, or run remote reset as part of this procedure.
 
-5. Recheck history, `check.sql`, and task-specific invariants/tests; record the head,
+5. Recheck history, `supabase/check.sql`, and task-specific invariants/tests; record the head,
    target, actual result and failures. Refresh generated types via Task 04's
    validated method when applicable. Do not report successful persistence on error.
 

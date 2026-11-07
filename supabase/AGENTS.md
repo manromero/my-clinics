@@ -1,6 +1,6 @@
 # Database agent instructions
 
-Read [the setup guide](README.md) before database changes. Use the pinned
+Read [the setup guide](../docs/supabase.md) before database changes. Use the pinned
 `pnpm supabase` CLI. All databases are hosted; do not start Docker, local Supabase,
 local PostgreSQL, or a shadow database on this workstation.
 

@@ -1,6 +1,6 @@
 # Task 03 — Establish reproducible hosted Supabase foundations
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -113,3 +113,10 @@ and review limitations are preserved in the PR.
   visual capture. Dashboard/Data API state remains user-confirmed evidence.
 - Correction rounds used: 0. Final tracking review and human acceptance are
   recorded separately; no remote writes were performed.
+
+## Documentation follow-up - 2026-11-07
+
+The user approved moving the single hosted management guide to docs/supabase.md,
+keeping database agent rules in supabase/AGENTS.md, and improving root discovery
+and architecture references. This changes documentation only. Reopened pending
+implementation and independent review; correction rounds remain 0.
