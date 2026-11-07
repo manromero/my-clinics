@@ -1,6 +1,6 @@
 # Task 03 — Establish reproducible hosted Supabase foundations
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -120,3 +120,9 @@ The user approved moving the single hosted management guide to docs/supabase.md,
 keeping database agent rules in supabase/AGENTS.md, and improving root discovery
 and architecture references. This changes documentation only. Reopened pending
 implementation and independent review; correction rounds remain 0.
+
+Follow-up implementation and independent review passed at
+2a3721a766f56a1a0dc506270593e734d6628a24: formatting, 51 local links and seven
+anchors passed, with no stale guide paths or new blockers. Task status returns
+to done; final tracking rereview and human acceptance remain separate. No
+application files or remote database state changed; correction rounds remain 0.
