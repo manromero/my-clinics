@@ -141,3 +141,27 @@ retry is authorized until that response. The shared project was not mutated.
 
 Correction round 1 is assigned for R2/R3 and affected validation; R1 remains an
 external authorization prerequisite. Correction rounds used: 1 of 2.
+
+## Correction round 1 review — 2026-11-07
+
+Reviewed head: `3d848e5d379920be4729c53c6d23fe7c0fdc994b`. R2 and R3 are fixed
+and independently verified. Surviving columns use logical order; enum/domain
+owners and domain collations are included. Hosted regressions prove equivalent
+schemas pass and isolated order/type/owner/collation differences fail. The reviewer
+verified the complete saved exact-head execution log and independently confirmed
+disposable target cleanup. Detailed evidence is in the
+[PR review record](https://github.com/manromero/my-clinics/pull/40#issuecomment-6711030634).
+
+Independent lint, typecheck, formatting, tooling tests (2/2), committed diff and
+31 documentation links passed again. Current-head tooling CI passed. No new
+blocking findings or optional suggestions remain beyond R1. The full hosted
+lifecycle was verified from saved evidence rather than independently repeated.
+
+Delivery remains blocked and PR #40 stays draft: R1 requires a successful hosted
+CI run on the delivered head after explicit authorization to send the current
+Supabase CLI token to GitHub Actions secret `SUPABASE_ACCESS_TOKEN` in repository
+`manromero/my-clinics`, or after the user configures that secret. That question is
+pending; the prior automatic approval rejection has not been bypassed. No second
+correction round is needed for code at this point. Task/index remain
+`in_progress`; human acceptance and manual merge are pending. Correction rounds
+used: 1 of 2. Task 10 records dedicated credentials as future pending work.
