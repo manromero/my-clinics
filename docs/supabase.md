@@ -209,6 +209,15 @@ and deliberately change the expected type content. The same replay/parity/freshn
 assertions must reject them. The table is removed and parity rechecked; invalid
 SQL leaves no object and type drift stays in memory. All targets are then deleted.
 
+Hosted catalog regressions also compare a table whose earlier column was dropped
+with its fresh declarative equivalent. Column positions use surviving logical
+order, so physical attribute-number gaps do not cause drift; actual column order
+and type differences still fail. Enum/domain ownership uses role names, and domain
+collation uses its schema and name, never project-specific OIDs. Recreated equal
+types compare equal, while isolated owner and collation changes must fail. These
+test-only objects and their temporary non-login owner role are removed, followed
+by a full baseline-parity check.
+
 The [database workflow](../.github/workflows/database-validation.yml) runs offline
 tooling checks for PRs to `develop`. Its hosted job runs only by explicit
 `workflow_dispatch` on the reviewed assignment branch, using GitHub Actions secret

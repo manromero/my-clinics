@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { format } from "prettier";
+import { catalogRegressions } from "./database-catalog-regressions.mjs";
 
 export const organization = "njnmfutclorywskqrftd";
 const protectedRef = "lvqbrjybwstvdhaxyxyn";
@@ -268,6 +269,11 @@ export async function main(mode = process.argv[2]) {
       await databaseTests(ref);
       await upgrade(ref);
       await negativeControls(ref, catalog, generated);
+      await catalogRegressions({
+        query: (sql) => query(ref, sql),
+        snapshot: () => snapshot(ref),
+        checkParity,
+      });
     }
     return { catalog, generated };
   });

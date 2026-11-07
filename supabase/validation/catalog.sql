@@ -47,7 +47,8 @@ with relations as (
       'replica_identity', relreplident) as definition from relations
   union all
   select 'column', c.relname || '.' || a.attname,
-    jsonb_build_object('position', a.attnum, 'type', format_type(a.atttypid,a.atttypmod),
+    jsonb_build_object('position', row_number() over (partition by c.oid order by a.attnum),
+      'type', format_type(a.atttypid,a.atttypmod),
       'nullable', not a.attnotnull, 'default', pg_get_expr(d.adbin,d.adrelid),
       'identity', a.attidentity, 'generated', a.attgenerated,
       'collation', co.collname, 'acl', a.attacl)
@@ -96,6 +97,10 @@ with relations as (
   select 'type', t.typname,
     jsonb_build_object('kind',t.typtype,'base',format_type(t.typbasetype,t.typtypmod),
       'notnull',t.typnotnull,'default',t.typdefault,'acl',t.typacl,
+      'owner',pg_get_userbyid(t.typowner),
+      'collation',(select jsonb_build_object('schema',cn.nspname,'name',co.collname)
+        from pg_collation co join pg_namespace cn on cn.oid=co.collnamespace
+        where co.oid=t.typcollation),
       'labels',(select jsonb_agg(e.enumlabel order by e.enumsortorder) from pg_enum e where e.enumtypid=t.oid),
       'constraints',(select jsonb_agg(pg_get_constraintdef(x.oid,false) order by x.conname) from pg_constraint x where x.contypid=t.oid))
   from pg_type t join pg_namespace n on n.oid=t.typnamespace
