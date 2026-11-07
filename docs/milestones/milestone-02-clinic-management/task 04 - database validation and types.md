@@ -1,6 +1,6 @@
 # Task 04 — Validate migrations and generated database types
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -64,3 +64,50 @@ review does not apply.
 
 Implementation pending assignment. Planning decision recorded on 2026-11-07;
 this task definition does not start implementation.
+
+### Assignment intake — 2026-11-07
+
+The user assigned implementation following the project workflow and explicitly
+authorized disposable hosted target creation, migration/schema/fixture writes,
+negative controls and cleanup. The existing shared development project is not
+an authorized disposable target. The initial authorization blocker is resolved.
+
+Preparation verified a clean checkout, GitHub authentication and remote access,
+pnpm 11.25.0, and Supabase CLI 3.0.0. Remote `develop` is
+`55c5c34` and includes Task 03 through PR #39. Read-only project listing exposes
+only the existing `my-clinics` development project (`lvqbrjybwstvdhaxyxyn`) in
+organization `njnmfutclorywskqrftd`; no disposable target has been selected.
+Network/tool checks succeeded with system CA trust and approved network access.
+Native implementer and reviewer roles are available in this session. No remote
+database writes, application changes, CI runs, or task validation were performed.
+Correction rounds used: 0.
+
+## Execution context
+
+- Readiness: approved scope, dependency Task 03 merged, native implementer/reviewer
+  roles available, GitHub and hosted Supabase access verified. User authorized
+  disposable validation operations in response to the intake question.
+- Branch: `feature/database-validation-types`; base:
+  `55c5c345b407a0cf9578480c2906a7f1aa69cf40` (updated `origin/develop`).
+- Sources: this task, milestone index, requirements, architecture, development
+  workflow, `supabase/AGENTS.md`, `docs/supabase.md`, official Supabase declarative,
+  database testing and generated-types guides, and actual CLI 3.0.0 help.
+- Relevant assets: `package.json`, `pnpm-lock.yaml`, `supabase/config.toml`,
+  `supabase/schemas/`, `supabase/migrations/`, future `supabase/tests/`,
+  `src/lib/supabase/database.types.ts`, validation scripts and GitHub Actions.
+- Verified findings: CLI 3.0.0 supports explicit `--remote=<ref>` query and
+  TypeScript generation; declarative sync needs a local shadow runtime and must
+  not be used. Organization `njnmfutclorywskqrftd` is accessible. Disposable
+  targets must be created/verified and their Data API disabled before fixture
+  writes. Shared development ref `lvqbrjybwstvdhaxyxyn` must never be reset or
+  used as a disposable validation target.
+- Constraints: no Docker/local database, business entities, auth/app integration,
+  real data, shared-development deployment automation, secret output or commits.
+  Keep CLI pinned, preserve approved acceptance criteria and record target cleanup.
+- Validation: lint, typecheck, formatting, relevant script tests, remote clean
+  replay/parity/database tests/type freshness/upgrade, negative controls and CI
+  on delivered head. Build only if production build is affected; UI review does
+  not apply. Missing runtime/CI evidence prevents ready delivery.
+- Technical implementation choices remain with the implementer; no product
+  questions remain. Report target capacity, access or cost blockers with evidence.
+- Correction rounds used: 0.
