@@ -6,11 +6,11 @@ before implementation begins.
 
 ## Milestone index
 
-| Milestone                                                                                 | Description                                                                            | Status                                                                   |
-| ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| [00 — Development workflow](milestone-00-development-workflow/readme.md)                  | Coordinator, implementer, and reviewer workflow with human PR review and merge         | All agent tasks done; human acceptance tracked in GitHub PR #4           |
-| [01 — Visual foundations and shared components](milestone-01-shared-components/readme.md) | Components catalogue, visual foundations, basic controls and shared screen structure   | Complete. All 28 tasks are done and merged into `develop`.               |
-| [02 — Clinic management](milestone-02-clinic-management/readme.md)                        | Clinic list and editing, from a visual prototype to authenticated Supabase persistence | Task 00 merged. Task 01 ready for human acceptance. Tasks 02–04 pending. |
+| Milestone                                                                                 | Description                                                                            | Status                                                                                             |
+| ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| [00 — Development workflow](milestone-00-development-workflow/readme.md)                  | Coordinator, implementer, and reviewer workflow with human PR review and merge         | All agent tasks done; human acceptance tracked in GitHub PR #4                                     |
+| [01 — Visual foundations and shared components](milestone-01-shared-components/readme.md) | Components catalogue, visual foundations, basic controls and shared screen structure   | Complete. All 28 tasks are done and merged into `develop`.                                         |
+| [02 — Clinic management](milestone-02-clinic-management/readme.md)                        | Clinic list and editing, from a visual prototype to authenticated Supabase persistence | Tasks 00–02 done; Tasks 03–09 pending. Human acceptance and merge tracked in task records and PRs. |
 
 Further milestones will be added after the user validates their scope and order.
 
