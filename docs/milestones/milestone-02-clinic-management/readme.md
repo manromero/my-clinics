@@ -21,6 +21,8 @@ then complete authentication and authorization as the final release gate.
   Do not create an activity schema to support deletion in this milestone.
 - Establish reproducible hosted Supabase development, declarative schemas, reviewed
   migrations, synthetic seeds, validation in scripts/CI and generated database types.
+- Follow up with dedicated local/CI validation credentials and documented rotation
+  in Task 10, without replacing Task 09's application security gate.
 - Require a service layer, repository contract, in-memory and Supabase repository
   implementations, typed client and server entry points. UI and server entry points
   call the service, never repositories directly; do not add a new framework.
@@ -47,6 +49,7 @@ then complete authentication and authorization as the final release gate.
 | [07 — Create persistent clinics](<task 07 - create persistent clinics.md>)                                          | `pending`     | 06                  |
 | [08 — Edit, deactivate and reactivate persistent clinics](<task 08 - update persistent clinics.md>)                 | `pending`     | 07                  |
 | [09 — Secure persistent Clinics with Google authentication](<task 09 - clinic authentication and authorization.md>) | `pending`     | 08                  |
+| [10 — Configure dedicated database validation credentials](<task 10 - dedicated validation credentials.md>)         | `pending`     | 04                  |
 
 ## Delivery and validation
 
@@ -115,3 +118,10 @@ shared development project. Keep Data API disabled before Task 09's security gat
 CLI 3.0.0 declarative sync is local-only; use reviewed manual migration authoring
 and establish remote schema/history reconciliation in Task 04. This scope adaptation
 does not implement or start the later tasks.
+
+## Validation credential follow-up — 2026-11-07
+
+The user authorized use of the current CLI token for Task 04 and its CI secret,
+then requested Task 10 at the end of this milestone to configure dedicated
+validation credentials later. Task 10 is pending assignment; it does not delay
+Task 04 or authorize extracting credentials in future sessions without approval.
