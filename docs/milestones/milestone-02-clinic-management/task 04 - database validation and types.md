@@ -111,3 +111,33 @@ Correction rounds used: 0.
 - Technical implementation choices remain with the implementer; no product
   questions remain. Report target capacity, access or cost blockers with evidence.
 - Correction rounds used: 0.
+
+## Implementation and initial review — 2026-11-07
+
+Draft [PR #40](https://github.com/manromero/my-clinics/pull/40) delivers validation
+scripts, hosted CI, generated types, catalog reconciliation, SQL assertions,
+synthetic upgrade fixtures and operating guidance. Initial reviewed head:
+`a7d6381087461842651dc581a835eb124685067f`.
+
+The implementer reports successful exact-head hosted replay, parity, deterministic
+type freshness, SQL tests, preserved-data upgrade and migration/schema/type
+negative controls. Disposable targets were deleted; the reviewer independently
+confirmed final target absence. Independent lint, typecheck, formatting, tooling
+tests (2/2), diff and documentation link checks passed. Production build and
+visual review do not apply to this tooling-only change.
+
+Initial review is blocked: R1, hosted CI failed before remote operations because
+the Actions token secret is absent; R2, physical column positions can falsely
+report drift after a dropped column; R3, type ownership and domain collation are
+missing from supported catalog reconciliation. Detailed evidence is preserved in
+the PR. Full local hosted execution was not independently rerun during initial
+review. Task remains `in_progress`.
+
+The user explicitly authorized reading the current CLI token for this task.
+Automatic approval review separately rejected sending it to GitHub Actions
+without authorization naming the exact external destination. A question covering
+secret `SUPABASE_ACCESS_TOKEN` in `manromero/my-clinics` remains pending; no upload
+retry is authorized until that response. The shared project was not mutated.
+
+Correction round 1 is assigned for R2/R3 and affected validation; R1 remains an
+external authorization prerequisite. Correction rounds used: 1 of 2.
