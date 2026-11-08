@@ -5,19 +5,19 @@ import { ClinicsPreview } from "./clinics-preview";
 import type { Clinic } from "./clinic-source";
 
 export const metadata: Metadata = {
-  title: "Clínicas | MyClinics",
+  title: "ClÃ­nicas | MyClinics",
 };
 
 const sampleClinics: readonly Clinic[] = [
   {
     id: "alameda",
-    name: "Clínica Dental Alameda",
+    name: "ClÃ­nica Dental Alameda",
     percentage: 30,
     active: true,
   },
   {
     id: "mirador",
-    name: "Centro Odontológico Mirador",
+    name: "Centro OdontolÃ³gico Mirador",
     percentage: 27.5,
     active: true,
   },
@@ -56,7 +56,7 @@ export default async function ClinicsPage({
       <ClinicsPreview
         key={isPreview ? scenario : "persistent"}
         persistent={!isPreview}
-        initialClinics={initialClinics}
+        initialClinics={isPreview ? initialClinics : []}
         linkedClinicIds={["alameda"]}
         failure={failure}
       />
@@ -65,7 +65,7 @@ export default async function ClinicsPage({
         metadata={
           isPreview
             ? "Vista previa en memoria con datos de ejemplo"
-            : "Entorno de desarrollo � Datos sint�ticos"
+            : "Entorno de desarrollo ï¿½ Datos sintï¿½ticos"
         }
       />
     </div>

@@ -1,4 +1,4 @@
 export {
   createMemoryClinicSource,
   type ClinicFailure,
-} from "@/lib/clinics/memory-clinic-repository";
+} from "@/lib/clinics/memory-clinic-service";

@@ -3,12 +3,11 @@ import {
   type ClinicSaveResult,
   type ClinicSource,
 } from "./clinic";
-import { createClinicService } from "./clinic-service";
 import type { ClinicRepository } from "./clinic-repository";
 
 export type ClinicFailure = "load-error" | "save-error" | "delete-error";
 
-export function createMemoryClinicSource(
+export function createMemoryClinicRepository(
   initialClinics: readonly Clinic[],
   {
     failure,
@@ -19,7 +18,7 @@ export function createMemoryClinicSource(
     delay?: number;
     linkedClinicIds?: ReadonlySet<string>;
   } = {},
-): ClinicSource & Required<Pick<ClinicSource, "deletion">> {
+): ClinicRepository & Required<Pick<ClinicRepository, "deletion">> {
   const clinics = new Map(
     initialClinics.map((clinic) => [clinic.id, { ...clinic }]),
   );
@@ -88,6 +87,5 @@ export function createMemoryClinicSource(
       },
     },
   };
-  return createClinicService(repository) as ClinicSource &
-    Required<Pick<ClinicSource, "deletion">>;
+  return repository;
 }
