@@ -94,3 +94,42 @@ Shared development `lvqbrjybwstvdhaxyxyn` is excluded from remote writes.
   the existing authorized CI secret is available for hosted validation. Do not
   extract stored CLI credentials without separate authorization.
 - Correction rounds used: 0 of 2.
+
+## Assignment decisions — 2026-11-08
+
+The user clarified that stored names need not exclude surrounding whitespace;
+uniqueness is the priority. The model accepts that whitespace and ignores it
+when comparing names, retaining the approved case-insensitive uniqueness and
+nonblank rules. No trimmed-storage constraint is required.
+
+At the user's request, the coordinator researched primary-key options in official
+[Supabase guidance](https://supabase.com/docs/guides/database/tables) and
+[PostgreSQL identity documentation](https://www.postgresql.org/docs/current/ddl-identity-columns.html).
+The coordinator selected `bigint generated always as identity` for this single
+database rather than random UUIDs. This is a routine technical choice within the
+stable-identity criterion. Future repository integration must preserve exact
+integer identity when mapping to the existing string contract; generated numeric
+types alone do not protect against unsafe JavaScript integer transport.
+
+## Initial implementation — 2026-11-08
+
+[PR #41](https://github.com/manromero/my-clinics/pull/41) contains the declarative
+model, reviewed first migration, reproducible synthetic seeds, SQL boundaries,
+concurrent conflict tests, actual migration upgrade preservation, generated types,
+and documented database error identifiers. Implementation head:
+`8e1c2ebe95adafd621b5d78a21c66bb2b03c4398`.
+
+The implementer reports passing lint, typecheck, formatting, tooling tests (4),
+and existing clinic tests (28). Hosted type generation passed in
+[run 42492797764](https://github.com/manromero/my-clinics/actions/runs/42492797764).
+Full validation passed at the implementation head in
+[run 42493002735](https://github.com/manromero/my-clinics/actions/runs/42493002735):
+clean replay, schema/history parity, seed repeatability, type freshness, SQL
+boundaries, three lock-observed concurrent conflicts, actual migration upgrade
+preserving synthetic data, and negative controls. All owned disposable projects
+were deleted and verified absent; the shared development project was excluded.
+
+Production build and visual capture do not apply because runtime application
+code and production configuration are unchanged. Hosted validation used the
+existing CI secret without extracting local CLI credentials. Independent review
+is pending; task/index remain `in_progress`. Correction rounds used: 0 of 2.
