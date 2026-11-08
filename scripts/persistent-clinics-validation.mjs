@@ -35,19 +35,32 @@ export async function validatePersistentClinics({
     connect_timeout: 10,
   });
   try {
-    const [result] =
-      await probe`select ssl from pg_stat_ssl where pid=pg_backend_pid()`;
-    assert.equal(result.ssl, true, "PostgreSQL must use TLS");
-    console.log(
-      `Verified ${pooled ? "session pooler" : "direct"} PostgreSQL TLS connectivity`,
-    );
-  } catch (error) {
-    const code = /^[A-Z_0-9]+$/.test(error.code ?? "")
-      ? error.code
-      : "CONNECTION_FAILED";
-    throw new Error(
-      `PostgreSQL connectivity unavailable (${code}); pooler metadata permission or verified pooler host may be required`,
-    );
+    for (let attempt = 0; attempt < 7; attempt++) {
+      try {
+        const [result] =
+          await probe`select ssl from pg_stat_ssl where pid=pg_backend_pid()`;
+        assert.equal(result.ssl, true, "PostgreSQL must use TLS");
+        console.log(
+          `Verified ${pooled ? "session pooler" : "direct"} PostgreSQL TLS connectivity`,
+        );
+        break;
+      } catch (error) {
+        const code = /^[A-Z_0-9]+$/.test(error.code ?? "")
+          ? error.code
+          : "CONNECTION_FAILED";
+        if (
+          attempt < 6 &&
+          ["ENOTFOUND", "EAI_AGAIN", "ECONNREFUSED"].includes(code)
+        ) {
+          console.log(`PostgreSQL provisioning/network retry (${code})`);
+          await pause(5000);
+          continue;
+        }
+        assert.fail(
+          `PostgreSQL connectivity unavailable (${code}); verified pooler metadata may be required`,
+        );
+      }
+    }
   } finally {
     await probe.end({ timeout: 1 });
   }
