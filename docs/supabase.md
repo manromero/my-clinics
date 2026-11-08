@@ -13,10 +13,9 @@ tables, auth setup, app integration or real data. The desired `public` applicati
 schema, migration history and seed are empty. Supabase's own schemas/extensions
 are platform-managed and are not an application baseline to erase.
 
-That describes the historical Task 03 baseline. Task 05 adds the
-[clinic database model](clinic-database-model.md), its first migration and
-deterministic synthetic seed; the shared development project remains excluded
-from this task's writes.
+That describes the historical Task 03 baseline. Task 05 adds the clinic schema,
+its first migration and deterministic synthetic seed; the shared development
+project remains excluded from this task's writes.
 
 Keep the hosted **Data API disabled** until Task 09 verifies authentication,
 Ana-only access, RLS and permissions. Disabling it does not restrict SQL credentials
@@ -206,8 +205,7 @@ synthetic row, commits a subsequent schema/data migration, and verifies the orig
 row plus the expected change without reset. The fixture is then removed. No
 production migration or business table is introduced to demonstrate tooling.
 Task 05 additionally validates the actual clinic migration from its previous
-empty baseline with committed synthetic data in a separate test-only schema,
-as described in the [clinic model](clinic-database-model.md#validation-and-upgrades).
+empty baseline with committed synthetic data in a separate test-only schema.
 Future schema tasks must continue adding their actual earlier migration/data
 baselines and preservation assertions; the infrastructure fixture alone does not
 prove application migrations safe.
