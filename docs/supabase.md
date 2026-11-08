@@ -290,3 +290,44 @@ If your trusted organization CA is installed in the OS certificate store but the
 CLI reports a TLS/transport error, use `$env:NODE_USE_SYSTEM_CA='1'` in that terminal
 and retry. This adds system certificate trust without disabling TLS verification;
 see [Bun certificate support](https://bun.sh/docs/runtime/environment-variables).
+
+## Persistent clinic listing
+
+The normal `/clinics` screen reads saved synthetic clinics through
+`GET /api/clinics`, the clinic service, the repository contract and the server-only
+Postgres.js client. Only listing is available; create/edit/state/delete remain
+unavailable until their assigned tasks. Explicit `?preview=default`, `empty`,
+`all-inactive`, `load-error`, `save-error` and `delete-error` scenarios use memory
+through the same service and do not write to PostgreSQL.
+
+Configure `MYCLINICS_DATABASE_URL` only in the server environment (an ignored
+`.env.local` for an explicitly authorized development connection). Obtain the
+connection string from the project's **Connect** dialog. For a persistent Node
+server on IPv4, choose the shared session pooler on port 5432; direct connections
+require IPv6 on Free projects. The client verifies TLS, disables prepared
+statements, bounds its pool and casts bigint IDs to text before JavaScript sees
+them. Generated `Database` types define the infrastructure row fields; the
+transport ID override preserves values above `Number.MAX_SAFE_INTEGER`.
+A missing connection or a transport/mapping error returns a generic failure with
+retry, without credentials or database errors. Do not use a Management API token
+as an application database connection. Shared development still requires its own
+explicitly configured application connection; disposable validation does not
+configure it.
+
+Run authorized `pnpm clinics:validate`, or dispatch database validation with
+`mode: clinics` to use the existing CI secret. This creates one Free disposable
+target, disables and verifies its Data API, replays migrations and sets up synthetic
+states. The production application reads over real TLS PostgreSQL through the
+platform-provided session pooler. Management SQL is used only for test setup.
+The runner checks exact bigint transport, saved reload, unavailable writes and
+browser bundle isolation, then Chrome headless/CDP checks desktop and 390px CSS
+layouts, loading/empty/inactive/failure/retry and preview isolation. CI artifacts
+include PNGs and measured viewport/source metadata for independent inspection;
+automated capture alone does not constitute visual review. The target is deleted
+and its absence verified even after test failure. No shared-development writes or
+local credential extraction occurs.
+
+Connection choices follow the official
+[connection guidance](https://supabase.com/docs/guides/database/connecting-to-postgres),
+[Postgres.js guide](https://supabase.com/docs/guides/database/postgres-js), and
+[pooler configuration API](https://supabase.com/docs/reference/api/v1-get-pooler-config).

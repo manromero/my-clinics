@@ -271,16 +271,34 @@ export function ClinicsPreview({
   initialClinics,
   linkedClinicIds,
   failure,
+  persistent = false,
 }: {
   initialClinics: readonly Clinic[];
+  persistent?: boolean;
   linkedClinicIds?: readonly string[];
   failure?: ClinicFailure;
 }) {
   const [source] = useState(() =>
-    createMemoryClinicSource(initialClinics, {
-      failure,
-      linkedClinicIds: new Set(linkedClinicIds),
-    }),
+    persistent
+      ? ({
+          async list(): ReturnType<ClinicSource["list"]> {
+            try {
+              const response = await fetch("/api/clinics", {
+                cache: "no-store",
+              });
+              if (!response.ok) return { status: "failed" };
+              return await response.json();
+            } catch {
+              return { status: "failed" };
+            }
+          },
+          create: async () => ({ status: "failed" }) as const,
+          update: async () => ({ status: "failed" }) as const,
+        } satisfies ClinicSource)
+      : createMemoryClinicSource(initialClinics, {
+          failure,
+          linkedClinicIds: new Set(linkedClinicIds),
+        }),
   );
   const [load, setLoad] = useState<Awaited<
     ReturnType<ClinicSource["list"]>
@@ -351,6 +369,7 @@ export function ClinicsPreview({
         title="Gestión de clínicas"
         description="Consulta tus clínicas y sus porcentajes por defecto. Los cambios de porcentaje se aplican a las actividades nuevas."
         actions={
+          !persistent &&
           clinics.length > 0 && (
             <Button ref={createButton} onClick={() => openForm("new")}>
               Nueva clínica
@@ -358,6 +377,12 @@ export function ClinicsPreview({
           )
         }
       />
+      {persistent && (
+        <p className="text-sm text-on-surface-variant">
+          Consulta de cl�nicas guardadas. La creaci�n y edici�n estar�n
+          disponibles pr�ximamente.
+        </p>
+      )}
       {saved?.created && (
         <Alert title="Clínica guardada" variant="success" announcement="polite">
           Se guardaron los cambios de {saved.clinic.name}.
@@ -431,15 +456,17 @@ export function ClinicsPreview({
                         </strong>
                       </p>
                     </div>
-                    <div className="col-start-2 sm:col-start-3">
-                      <Button
-                        variant="secondary"
-                        aria-label={`Editar ${clinic.name}`}
-                        onClick={() => openForm(clinic)}
-                      >
-                        Editar
-                      </Button>
-                    </div>
+                    {!persistent && (
+                      <div className="col-start-2 sm:col-start-3">
+                        <Button
+                          variant="secondary"
+                          aria-label={`Editar ${clinic.name}`}
+                          onClick={() => openForm(clinic)}
+                        >
+                          Editar
+                        </Button>
+                      </div>
+                    )}
                   </div>
                   {saved && !saved.created && saved.clinic.id === clinic.id && (
                     <Alert

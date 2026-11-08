@@ -8,7 +8,7 @@ on:
       mode:
         description: Validate committed types or generate a hosted types artifact
         type: choice
-        options: [validate, types]
+        options: [validate, types, clinics]
         default: validate
 
 permissions:
@@ -45,11 +45,22 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm test && pnpm build
+        if: inputs.mode == 'clinics'
       - name: Validate authorized disposable hosted targets
-        run: pnpm db:${{ inputs.mode || 'validate' }}
+        run: |
+          if [ "${{ inputs.mode }}" = "clinics" ]; then pnpm clinics:validate; else pnpm db:${{ inputs.mode || 'validate' }}; fi
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           MYCLINICS_DISPOSABLE_AUTHORIZATION: njnmfutclorywskqrftd
+          MYCLINICS_EVIDENCE_DIR: ${{ runner.temp }}/clinics-evidence
+      - name: Upload clinic integration screenshots and metadata
+        if: always() && inputs.mode == 'clinics'
+        uses: actions/upload-artifact@v4
+        with:
+          name: persistent-clinics-evidence
+          path: ${{ runner.temp }}/clinics-evidence
+          if-no-files-found: warn
       - name: Upload generated types from authorized hosted replay
         if: inputs.mode == 'types'
         uses: actions/upload-artifact@v4

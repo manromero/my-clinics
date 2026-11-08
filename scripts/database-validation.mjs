@@ -93,11 +93,12 @@ async function query(ref, sql) {
 
 async function disposable(label, run) {
   const name = `myclinics-validation-${label}-${randomBytes(5).toString("hex")}`;
+  const password = randomBytes(32).toString("base64url");
   const project = await api("/projects", "POST", {
     name,
     organization_slug: organization,
     region: "eu-central-1",
-    db_pass: randomBytes(32).toString("base64url"),
+    db_pass: password,
   });
   const ref = project.id ?? project.ref;
   // Register immediately so provisioning/configuration failures still clean up.
@@ -119,7 +120,7 @@ async function disposable(label, run) {
     assert.ok(healthy, `Provisioning timed out: ${ref}`);
     await api(`/projects/${ref}/postgrest`, "PATCH", { db_schema: "" });
     console.log(`Verified disposable identity; disabling Data API: ${ref}`);
-    return await run(ref);
+    return await run(ref, password);
   } finally {
     const current = await api(`/projects/${ref}`);
     verifyTarget(current, name);
@@ -278,7 +279,10 @@ async function negativeControls(ref, baseline, generated) {
 }
 
 export async function main(mode = process.argv[2]) {
-  assert.ok(["validate", "types"].includes(mode), "Use validate or types");
+  assert.ok(
+    ["validate", "types", "clinics"].includes(mode),
+    "Use validate, types or clinics",
+  );
   assert.ok(
     process.env.SUPABASE_ACCESS_TOKEN,
     "Set SUPABASE_ACCESS_TOKEN in the shell or .env.database-validation",
@@ -300,6 +304,24 @@ export async function main(mode = process.argv[2]) {
     "No free project capacity; never delete an existing project",
   );
   console.log("Verified Free plan and one sequential disposable project slot");
+  if (mode === "clinics") {
+    await disposable("clinics", async (ref, password) => {
+      await replay(ref);
+      const { validatePersistentClinics } =
+        await import("./persistent-clinics-validation.mjs");
+      const poolers = await api(`/projects/${ref}/config/database/pooler`);
+      await validatePersistentClinics({
+        ref,
+        password,
+        poolers,
+        query: (sql) => query(ref, sql),
+      });
+    });
+    console.log(
+      "Persistent clinics integration passed; disposable target cleaned up",
+    );
+    return;
+  }
   const result = await disposable("replay", async (ref) => {
     await replay(ref);
     const catalog = await snapshot(ref);

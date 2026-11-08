@@ -14,13 +14,16 @@
     "test:watch": "vitest",
     "supabase": "supabase",
     "db:validate": "node --env-file-if-exists=.env.database-validation scripts/database-validation.mjs validate",
+    "clinics:validate": "node --env-file-if-exists=.env.database-validation scripts/database-validation.mjs clinics",
     "db:types": "node --env-file-if-exists=.env.database-validation scripts/database-validation.mjs types",
     "db:test-tooling": "node --test scripts/database-validation.test.mjs scripts/clinic-database-validation.test.mjs"
   },
   "dependencies": {
     "next": "16.4.3",
+    "postgres": "^4.1.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
