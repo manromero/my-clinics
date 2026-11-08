@@ -45,7 +45,7 @@ then complete authentication and authorization as the final release gate.
 | [03 — Establish reproducible hosted Supabase foundations](<task 03 - supabase local foundations.md>)                | `done`    | 01, 02              |
 | [04 — Validate migrations and generated database types](<task 04 - database validation and types.md>)               | `done`    | 03                  |
 | [05 — Define and validate the clinic database model](<task 05 - clinic database model.md>)                          | `done`    | 04                  |
-| [06 — List persistent clinics through the service boundary](<task 06 - list persistent clinics.md>)                 | `pending` | 01, 02, 05          |
+| [06 — List persistent clinics through the service boundary](<task 06 - list persistent clinics.md>)                 | `in_progress` | 01, 02, 05          |
 | [07 — Create persistent clinics](<task 07 - create persistent clinics.md>)                                          | `pending` | 06                  |
 | [08 — Edit, deactivate and reactivate persistent clinics](<task 08 - update persistent clinics.md>)                 | `pending` | 07                  |
 | [09 — Secure persistent Clinics with Google authentication](<task 09 - clinic authentication and authorization.md>) | `pending` | 08                  |
@@ -125,3 +125,4 @@ The user authorized use of the current CLI token for Task 04 and its CI secret,
 then requested Task 10 at the end of this milestone to configure dedicated
 validation credentials later. Task 10 is pending assignment; it does not delay
 Task 04 or authorize extracting credentials in future sessions without approval.
+
