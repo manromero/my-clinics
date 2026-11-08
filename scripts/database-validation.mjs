@@ -309,7 +309,23 @@ export async function main(mode = process.argv[2]) {
       await replay(ref);
       const { validatePersistentClinics } =
         await import("./persistent-clinics-validation.mjs");
-      const poolers = await api(`/projects/${ref}/config/database/pooler`);
+      let poolers;
+      try {
+        poolers = await api(`/projects/${ref}/config/database/pooler`);
+      } catch (error) {
+        if (error.status !== 403) throw error;
+        const project = await api(`/projects/${ref}`);
+        assert.equal(project.database.host, `db.${ref}.supabase.co`);
+        console.log(
+          "Pooler metadata read permission unavailable; testing project-reported direct PostgreSQL host",
+        );
+        poolers = [
+          {
+            database_type: "PRIMARY",
+            connection_string: `postgresql://postgres@${project.database.host}:5432/postgres`,
+          },
+        ];
+      }
       await validatePersistentClinics({
         ref,
         password,

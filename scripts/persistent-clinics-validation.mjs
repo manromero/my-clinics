@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import postgres from "postgres";
 import { spawn, execFileSync } from "node:child_process";
 import { readFile, readdir, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -19,10 +20,37 @@ export async function validatePersistentClinics({
   );
   assert.ok(pooler, "Primary pooler configuration unavailable");
   const connection = new URL(pooler.connection_string);
-  assert.ok(connection.hostname.endsWith(".pooler.supabase.com"));
-  assert.equal(decodeURIComponent(connection.username), `postgres.${ref}`);
+  const pooled = connection.hostname.endsWith(".pooler.supabase.com");
+  assert.ok(pooled || connection.hostname === `db.${ref}.supabase.co`);
+  assert.equal(
+    decodeURIComponent(connection.username),
+    pooled ? `postgres.${ref}` : "postgres",
+  );
   connection.password = password;
-  connection.port = "5432"; // Session mode supports persistent Node servers and IPv4.
+  connection.port = "5432"; // Direct PostgreSQL or IPv4 session pooling.
+  const probe = postgres(connection.toString(), {
+    ssl: "verify-full",
+    prepare: false,
+    max: 1,
+    connect_timeout: 10,
+  });
+  try {
+    const [result] =
+      await probe`select ssl from pg_stat_ssl where pid=pg_backend_pid()`;
+    assert.equal(result.ssl, true, "PostgreSQL must use TLS");
+    console.log(
+      `Verified ${pooled ? "session pooler" : "direct"} PostgreSQL TLS connectivity`,
+    );
+  } catch (error) {
+    const code = /^[A-Z_0-9]+$/.test(error.code ?? "")
+      ? error.code
+      : "CONNECTION_FAILED";
+    throw new Error(
+      `PostgreSQL connectivity unavailable (${code}); pooler metadata permission or verified pooler host may be required`,
+    );
+  } finally {
+    await probe.end({ timeout: 1 });
+  }
   const output =
     process.env.MYCLINICS_EVIDENCE_DIR ??
     join(tmpdir(), `myclinics-task06-${Date.now()}`);
@@ -91,7 +119,7 @@ export async function validatePersistentClinics({
       );
     }
     console.log(
-      `Actual PostgreSQL session pooler listing verified with TLS; exact bigint ID, saved reload and unsupported writes passed (${ref})`,
+      `Actual PostgreSQL listing verified with TLS; exact bigint ID, saved reload and unsupported writes passed (${ref})`,
     );
     await chromeClinicChecks({
       output,
