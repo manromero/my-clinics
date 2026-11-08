@@ -112,8 +112,8 @@ schema definition files directly against an existing database. Migrations descri
 incremental changes and data preservation; desired definitions describe the end
 state. No no-op migration is needed for the current empty application baseline.
 `supabase/seed.sql` is comment-only and disabled; it must not be applied remotely
-by default. Database tests will live in `supabase/tests/`; Task 04 will introduce
-generated types at `src/lib/supabase/database.types.ts`.
+by default. Database tests live in `supabase/tests/`; generated types live at
+`src/lib/supabase/database.types.ts`.
 
 CLI 3.0.0 `db schema declarative sync --help` reports **Local only**, needs a shadow
 database, and offers no remote/shadow URL flag. `--no-apply` prevents application
@@ -125,12 +125,108 @@ Do not run them as a workaround. See the official
 [declarative guide](https://supabase.com/docs/guides/local-development/declarative-database-schemas)
 and use actual pinned CLI help where the web reference differs.
 
-Task 04 will implement and validate a remote-only method for declarative/history
-reconciliation, clean replay, existing-data upgrades, tests and type freshness on
-explicitly authorized disposable hosted databases/branches. Those checks do not
-exist yet and are not claimed as passing. Manual authoring does not remove parity
-or review requirements. Any new remote generation tool needs a separate verified
-technical choice; no unsupported shadow-database procedure is promised here.
+The remote validation procedure below reconciles declarative SQL and migration
+history without a local runtime. Manual authoring does not remove parity or review
+requirements. No unsupported shadow-database procedure is used.
+
+## 4a. Disposable hosted validation and generated types
+
+Use Node 24, the frozen pnpm dependencies and CLI 3.0.0. These commands create,
+write and delete disposable projects in the explicitly authorized organization
+`njnmfutclorywskqrftd`. They never link, reset or deploy to shared development
+`lvqbrjybwstvdhaxyxyn`. Obtain authorization for this lifecycle before running it.
+Only the Free organization plan is accepted; no paid upgrade is performed. One
+free project slot is required. Existing projects are never removed for capacity.
+
+Provide `SUPABASE_ACCESS_TOKEN` through a temporary shell environment. An optional
+ignored repository-root `.env.database-validation` is also loaded by the scripts;
+copy field names from [validation.env.example](../supabase/validation.env.example).
+Never copy a secret into Next.js environment files, logs or Git. Set
+`MYCLINICS_DISPOSABLE_AUTHORIZATION=njnmfutclorywskqrftd` to acknowledge the authorized
+lifecycle. The runner does not extract stored CLI credentials. The current task
+used the user's explicitly authorized existing CLI credential; the planned
+[dedicated credentials task](<milestones/milestone-02-clinic-management/task 10 - dedicated validation credentials.md>)
+improves credential isolation later.
+
+```powershell
+pnpm db:test-tooling
+pnpm db:types
+pnpm db:validate
+```
+
+`db:types` creates a fresh hosted replay target, executes committed migrations in
+lexical order, generates `public` TypeScript types twice using the pinned CLI,
+and checks deterministic output. It deletes that project before creating a second
+fresh project for declarative SQL. Catalog agreement must pass before writing
+`src/lib/supabase/database.types.ts`. Prettier normalizes generated formatting only;
+types are never hand-authored. `db:validate` compares generation with the committed
+file without rewriting it and additionally runs database tests, upgrade and
+negative controls. SQL errors and assertion failures exit nonzero.
+
+The Management API creates the targets with random, unlogged database passwords.
+The runner verifies ref/name/organization and healthy status, then sets the Data
+API's `db_schema` to the empty disabled value. It rechecks disabled state before
+every SQL operation, including fixtures. The pinned CLI recognizes empty schema
+configuration as Data API disabled. No application object is written before that
+verification. The finalizer verifies identity again, deletes only the project
+created by that process and checks its absence. If a process is killed or cleanup
+fails, use its printed ref/name to inspect the organization and manually remove
+only that disposable project before rerunning; never delete shared development.
+
+Replay executes each reviewed migration and its standard
+`supabase_migrations.schema_migrations` record in one transaction via the hosted
+SQL Management API. This validates SQL/history reproduction rather than invoking
+interactive `db push` or silently repairing history. Migrations must support
+transactional execution; explicitly review operations requiring another execution
+model before adopting them. Declarative SQL runs only on its own fresh target.
+The targets are sequential so the existing project plus one free slot suffices.
+
+[catalog.sql](../supabase/validation/catalog.sql) compares sorted semantic `public`
+metadata: relations, columns/defaults, constraints, indexes, views, sequences,
+triggers, routines, enum/domain types, policies, ownership and grants. It excludes
+OID identities and platform extension-owned objects. No SQL-text equality, local
+shadow database, Docker, diff or dump is involved. The supported application scope
+is `public`; extend the catalog and its validation before adding other schemas or
+object kinds (for example aggregates, custom operators, partitioning or standalone
+composite types). Known unsupported namespace object kinds fail closed. An
+unrepresented object must never be accepted as proven parity; review the catalog
+coverage with every new schema feature. Comments and physical storage tuning are
+outside this semantic comparison and still require SQL review.
+
+Database assertions live in `supabase/tests/*.sql`, run in sorted order inside
+rolled-back transactions, and must raise exceptions on failure. Test-only upgrade
+SQL in `supabase/validation/upgrade/` creates a separate fixture schema, inserts a
+synthetic row, commits a subsequent schema/data migration, and verifies the original
+row plus the expected change without reset. The fixture is then removed. No
+production migration or business table is introduced to demonstrate tooling.
+Future schema tasks must add actual earlier migration/data baselines and preservation
+assertions alongside this infrastructure smoke scenario, including their own
+production migration upgrade coverage; this fixture alone does not prove those
+future changes safe.
+
+Negative controls execute invalid migration SQL, introduce an extra `public` table
+and deliberately change the expected type content. The same replay/parity/freshness
+assertions must reject them. The table is removed and parity rechecked; invalid
+SQL leaves no object and type drift stays in memory. All targets are then deleted.
+
+Hosted catalog regressions also compare a table whose earlier column was dropped
+with its fresh declarative equivalent. Column positions use surviving logical
+order, so physical attribute-number gaps do not cause drift; actual column order
+and type differences still fail. Enum/domain ownership uses role names, and domain
+collation uses its schema and name, never project-specific OIDs. Recreated equal
+types compare equal, while isolated owner and collation changes must fail. These
+test-only objects and their temporary non-login owner role are removed, followed
+by a full baseline-parity check.
+
+The [database workflow](../.github/workflows/database-validation.yml) runs offline
+tooling checks for PRs to `develop`. Its hosted job runs only by explicit
+`workflow_dispatch` on the reviewed assignment branch, using GitHub Actions secret
+`SUPABASE_ACCESS_TOKEN`. This prevents untrusted PRs from receiving credentials or
+automatically creating projects. The hosted run includes replay, parity, database
+tests, deterministic type freshness, upgrade and negative controls. Concurrency
+serializes hosted runs without cancelling cleanup. There is no shared-development
+deployment automation. Record the actual run URL and exact head in the PR; a
+passing tooling-only PR run is not evidence that hosted validation ran.
 
 ## 5. Manual migration application (future authorized writes)
 
