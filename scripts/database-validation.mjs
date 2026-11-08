@@ -5,6 +5,11 @@ import { readFile, readdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { format } from "prettier";
 import { catalogRegressions } from "./database-catalog-regressions.mjs";
+import {
+  clinicConcurrencyTests,
+  clinicNegativeControls,
+  clinicSeedTests,
+} from "./clinic-database-validation.mjs";
 
 export const organization = "njnmfutclorywskqrftd";
 const protectedRef = "lvqbrjybwstvdhaxyxyn";
@@ -57,6 +62,7 @@ async function api(path, method = "GET", body) {
       `Management API ${method} ${path}: HTTP ${response.status}${sqlState ? ` SQLSTATE ${sqlState}` : ""}`,
     );
     error.status = response.status;
+    error.sqlState = sqlState;
     throw error;
   }
   return response.status === 204 ? undefined : response.json();
@@ -138,14 +144,14 @@ async function snapshot(ref) {
   return rows[0].catalog;
 }
 
-async function replay(ref) {
+async function replay(ref, files = undefined) {
   await query(
     ref,
     `create schema if not exists supabase_migrations;
     create table if not exists supabase_migrations.schema_migrations
     (version text primary key, statements text[], name text);`,
   );
-  for (const name of await sqlFiles("supabase/migrations")) {
+  for (const name of files ?? (await sqlFiles("supabase/migrations"))) {
     assert.match(name, /^\d{14}_[a-z0-9_]+\.sql$/, "Invalid migration name");
     const sql = await readFile(
       new URL(`../supabase/migrations/${name}`, import.meta.url),
@@ -161,6 +167,41 @@ async function replay(ref) {
     console.log(`Replayed ${name}`);
   }
   console.log("Clean migration replay passed");
+}
+
+async function clinicUpgrade(ref) {
+  const files = await sqlFiles("supabase/migrations");
+  const clinicMigration = "20261108090000_create_clinics.sql";
+  const position = files.indexOf(clinicMigration);
+  assert.ok(position >= 0, "Clinic migration must exist");
+  await replay(ref, files.slice(0, position));
+  // The previous public baseline was empty: no pre-existing clinics are possible.
+  // Commit synthetic data in a separate schema before applying the real migration.
+  await query(
+    ref,
+    `create schema validation_preclinic;
+    create table validation_preclinic.existing_data(id uuid primary key,payload text not null);
+    insert into validation_preclinic.existing_data values
+      ('00000000-0000-4000-8000-000000000099','synthetic-before-clinic-migration');`,
+  );
+  const before = await query(
+    ref,
+    "select * from validation_preclinic.existing_data",
+  );
+  await replay(ref, files.slice(position));
+  assert.deepEqual(
+    await query(ref, "select * from validation_preclinic.existing_data"),
+    before,
+  );
+  assert.deepEqual(
+    await query(ref, "select count(*)::integer as count from public.clinics"),
+    [{ count: 0 }],
+  );
+  await query(ref, "drop schema validation_preclinic cascade");
+  console.log(
+    "Actual clinic migration upgrade from previous empty baseline preserved committed synthetic data",
+  );
+  return snapshot(ref);
 }
 
 async function generateTypes(ref) {
@@ -266,7 +307,23 @@ export async function main(mode = process.argv[2]) {
     checkTypes(await generateTypes(ref), generated);
     if (mode === "validate") {
       checkTypes(generated, await readFile(typesPath, "utf8"));
+      await clinicSeedTests(
+        (sql) => query(ref, sql),
+        await readFile(
+          new URL("../supabase/seed.sql", import.meta.url),
+          "utf8",
+        ),
+      );
       await databaseTests(ref);
+      await clinicConcurrencyTests((sql) => query(ref, sql));
+      await clinicNegativeControls(
+        (sql) => query(ref, sql),
+        await readFile(
+          new URL("../supabase/tests/10-clinics.sql", import.meta.url),
+          "utf8",
+        ),
+      );
+      checkParity(await snapshot(ref), catalog);
       await upgrade(ref);
       await negativeControls(ref, catalog, generated);
       await catalogRegressions({
@@ -277,6 +334,12 @@ export async function main(mode = process.argv[2]) {
     }
     return { catalog, generated };
   });
+  if (mode === "validate") {
+    await disposable("upgrade", async (ref) => {
+      checkParity(result.catalog, await clinicUpgrade(ref));
+      console.log("Actual upgrade catalog matches clean replay");
+    });
+  }
   await disposable("desired", async (ref) => {
     for (const name of await sqlFiles("supabase/schemas")) {
       await query(

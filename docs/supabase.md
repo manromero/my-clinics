@@ -13,6 +13,11 @@ tables, auth setup, app integration or real data. The desired `public` applicati
 schema, migration history and seed are empty. Supabase's own schemas/extensions
 are platform-managed and are not an application baseline to erase.
 
+That describes the historical Task 03 baseline. Task 05 adds the
+[clinic database model](clinic-database-model.md), its first migration and
+deterministic synthetic seed; the shared development project remains excluded
+from this task's writes.
+
 Keep the hosted **Data API disabled** until Task 09 verifies authentication,
 Ana-only access, RLS and permissions. Disabling it does not restrict SQL credentials
 or replace that security gate. Do not deploy the persistent application publicly.
@@ -227,6 +232,14 @@ tests, deterministic type freshness, upgrade and negative controls. Concurrency
 serializes hosted runs without cancelling cleanup. There is no shared-development
 deployment automation. Record the actual run URL and exact head in the PR; a
 passing tooling-only PR run is not evidence that hosted validation ran.
+
+For environments without an authorized local token, explicitly dispatch `mode:
+types` on the assignment branch. This runs `pnpm db:types` with the existing CI
+secret and uploads only `src/lib/supabase/database.types.ts` as
+`hosted-database-types`. Retrieve that artifact, inspect and commit the generated
+file, then dispatch `mode: validate` on the resulting head. The types artifact is
+not evidence of committed-type freshness; the subsequent validation run provides
+that check. No token extraction or automatic commit is involved.
 
 ## 5. Manual migration application (future authorized writes)
 

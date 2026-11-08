@@ -15,7 +15,7 @@
     "supabase": "supabase",
     "db:validate": "node --env-file-if-exists=.env.database-validation scripts/database-validation.mjs validate",
     "db:types": "node --env-file-if-exists=.env.database-validation scripts/database-validation.mjs types",
-    "db:test-tooling": "node --test scripts/database-validation.test.mjs"
+    "db:test-tooling": "node --test scripts/database-validation.test.mjs scripts/clinic-database-validation.test.mjs"
   },
   "dependencies": {
     "next": "16.4.3",
