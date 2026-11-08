@@ -66,8 +66,7 @@ build and application checks. This is not a security acceptance check.
 
 ## Progress notes
 
-Implementation pending assignment. Planning decision recorded on 2026-11-07;
-this task definition does not start implementation.
+Assigned for implementation on 2026-11-08. The approved scope remains unchanged. Task and index remain `in_progress` while hosted validation is blocked.
 
 ## Execution context
 
@@ -109,3 +108,58 @@ this task definition does not start implementation.
   not configured; integration validation uses the authorized disposable targets.
   Verify direct/pooler connectivity in that environment rather than assuming it.
 - Correction rounds used: 0 of 2.
+
+## Initial implementation and validation — 2026-11-08
+
+[Draft PR #42](https://github.com/manromero/my-clinics/pull/42) targets `develop`.
+Implementation head: `2df3a4a777244d15d4739e482b02e1b15d23dd77`.
+Normal `/clinics` now uses the server entry, service, repository contract and typed
+server-only PostgreSQL client. Exact bigint IDs reach JavaScript as strings.
+Persistent writes are unavailable; explicit memory previews retain their completed
+interactions through the same service boundary. No migration or generated-type
+changes were needed.
+
+[Exact-head CI](https://github.com/manromero/my-clinics/actions/runs/42498883831)
+passed 225 tests, four database-tooling tests, lint, typecheck, formatting and
+production build. Import and client-bundle inspection found no privileged setup.
+Desktop/mobile failure screenshots and capture metadata are saved inline in the
+PR. The coordinator retrieved and inspected both PNGs and confirmed their hashes
+match the original captures. Rendered GitHub-page inspection was unavailable.
+
+Hosted validation is blocked: the existing CI token receives HTTP 403 consulting
+per-project pooler metadata; the official direct PostgreSQL endpoint returns
+`ENETUNREACH`. Actual hosted listing and successful load/empty/all-inactive/retry/
+reload coverage and their visual evidence remain unverified. The user was asked
+to supply a CI token with `database_pooling_config_read`, preserving existing
+permissions, or choose blocked delivery. No credential is requested through chat.
+
+All three owned disposable targets were deleted and verified absent. No writes
+were made to shared development, and no local stored credential was extracted.
+The full run/target history and detailed evidence remain in the PR. The attempt
+to inspect pooler metadata in the existing Chrome session was rejected by the UI
+tool; no browser action occurred.
+
+Independent review completed at the application head above. Its result is recorded below. Correction rounds used: 0 of 2.
+
+## Independent review — 2026-11-08
+
+The separate reviewer independently passed all 225 tests, four database-tooling
+checks, lint, typecheck, formatting and build at the implementation head above.
+Code/import review verified the layer sequence, generated typed DTO mapping,
+exact IDs, contained errors and persistent write refusal, with no application
+blocker found.
+
+Live Chrome desktop/mobile review verified persistent missing-configuration
+failure and retry, unknown preview handling, preview load recovery, empty and
+all-inactive states, creation with a Spanish decimal and preview isolation.
+The API returned generic no-store failures and refused unsupported write methods.
+Ten captures at measured CSS viewports 1440 x 1000 and 390 x 844, DPR 1, were
+inspected against Alexandria and Stitch. This local review does not establish
+successful hosted listing or hosted recovery.
+
+Blocking R06-01 remains open: the required hosted list integration and corresponding
+persistent state/reload/visual evidence cannot pass until PostgreSQL connectivity
+is available. The reviewer independently inspected the exact-head CI failure and
+verified the recorded disposable deletion. No additional application blockers
+were found. Task/index remain `in_progress`; PR #42 remains draft. No correction
+round has been used, and human acceptance and manual merge remain pending.
