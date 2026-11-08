@@ -1,6 +1,6 @@
 # Task 05 — Define and validate the clinic database model
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -133,3 +133,27 @@ Production build and visual capture do not apply because runtime application
 code and production configuration are unchanged. Hosted validation used the
 existing CI secret without extracting local CLI credentials. Independent review
 is pending; task/index remain `in_progress`. Correction rounds used: 0 of 2.
+
+## Independent review and agent completion — 2026-11-08
+
+The independent reviewer inspected base
+`23dafd061bf727fe411f28c291214dfadc40a84a` through head
+`15d688afb561562cf8a04da7f28fb360bf60f949`, including implementation and tracking.
+Code and functional review found no blocking or optional findings. All acceptance
+criteria are covered. The reviewer independently passed lint, typecheck,
+formatting, tooling tests (4), existing clinic tests (28), diff whitespace and
+32 local Markdown link targets across six changed documents.
+
+The reviewer inspected actual type-generation and full hosted-validation logs,
+including numeric/constraint negative controls, concurrency lock evidence,
+upgrade preservation, parity, freshness and disposable cleanup. Tracking-head
+[CI run 42493548508](https://github.com/manromero/my-clinics/actions/runs/42493548508)
+also passed. Hosted SQL was independently assessed through CI evidence rather
+than repeated remote execution; no credentials were extracted. Visual review
+and production build do not apply to this database-only change.
+
+Task/index are `done` for agent delivery in
+[PR #41](https://github.com/manromero/my-clinics/pull/41). Final focused review
+and exact-head CI evidence for the completion-tracking commit are retained in
+the PR before handoff. Human acceptance and manual merge remain pending.
+Correction rounds used: 0 of 2. No unresolved blockers or optional findings.
