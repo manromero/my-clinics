@@ -1,6 +1,6 @@
 # Task 05 — Define and validate the clinic database model
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -54,5 +54,43 @@ Ana-only access or permission to use real data before the final security gate.
 
 ## Progress notes
 
-Implementation pending assignment. Planning decision recorded on 2026-11-07;
-this task definition does not start implementation.
+Assigned by the user on 2026-11-08 following the project workflow. The user
+explicitly authorized Free disposable `myclinics-validation-*` projects in
+organization `njnmfutclorywskqrftd`, synthetic migration/seed/test writes with
+Data API disabled, cleanup, and CI using the existing repository secret.
+Shared development `lvqbrjybwstvdhaxyxyn` is excluded from remote writes.
+
+## Execution context
+
+- Readiness: approved scope and criteria; dependency Task 04 merged through
+  PR #40. Clean checkout, remote access and pnpm 11.25.0 verified. Native
+  implementer and reviewer roles are available in the active session.
+- Branch: `feature/clinic-database-model`; base:
+  `23dafd061bf727fe411f28c291214dfadc40a84a` (updated `origin/develop`).
+- Sources: this task, milestone index, clinic requirements, architecture,
+  screens, development and Git workflows, `supabase/AGENTS.md`, and
+  `docs/supabase.md`. Consult official PostgreSQL documentation for numeric
+  coercion, normalization and concurrent uniqueness details.
+- Relevant assets: `supabase/schemas/`, `supabase/migrations/`,
+  `supabase/seed.sql`, `supabase/tests/`, `supabase/validation/`,
+  `scripts/database-validation.mjs`, its tests and CI workflow,
+  `src/lib/supabase/database.types.ts`, and the existing clinic source contract
+  in `src/app/clinics/`.
+- Verified findings: the previous application schema/migration baseline is
+  empty. Current upgrade coverage is an infrastructure fixture only; this task
+  must also exercise the actual new migration from its previous baseline while
+  preserving existing synthetic data. SQL assertions currently execute in
+  rolled-back transactions; concurrent uniqueness needs independent sessions.
+  Generated types must come from the hosted replay, never manual edits.
+- Constraints: no Docker/local database, real data, shared-development writes,
+  authentication/RLS implementation, UI integration, activity entities or
+  persistent deletion. Preserve applied migration history. One writer at a time.
+- Validation: lint, typecheck, formatting, tooling tests, hosted clean replay,
+  schema/history parity, seeds, database boundary and concurrency assertions,
+  actual migration upgrade preservation, deterministic generated type freshness,
+  negative controls, and delivered-head CI. Assess production build impact;
+  no UI capture applies. Record actual results and disposable cleanup.
+- Open product questions: none. Local credential availability is unverified;
+  the existing authorized CI secret is available for hosted validation. Do not
+  extract stored CLI credentials without separate authorization.
+- Correction rounds used: 0 of 2.
