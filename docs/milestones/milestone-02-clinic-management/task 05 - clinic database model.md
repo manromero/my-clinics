@@ -1,6 +1,6 @@
 # Task 05 — Define and validate the clinic database model
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -160,11 +160,13 @@ Correction rounds used: 0 of 2. No unresolved blockers or optional findings.
 
 ## Documentation cleanup — 2026-11-08
 
-The user requested removing the separate model document as unnecessary detail.
+The user requested removing the separate model document as unnecessary detail
+and keeping `docs/supabase.md` focused on operations rather than task history or
+future implementation plans.
 Keep only these error identifiers for later mapping: `23505` with
 `clinics_name_key_unique` means duplicate name; `23514` with
 `clinics_name_nonblank`, `clinics_percentage_range` or
 `clinics_percentage_precision` identifies the invalid field. Independent review
 passed at `86f4d06`: formatting, diff checks and 29 local links passed with no
-findings. Task/index are `done`; correction rounds remain 0 of 2. Human acceptance
-and manual merge remain pending.
+findings. The operational-guide cleanup is in progress; correction rounds remain
+0 of 2. Human acceptance and manual merge remain pending.
