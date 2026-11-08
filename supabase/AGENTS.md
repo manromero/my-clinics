@@ -8,7 +8,7 @@ local PostgreSQL, or a shadow database on this workstation.
 - `migrations/<timestamp>_<name>.sql`: reviewed, append-only change history.
   CLI 3.0.0 declarative `sync` is local-only; author SQL manually until a separately
   verified remote-only generation method is approved. Never imply generation ran.
-- `seed.sql`: deterministic synthetic data only; currently empty and disabled.
+- `seed.sql`: deterministic synthetic data only; automatic CLI seeding is disabled.
 - `tests/`: SQL assertions executed transactionally by `pnpm db:validate`.
 - `validation/`: remote catalog reconciliation and test-only upgrade fixtures;
   never deploy the fixtures as application migrations.
@@ -20,12 +20,13 @@ local PostgreSQL, or a shadow database on this workstation.
 Review schema and migration changes together. Do not edit applied migrations,
 change schema through Studio, import real data, or add business entities outside
 an assigned task. Record drift and reconcile with reviewed SQL rather than silently
-repairing migration history. Task 04 establishes executable parity/replay/upgrade
-checks on separately authorized disposable hosted databases or branches.
+repairing migration history. Run parity/replay/upgrade checks on separately
+authorized disposable hosted projects.
 
 Every remote command names an explicit verified project ref. Linking a checkout
-is not approval to change that project. Keep Data API disabled before Task 09's
-security gate; config.toml does not configure the hosted project by itself.
+is not approval to change that project. Keep Data API disabled until authentication,
+Ana-only access, RLS and permissions are verified; config.toml does not configure
+the hosted project by itself.
 Read-only inspection and migration application are separate steps. Remote reset,
 seed, repair, config push and destructive SQL require explicit target/scope approval;
 never use them as routine recovery. Do not use global `--yes` to bypass review.

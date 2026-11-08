@@ -42,11 +42,10 @@ desired schema SQL, reviewed migration history, synthetic seeds and database tes
 The [Supabase guide](supabase.md) covers hosted setup and operating procedures;
 [database agent rules](../supabase/AGENTS.md) govern automated changes.
 
-Future application integration and generated database types belong in
-`src/lib/supabase/`, separate from database assets. That integration does not exist
-yet; Task 04 introduces generated types and Task 06 establishes the client and
-repository/service boundary. Routes keep using the shared application boundary
-described by those tasks rather than importing database SQL or CLI configuration.
+Generated database types and Supabase infrastructure code belong in
+`src/lib/supabase/`, separate from database assets. Keep application data access
+behind service/repository boundaries rather than importing database SQL or CLI
+configuration into routes.
 
 ## Component reuse
 

@@ -1,2 +1,2 @@
--- Desired application schema is empty. Supabase-managed schemas are not owned here.
--- Define future business objects here before authoring their reviewed migrations.
+-- Supabase-managed schemas are not owned here. Application definitions follow
+-- in lexical order; the previous application baseline contained no objects.

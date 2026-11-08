@@ -21,6 +21,8 @@ This is the mandatory gate before real data or public use. Earlier tasks establi
 only hosted development synthetic-data behavior and do not satisfy access requirements. Document
 configuration and the manual remote procedure; remote mutations require a separately
 authorized, explicitly verified target, rather than automatic deployment in CI.
+Keep current configuration and operating steps concise in the existing Supabase
+guide; keep execution history, future plans and validation evidence in the task/PR.
 
 Decision renewed on 2026-11-07: persistent deletion stays deferred until a real
 activity relationship can enforce eligibility. Keep it unavailable on the persistent

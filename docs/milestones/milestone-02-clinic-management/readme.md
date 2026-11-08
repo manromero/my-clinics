@@ -44,7 +44,7 @@ then complete authentication and authorization as the final release gate.
 | [02 — Validate clinic deletion with an in-memory data source](<task 02 - delete clinics.md>)                        | `done`    | 01                  |
 | [03 — Establish reproducible hosted Supabase foundations](<task 03 - supabase local foundations.md>)                | `done`    | 01, 02              |
 | [04 — Validate migrations and generated database types](<task 04 - database validation and types.md>)               | `done`    | 03                  |
-| [05 — Define and validate the clinic database model](<task 05 - clinic database model.md>)                          | `pending` | 04                  |
+| [05 — Define and validate the clinic database model](<task 05 - clinic database model.md>)                          | `done`    | 04                  |
 | [06 — List persistent clinics through the service boundary](<task 06 - list persistent clinics.md>)                 | `pending` | 01, 02, 05          |
 | [07 — Create persistent clinics](<task 07 - create persistent clinics.md>)                                          | `pending` | 06                  |
 | [08 — Edit, deactivate and reactivate persistent clinics](<task 08 - update persistent clinics.md>)                 | `pending` | 07                  |

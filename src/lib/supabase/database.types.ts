@@ -14,13 +14,33 @@ export type Database = {
   };
   public: {
     Tables: {
-      [_ in never]: never;
+      clinics: {
+        Row: {
+          active: boolean;
+          id: number;
+          name: string;
+          percentage: number;
+        };
+        Insert: {
+          active?: boolean;
+          id?: never;
+          name: string;
+          percentage: number;
+        };
+        Update: {
+          active?: boolean;
+          id?: never;
+          name?: string;
+          percentage?: number;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      clinic_name_key: { Args: { value: string }; Returns: string };
     };
     Enums: {
       [_ in never]: never;

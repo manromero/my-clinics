@@ -4,20 +4,19 @@ Run all commands from the repository root. File paths below are repository-relat
 For automated work, also follow the complementary
 [database agent rules](../supabase/AGENTS.md).
 
-## Boundary and baseline
+## Development boundary
 
 Use hosted development projects with synthetic data only. No Docker, local
 Supabase stack or local database is part of this workflow. The CLI runs on the
-workstation; the database and Studio run at Supabase. Task 03 adds no business
-tables, auth setup, app integration or real data. The desired `public` application
-schema, migration history and seed are empty. Supabase's own schemas/extensions
-are platform-managed and are not an application baseline to erase.
+workstation; the database and Studio run at Supabase. Desired schemas, migrations,
+synthetic seeds and tests live in `supabase/`. Supabase's own schemas/extensions
+are platform-managed; do not erase them to reproduce the application schema.
 
-Keep the hosted **Data API disabled** until Task 09 verifies authentication,
+Keep the hosted **Data API disabled** until authentication,
 Ana-only access, RLS and permissions. Disabling it does not restrict SQL credentials
 or replace that security gate. Do not deploy the persistent application publicly.
-Tasks 06–08 must resolve a server-only hosted connection compatible with this
-restriction when assigned; this task does not choose their implementation.
+Application connections must respect this restriction; integration does not
+authorize enabling the API or bypassing the security prerequisite.
 
 ## 1. Create the account and development project
 
@@ -55,10 +54,10 @@ pnpm supabase db query --help
 pnpm supabase db push --help
 ```
 
-The committed dependency pins Supabase CLI **3.0.0**. On 2026-11-07 its actual help
+The committed dependency pins Supabase CLI **3.0.0**. Its help
 uses `--remote=<ref>`; older CLI reference examples using `--linked` or `--db-url`
-do not match this binary. Recheck help before upgrading. `supabase init` was used
-only to establish the repository config; do not run it again over this checkout.
+do not match this binary. Recheck help before upgrading. Do not run `supabase init`
+over the existing repository configuration.
 `supabase/config.toml` declares schema/seed paths and safe tooling defaults. It does **not**
 turn off the hosted Data API; verify that separately in the Dashboard.
 
@@ -75,7 +74,7 @@ interactive login/OS credential storage. `supabase/.env.example` contains only
 optional blank metadata; copying it is not required and does not select a target.
 CLI credentials in `SUPABASE_ACCESS_TOKEN` / `SUPABASE_DB_PASSWORD`, if needed,
 belong in a temporary local shell session or a secret manager, not committed files.
-No application environment variables or Supabase API keys are needed for Task 03.
+Database validation credentials are separate from application configuration.
 Never place secrets in `NEXT_PUBLIC_*` or Next.js `env` config (both can be bundled).
 
 ## 3. Verify connectivity without writes
@@ -94,9 +93,8 @@ running it. Confirm Data API is disabled in Dashboard and inspect baseline objec
 Record command, CLI/server versions, ref/name, date and redacted result. A successful
 CLI help command or Dashboard login does not prove database connectivity.
 
-Record actual results separately for each target. Until these steps are executed,
-connectivity, hosted Studio access, Data API configuration and baseline inspection
-are unverified. There is no automated linking or remote write script here.
+Record actual results separately for each target in the task/PR. CLI help or login
+alone does not verify connectivity, project identity or hosted API configuration.
 
 ## 4. Schema and reviewed migrations
 
@@ -110,15 +108,15 @@ pnpm supabase migration new describe_change
 Author its SQL manually and review it alongside the desired schema. Do not run the
 schema definition files directly against an existing database. Migrations describe
 incremental changes and data preservation; desired definitions describe the end
-state. No no-op migration is needed for the current empty application baseline.
-`supabase/seed.sql` is comment-only and disabled; it must not be applied remotely
-by default. Database tests live in `supabase/tests/`; generated types live at
+state. `supabase/seed.sql` contains deterministic synthetic clinic examples;
+automatic seeding remains disabled and it must not be applied remotely by
+default. Database tests live in `supabase/tests/`; generated types live at
 `src/lib/supabase/database.types.ts`.
 
 CLI 3.0.0 `db schema declarative sync --help` reports **Local only**, needs a shadow
 database, and offers no remote/shadow URL flag. `--no-apply` prevents application
 but does not make generation remote-only. We therefore **do not use automatic
-declarative generation** under the user's no-local-database decision. A disposable
+declarative generation** in this hosted-only workflow. A disposable
 remote database alone does not make that command supported. `db diff`, `db pull`,
 `db dump` or reset must not be presumed Docker-free just because they target remote.
 Do not run them as a workaround. See the official
@@ -143,10 +141,8 @@ ignored repository-root `.env.database-validation` is also loaded by the scripts
 copy field names from [validation.env.example](../supabase/validation.env.example).
 Never copy a secret into Next.js environment files, logs or Git. Set
 `MYCLINICS_DISPOSABLE_AUTHORIZATION=njnmfutclorywskqrftd` to acknowledge the authorized
-lifecycle. The runner does not extract stored CLI credentials. The current task
-used the user's explicitly authorized existing CLI credential; the planned
-[dedicated credentials task](<milestones/milestone-02-clinic-management/task 10 - dedicated validation credentials.md>)
-improves credential isolation later.
+lifecycle. The runner does not extract stored CLI credentials; supplying a token
+requires separate authorization for its use and the disposable target lifecycle.
 
 ```powershell
 pnpm db:test-tooling
@@ -194,29 +190,28 @@ coverage with every new schema feature. Comments and physical storage tuning are
 outside this semantic comparison and still require SQL review.
 
 Database assertions live in `supabase/tests/*.sql`, run in sorted order inside
-rolled-back transactions, and must raise exceptions on failure. Test-only upgrade
-SQL in `supabase/validation/upgrade/` creates a separate fixture schema, inserts a
-synthetic row, commits a subsequent schema/data migration, and verifies the original
-row plus the expected change without reset. The fixture is then removed. No
-production migration or business table is introduced to demonstrate tooling.
-Future schema tasks must add actual earlier migration/data baselines and preservation
-assertions alongside this infrastructure smoke scenario, including their own
-production migration upgrade coverage; this fixture alone does not prove those
-future changes safe.
+rolled-back transactions, and must raise exceptions on failure. Concurrent clinic
+uniqueness is checked through independent sessions, with lock observation before
+asserting one committed winner. Synthetic seeds are applied twice to verify
+repeatability. Regression controls must detect limited-scale numeric rounding
+and missing constraints or indexes.
+
+Upgrade validation applies the actual clinic migration to its previous baseline
+with committed synthetic data in a separate test-only schema, verifies preservation
+without reset and compares the result with clean replay. The infrastructure fixture
+in `supabase/validation/upgrade/` also checks the upgrade mechanism. Schema changes
+require their own earlier baseline and preservation assertions; the infrastructure
+fixture alone does not prove application migrations safe. Test-only fixtures are
+removed after validation.
 
 Negative controls execute invalid migration SQL, introduce an extra `public` table
 and deliberately change the expected type content. The same replay/parity/freshness
 assertions must reject them. The table is removed and parity rechecked; invalid
 SQL leaves no object and type drift stays in memory. All targets are then deleted.
 
-Hosted catalog regressions also compare a table whose earlier column was dropped
-with its fresh declarative equivalent. Column positions use surviving logical
-order, so physical attribute-number gaps do not cause drift; actual column order
-and type differences still fail. Enum/domain ownership uses role names, and domain
-collation uses its schema and name, never project-specific OIDs. Recreated equal
-types compare equal, while isolated owner and collation changes must fail. These
-test-only objects and their temporary non-login owner role are removed, followed
-by a full baseline-parity check.
+Catalog regressions check logical column order, type ownership and collation
+without relying on project-specific OIDs. Fixture cleanup must restore full
+baseline parity.
 
 The [database workflow](../.github/workflows/database-validation.yml) runs offline
 tooling checks for PRs to `develop`. Its hosted job runs only by explicit
@@ -228,15 +223,23 @@ serializes hosted runs without cancelling cleanup. There is no shared-developmen
 deployment automation. Record the actual run URL and exact head in the PR; a
 passing tooling-only PR run is not evidence that hosted validation ran.
 
-## 5. Manual migration application (future authorized writes)
+For environments without an authorized local token, explicitly dispatch `mode:
+types` on the assignment branch. This runs `pnpm db:types` with the existing CI
+secret and uploads only `src/lib/supabase/database.types.ts` as
+`hosted-database-types`. Retrieve that artifact, inspect and commit the generated
+file, then dispatch `mode: validate` on the resulting head. The types artifact is
+not evidence of committed-type freshness; the subsequent validation run provides
+that check. No token extraction or automatic commit is involved.
 
-This procedure documents future work; Task 03 does not authorize remote mutation.
+## 5. Manual migration application
+
+The procedure itself does not authorize remote writes.
 
 1. Obtain approval for the exact project ref, migration set/commit and intended
    changes. Verify name/ref/organization/environment in Dashboard. Ensure Data API
    remains disabled during pre-security development. Confirm only synthetic data.
 2. Review every pending SQL file, destructive effects, data preservation, seed and
-   schema agreement. Complete Task 04 validation on an authorized disposable hosted
+   schema agreement. Complete database validation on an authorized disposable hosted
    target before applying business migrations. Arrange an appropriate backup and
    recovery plan before a change that can destroy data. Use a reviewed forward fix
    for recovery; do not edit applied migrations or reset the development project.
@@ -263,8 +266,8 @@ This procedure documents future work; Task 03 does not authorize remote mutation
    include seeds/roles, push config, or run remote reset as part of this procedure.
 
 5. Recheck history, `supabase/check.sql`, and task-specific invariants/tests; record the head,
-   target, actual result and failures. Refresh generated types via Task 04's
-   validated method when applicable. Do not report successful persistence on error.
+   target, actual result and failures in the task/PR. Refresh generated types with
+   `pnpm db:types` when applicable. Do not report successful persistence on error.
 
 ## Recovery from a clean clone
 
@@ -273,7 +276,7 @@ the same hosted development ref, then run the read-only inspection. There is no
 local start/stop/reset lifecycle and no uncommitted Studio schema to recover.
 Use Git migrations plus the hosted history to diagnose divergence. Clean replay
 and repeated baseline reproduction require separately authorized disposable hosted
-projects/branches in Task 04, never resetting the shared development project.
+projects, never resetting the shared development project.
 
 ## Validation recorded at delivery
 
@@ -281,7 +284,7 @@ CLI version/help and file-only migration creation can be checked without databas
 access. Hosted checks require a verified target and local authentication. Record
 each check as passing, failed or unavailable; do not infer Dashboard API settings
 from SQL connectivity. Exact delivered-head results are recorded in the PR.
-There are no UI changes, so desktop/mobile screenshots do not apply.
+Database-only validation does not require desktop/mobile screenshots.
 
 If your trusted organization CA is installed in the OS certificate store but the
 CLI reports a TLS/transport error, use `$env:NODE_USE_SYSTEM_CA='1'` in that terminal
