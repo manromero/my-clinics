@@ -17,13 +17,14 @@ begin
 end $$;
 
 do $$
-declare clinic_id uuid; value text; whitespace text;
+declare clinic_id bigint; value text; whitespace text;
 begin
   insert into public.clinics (name, percentage) values ('Validation Clinic', 12.34) returning id into clinic_id;
-  if clinic_id is null or not (select active from public.clinics where id=clinic_id) then
-    raise exception 'UUID/active default missing';
+  if clinic_id is null or clinic_id <= 0 or not (select active from public.clinics where id=clinic_id) then
+    raise exception 'Identity/active default missing';
   end if;
   update public.clinics set name='Validation Clinic', active=false, percentage=100 where id=clinic_id;
+  perform pg_temp.reject_clinic_write($s$insert into public.clinics(name,percentage) values ('VALIDATION CLINIC',20)$s$, '23505', 'clinics_name_key_unique');
   update public.clinics set name=E'\tVALIDATION CLINIC\n', active=true, percentage=0 where id=clinic_id;
   if not exists (select 1 from public.clinics where id=clinic_id and active and percentage=0) then
     raise exception 'Unchanged-name edit, identity or reactivation failed';
@@ -55,4 +56,5 @@ begin
   perform pg_temp.reject_clinic_write($s$insert into public.clinics(name,percentage) values (null,20)$s$, '23502');
   perform pg_temp.reject_clinic_write($s$insert into public.clinics(name,percentage) values ('Null percentage',null)$s$, '23502');
   perform pg_temp.reject_clinic_write($s$insert into public.clinics(name,percentage,active) values ('Null active',20,null)$s$, '23502');
+  perform pg_temp.reject_clinic_write($s$insert into public.clinics(id,name,percentage) values (999,'Explicit identity',20)$s$, '428C9');
 end $$;

@@ -7,17 +7,16 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // a rejection as concurrency evidence; sequential duplicate tests are insufficient.
 export async function clinicConcurrencyTests(query) {
   for (const scenario of ["insert-insert", "insert-update", "update-update"]) {
-    await query(`insert into public.clinics(id,name,percentage) values
-      ('00000000-0000-4000-8000-000000000011','Race original one',10),
-      ('00000000-0000-4000-8000-000000000012','Race original two',20)`);
+    await query(`insert into public.clinics(id,name,percentage) overriding system value values
+      (-11,'Race original one',10), (-12,'Race original two',20)`);
     const firstWrite =
       scenario === "update-update"
-        ? `update public.clinics set name='Race target' where id='00000000-0000-4000-8000-000000000011'`
+        ? `update public.clinics set name='Race target' where id=-11`
         : `insert into public.clinics(name,percentage) values ('Race target',30)`;
     const secondWrite =
       scenario === "insert-insert"
         ? `insert into public.clinics(name,percentage) values (E'\\tRACE TARGET\\n',40)`
-        : `update public.clinics set name=' RACE TARGET ' where id='00000000-0000-4000-8000-000000000012'`;
+        : `update public.clinics set name=' RACE TARGET ' where id=-12`;
     const settle = (promise) =>
       promise.then(
         (value) => ({ value }),

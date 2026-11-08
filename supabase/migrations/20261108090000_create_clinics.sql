@@ -7,7 +7,7 @@ as $$
 $$;
 
 create table public.clinics (
-  id uuid default gen_random_uuid() constraint clinics_pkey primary key,
+  id bigint generated always as identity constraint clinics_pkey primary key,
   name text not null,
   -- No numeric(p,s): a typmod would round before CHECK constraints see input.
   percentage numeric not null,

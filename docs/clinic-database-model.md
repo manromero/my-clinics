@@ -1,11 +1,21 @@
 # Clinic database model
 
 Task 05 defines `public.clinics` independently of the current memory preview.
-The UUID `id` primary key defaults to `gen_random_uuid()`; later repositories
-retain it on edits. `name`, `percentage` and `active` are required. Only `active`
+The `bigint generated always as identity` primary key uses PostgreSQL's sequence;
+later repositories retain it on edits. A single hosted database generates all
+identities, so no distributed/offline UUID generation is needed. `name`,
+`percentage` and `active` are required. Only `active`
 has a business default (`true`). No activity, deletion API, application integration,
 authentication, RLS or permission configuration is introduced here. Hosted Data
 API access remains disabled and all validation data is synthetic.
+
+The existing memory contract uses string IDs. Task 06 must map database identities
+to that contract at its repository boundary (`String(id)` for safely represented
+integer values), without changing the preview's IDs. PostgreSQL bigint exceeds
+JavaScript's safe integer range; a future driver must preserve larger integers as
+text/bigint before string conversion, or explicitly reject unsafe numeric values.
+Generated Supabase types describe this column as `number`; they do not enforce
+safe transport. No repository/client integration is added in this task.
 
 ## Names
 
@@ -36,19 +46,20 @@ caller. The hosted tests send direct unrounded numeric literals.
 
 ## Later error mapping
 
-| SQLSTATE | Identifier                                    | Meaning                                    |
-| -------- | --------------------------------------------- | ------------------------------------------ |
-| `23505`  | `clinics_name_key_unique`                     | Name conflicts after normalization         |
-| `23514`  | `clinics_name_nonblank`                       | Name contains only surrounding whitespace  |
-| `23514`  | `clinics_percentage_range`                    | Percentage outside inclusive bounds        |
-| `23514`  | `clinics_percentage_precision`                | Percentage has excess fractional precision |
-| `23502`  | Column `name`, `percentage`, `active` or `id` | Required value is null                     |
-| `23505`  | `clinics_pkey`                                | Duplicate identity, not a name conflict    |
+| SQLSTATE | Identifier                              | Meaning                                                       |
+| -------- | --------------------------------------- | ------------------------------------------------------------- |
+| `23505`  | `clinics_name_key_unique`               | Name conflicts after normalization                            |
+| `23514`  | `clinics_name_nonblank`                 | Name contains only surrounding whitespace                     |
+| `23514`  | `clinics_percentage_range`              | Percentage outside inclusive bounds                           |
+| `23514`  | `clinics_percentage_precision`          | Percentage has excess fractional precision                    |
+| `23502`  | Column `name`, `percentage` or `active` | Required value is null                                        |
+| `428C9`  | Identity column `id`                    | Explicit identity assignment requires an intentional override |
+| `23505`  | `clinics_pkey`                          | Duplicate identity, not a name conflict                       |
 
 A value can violate multiple checks; PostgreSQL does not promise which check is
 reported first. Later repositories should map both percentage checks to the
 existing invalid-percentage outcome and reserve duplicate-name for the named
-unique index. UUID syntax failures (`22P02`) and unexpected database failures
+unique index. Invalid integer syntax (`22P02`) and unexpected database failures
 remain distinct from name conflicts. This document records identifiers, not a
 new error mapping implementation.
 
@@ -56,14 +67,17 @@ new error mapping implementation.
 
 The declarative schema was authored first and the initial migration authored
 manually from it. Existing catalog reconciliation covers every introduced
-feature: tables, UUID/numeric/text/boolean columns, defaults, nullability, checks,
-expression indexes and SQL routine definition/configuration. No additional object
+feature: tables, bigint/numeric/text/boolean columns, identity sequences and their
+ownership, defaults, nullability, checks, expression indexes and SQL routine
+definition/configuration. No additional object
 kind is needed. Comments are reviewed separately from semantic parity.
 
-`supabase/seed.sql` uses stable synthetic UUIDs, active/inactive examples and 0,
+`supabase/seed.sql` uses stable synthetic identities, active/inactive examples and 0,
 100 and 37.25 percentages. The authorized disposable runner applies it twice and
 compares rows. Automatic CLI seeding stays disabled, preventing incidental shared
 project writes.
+The seed explicitly overrides identity values only for these fixtures and aligns
+the identity sequence so subsequent generated inserts cannot collide with them.
 
 SQL assertions cover required fields, whitespace normalization, case, unchanged
 names, edits, state transitions, exact boundaries and invalid precision/range.
@@ -82,4 +96,7 @@ fixture. No reset or shared project write is involved.
 
 Sources: PostgreSQL [numeric types](https://www.postgresql.org/docs/current/datatype-numeric.html),
 [expression indexes](https://www.postgresql.org/docs/current/indexes-expressional.html),
-and [unique index concurrency](https://www.postgresql.org/docs/current/index-unique-checks.html).
+[unique index concurrency](https://www.postgresql.org/docs/current/index-unique-checks.html),
+and [identity columns](https://www.postgresql.org/docs/current/ddl-identity-columns.html);
+Supabase [primary key guidance](https://supabase.com/docs/guides/database/tables#primary-keys)
+and [identity recommendation](https://github.com/supabase/agent-skills/blob/main/skills/supabase-postgres-best-practices/references/schema-primary-keys.md).
