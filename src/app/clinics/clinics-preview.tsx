@@ -84,7 +84,7 @@ function ClinicForm({
     clinic ? percentageFormat.format(clinic.percentage) : "",
   );
 
-  const nameError = "Introduce el nombre de la clÃ­nica.";
+  const nameError = "Introduce el nombre de la clínica.";
   const percentageError =
     "Introduce un porcentaje entre 0 y 100 con hasta dos decimales.";
   const deletion = source.deletion;
@@ -126,7 +126,7 @@ function ClinicForm({
         onSaved(result.clinic);
         break;
       case "duplicate-name":
-        setErrors({ name: "Ya existe una clÃ­nica con ese nombre." });
+        setErrors({ name: "Ya existe una clínica con ese nombre." });
         break;
       case "invalid":
         setErrors({
@@ -158,7 +158,7 @@ function ClinicForm({
         break;
       case "failed":
         setDeleteError(
-          "La clÃ­nica se conserva. Vuelve a pulsar Eliminar clÃ­nica para reintentar.",
+          "La clínica se conserva. Vuelve a pulsar Eliminar clínica para reintentar.",
         );
         break;
     }
@@ -170,7 +170,7 @@ function ClinicForm({
       <FormPanel
         presentation="modal"
         open={deleteStage !== "confirm"}
-        title={clinic ? "Editar clÃ­nica" : "Nueva clÃ­nica"}
+        title={clinic ? "Editar clínica" : "Nueva clínica"}
         initialFocusRef={
           deleteStage === "return"
             ? hasLinkedActivity
@@ -186,10 +186,10 @@ function ClinicForm({
       >
         <TextInput
           ref={nameInput}
-          label="Nombre de la clÃ­nica"
+          label="Nombre de la clínica"
           name="name"
           defaultValue={clinic?.name}
-          placeholder="Ej. ClÃ­nica Dental Alameda"
+          placeholder="Ej. Clínica Dental Alameda"
           error={errors.name}
           required
         />
@@ -207,7 +207,7 @@ function ClinicForm({
         />
         <div className="space-y-2">
           <SegmentedControl
-            label="Estado de la clÃ­nica"
+            label="Estado de la clínica"
             name="state"
             options={clinicStates}
             defaultValue={clinic?.active === false ? "inactive" : "active"}
@@ -215,8 +215,8 @@ function ClinicForm({
           />
           <p className="text-label text-on-surface-variant">
             {clinic
-              ? "Desactivar una clÃ­nica conserva su actividad anterior e impide registrar nuevas actividades en ella."
-              : "Las clÃ­nicas nuevas se crean activas."}
+              ? "Desactivar una clínica conserva su actividad anterior e impide registrar nuevas actividades en ella."
+              : "Las clínicas nuevas se crean activas."}
           </p>
         </div>
         {clinic && deletion && (
@@ -227,7 +227,7 @@ function ClinicForm({
                 tabIndex={-1}
                 className="text-label text-on-surface-variant"
               >
-                Esta clÃ­nica tiene actividad registrada y no se puede eliminar.
+                Esta clínica tiene actividad registrada y no se puede eliminar.
               </p>
             ) : (
               <Button
@@ -239,7 +239,7 @@ function ClinicForm({
                   setDeleteStage("confirm");
                 }}
               >
-                Eliminar clÃ­nica
+                Eliminar clínica
               </Button>
             )}
           </div>
@@ -248,17 +248,17 @@ function ClinicForm({
       {clinic && deleteStage === "confirm" && (
         <ConfirmDialog
           open
-          title="Eliminar clÃ­nica"
-          description="Esta acciÃ³n es permanente."
+          title="Eliminar clínica"
+          description="Esta acción es permanente."
           destructive
-          confirmLabel="Eliminar clÃ­nica"
-          pendingLabel="Eliminandoâ€¦"
+          confirmLabel="Eliminar clínica"
+          pendingLabel="Eliminando…"
           error={deleteError}
           onOpenChange={() => setDeleteStage("return")}
           onConfirm={deleteClinic}
         >
           <p className="text-sm leading-6 text-on-surface-variant">
-            ClÃ­nica que se eliminarÃ¡
+            Clínica que se eliminará
             <strong className="block text-on-surface">{clinic.name}</strong>
           </p>
         </ConfirmDialog>
@@ -365,30 +365,26 @@ export function ClinicsPreview({
   return (
     <PageContainer as="main" className="flex-1 space-y-8">
       <PageHeader
-        eyebrow="ConfiguraciÃ³n de centros"
-        title="GestiÃ³n de clÃ­nicas"
-        description="Consulta tus clÃ­nicas y sus porcentajes por defecto. Los cambios de porcentaje se aplican a las actividades nuevas."
+        eyebrow="Configuración de centros"
+        title="Gestión de clínicas"
+        description="Consulta tus clínicas y sus porcentajes por defecto. Los cambios de porcentaje se aplican a las actividades nuevas."
         actions={
           !persistent &&
           clinics.length > 0 && (
             <Button ref={createButton} onClick={() => openForm("new")}>
-              Nueva clÃ­nica
+              Nueva clínica
             </Button>
           )
         }
       />
       {persistent && (
         <p className="text-sm text-on-surface-variant">
-          Consulta de clï¿½nicas guardadas. La creaciï¿½n y ediciï¿½n estarï¿½n
-          disponibles prï¿½ximamente.
+          Consulta de clínicas guardadas. La creación y edición estarán
+          disponibles próximamente.
         </p>
       )}
       {saved?.created && (
-        <Alert
-          title="ClÃ­nica guardada"
-          variant="success"
-          announcement="polite"
-        >
+        <Alert title="Clínica guardada" variant="success" announcement="polite">
           Se guardaron los cambios de {saved.clinic.name}.
         </Alert>
       )}
@@ -396,18 +392,18 @@ export function ClinicsPreview({
         <Alert
           ref={deleteConfirmation}
           tabIndex={-1}
-          title="ClÃ­nica eliminada"
+          title="Clínica eliminada"
           variant="success"
           announcement="polite"
         >
-          Se eliminÃ³ {deleted.name}.
+          Se eliminó {deleted.name}.
         </Alert>
       )}
       {load === null ? (
-        <LoadingState label="Cargando clÃ­nicasâ€¦" variant="region" />
+        <LoadingState label="Cargando clínicas…" variant="region" />
       ) : load.status === "failed" ? (
         <Alert
-          title="No se pudieron cargar las clÃ­nicas"
+          title="No se pudieron cargar las clínicas"
           variant="error"
           announcement="assertive"
           action={{
@@ -418,16 +414,18 @@ export function ClinicsPreview({
             },
           }}
         >
-          Vuelve a intentarlo para consultar tus clÃ­nicas.
+          Vuelve a intentarlo para consultar tus clínicas.
         </Alert>
       ) : clinics.length > 0 ? (
         <section aria-labelledby="clinics-list" className="space-y-4">
           <h2 id="clinics-list" className="font-headline text-title">
-            Todas las clÃ­nicas
+            Todas las clínicas
           </h2>
           {clinics.every((clinic) => !clinic.active) && (
-            <Alert title="Todas las clÃ­nicas estÃ¡n inactivas">
-              Edita una clÃ­nica para volver a activarla.
+            <Alert title="Todas las clínicas están inactivas">
+              {persistent
+                ? "No hay clínicas activas disponibles para registrar nueva actividad."
+                : "Edita una clínica para volver a activarla."}
             </Alert>
           )}
           <ul className="space-y-3">
@@ -475,7 +473,7 @@ export function ClinicsPreview({
                   {saved && !saved.created && saved.clinic.id === clinic.id && (
                     <Alert
                       ref={editConfirmation}
-                      title="ClÃ­nica guardada"
+                      title="Clínica guardada"
                       variant="success"
                       announcement="polite"
                       className="mt-3 scroll-m-4"
@@ -491,9 +489,17 @@ export function ClinicsPreview({
       ) : (
         <EmptyState
           icon={<ClinicIcon />}
-          title="AÃºn no hay clÃ­nicas"
-          explanation="AÃ±ade una clÃ­nica para preparar el registro de actividad."
-          action={{ label: "Nueva clÃ­nica", onClick: () => openForm("new") }}
+          title="Aún no hay clínicas"
+          explanation={
+            persistent
+              ? "Las clínicas guardadas aparecerán aquí."
+              : "Añade una clínica para preparar el registro de actividad."
+          }
+          action={
+            persistent
+              ? undefined
+              : { label: "Nueva clínica", onClick: () => openForm("new") }
+          }
         />
       )}
       {selection && (

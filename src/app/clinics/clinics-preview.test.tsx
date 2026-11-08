@@ -53,12 +53,12 @@ it("retries the initial load under Strict Mode", async () => {
       <ClinicsPreview initialClinics={[clinic]} failure="load-error" />
     </StrictMode>,
   );
-  expect(screen.getByRole("status")).toHaveTextContent("Cargando clÃ­nicas");
+  expect(screen.getByRole("status")).toHaveTextContent("Cargando clínicas");
   expect(await screen.findByRole("alert")).toHaveTextContent(
-    "No se pudieron cargar las clÃ­nicas",
+    "No se pudieron cargar las clínicas",
   );
   await user.click(screen.getByRole("button", { name: "Reintentar" }));
-  expect(screen.getByRole("status")).toHaveTextContent("Cargando clÃ­nicas");
+  expect(screen.getByRole("status")).toHaveTextContent("Cargando clínicas");
   expect(
     await screen.findByRole("heading", { name: clinic.name }),
   ).toBeInTheDocument();
@@ -68,9 +68,9 @@ it("validates beside each field, creates an active clinic at zero, and rejects i
   const user = userEvent.setup();
   render(<ClinicsPreview initialClinics={[]} />);
   await user.click(
-    await screen.findByRole("button", { name: "Nueva clÃ­nica" }),
+    await screen.findByRole("button", { name: "Nueva clínica" }),
   );
-  const name = screen.getByRole("textbox", { name: "Nombre de la clÃ­nica" });
+  const name = screen.getByRole("textbox", { name: "Nombre de la clínica" });
   const percentage = screen.getByRole("textbox", {
     name: "Porcentaje por defecto",
   });
@@ -78,7 +78,7 @@ it("validates beside each field, creates an active clinic at zero, and rejects i
   await user.type(percentage, "100,01");
   await user.click(screen.getByRole("button", { name: "Guardar" }));
   expect(name).toHaveAccessibleDescription(
-    "Introduce el nombre de la clÃ­nica.",
+    "Introduce el nombre de la clínica.",
   );
   expect(percentage).toHaveAccessibleDescription(/hasta dos decimales/);
   await user.type(name, "Dental Uno  ");
@@ -86,18 +86,20 @@ it("validates beside each field, creates an active clinic at zero, and rejects i
   await user.type(percentage, "0");
   await user.click(screen.getByRole("button", { name: "Guardar" }));
   fireEvent.submit(screen.getByRole("form"));
-  expect(screen.getByRole("button", { name: "Guardandoâ€¦" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Guardando…" })).toBeDisabled();
   expect(
     await screen.findByRole("heading", { name: "Dental Uno" }),
   ).toBeInTheDocument();
   expect(screen.getByRole("listitem")).toHaveTextContent("Activa");
   expect(screen.getByRole("listitem")).toHaveTextContent("0,00 %");
-  expect(screen.getByRole("status")).toHaveTextContent("ClÃ­nica guardada");
-  expect(screen.getByRole("button", { name: "Nueva clÃ­nica" })).toHaveFocus();
+  expect(screen.getByRole("status")).toHaveTextContent("Clínica guardada");
+  await waitFor(() =>
+    expect(screen.getByRole("button", { name: "Nueva clínica" })).toHaveFocus(),
+  );
 
-  await user.click(screen.getByRole("button", { name: "Nueva clÃ­nica" }));
+  await user.click(screen.getByRole("button", { name: "Nueva clínica" }));
   await user.type(
-    screen.getByRole("textbox", { name: "Nombre de la clÃ­nica" }),
+    screen.getByRole("textbox", { name: "Nombre de la clínica" }),
     " DENTAL UNO ",
   );
   await user.type(
@@ -106,7 +108,7 @@ it("validates beside each field, creates an active clinic at zero, and rejects i
   );
   await user.click(screen.getByRole("button", { name: "Guardar" }));
   expect(
-    await screen.findByText("Ya existe una clÃ­nica con ese nombre."),
+    await screen.findByText("Ya existe una clínica con ese nombre."),
   ).toBeInTheDocument();
   expect(screen.getAllByRole("listitem")).toHaveLength(1);
 });
@@ -120,7 +122,7 @@ it("cancels edits, retains changes after failure, and saves deactivation and rea
   await user.click(edit);
   let dialog = within(screen.getByRole("dialog"));
   await user.type(
-    dialog.getByRole("textbox", { name: "Nombre de la clÃ­nica" }),
+    dialog.getByRole("textbox", { name: "Nombre de la clínica" }),
     " Cancelled",
   );
   await user.click(dialog.getByRole("radio", { name: "Inactiva" }));
@@ -133,7 +135,7 @@ it("cancels edits, retains changes after failure, and saves deactivation and rea
 
   await user.click(edit);
   dialog = within(screen.getByRole("dialog"));
-  const name = dialog.getByRole("textbox", { name: "Nombre de la clÃ­nica" });
+  const name = dialog.getByRole("textbox", { name: "Nombre de la clínica" });
   const percentage = dialog.getByRole("textbox", {
     name: "Porcentaje por defecto",
   });
@@ -158,21 +160,19 @@ it("cancels edits, retains changes after failure, and saves deactivation and rea
   });
   expect(editUpdated).toHaveFocus();
   const updatedCard = within(screen.getByRole("listitem"));
-  expect(updatedCard.getByRole("status")).toHaveTextContent(
-    "ClÃ­nica guardada",
-  );
+  expect(updatedCard.getByRole("status")).toHaveTextContent("Clínica guardada");
   expect(
-    screen.getByText("Todas las clÃ­nicas estÃ¡n inactivas"),
+    screen.getByText("Todas las clínicas están inactivas"),
   ).toBeInTheDocument();
   expect(screen.getByRole("listitem")).toHaveTextContent("100,00 %");
   await user.click(editUpdated);
   dialog = within(screen.getByRole("dialog"));
   await user.click(dialog.getByRole("radio", { name: "Activa" }));
   await user.click(dialog.getByRole("button", { name: "Guardar" }));
-  expect(await screen.findByText("ClÃ­nica guardada")).toBeInTheDocument();
+  expect(await screen.findByText("Clínica guardada")).toBeInTheDocument();
   expect(screen.getByRole("listitem")).toHaveTextContent("Activa");
   expect(
-    screen.queryByText("Todas las clÃ­nicas estÃ¡n inactivas"),
+    screen.queryByText("Todas las clínicas están inactivas"),
   ).not.toBeInTheDocument();
 });
 
@@ -181,7 +181,7 @@ it.each([
   {
     scenario: "long name",
     savedName:
-      "ClÃ­nica de OdontologÃ­a y CirugÃ­a Bucal de la Alameda y el Centro HistÃ³rico "
+      "Clínica de Odontología y Cirugía Bucal de la Alameda y el Centro Histórico "
         .repeat(20)
         .trim(),
   },
@@ -195,14 +195,14 @@ it.each([
     await user.click(
       await screen.findByRole("button", { name: `Editar ${savedName}` }),
     );
-    const name = screen.getByRole("textbox", { name: "Nombre de la clÃ­nica" });
+    const name = screen.getByRole("textbox", { name: "Nombre de la clínica" });
     await user.type(name, " Centro");
     const deleteButton = screen.getByRole("button", {
-      name: "Eliminar clÃ­nica",
+      name: "Eliminar clínica",
     });
     await user.click(deleteButton);
-    const confirm = screen.getByRole("dialog", { name: "Eliminar clÃ­nica" });
-    expect(confirm).toHaveAccessibleDescription("Esta acciÃ³n es permanente.");
+    const confirm = screen.getByRole("dialog", { name: "Eliminar clínica" });
+    expect(confirm).toHaveAccessibleDescription("Esta acción es permanente.");
     expect(within(confirm).getByText(savedName)).toBeVisible();
     const cancel = within(confirm).getByRole("button", { name: "Cancelar" });
     expect(cancel).toHaveFocus();
@@ -225,17 +225,13 @@ it("explains why a linked clinic cannot be deleted and still allows deactivation
     name: `Editar ${clinic.name}`,
   });
   await user.click(edit);
-  expect(
-    screen.queryByRole("button", { name: "Eliminar clÃ­nica" }),
-  ).toBeNull();
+  expect(screen.queryByRole("button", { name: "Eliminar clínica" })).toBeNull();
   expect(screen.getByText(/tiene actividad registrada/)).toBeInTheDocument();
   await user.click(screen.getByRole("radio", { name: "Inactiva" }));
   await user.click(screen.getByRole("button", { name: "Guardar" }));
-  expect(await screen.findByText("ClÃ­nica guardada")).toBeInTheDocument();
+  expect(await screen.findByText("Clínica guardada")).toBeInTheDocument();
   await user.click(edit);
-  expect(
-    screen.queryByRole("button", { name: "Eliminar clÃ­nica" }),
-  ).toBeNull();
+  expect(screen.queryByRole("button", { name: "Eliminar clínica" })).toBeNull();
   expect(screen.getByRole("radio", { name: "Inactiva" })).toBeChecked();
 });
 
@@ -250,30 +246,30 @@ it("blocks repeat confirmation, preserves the clinic on failure and shows the em
   await user.click(
     await screen.findByRole("button", { name: `Editar ${clinic.name}` }),
   );
-  await user.click(screen.getByRole("button", { name: "Eliminar clÃ­nica" }));
+  await user.click(screen.getByRole("button", { name: "Eliminar clínica" }));
   const confirm = within(
-    screen.getByRole("dialog", { name: "Eliminar clÃ­nica" }),
+    screen.getByRole("dialog", { name: "Eliminar clínica" }),
   );
   await user.dblClick(
-    confirm.getByRole("button", { name: "Eliminar clÃ­nica" }),
+    confirm.getByRole("button", { name: "Eliminar clínica" }),
   );
-  expect(confirm.getByRole("button", { name: "Eliminandoâ€¦" })).toBeDisabled();
+  expect(confirm.getByRole("button", { name: "Eliminando…" })).toBeDisabled();
   expect(confirm.getByRole("button", { name: "Cancelar" })).toBeDisabled();
   expect(await confirm.findByRole("alert")).toHaveTextContent(
-    "La clÃ­nica se conserva",
+    "La clínica se conserva",
   );
   expect(
     screen.getByRole("heading", { name: clinic.name }),
   ).toBeInTheDocument();
-  await user.click(confirm.getByRole("button", { name: "Eliminar clÃ­nica" }));
+  await user.click(confirm.getByRole("button", { name: "Eliminar clínica" }));
   expect(
-    await screen.findByRole("heading", { name: "AÃºn no hay clÃ­nicas" }),
+    await screen.findByRole("heading", { name: "Aún no hay clínicas" }),
   ).toBeInTheDocument();
   expect(screen.getByRole("status")).toHaveTextContent(
-    `Se eliminÃ³ ${clinic.name}.`,
+    `Se eliminó ${clinic.name}.`,
   );
   expect(
-    screen.getByRole("group", { name: "ClÃ­nica eliminada" }),
+    screen.getByRole("group", { name: "Clínica eliminada" }),
   ).toHaveFocus();
   expect(screen.queryByRole("dialog")).toBeNull();
 });
