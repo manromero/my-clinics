@@ -24,6 +24,10 @@ Replace the reused personal-token CI secret only after the replacement is verifi
 do not revoke the user's personal CLI token or disrupt manual login without
 explicit approval.
 
+Update the existing Supabase guide only with current configuration, supported
+permission limits and renewal/recovery steps. Keep credential transition history,
+future plans and execution evidence in the task/PR rather than the operating guide.
+
 This is operational credential configuration, not application authentication or a
 new database feature. Do not change product behavior, add paid services, broaden
 database targets, deploy to shared development/production, or put secrets in chat,
