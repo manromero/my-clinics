@@ -1,6 +1,6 @@
 # Task 05 — Define and validate the clinic database model
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -157,3 +157,12 @@ Task/index are `done` for agent delivery in
 and exact-head CI evidence for the completion-tracking commit are retained in
 the PR before handoff. Human acceptance and manual merge remain pending.
 Correction rounds used: 0 of 2. No unresolved blockers or optional findings.
+
+## Documentation cleanup — 2026-11-08
+
+The user requested removing the separate model document as unnecessary detail.
+Keep only these error identifiers for later mapping: `23505` with
+`clinics_name_key_unique` means duplicate name; `23514` with
+`clinics_name_nonblank`, `clinics_percentage_range` or
+`clinics_percentage_precision` identifies the invalid field. Review of this
+documentation-only update is in progress; correction rounds remain 0 of 2.
