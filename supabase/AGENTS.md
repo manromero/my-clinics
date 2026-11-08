@@ -8,7 +8,7 @@ local PostgreSQL, or a shadow database on this workstation.
 - `migrations/<timestamp>_<name>.sql`: reviewed, append-only change history.
   CLI 3.0.0 declarative `sync` is local-only; author SQL manually until a separately
   verified remote-only generation method is approved. Never imply generation ran.
-- `seed.sql`: deterministic synthetic data only; currently empty and disabled.
+- `seed.sql`: deterministic synthetic data only; automatic CLI seeding is disabled.
 - `tests/`: SQL assertions executed transactionally by `pnpm db:validate`.
 - `validation/`: remote catalog reconciliation and test-only upgrade fixtures;
   never deploy the fixtures as application migrations.

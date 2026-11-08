@@ -115,9 +115,10 @@ pnpm supabase migration new describe_change
 Author its SQL manually and review it alongside the desired schema. Do not run the
 schema definition files directly against an existing database. Migrations describe
 incremental changes and data preservation; desired definitions describe the end
-state. No no-op migration is needed for the current empty application baseline.
-`supabase/seed.sql` is comment-only and disabled; it must not be applied remotely
-by default. Database tests live in `supabase/tests/`; generated types live at
+state. Task 05 introduces the first clinic migration from the empty Task 03/04
+baseline. `supabase/seed.sql` contains deterministic synthetic clinic examples;
+automatic seeding remains disabled and it must not be applied remotely by
+default. Database tests live in `supabase/tests/`; generated types live at
 `src/lib/supabase/database.types.ts`.
 
 CLI 3.0.0 `db schema declarative sync --help` reports **Local only**, needs a shadow
@@ -204,10 +205,12 @@ SQL in `supabase/validation/upgrade/` creates a separate fixture schema, inserts
 synthetic row, commits a subsequent schema/data migration, and verifies the original
 row plus the expected change without reset. The fixture is then removed. No
 production migration or business table is introduced to demonstrate tooling.
-Future schema tasks must add actual earlier migration/data baselines and preservation
-assertions alongside this infrastructure smoke scenario, including their own
-production migration upgrade coverage; this fixture alone does not prove those
-future changes safe.
+Task 05 additionally validates the actual clinic migration from its previous
+empty baseline with committed synthetic data in a separate test-only schema,
+as described in the [clinic model](clinic-database-model.md#validation-and-upgrades).
+Future schema tasks must continue adding their actual earlier migration/data
+baselines and preservation assertions; the infrastructure fixture alone does not
+prove application migrations safe.
 
 Negative controls execute invalid migration SQL, introduce an extra `public` table
 and deliberately change the expected type content. The same replay/parity/freshness
