@@ -162,7 +162,12 @@ Correction rounds used: 0 of 2. No unresolved blockers or optional findings.
 
 The user requested removing the separate model document as unnecessary detail
 and keeping `docs/supabase.md` focused on operations rather than task history or
-future implementation plans.
+future implementation plans. The requested audit covered all 44 task definitions:
+completed records were preserved; pending Tasks 06–08 needed no change; Tasks 09
+and 10 now explicitly keep durable procedures in the existing guide and execution
+history in task/PR records. Matching chronology was removed from the architecture
+guide and database instructions. The implementer checked formatting, diff
+whitespace and 254 local links across 49 documents at `238f1f3`.
 Keep only these error identifiers for later mapping: `23505` with
 `clinics_name_key_unique` means duplicate name; `23514` with
 `clinics_name_nonblank`, `clinics_percentage_range` or
