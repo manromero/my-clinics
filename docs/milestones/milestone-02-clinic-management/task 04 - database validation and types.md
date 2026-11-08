@@ -165,3 +165,20 @@ pending; the prior automatic approval rejection has not been bypassed. No second
 correction round is needed for code at this point. Task/index remain
 `in_progress`; human acceptance and manual merge are pending. Correction rounds
 used: 1 of 2. Task 10 records dedicated credentials as future pending work.
+
+## User-configured CI credential — 2026-11-08
+
+The user configured `SUPABASE_ACCESS_TOKEN` directly in GitHub Actions. Only the
+secret name was checked; no CLI credential extraction or token upload occurred.
+This resolves the previous missing-secret prerequisite and supersedes the pending
+request to upload the personal CLI token.
+
+[Hosted CI run 42470527981](https://github.com/manromero/my-clinics/actions/runs/42470527981)
+at `3fe4e5d996c30f0cea0cc62ed4ff02350e342a29` passed tooling checks but failed
+the initial organization lookup with HTTP 403. No project was created and no
+cleanup was needed. The scoped token needs `Organization Settings` Read
+(`organization_admin_read`) and access to organization `njnmfutclorywskqrftd`;
+the response alone does not distinguish a missing permission from an excluded
+organization. The user has been asked to verify both and update the GitHub secret
+if necessary. R1 remains open; task/index stay `in_progress`, PR stays draft.
+No code changes or additional correction rounds were made; count remains 1 of 2.
