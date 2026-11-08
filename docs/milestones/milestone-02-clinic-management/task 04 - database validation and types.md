@@ -1,6 +1,6 @@
 # Task 04 — Validate migrations and generated database types
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -182,3 +182,29 @@ the response alone does not distinguish a missing permission from an excluded
 organization. The user has been asked to verify both and update the GitHub secret
 if necessary. R1 remains open; task/index stay `in_progress`, PR stays draft.
 No code changes or additional correction rounds were made; count remains 1 of 2.
+
+## Completed validation and independent review — 2026-11-08
+
+The user corrected the dedicated GitHub secret's organization scope.
+[CI run 42490668690](https://github.com/manromero/my-clinics/actions/runs/42490668690)
+passed both tooling and hosted jobs at reviewed head
+`25369032b9b4426ab1b81ce0025c9ea1e7b969a6`. The reviewer independently inspected
+the exact head, jobs and complete execution logs and closed R1. R2/R3 remain fixed;
+no blocking or optional findings remain. Earlier blocked records above are
+historical and superseded by this successful verification.
+
+Acceptance coverage includes clean replay, deterministic generated types and
+freshness, SQL tests, existing-data upgrade preservation, migration/schema/type
+negative controls and recovery, catalog regressions and declarative/history
+parity. Tooling tests (2/2), lint, typecheck and formatting passed in CI. Both
+disposable targets were deleted and absence verified; the shared development
+project was not mutated. Review verified CI evidence rather than repeating the
+hosted lifecycle or independently querying Supabase. UI review and production
+build do not apply.
+
+Task and milestone index are `done` for agent delivery through
+[PR #40](https://github.com/manromero/my-clinics/pull/40). Final tracking changes
+receive focused review and final-head CI verification before handoff. Human
+acceptance and manual merge remain pending. Correction rounds used: 1 of 2.
+Task 10 remains pending and covers the remaining credential configuration and
+rotation follow-up; this CI setup does not claim that whole task is complete.
