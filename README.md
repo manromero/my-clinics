@@ -19,7 +19,8 @@ Open [localhost:3000](http://localhost:3000).
 
 Follow the [Supabase setup guide](docs/supabase.md). Database development uses
 hosted development projects with synthetic data; Docker and a local Supabase
-runtime are not required. The application is not connected to Supabase yet.
+runtime are not required. Configure the root environment variables to display
+saved clinics at `/clinics`. See [Persistent clinic listing](docs/supabase.md#persistent-clinic-listing).
 
 ## Styling
 
