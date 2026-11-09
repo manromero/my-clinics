@@ -304,7 +304,10 @@ Configure `MYCLINICS_DATABASE_URL` only in the server environment (an ignored
 `.env.local` for an explicitly authorized development connection). Obtain the
 connection string from the project's **Connect** dialog. For a persistent Node
 server on IPv4, choose the shared session pooler on port 5432; direct connections
-require IPv6 on Free projects. The client verifies TLS, disables prepared
+require IPv6 on Free projects. Download the public root CA from **Database
+Settings > SSL Configuration**. Add `sslrootcert` to the database URL query
+with the URL-encoded absolute path to the downloaded PEM file. The server
+uses `verify-full` to check the certificate chain and hostname, disables prepared
 statements, bounds its pool and casts bigint IDs to text before JavaScript sees
 them. Generated `Database` types define the infrastructure row fields; the
 transport ID override preserves values above `Number.MAX_SAFE_INTEGER`.
@@ -315,7 +318,11 @@ explicitly configured application connection; disposable validation does not
 configure it.
 
 Run authorized `pnpm clinics:validate`, or dispatch database validation with
-`mode: clinics` to use the existing CI secret. This creates one Free disposable
+`mode: clinics` to use the existing CI secret. For a local validation run, set
+`MYCLINICS_SUPABASE_CA_FILE` to the downloaded PEM path. CI downloads the same
+[public production CA](https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt)
+published by the Supabase Dashboard and checks its SHA-256 before use. The CA
+is scoped to the PostgreSQL connection. This creates one Free disposable
 target, disables and verifies its Data API, replays migrations and sets up synthetic
 states. The production application reads over real TLS PostgreSQL through the
 platform-provided session pooler. Management SQL is used only for test setup.

@@ -47,6 +47,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test && pnpm build
         if: inputs.mode == 'clinics'
+      - name: Fetch and verify the Supabase PostgreSQL CA
+        if: inputs.mode == 'clinics'
+        run: |
+          ca_file="$RUNNER_TEMP/supabase-prod-ca-2021.crt"
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --connect-timeout 10 --max-time 45 \
+            --output "$ca_file" 'https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt'
+          printf '%s  %s\n' '700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7' "$ca_file" | sha256sum --check
       - name: Validate authorized disposable hosted targets
         run: |
           if [ "${{ inputs.mode }}" = "clinics" ]; then pnpm clinics:validate; else pnpm db:${{ inputs.mode || 'validate' }}; fi
@@ -54,6 +61,7 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           MYCLINICS_DISPOSABLE_AUTHORIZATION: njnmfutclorywskqrftd
           MYCLINICS_EVIDENCE_DIR: ${{ runner.temp }}/clinics-evidence
+          MYCLINICS_SUPABASE_CA_FILE: ${{ runner.temp }}/supabase-prod-ca-2021.crt
       - name: Upload clinic integration screenshots and metadata
         if: always() && inputs.mode == 'clinics'
         uses: actions/upload-artifact@v4

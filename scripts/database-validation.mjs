@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { readFile, readdir, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { format } from "prettier";
 import { catalogRegressions } from "./database-catalog-regressions.mjs";
@@ -292,6 +293,15 @@ export async function main(mode = process.argv[2]) {
     organization,
     "Explicit disposable-target authorization is required",
   );
+  const caFile = process.env.MYCLINICS_SUPABASE_CA_FILE;
+  if (mode === "clinics") {
+    assert.ok(caFile, "Set MYCLINICS_SUPABASE_CA_FILE to the Supabase root CA");
+    assert.match(
+      await readFile(caFile, "utf8"),
+      /^-----BEGIN CERTIFICATE-----\r?\n/,
+      "Supabase root CA must be a PEM certificate",
+    );
+  }
   const org = await api(`/organizations/${organization}`);
   assert.equal(
     org.plan,
@@ -330,6 +340,7 @@ export async function main(mode = process.argv[2]) {
         ref,
         password,
         poolers,
+        caFile: resolve(caFile),
         query: (sql) => query(ref, sql),
       });
     });

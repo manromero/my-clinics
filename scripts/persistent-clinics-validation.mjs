@@ -12,6 +12,7 @@ export async function validatePersistentClinics({
   ref,
   password,
   poolers,
+  caFile,
   query,
 }) {
   // Use the platform-provided host rather than guessing a pooler from region.
@@ -28,6 +29,7 @@ export async function validatePersistentClinics({
   );
   connection.password = password;
   connection.port = "5432"; // Direct PostgreSQL or IPv4 session pooling.
+  connection.searchParams.set("sslrootcert", caFile);
   const probe = postgres(connection.toString(), {
     ssl: "verify-full",
     prepare: false,
@@ -37,11 +39,10 @@ export async function validatePersistentClinics({
   try {
     for (let attempt = 0; attempt < 7; attempt++) {
       try {
-        const [result] =
-          await probe`select ssl from pg_stat_ssl where pid=pg_backend_pid()`;
-        assert.equal(result.ssl, true, "PostgreSQL must use TLS");
+        const [result] = await probe`select 1 as connected`;
+        assert.equal(result.connected, 1);
         console.log(
-          `Verified ${pooled ? "session pooler" : "direct"} PostgreSQL TLS connectivity`,
+          `Verified PostgreSQL connectivity with certificate and hostname checks (${pooled ? "session pooler" : "direct"})`,
         );
         break;
       } catch (error) {
@@ -56,9 +57,7 @@ export async function validatePersistentClinics({
           await pause(5000);
           continue;
         }
-        assert.fail(
-          `PostgreSQL connectivity unavailable (${code}); verified pooler metadata may be required`,
-        );
+        assert.fail(`PostgreSQL connectivity unavailable (${code})`);
       }
     }
   } finally {
