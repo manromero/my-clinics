@@ -1,6 +1,6 @@
 # Task 06 — List persistent clinics through the service boundary
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -210,3 +210,17 @@ Next.js environment guidance and passed formatting, diff and five local link
 checks. Application, database and visual evidence from the reviewed implementation
 still applies. This follow-up used no additional correction round. Human
 acceptance and manual merge remain pending in PR #42.
+
+## Backend organization follow-up — 2026-11-09
+
+The user requested the proposed backend organization in the open PR. Move the
+persistent clinic service, Supabase repository and its tests, and PostgreSQL
+client under private folders in `src/app/api/`. Keep the public endpoint, shared
+clinic domain and memory previews, generated type location, environment setup,
+and database behavior. Document the folder convention. The follow-up starts
+from `c1a8ed105493dc8f222ee23a817ccd90566242b6`; PR #42 retains its original
+base `67605dcf49f7d48922e683aeca467ea863ec8cd7`.
+
+Revalidate imports, application checks, production build and the existing clinic
+behavior, including the hosted entry point on the authorized disposable target.
+Separate implementation and review are required before returning to `done`.
