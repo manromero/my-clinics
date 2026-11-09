@@ -8,10 +8,11 @@ Persist clinic edits and state changes without losing recoverable form state.
 
 ## Scope
 
-Extend the existing repository, service and server entry point with updates and
-connect the edit form, including active state. Retain the in-memory preview under
-the same service. Use hosted development synthetic data only, with Data API disabled. Persistent deletion is separately
-scoped; authentication, authorization, RLS and permissions remain the final gate.
+Add an edit form, including active state, and connect it to the Supabase Data API
+through Next.js server code. Use the
+[hosted synthetic development exception](../../supabase.md#synthetic-development-rollout).
+Persistent deletion is separately scoped. Authentication, authorization, RLS and
+permissions remain the final gate.
 
 ## Dependencies
 
@@ -31,7 +32,7 @@ scoped; authentication, authorization, RLS and permissions remain the final gate
   retry feedback. Repeated submissions are prevented and success is shown only
   after persistence. A missing/deleted record produces an explicit recoverable
   outcome rather than a false success.
-- All updates use the Task 06 service boundary. Changing defaults does not rewrite
+- All updates use the typed Supabase client on the server. Changing defaults does not rewrite
   historical data. Persistent deletion remains unavailable until its own rule can
   be enforced against activity references.
 
@@ -39,8 +40,8 @@ scoped; authentication, authorization, RLS and permissions remain the final gate
 
 Follow [milestone validation](readme.md#delivery-and-validation). Test updates,
 normalization, percentage bounds/precision, conflicts, missing records, cancellation
-and failure/retry with hosted development Supabase. Run database/type checks and preview
-regressions as applicable. Verify edit, deactivate, reactivate, cancel and retry
+and failure/retry with hosted development Supabase. Run database/type checks as
+applicable. Verify edit, deactivate, reactivate, cancel and retry
 on desktop/mobile against S02 and capture evidence. Run application checks and
 production build. Security acceptance remains pending the final task.
 
