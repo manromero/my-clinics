@@ -300,17 +300,24 @@ unavailable until their assigned tasks. Explicit `?preview=default`, `empty`,
 `all-inactive`, `load-error`, `save-error` and `delete-error` scenarios use memory
 through the same service and do not write to PostgreSQL.
 
-Configure `MYCLINICS_DATABASE_URL` only in the server environment (an ignored
-`.env.local` for an explicitly authorized development connection). Obtain the
-connection string from the project's **Connect** dialog. For a persistent Node
-server on IPv4, choose the shared session pooler on port 5432; direct connections
-require IPv6 on Free projects. Download the public root CA from **Database
-Settings > SSL Configuration**. Add `sslrootcert` to the database URL query
-with the URL-encoded absolute path to the downloaded PEM file. The server
-uses `verify-full` to check the certificate chain and hostname, disables prepared
-statements, bounds its pool and casts bigint IDs to text before JavaScript sees
-them. Generated `Database` types define the infrastructure row fields; the
-transport ID override preserves values above `Number.MAX_SAFE_INTEGER`.
+For local development, copy the [root template](../.env.example) to `.env.local`
+in the repository root if that file is missing. Set `MYCLINICS_DATABASE_URL`
+in the ignored `.env.local` using the connection string from the authorized
+Supabase project's **Connect** dialog. On a host, set the same variable in the
+hosting provider's server environment settings and make the CA file available to
+the server process.
+
+On IPv4, choose the shared session pooler on port 5432 for a persistent Node
+server. Direct connections require IPv6 on Free projects. Download the public
+root CA from **Database Settings > SSL Configuration**. Add `sslrootcert` to the
+database URL query with the URL-encoded absolute path to the PEM file on the
+machine running the server.
+
+The server uses `verify-full` to check the certificate chain and hostname. It
+disables prepared statements, bounds its pool and casts bigint IDs to text before
+JavaScript sees them. Generated `Database` types define the infrastructure row
+fields. The transport ID override preserves values above
+`Number.MAX_SAFE_INTEGER`.
 A missing connection or a transport/mapping error returns a generic failure with
 retry, without credentials or database errors. Do not use a Management API token
 as an application database connection. Shared development still requires its own
