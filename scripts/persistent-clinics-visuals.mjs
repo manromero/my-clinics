@@ -122,11 +122,12 @@ export async function chromeClinicChecks({ output, query, seed, head }) {
         });
       };
       const navigate = async (suffix = "") => {
+        await evaluate("window.myclinicsPreviousDocument = true");
         await send("Page.navigate", {
           url: `http://127.0.0.1:3106/clinics${suffix}`,
         });
         await wait(
-          "document.readyState==='complete' && document.querySelector('main') && location.pathname==='/clinics'",
+          `!window.myclinicsPreviousDocument && document.readyState==='complete' && document.querySelector('main') && location.pathname==='/clinics' && location.search===${JSON.stringify(suffix)}`,
         );
       };
       await query("truncate public.clinics restart identity");
@@ -246,6 +247,19 @@ export async function chromeClinicChecks({ output, query, seed, head }) {
       else child.once("exit", resolve);
     });
     // profile was created by mkdtemp under the OS temp directory in this call.
-    await rm(profile, { recursive: true, force: true });
+    try {
+      await rm(profile, {
+        recursive: true,
+        force: true,
+        maxRetries: 10,
+        retryDelay: 150,
+      });
+      console.log("Chrome temporary profile removed");
+    } catch (error) {
+      const code = /^[A-Z0-9_]+$/.test(error.code ?? "")
+        ? error.code
+        : "UNKNOWN";
+      assert.fail(`Chrome temporary profile cleanup failed (${code})`);
+    }
   }
 }

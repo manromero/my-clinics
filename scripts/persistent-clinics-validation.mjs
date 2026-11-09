@@ -133,14 +133,6 @@ export async function validatePersistentClinics({
     console.log(
       `Actual PostgreSQL listing verified with TLS; exact bigint ID, saved reload and unsupported writes passed (${ref})`,
     );
-    await chromeClinicChecks({
-      output,
-      query,
-      seed,
-      head: execFileSync("git", ["rev-parse", "HEAD"], {
-        encoding: "utf8",
-      }).trim(),
-    });
     async function inspect(folder) {
       for (const item of await readdir(folder, { withFileTypes: true })) {
         const path = join(folder, item.name);
@@ -164,10 +156,26 @@ export async function validatePersistentClinics({
         }
       }
     }
-    await inspect(".next/static");
+    try {
+      await inspect(".next/static");
+    } catch (error) {
+      if (error instanceof assert.AssertionError) throw error;
+      const code = /^[A-Z0-9_]+$/.test(error.code ?? "")
+        ? error.code
+        : "UNKNOWN";
+      assert.fail(`Production browser bundle inspection failed (${code})`);
+    }
     console.log(
       "Production browser bundles contain no connection secret, SQL, or privileged setup",
     );
+    await chromeClinicChecks({
+      output,
+      query,
+      seed,
+      head: execFileSync("git", ["rev-parse", "HEAD"], {
+        encoding: "utf8",
+      }).trim(),
+    });
   } finally {
     server.kill();
     await new Promise((resolve) => {
