@@ -137,3 +137,7 @@ For the current follow-up, the user chose to defer Auth and limit anonymous
 listing to an isolated temporary project containing synthetic clinics. Shared
 development keeps the Data API disabled. Task 09 remains the access gate for
 non-test use.
+
+The user then chose the existing shared development project `my-clinics` for
+anonymous, read-only testing with synthetic data. This supersedes the isolated
+project choice. Auth and non-test access remain in Task 09.

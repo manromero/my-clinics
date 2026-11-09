@@ -281,3 +281,22 @@ writes before enabling the temporary Data API. Confirm the application lists
 synthetic rows from that API. The local project URL and publishable key may point
 to the temporary target for the user's test. Retain the project until the user
 finishes testing, then remove it through a separately verified cleanup operation.
+
+### Shared development test decision
+
+The user superseded the separate temporary project decision and authorized
+anonymous read-only listing on `my-clinics` (`lvqbrjybwstvdhaxyxyn`) while it
+contains synthetic data. A read-only inspection verified that `public.clinics`
+is the only public table and its three rows match the synthetic seed. Do not
+provision a retained temporary project for the user. Task 09 will replace the
+anonymous policy with authenticated access.
+
+Implement the development read policy in the declarative schema and an
+append-only migration. Enable RLS and grant anonymous SELECT on clinics only.
+Deny anonymous writes and remove inherited application access to unrelated
+clinic objects. Browser configuration uses the project URL and publishable
+key. The coordinator applies the reviewed migration to the verified project
+before enabling the Data API for the public schema, with automatic exposure
+of new tables disabled. Verify the migration and three rows, actual REST
+listing, denied writes and local browser behavior. Keep synthetic data only
+until Task 09 closes this temporary access path.
