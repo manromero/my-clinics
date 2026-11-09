@@ -295,20 +295,17 @@ see [Bun certificate support](https://bun.sh/docs/runtime/environment-variables)
 
 ## Persistent clinic listing
 
-`/clinics` lists saved clinics through the Supabase Data API in the browser.
-PostgreSQL grants and row-level security (RLS) govern direct requests. The
-screen lists clinics and offers retry. The memory previews remain separate and
-need no Supabase connection. Use `?preview=default`, `empty`, `all-inactive`,
-`load-error`, `save-error` or `delete-error` for those synthetic scenarios.
+`/clinics` lists saved clinics through the Supabase Data API in a Next.js
+Server Component. It follows the [Supabase Next.js quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/nextjs#7-query-supabase-data-from-nextjs)
+query pattern. PostgreSQL grants and row-level security (RLS) govern Data API
+requests. The screen lists clinics and offers retry.
 
 Copy the [root template](../.env.example) to an ignored root `.env.local` if
 it does not exist. Set `NEXT_PUBLIC_SUPABASE_URL` to the approved development
 project URL and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to its
-`sb_publishable_` key. The same public variables can be supplied at build time
-on an approved host when public deployment is authorized. Use only the
-publishable key in the browser. Keep Management API tokens, database passwords
-and Supabase secret keys in trusted operator settings. The browser listing
-requires no PostgreSQL URL or CA file.
+`sb_publishable_` key. Supply the same variables to Next.js on an approved
+host when public deployment is authorized. Keep Management API tokens,
+database passwords and Supabase secret keys in trusted operator settings.
 
 ### Synthetic development rollout
 
@@ -332,7 +329,8 @@ also support synthetic insert, update and deletion requests.
    enabling the Data API on the named shared target.
 3. Enable the Data API for the public schema on that target and keep automatic
    exposure of new tables disabled. Verify direct REST listing with the
-   publishable key and confirm the local app displays the three synthetic rows.
+   publishable key and confirm the local Server Component displays the three
+   synthetic rows.
    Verify access limitations with the SQL role tests and record actual HTTP
    results separately. Leave existing synthetic rows untouched during rollout
    verification unless a separate probe mutation is authorized.
@@ -345,6 +343,6 @@ also support synthetic insert, update and deletion requests.
 Authorized `pnpm db:validate` uses disposable projects with the Data API
 still disabled. It verifies replay, schema parity, committed type freshness,
 upgrade preservation, and anonymous CRUD and privilege limits under real SQL
-roles. The browser tests use mocked Data API responses for request construction
-and UI behavior. The PostgreSQL and mocked tests do not substitute for the live
-REST and local browser checks on the authorized shared project.
+roles. The application unit tests verify the SDK request and row mapping with
+controlled HTTP responses. Live REST and local browser checks on the approved
+shared project verify the running Server Component.

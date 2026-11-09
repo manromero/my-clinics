@@ -18,24 +18,27 @@ Keep routes and layouts in `src/app`. Treat `src/lib` as the application's share
 src/
   app/
     clinics/
+      page.tsx
+      saved-clinics.tsx
+      list-clinics.ts
     layout.tsx
     globals.css
     page.tsx
   lib/
-    clinics/browser-clinic-source.ts
+    clinics/
     components/
-    supabase/browser-client.ts
+    supabase/server-client.ts
     supabase/database.types.ts
 ```
 
 Use one folder per shared component, for example `src/lib/components/button/button.tsx` with `button.test.tsx` beside it. Keep catalogue specimens in the corresponding `src/app/components/<slug>` folder. Catalogue pages and specimens are tested live rather than with unit tests; reusable components retain their unit tests.
 
-| Location                                          | Responsibility                                                       | Examples                                                      |
-| ------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------- |
-| `src/app`                                         | Routing, layouts, loading and error boundaries, and page composition | Clinic list route                                             |
-| Route-local `_components` and `_lib`, when needed | UI and helpers used by a single route                                | Route-specific filter panel                                   |
-| `src/lib/components`                              | Components reused across screens                                     | Button, clinic selector, navigation                           |
-| `src/lib`                                         | Shared business logic, utilities, and contracts                      | Fee calculations, date formatting, clinic repository contract |
+| Location                                          | Responsibility                                                       | Examples                                                   |
+| ------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `src/app`                                         | Routing, layouts, loading and error boundaries, and page composition | Clinic list route                                          |
+| Route-local `_components` and `_lib`, when needed | UI and helpers used by a single route                                | Route-specific filter panel                                |
+| `src/lib/components`                              | Components reused across screens                                     | Button, clinic selector, navigation                        |
+| `src/lib`                                         | Shared business logic, utilities, and contracts                      | Fee calculations, date formatting, clinic percentage rules |
 
 Start with route-local code for a small screen. Move reusable logic or UI into the shared library when it serves multiple screens. Keep related types and helpers close to the code that uses them.
 
@@ -46,20 +49,17 @@ desired schema SQL, reviewed migration history, synthetic seeds and database tes
 The [Supabase guide](supabase.md) covers hosted setup and operating procedures;
 [database agent rules](../supabase/AGENTS.md) govern automated changes.
 
-Generated database types live in `src/lib/supabase/database.types.ts`. Shared
-clinic types, service rules, the repository contract, and the memory preview
-implementation live in `src/lib/clinics/`.
+The Supabase client in `src/lib/supabase/server-client.ts` uses the project's
+publishable key and generated types from `src/lib/supabase/database.types.ts`.
+The Clinics Server Component queries the Data API at request time. The query and
+row mapping live next to the route in `src/app/clinics/list-clinics.ts` and cast
+bigint IDs to text before transport. Suspense streams the loading state and the
+retry button refreshes the route.
 
-The browser Supabase client lives in `src/lib/supabase/browser-client.ts` and
-uses the project's publishable key. PostgreSQL grants and row-level security
-control access to the Data API. The approved development policy allows anonymous
-access to the synthetic clinic table until Task 09 adds authentication and
-authorization. The Clinics screen exposes listing and retry for saved clinics.
-
-Keep clinic Data API queries and row mapping in
-`src/lib/clinics/browser-clinic-source.ts`. This module implements the shared
-list contract and preserves bigint IDs as strings by casting in the Data API
-selection. The separate memory previews use the same shared clinic rules.
+PostgreSQL grants and row-level security control access to the Data API. The
+approved development policy allows anonymous access to the synthetic clinic
+table until Task 09 adds authentication and authorization. The Clinics screen
+exposes listing and retry for saved clinics.
 
 ## Component reuse
 

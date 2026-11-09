@@ -1,29 +1,10 @@
-import { parseDecimal } from "./parse-decimal";
+import { parseDecimal } from "@/lib/components/decimal-input/parse-decimal";
 
-type ClinicDetails = { name: string; percentage: number };
-type ClinicChanges = ClinicDetails & { active: boolean };
-
-export type Clinic = ClinicChanges & { id: string };
-
-export type ClinicSaveResult =
-  | { status: "saved"; clinic: Clinic }
-  | { status: "invalid"; field: keyof ClinicDetails }
-  | { status: "duplicate-name" | "failed" };
-
-type ClinicDeletion = {
-  hasLinkedActivity(id: string): boolean;
-  remove(id: string): Promise<{
-    status: "deleted" | "linked-activity" | "failed";
-  }>;
-};
-
-export type ClinicSource = {
-  list(): Promise<
-    { status: "loaded"; clinics: readonly Clinic[] } | { status: "failed" }
-  >;
-  create(details: ClinicDetails): Promise<ClinicSaveResult>;
-  update(id: string, changes: ClinicChanges): Promise<ClinicSaveResult>;
-  deletion?: ClinicDeletion;
+export type Clinic = {
+  id: string;
+  name: string;
+  percentage: number;
+  active: boolean;
 };
 
 export function parseClinicPercentage(raw: string) {

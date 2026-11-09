@@ -1,10 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { describe, expect, it, vi } from "vitest";
 import type { Database } from "@/lib/supabase/database.types";
-import {
-  createBrowserClinicSource,
-  type ClinicRow,
-} from "./browser-clinic-source";
+import { listClinics, type ClinicRow } from "./list-clinics";
 
 const row: ClinicRow = {
   id: "9007199254740993",
@@ -13,8 +10,8 @@ const row: ClinicRow = {
   active: false,
 };
 
-function transport(fetch: typeof globalThis.fetch) {
-  const client = createClient<Database>(
+function testClient(fetch: typeof globalThis.fetch) {
+  return createClient<Database>(
     "https://myclinics.example",
     "sb_publishable_fixture",
     {
@@ -22,7 +19,6 @@ function transport(fetch: typeof globalThis.fetch) {
       global: { fetch },
     },
   );
-  return createBrowserClinicSource(() => client);
 }
 
 function response(data: unknown, status = 200) {
@@ -32,7 +28,7 @@ function response(data: unknown, status = 200) {
   });
 }
 
-describe("Supabase browser clinic source", () => {
+describe("Supabase clinic listing", () => {
   it("uses a publishable key with an exact ID cast and numeric server ordering", async () => {
     const fetch = vi
       .fn<typeof globalThis.fetch>()
@@ -52,18 +48,11 @@ describe("Supabase browser clinic source", () => {
         expect(init?.method).toBe("GET");
         return response([{ ...row, id: "9" }, { ...row, id: "10" }, row]);
       });
-    const source = transport(fetch);
-    expect(await source.list()).toEqual({
-      status: "loaded",
-      clinics: [{ ...row, id: "9" }, { ...row, id: "10" }, row],
-    });
-    expect(await source.create({ name: "Otra", percentage: 20 })).toEqual({
-      status: "failed",
-    });
-    expect(await source.update(row.id, { ...row, active: true })).toEqual({
-      status: "failed",
-    });
-    expect(source.deletion).toBeUndefined();
+    expect(await listClinics(testClient(fetch))).toEqual([
+      { ...row, id: "9" },
+      { ...row, id: "10" },
+      row,
+    ]);
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
@@ -75,14 +64,14 @@ describe("Supabase browser clinic source", () => {
     { percentage: 1.001 },
     { active: null },
   ])("rejects invalid wire DTO %j without a partial list", async (invalid) => {
-    const source = transport(
+    const client = testClient(
       vi.fn().mockResolvedValue(response([row, { ...row, ...invalid }])),
     );
-    expect(await source.list()).toEqual({ status: "failed" });
+    expect(await listClinics(client)).toBeNull();
   });
 
   it("contains API errors and can retry", async () => {
-    const source = transport(
+    const client = testClient(
       vi
         .fn()
         .mockResolvedValueOnce(
@@ -90,7 +79,7 @@ describe("Supabase browser clinic source", () => {
         )
         .mockResolvedValueOnce(response([])),
     );
-    expect(await source.list()).toEqual({ status: "failed" });
-    expect(await source.list()).toEqual({ status: "loaded", clinics: [] });
+    expect(await listClinics(client)).toBeNull();
+    expect(await listClinics(client)).toEqual([]);
   });
 });
