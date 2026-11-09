@@ -176,11 +176,11 @@ async function clinicUpgrade(ref) {
   const position = files.indexOf(clinicMigration);
   assert.ok(position >= 0, "Clinic migration must exist");
   const securityPosition = files.indexOf(
-    "20261109180000_protect_clinic_reads.sql",
+    "20261109220000_allow_synthetic_clinic_access.sql",
   );
   assert.ok(
     securityPosition > position,
-    "Clinic read security must follow the clinic migration",
+    "Clinic development access must follow the clinic migration",
   );
   await replay(ref, files.slice(0, position));
   // The previous public baseline was empty: no pre-existing clinics are possible.
@@ -221,14 +221,14 @@ async function clinicUpgrade(ref) {
   assert.deepEqual(
     await query(ref, list),
     clinicsBefore,
-    "Read security upgrade must preserve clinic rows",
+    "Development access upgrade must preserve clinic rows",
   );
   await query(ref, "drop schema validation_preclinic cascade");
   console.log(
     "Actual clinic migration upgrade from previous empty baseline preserved committed synthetic data",
   );
   console.log(
-    "Actual read security upgrade preserved three existing synthetic clinics",
+    "Actual development access upgrade preserved three existing synthetic clinics",
   );
   return snapshot(ref);
 }
@@ -345,7 +345,7 @@ export async function main(mode = process.argv[2]) {
       );
       await databaseTests(ref);
       console.log(
-        "Clinic grants and RLS verified with SQL role and claim emulation. Data API and Google sign-in were not exercised.",
+        "Clinic development grants, RLS and anonymous CRUD verified with SQL role tests while the Data API was disabled.",
       );
       await clinicConcurrencyTests((sql) => query(ref, sql));
       await clinicNegativeControls(

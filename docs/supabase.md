@@ -12,9 +12,10 @@ workstation; the database and Studio run at Supabase. Desired schemas, migration
 synthetic seeds and tests live in `supabase/`. Supabase's own schemas/extensions
 are platform-managed; do not erase them to reproduce the application schema.
 
-Keep the hosted **Data API disabled** until authentication,
-Ana-only access, RLS and permissions. Disabling it does not restrict SQL credentials
-or replace that security gate. Do not deploy the persistent application publicly.
+Keep the hosted **Data API disabled** until authentication, Ana-only access,
+RLS and permissions have been verified. The user authorized a scoped
+[synthetic development exception](#synthetic-development-rollout) for
+`lvqbrjybwstvdhaxyxyn`. Do not deploy the persistent application publicly.
 Application connections must respect this restriction; integration does not
 authorize enabling the API or bypassing the security prerequisite.
 
@@ -237,7 +238,8 @@ The procedure itself does not authorize remote writes.
 
 1. Obtain approval for the exact project ref, migration set/commit and intended
    changes. Verify name/ref/organization/environment in Dashboard. Ensure Data API
-   remains disabled during pre-security development. Confirm only synthetic data.
+   remains disabled during migration. Confirm only synthetic data. Use the scoped
+   development rollout below for any separately authorized enablement.
 2. Review every pending SQL file, destructive effects, data preservation, seed and
    schema agreement. Complete database validation on an authorized disposable hosted
    target before applying business migrations. Arrange an appropriate backup and
@@ -293,61 +295,56 @@ see [Bun certificate support](https://bun.sh/docs/runtime/environment-variables)
 
 ## Persistent clinic listing
 
-`/clinics` reads the Supabase Data API in the browser after Google sign-in.
-The browser checks access for user feedback. PostgreSQL grants and row-level
-security (RLS) protect saved clinic data. Persistent create, edit, state changes
-and deletion belong to later tasks. Explicit `?preview=default`, `empty`,
-`all-inactive`, `load-error`, `save-error` and `delete-error` scenarios run in
-memory with synthetic records and need no Supabase connection.
+`/clinics` lists saved clinics through the Supabase Data API in the browser.
+PostgreSQL grants and row-level security (RLS) govern direct requests. The
+screen lists clinics and offers retry. The memory previews remain separate and
+need no Supabase connection. Use `?preview=default`, `empty`, `all-inactive`,
+`load-error`, `save-error` or `delete-error` for those synthetic scenarios.
 
-For local development, copy the [root template](../.env.example) to an ignored
-root `.env.local` if it does not exist. Set `NEXT_PUBLIC_SUPABASE_URL` to the
-project URL and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to its `sb_publishable_`
-key. Configure the same two public variables at build time on an approved host.
-Use only the publishable key for the browser. Management API tokens, database
-passwords, Supabase secret keys and Google client secrets belong in trusted
-operator settings. The browser listing requires no database URL or CA file.
+Copy the [root template](../.env.example) to an ignored root `.env.local` if
+it does not exist. Set `NEXT_PUBLIC_SUPABASE_URL` to the approved development
+project URL and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to its
+`sb_publishable_` key. The same public variables can be supplied at build time
+on an approved host when public deployment is authorized. Use only the
+publishable key in the browser. Keep Management API tokens, database passwords
+and Supabase secret keys in trusted operator settings. The browser listing
+requires no PostgreSQL URL or CA file.
 
-### Configure protected read access
+### Synthetic development rollout
 
-Keep the Data API disabled on shared development while preparing this setup.
-Each hosted change requires explicit authorization for the verified target.
+The user authorized anonymous access on `my-clinics` (`lvqbrjybwstvdhaxyxyn`)
+while it holds synthetic clinics. Anyone with the project's publishable key
+can read and change those rows through the API. Keep this project synthetic
+until Task 09 replaces the development policies with authenticated access. Task
+06 exposes only listing and retry in the app. The temporary database grants
+also support synthetic insert, update and deletion requests.
 
-1. Apply the reviewed read-access migration through the [manual migration
-   procedure](#5-manual-migration-application). Verify the existing synthetic
-   rows are preserved, RLS is enabled and only `authenticated` has the clinic
-   table's `SELECT` grant among application roles. The policy requires a
-   non-anonymous signed-in user ID and an admin-managed read marker.
-2. Configure the Google provider in Supabase Auth. In Google Cloud, register the
-   Supabase Auth callback URI from the provider settings. In Supabase Auth, allow
-   the exact application `/login` URLs for authorized environments. Set the
-   appropriate Site URL and disable anonymous sign-ins and unused sign-in
-   providers. The browser exchanges its one-use PKCE code at `/login` and opens
-   Clinics after access is confirmed. Follow the [Google provider setup](https://supabase.com/docs/guides/auth/social-sign-in/auth-google).
-3. Verify Ana's intended Google identity in Supabase Auth after she signs in.
-   In a trusted administrator environment, set `myclinics_clinic_reader` to the
-   JSON boolean `true` in that user's `app_metadata`. Use the verified Auth user
-   ID and [the Supabase Admin API](https://supabase.com/docs/reference/javascript/auth-admin-updateuserbyid).
-   Keep existing metadata and confirm the marker is present only on Ana's account.
-   Ask Ana to sign out and sign in again so her token reflects the grant. On
-   revocation, remove the marker and revoke active sessions. Already-issued
-   access tokens retain their claims until expiry. Keep the Data API disabled
-   when access must be cut off before those tokens expire.
-4. Obtain explicit authorization for an approved synthetic validation target
-   before enabling its Data API. Verify direct requests with a publishable key
-   alone and with another Google account cannot read rows. Verify the authorized
-   Google account can read, including exact large IDs and numeric order, and that
-   all application identities are denied writes. Check reload, sign-out and loss
-   of session in the browser. Record the actual results before enabling the shared
-   project. Task 09 remains the gate for real data and public use.
+1. Verify the target name and ref, the Data API disabled setting, and that
+   `public.clinics` is the only public table with exactly the approved three
+   synthetic rows. Review the exact migration preview and apply it through the
+   [manual migration procedure](#5-manual-migration-application). Check migration
+   history and verify the three rows are preserved.
+2. Confirm RLS is enabled. The `anon` role can select and delete clinic rows and
+   insert or update `name`, `percentage` and `active`. PostgreSQL generates IDs.
+   The name constraint needs execute access to its pure normalization helper.
+   Direct sequence access, ID writes, truncate and clinic access for other app
+   roles are excluded by the grants. Verify the disposable SQL results before
+   enabling the Data API on the named shared target.
+3. Enable the Data API for the public schema on that target and keep automatic
+   exposure of new tables disabled. Verify direct REST listing with the
+   publishable key and confirm the local app displays the three synthetic rows.
+   Verify access limitations with the SQL role tests and record actual HTTP
+   results separately. Leave existing synthetic rows untouched during rollout
+   verification unless a separate probe mutation is authorized.
+4. Disable the Data API before introducing real data or widening access beyond
+   this synthetic exception. Task 09 owns the authenticated policy, access
+   verification and public-use gate.
 
 ### Validation evidence
 
-Authorized `pnpm db:validate` creates disposable projects with the Data API
-still disabled. It verifies replay, schema parity, committed type freshness, the
-upgrade preserving synthetic clinic rows, and PostgreSQL grants and RLS under
-simulated request roles and JWT claims. The browser tests mock Auth and Data API
-responses to exercise application behavior and request construction. Neither
-check completes a real Google sign-in or proves HTTP access against an enabled
-Data API. Record the separate live checks when an authorized configured target
-is available.
+Authorized `pnpm db:validate` uses disposable projects with the Data API
+still disabled. It verifies replay, schema parity, committed type freshness,
+upgrade preservation, and anonymous CRUD and privilege limits under real SQL
+roles. The browser tests use mocked Data API responses for request construction
+and UI behavior. The PostgreSQL and mocked tests do not substitute for the live
+REST and local browser checks on the authorized shared project.

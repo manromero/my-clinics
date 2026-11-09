@@ -18,11 +18,11 @@ function transport(fetch: typeof globalThis.fetch) {
     "https://myclinics.example",
     "sb_publishable_fixture",
     {
-      accessToken: async () => "synthetic-user-session",
+      accessToken: async () => null,
       global: { fetch },
     },
   );
-  return createBrowserClinicSource(client);
+  return createBrowserClinicSource(() => client);
 }
 
 function response(data: unknown, status = 200) {
@@ -33,7 +33,7 @@ function response(data: unknown, status = 200) {
 }
 
 describe("Supabase browser clinic source", () => {
-  it("uses the session with an exact ID cast and numeric server ordering", async () => {
+  it("uses a publishable key with an exact ID cast and numeric server ordering", async () => {
     const fetch = vi
       .fn<typeof globalThis.fetch>()
       .mockImplementation(async (input, init) => {
@@ -43,8 +43,11 @@ describe("Supabase browser clinic source", () => {
           "id::text,name,percentage,active",
         );
         expect(url.searchParams.get("order")).toBe("id.asc");
+        expect(new Headers(init?.headers).get("apikey")).toBe(
+          "sb_publishable_fixture",
+        );
         expect(new Headers(init?.headers).get("authorization")).toBe(
-          "Bearer synthetic-user-session",
+          "Bearer sb_publishable_fixture",
         );
         expect(init?.method).toBe("GET");
         return response([{ ...row, id: "9" }, { ...row, id: "10" }, row]);

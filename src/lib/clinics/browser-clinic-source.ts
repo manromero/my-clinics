@@ -1,6 +1,6 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Clinic } from "@/lib/clinics/clinic";
 import { parseClinicPercentage } from "@/lib/clinics/clinic";
+import { getSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 import type { Database } from "@/lib/supabase/database.types";
 import { createClinicService } from "./clinic-service";
 
@@ -30,9 +30,13 @@ export function mapClinic(row: ClinicRow): Clinic {
   };
 }
 
-export function createBrowserClinicSource(client: SupabaseClient<Database>) {
+export function createBrowserClinicSource(
+  getClient = getSupabaseBrowserClient,
+) {
   return createClinicService({
     async list() {
+      const client = getClient();
+      if (!client) return { status: "failed" };
       const { data, error } = await client
         .from("clinics")
         .select("id::text,name,percentage,active")

@@ -18,7 +18,6 @@ Keep routes and layouts in `src/app`. Treat `src/lib` as the application's share
 src/
   app/
     clinics/
-    login/
     layout.tsx
     globals.css
     page.tsx
@@ -52,11 +51,10 @@ clinic types, service rules, the repository contract, and the memory preview
 implementation live in `src/lib/clinics/`.
 
 The browser Supabase client lives in `src/lib/supabase/browser-client.ts` and
-uses the project's publishable key and the signed-in user's session. The
-Google PKCE callback finishes in `/login`. The Clinics screen checks the
-verified claims for access feedback before mounting the list. PostgreSQL
-grants and row-level security enforce read access even when a caller bypasses
-the screen.
+uses the project's publishable key. PostgreSQL grants and row-level security
+control access to the Data API. The approved development policy allows anonymous
+access to the synthetic clinic table until Task 09 adds authentication and
+authorization. The Clinics screen exposes listing and retry for saved clinics.
 
 Keep clinic Data API queries and row mapping in
 `src/lib/clinics/browser-clinic-source.ts`. This module implements the shared

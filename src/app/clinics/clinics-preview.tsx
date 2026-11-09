@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  type FormEvent,
-  type ReactNode,
-} from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Alert } from "@/lib/components/alert/alert";
 import { Badge } from "@/lib/components/badge/badge";
 import { Button } from "@/lib/components/button/button";
@@ -278,11 +272,9 @@ export function ClinicsPreview({
   linkedClinicIds,
   failure,
   persistentSource,
-  persistentActions,
 }: {
   initialClinics: readonly Clinic[];
   persistentSource?: ClinicSource;
-  persistentActions?: ReactNode;
   linkedClinicIds?: readonly string[];
   failure?: ClinicFailure;
 }) {
@@ -364,13 +356,12 @@ export function ClinicsPreview({
         title="Gestión de clínicas"
         description="Consulta tus clínicas y sus porcentajes por defecto. Los cambios de porcentaje se aplican a las actividades nuevas."
         actions={
-          persistent
-            ? persistentActions
-            : clinics.length > 0 && (
-                <Button ref={createButton} onClick={() => openForm("new")}>
-                  Nueva clínica
-                </Button>
-              )
+          !persistent &&
+          clinics.length > 0 && (
+            <Button ref={createButton} onClick={() => openForm("new")}>
+              Nueva clínica
+            </Button>
+          )
         }
       />
       {persistent && (

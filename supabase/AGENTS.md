@@ -24,9 +24,11 @@ repairing migration history. Run parity/replay/upgrade checks on separately
 authorized disposable hosted projects.
 
 Every remote command names an explicit verified project ref. Linking a checkout
-is not approval to change that project. Keep Data API disabled until authentication,
-Ana-only access, RLS and permissions are verified; config.toml does not configure
-the hosted project by itself.
+is not approval to change that project. Keep the Data API disabled until
+authentication, Ana-only access, RLS and permissions are verified. Task 06 has
+a user-authorized synthetic-development exception for `lvqbrjybwstvdhaxyxyn`
+under the [procedure in the Supabase guide](../docs/supabase.md#synthetic-development-rollout).
+The repository's `config.toml` does not configure a hosted project by itself.
 Read-only inspection and migration application are separate steps. Remote reset,
 seed, repair, config push and destructive SQL require explicit target/scope approval;
 never use them as routine recovery. Do not use global `--yes` to bypass review.
