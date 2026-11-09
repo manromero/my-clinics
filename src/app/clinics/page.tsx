@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AppFooter } from "@/lib/components/app-footer/app-footer";
 import { AppHeader } from "@/lib/components/app-header/app-header";
 import { ClinicsPreview } from "./clinics-preview";
+import { PersistentClinics } from "./persistent-clinics";
 import type { Clinic } from "./clinic-source";
 
 export const metadata: Metadata = {
@@ -53,13 +54,16 @@ export default async function ClinicsPage({
   return (
     <div className="flex min-h-dvh flex-col">
       <AppHeader variant="public" />
-      <ClinicsPreview
-        key={isPreview ? scenario : "persistent"}
-        persistent={!isPreview}
-        initialClinics={isPreview ? initialClinics : []}
-        linkedClinicIds={["alameda"]}
-        failure={failure}
-      />
+      {isPreview ? (
+        <ClinicsPreview
+          key={scenario}
+          initialClinics={initialClinics}
+          linkedClinicIds={["alameda"]}
+          failure={failure}
+        />
+      ) : (
+        <PersistentClinics />
+      )}
       <AppFooter
         identity="MyClinics"
         metadata={

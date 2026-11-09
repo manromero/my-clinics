@@ -1,14 +1,14 @@
-import type { ClinicRepository } from "@/lib/clinics/clinic-repository";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Clinic } from "@/lib/clinics/clinic";
 import { parseClinicPercentage } from "@/lib/clinics/clinic";
 import type { Database } from "@/lib/supabase/database.types";
+import { createClinicService } from "./clinic-service";
 
 // PostgreSQL casts bigint to text before transport, overriding only its wire ID.
 export type ClinicRow = Omit<
   Database["public"]["Tables"]["clinics"]["Row"],
   "id"
 > & { id: string };
-export type ClinicClient = { listClinics(): Promise<readonly ClinicRow[]> };
 
 export function mapClinic(row: ClinicRow): Clinic {
   if (
@@ -30,19 +30,16 @@ export function mapClinic(row: ClinicRow): Clinic {
   };
 }
 
-export function createSupabaseClinicRepository(
-  client: ClinicClient,
-): ClinicRepository {
-  return {
+export function createBrowserClinicSource(client: SupabaseClient<Database>) {
+  return createClinicService({
     async list() {
-      try {
-        return {
-          status: "loaded",
-          clinics: (await client.listClinics()).map(mapClinic),
-        };
-      } catch {
-        return { status: "failed" };
-      }
+      const { data, error } = await client
+        .from("clinics")
+        .select("id::text,name,percentage,active")
+        .order("id", { ascending: true })
+        .overrideTypes<ClinicRow[], { merge: false }>();
+      if (error || !data) return { status: "failed" };
+      return { status: "loaded", clinics: data.map(mapClinic) };
     },
-  };
+  });
 }

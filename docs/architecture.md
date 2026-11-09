@@ -17,18 +17,15 @@ Keep routes and layouts in `src/app`. Treat `src/lib` as the application's share
 ```text
 src/
   app/
-    api/
-      clinics/route.ts
-      _services/clinics/clinic-service.ts
-      _repositories/clinics/clinic-repository.ts
-      _repositories/clinics/clinic-repository.test.ts
-      _supabase/client.ts
+    clinics/
+    login/
     layout.tsx
     globals.css
     page.tsx
   lib/
-    clinics/
+    clinics/browser-clinic-source.ts
     components/
+    supabase/browser-client.ts
     supabase/database.types.ts
 ```
 
@@ -54,14 +51,17 @@ Generated database types live in `src/lib/supabase/database.types.ts`. Shared
 clinic types, service rules, the repository contract, and the memory preview
 implementation live in `src/lib/clinics/`.
 
-Route handlers under `src/app/api/` own the HTTP request and response. Keep the
-persistent service composition in `_services/`, database adapters and their
-tests in `_repositories/`, and the PostgreSQL client in `_supabase/`. Next.js
-excludes these underscore-prefixed folders from routing. The clinic handler
-calls the persistent service, which wires the shared clinic service to its
-Supabase repository and client. The repository maps database rows to clinic
-objects. Keep `server-only` guards on persistent composition and the database
-client. Browser code accesses persistent data through the HTTP endpoint.
+The browser Supabase client lives in `src/lib/supabase/browser-client.ts` and
+uses the project's publishable key and the signed-in user's session. The
+Google PKCE callback finishes in `/login`. The Clinics screen checks the
+verified claims for access feedback before mounting the list. PostgreSQL
+grants and row-level security enforce read access even when a caller bypasses
+the screen.
+
+Keep clinic Data API queries and row mapping in
+`src/lib/clinics/browser-clinic-source.ts`. This module implements the shared
+list contract and preserves bigint IDs as strings by casting in the Data API
+selection. The separate memory previews use the same shared clinic rules.
 
 ## Component reuse
 

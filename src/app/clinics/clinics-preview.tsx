@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { Alert } from "@/lib/components/alert/alert";
 import { Badge } from "@/lib/components/badge/badge";
 import { Button } from "@/lib/components/button/button";
@@ -271,34 +277,23 @@ export function ClinicsPreview({
   initialClinics,
   linkedClinicIds,
   failure,
-  persistent = false,
+  persistentSource,
+  persistentActions,
 }: {
   initialClinics: readonly Clinic[];
-  persistent?: boolean;
+  persistentSource?: ClinicSource;
+  persistentActions?: ReactNode;
   linkedClinicIds?: readonly string[];
   failure?: ClinicFailure;
 }) {
-  const [source] = useState(() =>
-    persistent
-      ? ({
-          async list(): ReturnType<ClinicSource["list"]> {
-            try {
-              const response = await fetch("/api/clinics", {
-                cache: "no-store",
-              });
-              if (!response.ok) return { status: "failed" };
-              return await response.json();
-            } catch {
-              return { status: "failed" };
-            }
-          },
-          create: async () => ({ status: "failed" }) as const,
-          update: async () => ({ status: "failed" }) as const,
-        } satisfies ClinicSource)
-      : createMemoryClinicSource(initialClinics, {
-          failure,
-          linkedClinicIds: new Set(linkedClinicIds),
-        }),
+  const persistent = !!persistentSource;
+  const [source] = useState(
+    () =>
+      persistentSource ??
+      createMemoryClinicSource(initialClinics, {
+        failure,
+        linkedClinicIds: new Set(linkedClinicIds),
+      }),
   );
   const [load, setLoad] = useState<Awaited<
     ReturnType<ClinicSource["list"]>
@@ -369,12 +364,13 @@ export function ClinicsPreview({
         title="Gestión de clínicas"
         description="Consulta tus clínicas y sus porcentajes por defecto. Los cambios de porcentaje se aplican a las actividades nuevas."
         actions={
-          !persistent &&
-          clinics.length > 0 && (
-            <Button ref={createButton} onClick={() => openForm("new")}>
-              Nueva clínica
-            </Button>
-          )
+          persistent
+            ? persistentActions
+            : clinics.length > 0 && (
+                <Button ref={createButton} onClick={() => openForm("new")}>
+                  Nueva clínica
+                </Button>
+              )
         }
       />
       {persistent && (

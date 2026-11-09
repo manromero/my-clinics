@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { readFile, readdir, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { format } from "prettier";
 import { catalogRegressions } from "./database-catalog-regressions.mjs";
@@ -121,7 +120,7 @@ async function disposable(label, run) {
     assert.ok(healthy, `Provisioning timed out: ${ref}`);
     await api(`/projects/${ref}/postgrest`, "PATCH", { db_schema: "" });
     console.log(`Verified disposable identity; disabling Data API: ${ref}`);
-    return await run(ref, password);
+    return await run(ref);
   } finally {
     const current = await api(`/projects/${ref}`);
     verifyTarget(current, name);
@@ -176,6 +175,13 @@ async function clinicUpgrade(ref) {
   const clinicMigration = "20261108090000_create_clinics.sql";
   const position = files.indexOf(clinicMigration);
   assert.ok(position >= 0, "Clinic migration must exist");
+  const securityPosition = files.indexOf(
+    "20261109180000_protect_clinic_reads.sql",
+  );
+  assert.ok(
+    securityPosition > position,
+    "Clinic read security must follow the clinic migration",
+  );
   await replay(ref, files.slice(0, position));
   // The previous public baseline was empty: no pre-existing clinics are possible.
   // Commit synthetic data in a separate schema before applying the real migration.
@@ -190,7 +196,7 @@ async function clinicUpgrade(ref) {
     ref,
     "select * from validation_preclinic.existing_data",
   );
-  await replay(ref, files.slice(position));
+  await replay(ref, files.slice(position, securityPosition));
   assert.deepEqual(
     await query(ref, "select * from validation_preclinic.existing_data"),
     before,
@@ -199,9 +205,30 @@ async function clinicUpgrade(ref) {
     await query(ref, "select count(*)::integer as count from public.clinics"),
     [{ count: 0 }],
   );
+  await query(
+    ref,
+    await readFile(new URL("../supabase/seed.sql", import.meta.url), "utf8"),
+  );
+  const list =
+    "select id::text as id,name,percentage,active from public.clinics order by id";
+  const clinicsBefore = await query(ref, list);
+  assert.equal(
+    clinicsBefore.length,
+    3,
+    "Synthetic pre-security rows must exist",
+  );
+  await replay(ref, files.slice(securityPosition));
+  assert.deepEqual(
+    await query(ref, list),
+    clinicsBefore,
+    "Read security upgrade must preserve clinic rows",
+  );
   await query(ref, "drop schema validation_preclinic cascade");
   console.log(
     "Actual clinic migration upgrade from previous empty baseline preserved committed synthetic data",
+  );
+  console.log(
+    "Actual read security upgrade preserved three existing synthetic clinics",
   );
   return snapshot(ref);
 }
@@ -280,10 +307,7 @@ async function negativeControls(ref, baseline, generated) {
 }
 
 export async function main(mode = process.argv[2]) {
-  assert.ok(
-    ["validate", "types", "clinics"].includes(mode),
-    "Use validate, types or clinics",
-  );
+  assert.ok(["validate", "types"].includes(mode), "Use validate or types");
   assert.ok(
     process.env.SUPABASE_ACCESS_TOKEN,
     "Set SUPABASE_ACCESS_TOKEN in the shell or .env.database-validation",
@@ -293,15 +317,6 @@ export async function main(mode = process.argv[2]) {
     organization,
     "Explicit disposable-target authorization is required",
   );
-  const caFile = process.env.MYCLINICS_SUPABASE_CA_FILE;
-  if (mode === "clinics") {
-    assert.ok(caFile, "Set MYCLINICS_SUPABASE_CA_FILE to the Supabase root CA");
-    assert.match(
-      await readFile(caFile, "utf8"),
-      /^-----BEGIN CERTIFICATE-----\r?\n/,
-      "Supabase root CA must be a PEM certificate",
-    );
-  }
   const org = await api(`/organizations/${organization}`);
   assert.equal(
     org.plan,
@@ -314,41 +329,6 @@ export async function main(mode = process.argv[2]) {
     "No free project capacity; never delete an existing project",
   );
   console.log("Verified Free plan and one sequential disposable project slot");
-  if (mode === "clinics") {
-    await disposable("clinics", async (ref, password) => {
-      await replay(ref);
-      const { validatePersistentClinics } =
-        await import("./persistent-clinics-validation.mjs");
-      let poolers;
-      try {
-        poolers = await api(`/projects/${ref}/config/database/pooler`);
-      } catch (error) {
-        if (error.status !== 403) throw error;
-        const project = await api(`/projects/${ref}`);
-        assert.equal(project.database.host, `db.${ref}.supabase.co`);
-        console.log(
-          "Pooler metadata read permission unavailable; testing project-reported direct PostgreSQL host",
-        );
-        poolers = [
-          {
-            database_type: "PRIMARY",
-            connection_string: `postgresql://postgres@${project.database.host}:5432/postgres`,
-          },
-        ];
-      }
-      await validatePersistentClinics({
-        ref,
-        password,
-        poolers,
-        caFile: resolve(caFile),
-        query: (sql) => query(ref, sql),
-      });
-    });
-    console.log(
-      "Persistent clinics integration passed; disposable target cleaned up",
-    );
-    return;
-  }
   const result = await disposable("replay", async (ref) => {
     await replay(ref);
     const catalog = await snapshot(ref);
@@ -364,6 +344,9 @@ export async function main(mode = process.argv[2]) {
         ),
       );
       await databaseTests(ref);
+      console.log(
+        "Clinic grants and RLS verified with SQL role and claim emulation. Data API and Google sign-in were not exercised.",
+      );
       await clinicConcurrencyTests((sql) => query(ref, sql));
       await clinicNegativeControls(
         (sql) => query(ref, sql),

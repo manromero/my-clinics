@@ -1,22 +1,18 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
+import { createClinicService } from "@/lib/clinics/clinic-service";
 import { ClinicsPreview } from "./clinics-preview";
 
 afterEach(() => {
   cleanup();
-  vi.unstubAllGlobals();
 });
 
 it("keeps persistent empty lists read-only", async () => {
-  vi.stubGlobal(
-    "fetch",
-    vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ status: "loaded", clinics: [] }),
-    }),
-  );
-  render(<ClinicsPreview initialClinics={[]} persistent />);
+  const source = createClinicService({
+    list: async () => ({ status: "loaded", clinics: [] }),
+  });
+  render(<ClinicsPreview initialClinics={[]} persistentSource={source} />);
   expect(await screen.findByText("Aún no hay clínicas")).toBeInTheDocument();
   expect(
     screen.queryByRole("button", { name: "Nueva clínica" }),
@@ -24,25 +20,26 @@ it("keeps persistent empty lists read-only", async () => {
 });
 
 it("retries persistent load failure without allowing edits to saved clinics", async () => {
-  const fetch = vi
+  const list = vi
     .fn()
-    .mockResolvedValueOnce({ ok: false })
+    .mockResolvedValueOnce({ status: "failed" })
     .mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        status: "loaded",
-        clinics: [
-          {
-            id: "9007199254740993",
-            name: "Guardada",
-            percentage: 37.25,
-            active: false,
-          },
-        ],
-      }),
+      status: "loaded",
+      clinics: [
+        {
+          id: "9007199254740993",
+          name: "Guardada",
+          percentage: 37.25,
+          active: false,
+        },
+      ],
     });
-  vi.stubGlobal("fetch", fetch);
-  render(<ClinicsPreview initialClinics={[]} persistent />);
+  render(
+    <ClinicsPreview
+      initialClinics={[]}
+      persistentSource={createClinicService({ list })}
+    />,
+  );
   const user = userEvent.setup();
   await user.click(await screen.findByRole("button", { name: "Reintentar" }));
   expect(await screen.findByText("Guardada")).toBeInTheDocument();
@@ -51,5 +48,5 @@ it("retries persistent load failure without allowing edits to saved clinics", as
   expect(
     screen.queryByRole("button", { name: /Nueva clínica|Editar|Eliminar/ }),
   ).not.toBeInTheDocument();
-  expect(fetch).toHaveBeenLastCalledWith("/api/clinics", { cache: "no-store" });
+  expect(list).toHaveBeenCalledTimes(2);
 });

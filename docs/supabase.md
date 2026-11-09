@@ -293,55 +293,61 @@ see [Bun certificate support](https://bun.sh/docs/runtime/environment-variables)
 
 ## Persistent clinic listing
 
-The normal `/clinics` screen reads saved synthetic clinics through
-`GET /api/clinics`, the clinic service, the repository contract and the server-only
-Postgres.js client. Only listing is available; create/edit/state/delete remain
-unavailable until their assigned tasks. Explicit `?preview=default`, `empty`,
-`all-inactive`, `load-error`, `save-error` and `delete-error` scenarios use memory
-through the same service and do not write to PostgreSQL.
+`/clinics` reads the Supabase Data API in the browser after Google sign-in.
+The browser checks access for user feedback. PostgreSQL grants and row-level
+security (RLS) protect saved clinic data. Persistent create, edit, state changes
+and deletion belong to later tasks. Explicit `?preview=default`, `empty`,
+`all-inactive`, `load-error`, `save-error` and `delete-error` scenarios run in
+memory with synthetic records and need no Supabase connection.
 
-For local development, copy the [root template](../.env.example) to `.env.local`
-in the repository root if that file is missing. Set `MYCLINICS_DATABASE_URL`
-in the ignored `.env.local` using the connection string from the authorized
-Supabase project's **Connect** dialog. On a host, set the same variable in the
-hosting provider's server environment settings and make the CA file available to
-the server process.
+For local development, copy the [root template](../.env.example) to an ignored
+root `.env.local` if it does not exist. Set `NEXT_PUBLIC_SUPABASE_URL` to the
+project URL and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to its `sb_publishable_`
+key. Configure the same two public variables at build time on an approved host.
+Use only the publishable key for the browser. Management API tokens, database
+passwords, Supabase secret keys and Google client secrets belong in trusted
+operator settings. The browser listing requires no database URL or CA file.
 
-On IPv4, choose the shared session pooler on port 5432 for a persistent Node
-server. Direct connections require IPv6 on Free projects. Download the public
-root CA from **Database Settings > SSL Configuration**. Add `sslrootcert` to the
-database URL query with the URL-encoded absolute path to the PEM file on the
-machine running the server.
+### Configure protected read access
 
-The server uses `verify-full` to check the certificate chain and hostname. It
-disables prepared statements, bounds its pool and casts bigint IDs to text before
-JavaScript sees them. Generated `Database` types define the infrastructure row
-fields. The transport ID override preserves values above
-`Number.MAX_SAFE_INTEGER`.
-A missing connection or a transport/mapping error returns a generic failure with
-retry, without credentials or database errors. Do not use a Management API token
-as an application database connection. Shared development still requires its own
-explicitly configured application connection; disposable validation does not
-configure it.
+Keep the Data API disabled on shared development while preparing this setup.
+Each hosted change requires explicit authorization for the verified target.
 
-Run authorized `pnpm clinics:validate`, or dispatch database validation with
-`mode: clinics` to use the existing CI secret. For a local validation run, set
-`MYCLINICS_SUPABASE_CA_FILE` to the downloaded PEM path. CI downloads the same
-[public production CA](https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt)
-published by the Supabase Dashboard and checks its SHA-256 before use. The CA
-is scoped to the PostgreSQL connection. This creates one Free disposable
-target, disables and verifies its Data API, replays migrations and sets up synthetic
-states. The production application reads over real TLS PostgreSQL through the
-platform-provided session pooler. Management SQL is used only for test setup.
-The runner checks exact bigint transport, saved reload, unavailable writes and
-browser bundle isolation, then Chrome headless/CDP checks desktop and 390px CSS
-layouts, loading/empty/inactive/failure/retry and preview isolation. CI artifacts
-include PNGs and measured viewport/source metadata for independent inspection;
-automated capture alone does not constitute visual review. The target is deleted
-and its absence verified even after test failure. No shared-development writes or
-local credential extraction occurs.
+1. Apply the reviewed read-access migration through the [manual migration
+   procedure](#5-manual-migration-application). Verify the existing synthetic
+   rows are preserved, RLS is enabled and only `authenticated` has the clinic
+   table's `SELECT` grant among application roles. The policy requires a
+   non-anonymous signed-in user ID and an admin-managed read marker.
+2. Configure the Google provider in Supabase Auth. In Google Cloud, register the
+   Supabase Auth callback URI from the provider settings. In Supabase Auth, allow
+   the exact application `/login` URLs for authorized environments. Set the
+   appropriate Site URL and disable anonymous sign-ins and unused sign-in
+   providers. The browser exchanges its one-use PKCE code at `/login` and opens
+   Clinics after access is confirmed. Follow the [Google provider setup](https://supabase.com/docs/guides/auth/social-sign-in/auth-google).
+3. Verify Ana's intended Google identity in Supabase Auth after she signs in.
+   In a trusted administrator environment, set `myclinics_clinic_reader` to the
+   JSON boolean `true` in that user's `app_metadata`. Use the verified Auth user
+   ID and [the Supabase Admin API](https://supabase.com/docs/reference/javascript/auth-admin-updateuserbyid).
+   Keep existing metadata and confirm the marker is present only on Ana's account.
+   Ask Ana to sign out and sign in again so her token reflects the grant. On
+   revocation, remove the marker and revoke active sessions. Already-issued
+   access tokens retain their claims until expiry. Keep the Data API disabled
+   when access must be cut off before those tokens expire.
+4. Obtain explicit authorization for an approved synthetic validation target
+   before enabling its Data API. Verify direct requests with a publishable key
+   alone and with another Google account cannot read rows. Verify the authorized
+   Google account can read, including exact large IDs and numeric order, and that
+   all application identities are denied writes. Check reload, sign-out and loss
+   of session in the browser. Record the actual results before enabling the shared
+   project. Task 09 remains the gate for real data and public use.
 
-Connection choices follow the official
-[connection guidance](https://supabase.com/docs/guides/database/connecting-to-postgres),
-[Postgres.js guide](https://supabase.com/docs/guides/database/postgres-js), and
-[pooler configuration API](https://supabase.com/docs/reference/api/v1-get-pooler-config).
+### Validation evidence
+
+Authorized `pnpm db:validate` creates disposable projects with the Data API
+still disabled. It verifies replay, schema parity, committed type freshness, the
+upgrade preserving synthetic clinic rows, and PostgreSQL grants and RLS under
+simulated request roles and JWT claims. The browser tests mock Auth and Data API
+responses to exercise application behavior and request construction. Neither
+check completes a real Google sign-in or proves HTTP access against an enabled
+Data API. Record the separate live checks when an authorized configured target
+is available.
