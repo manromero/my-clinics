@@ -1,6 +1,6 @@
 # Task 06 — List persistent clinics through the service boundary
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -221,6 +221,20 @@ and database behavior. Document the folder convention. The follow-up starts
 from `c1a8ed105493dc8f222ee23a817ccd90566242b6`; PR #42 retains its original
 base `67605dcf49f7d48922e683aeca467ea863ec8cd7`.
 
-Revalidate imports, application checks, production build and the existing clinic
-behavior, including the hosted entry point on the authorized disposable target.
-Separate implementation and review are required before returning to `done`.
+Implementation and independent review revalidated imports, application checks, production build and clinic behavior.
+
+The independent reviewer verified relocation head
+`8115ed3dc2eab2a6511d6bbffec1c5e3f245c110`. Lint, typecheck, formatting,
+production build, 225 application tests, four tooling tests, and link and diff
+checks passed. The production manifest exposes `/api/clinics` without exposing the
+private folders. The browser bundle scan found no server connection code or secrets.
+
+[Hosted CI](https://github.com/manromero/my-clinics/actions/runs/42664840794)
+verified strict PostgreSQL TLS with the Data API disabled, saved listing and
+reload, exact IDs, unsupported writes, preview isolation, and desktop/mobile
+states and retry. The reviewer checked all 12 [captures](https://github.com/manromero/my-clinics/actions/runs/42664840794/artifacts/13696855490)
+and verified the recorded disposable project cleanup. The UI showed no regression.
+
+Task and indexes return to `done`. R06-01 remains fixed and verified. No new
+findings or correction rounds were required. Human acceptance and manual merge
+remain pending in PR #42.
