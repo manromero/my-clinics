@@ -17,6 +17,9 @@ access to Ana's configured Google identity; keep secrets outside source control
 and client bundles. After sign-in, open Clinics; monthly activity navigation
 belongs to a later milestone.
 
+Replace the [temporary anonymous grants and policies](../../supabase.md#synthetic-development-rollout)
+with access tied to the authenticated session.
+
 This is the mandatory gate before real data or public use. Earlier tasks establish
 only hosted development synthetic-data behavior and do not satisfy access requirements. Document
 configuration and the manual remote procedure; remote mutations require a separately
@@ -26,14 +29,13 @@ guide; keep execution history, future plans and validation evidence in the task/
 
 Decision renewed on 2026-11-07: persistent deletion stays deferred until a real
 activity relationship can enforce eligibility. Keep it unavailable on the persistent
-screen and in persistent service/server/database permissions. Deletion remains
-available only in the separate in-memory preview. Do not add an activity table,
+screen and in server and database permissions. Do not add an activity table,
 patients, appointments, monthly activity UI, reports or IRPF settings in this task.
 
 ## Dependencies
 
 - [Task 08](<task 08 - update persistent clinics.md>) and the preceding database
-  validation and service boundary.
+  validation and server integration.
 - [Access requirements](../../requirements.md#access-and-devices),
   [saving requirements](../../requirements.md#saving-and-date-defaults),
   [S01](../../screens.md#s01--sign-in) and [S02](../../screens.md#s02--clinics).
@@ -50,10 +52,10 @@ patients, appointments, monthly activity UI, reports or IRPF settings in this ta
   execute any persistent operation, including direct requests bypassing the UI.
   Unauthorized users receive appropriate Spanish access feedback. Sign-out removes
   access and prevents previously loaded data from being exposed through stale UI.
-- Every server entry point authorizes access before service execution. Database
+- Every server entry point authorizes access before querying or writing data. Database
   policies and permissions independently reject unauthorized reads/writes; any
   privileged infrastructure cannot bypass the application authorization boundary.
-- Database and application validation, error mapping and service boundaries remain
+- Database and application validation, error mapping and server boundaries remain
   intact. Save/cancel, load/save failure, retained inputs, retry, and duplicate
   submission prevention work for all supported persistent operations.
 - Persistent deletion is unavailable and denied through direct operations for all
@@ -69,8 +71,8 @@ another authenticated account and anonymous access, and direct-request tests for
 every persistent operation, including denied deletion. Verify sign-out and stale
 session behavior. Exercise all persistent list/create/update/state flows, cancel,
 recoverable failures/retries and cross-device persistence with synthetic test data.
-Run application checks, production build and regression tests, including the separate
-in-memory deletion preview. Capture desktop/mobile evidence for sign-in, denied
+Run application checks, production build and regression tests. Capture
+desktop/mobile evidence for sign-in, denied
 access and Clinics against the visual references. Record actual configured-environment
 results; unavailable Google or cross-device checks prevent clean final acceptance.
 

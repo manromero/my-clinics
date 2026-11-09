@@ -16,16 +16,16 @@ then complete authentication and authorization as the final release gate.
 - Persist listing, creation, editing, deactivation and reactivation of clinics.
 - Provide explicit save/cancel, field validation, visible success and recoverable
   loading/saving failures that retain inputs and allow retry.
-- Keep deletion in the separate in-memory preview only. Persistent deletion stays
-  deferred until eligibility can be enforced against real activity references.
-  Do not create an activity schema to support deletion in this milestone.
+- Defer persistent deletion in the app until eligibility can be enforced against
+  real activity references. Do not create an activity schema to support deletion
+  in this milestone.
 - Establish reproducible hosted Supabase development, declarative schemas, reviewed
   migrations, synthetic seeds, validation in scripts/CI and generated database types.
 - Follow up with dedicated local/CI validation credentials and documented rotation
   in Task 10, without replacing Task 09's application security gate.
-- Require a service layer, repository contract, in-memory and Supabase repository
-  implementations, typed client and server entry points. UI and server entry points
-  call the service, never repositories directly; do not add a new framework.
+- Use typed Supabase Data API access from Next.js server code. Use the hosted
+  synthetic development exception for Tasks 06–08, then replace its anonymous
+  access in Task 09.
 - Complete Google sign-in/sign-out, Ana-only authorization, database RLS and
   permissions for every persistent operation before real data or public use.
 - Reuse [Milestone 01](../milestone-01-shared-components/readme.md) components and
@@ -45,7 +45,7 @@ then complete authentication and authorization as the final release gate.
 | [03 — Establish reproducible hosted Supabase foundations](<task 03 - supabase local foundations.md>)                | `done`    | 01, 02              |
 | [04 — Validate migrations and generated database types](<task 04 - database validation and types.md>)               | `done`    | 03                  |
 | [05 — Define and validate the clinic database model](<task 05 - clinic database model.md>)                          | `done`    | 04                  |
-| [06 — List persistent clinics through the service boundary](<task 06 - list persistent clinics.md>)                 | `pending` | 01, 02, 05          |
+| [06 — List persistent clinics from Supabase](<task 06 - list persistent clinics.md>)                                | `done`    | 01, 02, 05          |
 | [07 — Create persistent clinics](<task 07 - create persistent clinics.md>)                                          | `pending` | 06                  |
 | [08 — Edit, deactivate and reactivate persistent clinics](<task 08 - update persistent clinics.md>)                 | `pending` | 07                  |
 | [09 — Secure persistent Clinics with Google authentication](<task 09 - clinic authentication and authorization.md>) | `pending` | 08                  |
@@ -84,12 +84,11 @@ Google accounts cannot access the screen or data through direct requests or the
 database API. Final access tests cover all persistent reads and writes, RLS,
 permissions, sign-out and desktop/mobile behavior.
 
-In-memory deletion keeps its completed behavior: confirm deletion of a clinic with
-no linked activity and offer deactivation when activity exists. The persistent
-screen and data permissions do not allow deletion before real activity references
-are available in a later scope.
+The application and its authenticated database permissions exclude persistent
+deletion until real activity references are available. Task 02 records the earlier
+in-memory deletion validation. Task 06 retired that preview.
 
-## Decisions — 2026-11-07
+## Original planning decisions — 2026-11-07
 
 - Split the previous pending Tasks 03/04 into Tasks 03–09 above. This is planning
   only; implementation of every new task remains pending assignment.
@@ -108,7 +107,7 @@ are available in a later scope.
 - The user reconfirmed that persistent deletion remains deferred. Do not add a
   minimal activity relation here; preserve the completed Task 02 record verbatim.
 
-## Hosted development decision - 2026-11-07
+## Original hosted development decision — 2026-11-07
 
 The user rejected Docker and local Supabase/database runtimes. Tasks 03-09 use
 hosted development and separately authorized disposable hosted validation targets,
@@ -125,3 +124,12 @@ The user authorized use of the current CLI token for Task 04 and its CI secret,
 then requested Task 10 at the end of this milestone to configure dedicated
 validation credentials later. Task 10 is pending assignment; it does not delay
 Task 04 or authorize extracting credentials in future sessions without approval.
+
+## Supabase Data API decision — 2026-11-09
+
+Task 06 queries the Supabase Data API from a Next.js Server Component. The user
+authorized anonymous clinic CRUD on my-clinics solely for synthetic development.
+Tasks 07 and 08 add persistent create and edit interfaces. Persistent deletion in
+the delivered application still depends on activity eligibility. Task 09 removes the temporary
+anonymous grants and policies and verifies authenticated access before real data
+or use outside the development test.

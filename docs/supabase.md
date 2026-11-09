@@ -12,9 +12,10 @@ workstation; the database and Studio run at Supabase. Desired schemas, migration
 synthetic seeds and tests live in `supabase/`. Supabase's own schemas/extensions
 are platform-managed; do not erase them to reproduce the application schema.
 
-Keep the hosted **Data API disabled** until authentication,
-Ana-only access, RLS and permissions. Disabling it does not restrict SQL credentials
-or replace that security gate. Do not deploy the persistent application publicly.
+Keep the hosted **Data API disabled** until authentication, Ana-only access,
+RLS and permissions have been verified. The user authorized a scoped
+[synthetic development exception](#synthetic-development-rollout) for
+`lvqbrjybwstvdhaxyxyn`. Do not deploy the persistent application publicly.
 Application connections must respect this restriction; integration does not
 authorize enabling the API or bypassing the security prerequisite.
 
@@ -237,7 +238,8 @@ The procedure itself does not authorize remote writes.
 
 1. Obtain approval for the exact project ref, migration set/commit and intended
    changes. Verify name/ref/organization/environment in Dashboard. Ensure Data API
-   remains disabled during pre-security development. Confirm only synthetic data.
+   remains disabled during migration. Confirm only synthetic data. Use the scoped
+   development rollout below for any separately authorized enablement.
 2. Review every pending SQL file, destructive effects, data preservation, seed and
    schema agreement. Complete database validation on an authorized disposable hosted
    target before applying business migrations. Arrange an appropriate backup and
@@ -290,3 +292,57 @@ If your trusted organization CA is installed in the OS certificate store but the
 CLI reports a TLS/transport error, use `$env:NODE_USE_SYSTEM_CA='1'` in that terminal
 and retry. This adds system certificate trust without disabling TLS verification;
 see [Bun certificate support](https://bun.sh/docs/runtime/environment-variables).
+
+## Persistent clinic listing
+
+`/clinics` lists saved clinics through the Supabase Data API in a Next.js
+Server Component. It follows the [Supabase Next.js quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/nextjs#7-query-supabase-data-from-nextjs)
+query pattern. PostgreSQL grants and row-level security (RLS) govern Data API
+requests. The screen lists clinics and offers retry.
+
+Copy the [root template](../.env.example) to an ignored root `.env.local` if
+it does not exist. Set `NEXT_PUBLIC_SUPABASE_URL` to the approved development
+project URL and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to its
+`sb_publishable_` key. Supply the same variables to Next.js on an approved
+host when public deployment is authorized. Keep Management API tokens,
+database passwords and Supabase secret keys in trusted operator settings.
+
+### Synthetic development rollout
+
+The user authorized anonymous access on `my-clinics` (`lvqbrjybwstvdhaxyxyn`)
+while it holds synthetic clinics. Anyone with the project's publishable key
+can read and change those rows through the API. Keep this project synthetic
+until Task 09 replaces the development policies with authenticated access. Task
+06 exposes only listing and retry in the app. The temporary database grants
+also support synthetic insert, update and deletion requests.
+
+1. Verify the target name and ref, the Data API disabled setting, and that
+   `public.clinics` is the only public table with exactly the approved three
+   synthetic rows. Review the exact migration preview and apply it through the
+   [manual migration procedure](#5-manual-migration-application). Check migration
+   history and verify the three rows are preserved.
+2. Confirm RLS is enabled. The `anon` role can select and delete clinic rows and
+   insert or update `name`, `percentage` and `active`. PostgreSQL generates IDs.
+   The name constraint needs execute access to its pure normalization helper.
+   Direct sequence access, ID writes, truncate and clinic access for other app
+   roles are excluded by the grants. Verify the disposable SQL results before
+   enabling the Data API on the named shared target.
+3. Enable the Data API for the public schema on that target and keep automatic
+   exposure of new tables disabled. Verify direct REST listing with the
+   publishable key and confirm the local Server Component displays the three
+   synthetic rows.
+   Verify access limitations with the SQL role tests and record actual HTTP
+   results separately. Leave existing synthetic rows untouched during rollout
+   verification unless a separate probe mutation is authorized.
+4. Disable the Data API before introducing real data or widening access beyond
+   this synthetic exception. Task 09 owns the authenticated policy, access
+   verification and public-use gate.
+
+### Validation evidence
+
+Authorized `pnpm db:validate` uses disposable projects with the Data API
+still disabled. It verifies replay, schema parity, committed type freshness,
+upgrade preservation, and anonymous CRUD and privilege limits under real SQL
+roles. The application unit tests verify the SDK request and row mapping with
+controlled HTTP responses. Live REST and local browser checks on the approved
+shared project verify the running Server Component.

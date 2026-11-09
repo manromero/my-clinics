@@ -93,11 +93,12 @@ async function query(ref, sql) {
 
 async function disposable(label, run) {
   const name = `myclinics-validation-${label}-${randomBytes(5).toString("hex")}`;
+  const password = randomBytes(32).toString("base64url");
   const project = await api("/projects", "POST", {
     name,
     organization_slug: organization,
     region: "eu-central-1",
-    db_pass: randomBytes(32).toString("base64url"),
+    db_pass: password,
   });
   const ref = project.id ?? project.ref;
   // Register immediately so provisioning/configuration failures still clean up.
@@ -174,6 +175,13 @@ async function clinicUpgrade(ref) {
   const clinicMigration = "20261108090000_create_clinics.sql";
   const position = files.indexOf(clinicMigration);
   assert.ok(position >= 0, "Clinic migration must exist");
+  const securityPosition = files.indexOf(
+    "20261109220000_allow_synthetic_clinic_access.sql",
+  );
+  assert.ok(
+    securityPosition > position,
+    "Clinic development access must follow the clinic migration",
+  );
   await replay(ref, files.slice(0, position));
   // The previous public baseline was empty: no pre-existing clinics are possible.
   // Commit synthetic data in a separate schema before applying the real migration.
@@ -188,7 +196,7 @@ async function clinicUpgrade(ref) {
     ref,
     "select * from validation_preclinic.existing_data",
   );
-  await replay(ref, files.slice(position));
+  await replay(ref, files.slice(position, securityPosition));
   assert.deepEqual(
     await query(ref, "select * from validation_preclinic.existing_data"),
     before,
@@ -197,9 +205,30 @@ async function clinicUpgrade(ref) {
     await query(ref, "select count(*)::integer as count from public.clinics"),
     [{ count: 0 }],
   );
+  await query(
+    ref,
+    await readFile(new URL("../supabase/seed.sql", import.meta.url), "utf8"),
+  );
+  const list =
+    "select id::text as id,name,percentage,active from public.clinics order by id";
+  const clinicsBefore = await query(ref, list);
+  assert.equal(
+    clinicsBefore.length,
+    3,
+    "Synthetic pre-security rows must exist",
+  );
+  await replay(ref, files.slice(securityPosition));
+  assert.deepEqual(
+    await query(ref, list),
+    clinicsBefore,
+    "Development access upgrade must preserve clinic rows",
+  );
   await query(ref, "drop schema validation_preclinic cascade");
   console.log(
     "Actual clinic migration upgrade from previous empty baseline preserved committed synthetic data",
+  );
+  console.log(
+    "Actual development access upgrade preserved three existing synthetic clinics",
   );
   return snapshot(ref);
 }
@@ -315,6 +344,9 @@ export async function main(mode = process.argv[2]) {
         ),
       );
       await databaseTests(ref);
+      console.log(
+        "Clinic development grants, RLS and anonymous CRUD verified with SQL role tests while the Data API was disabled.",
+      );
       await clinicConcurrencyTests((sql) => query(ref, sql));
       await clinicNegativeControls(
         (sql) => query(ref, sql),

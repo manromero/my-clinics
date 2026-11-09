@@ -1,59 +1,41 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { AppFooter } from "@/lib/components/app-footer/app-footer";
 import { AppHeader } from "@/lib/components/app-header/app-header";
-import { ClinicsPreview } from "./clinics-preview";
-import type { Clinic } from "./clinic-source";
+import { LoadingState } from "@/lib/components/loading-state/loading-state";
+import { PageContainer } from "@/lib/components/page-container/page-container";
+import { PageHeader } from "@/lib/components/page-header/page-header";
+import { SavedClinics } from "./saved-clinics";
 
 export const metadata: Metadata = {
   title: "Clínicas | MyClinics",
 };
 
-const sampleClinics: readonly Clinic[] = [
-  {
-    id: "alameda",
-    name: "Clínica Dental Alameda",
-    percentage: 30,
-    active: true,
-  },
-  {
-    id: "mirador",
-    name: "Centro Odontológico Mirador",
-    percentage: 27.5,
-    active: true,
-  },
-  { id: "olivos", name: "Dental Los Olivos", percentage: 20, active: false },
-];
-
-export default async function ClinicsPage({
-  searchParams,
-}: PageProps<"/clinics">) {
-  const { preview } = await searchParams;
-  const scenario = typeof preview === "string" ? preview : undefined;
-  const initialClinics =
-    scenario === "empty"
-      ? []
-      : scenario === "all-inactive"
-        ? sampleClinics.map((clinic) => ({ ...clinic, active: false }))
-        : sampleClinics;
-  const failure =
-    scenario === "load-error" ||
-    scenario === "save-error" ||
-    scenario === "delete-error"
-      ? scenario
-      : undefined;
-
+export default function ClinicsPage() {
   return (
     <div className="flex min-h-dvh flex-col">
       <AppHeader variant="public" />
-      <ClinicsPreview
-        key={scenario}
-        initialClinics={initialClinics}
-        linkedClinicIds={["alameda"]}
-        failure={failure}
-      />
+      <PageContainer as="main" className="flex-1 space-y-8">
+        <PageHeader
+          eyebrow="Configuración de centros"
+          title="Gestión de clínicas"
+          description="Consulta tus clínicas y sus porcentajes por defecto. Los cambios de porcentaje se aplican a las actividades nuevas."
+        />
+        <p className="text-sm text-on-surface-variant">
+          Consulta de clínicas guardadas. La creación y edición estarán
+          disponibles próximamente.
+        </p>
+        <Suspense
+          fallback={
+            <LoadingState label="Cargando clínicas…" variant="region" />
+          }
+        >
+          <SavedClinics />
+        </Suspense>
+      </PageContainer>
       <AppFooter
         identity="MyClinics"
-        metadata="Vista previa con datos de ejemplo"
+        metadata="Entorno de desarrollo · Datos sintéticos"
       />
     </div>
   );
