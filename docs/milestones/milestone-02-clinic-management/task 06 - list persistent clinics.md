@@ -1,6 +1,6 @@
 # Task 06 — List persistent clinics through the service boundary
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -66,7 +66,7 @@ build and application checks. This is not a security acceptance check.
 
 ## Progress notes
 
-Assigned for implementation on 2026-11-08. The approved scope remains unchanged. Task and index remain `in_progress` while hosted validation is blocked.
+Assigned for implementation on 2026-11-08. Hosted validation initially blocked delivery and was resolved on 2026-11-09.
 
 ## Execution context
 
@@ -126,7 +126,7 @@ Desktop/mobile failure screenshots and capture metadata are saved inline in the
 PR. The coordinator retrieved and inspected both PNGs and confirmed their hashes
 match the original captures. Rendered GitHub-page inspection was unavailable.
 
-Hosted validation is blocked: the existing CI token receives HTTP 403 consulting
+Initial hosted validation was blocked: the existing CI token receives HTTP 403 consulting
 per-project pooler metadata; the official direct PostgreSQL endpoint returns
 `ENETUNREACH`. Actual hosted listing and successful load/empty/all-inactive/retry/
 reload coverage and their visual evidence remain unverified. The user was asked
@@ -157,9 +157,41 @@ Ten captures at measured CSS viewports 1440 x 1000 and 390 x 844, DPR 1, were
 inspected against Alexandria and Stitch. This local review does not establish
 successful hosted listing or hosted recovery.
 
-Blocking R06-01 remains open: the required hosted list integration and corresponding
+Initial review recorded open blocker R06-01: the required hosted list integration and corresponding
 persistent state/reload/visual evidence cannot pass until PostgreSQL connectivity
 is available. The reviewer independently inspected the exact-head CI failure and
 verified the recorded disposable deletion. No additional application blockers
-were found. Task/index remain `in_progress`; PR #42 remains draft. No correction
+were found. Task/index remained `in_progress` and PR #42 remained draft at this point. No correction
 round has been used, and human acceptance and manual merge remain pending.
+
+## Hosted verification and completion — 2026-11-09
+
+The user updated the existing CI secret with the scoped pooler configuration read
+permission. [First retry](https://github.com/manromero/my-clinics/actions/runs/42650925150)
+confirmed pooler discovery and identified the missing Supabase certificate authority.
+Correction round 1 supplied the official CA to the PostgreSQL client with strict
+certificate and hostname verification. A later validation-harness adjustment
+ensured Chrome reload and profile cleanup were checked reliably.
+
+[Passing hosted CI](https://github.com/manromero/my-clinics/actions/runs/42652715902)
+validated implementation head `fc9134e358f1eab8200f6683f5de4641b9c69894`.
+Lint, typecheck, formatting, production build, 225 tests and four tooling tests
+passed. With the Data API disabled, the production server loaded active and
+inactive synthetic clinics through PostgreSQL, preserved exact bigint IDs and
+saved reloads, and refused writes. The browser checks covered loading, empty,
+all-inactive, failure/retry and preview isolation in both viewports. The production
+bundle check passed. The temporary Chrome profile was removed and the disposable
+Supabase project was deleted and verified absent. The shared development project
+was outside the validation target.
+
+The independent reviewer verified the correction diff, logs, assertions and all
+12 original [hosted screenshots](https://github.com/manromero/my-clinics/actions/runs/42652715902/artifacts/13689848082)
+against Alexandria and Stitch, at measured 1440 × 1000 and 390 × 844 CSS viewports.
+CI executed the hosted interactions. Independent local interaction checks from the
+initial review still apply to the unchanged application source. R06-01 is fixed
+and verified. There are no remaining blockers or optional findings. One of two
+correction rounds was used.
+
+Task and milestone index are `done` for agent delivery in
+[PR #42](https://github.com/manromero/my-clinics/pull/42). Human acceptance and
+manual merge remain pending.
