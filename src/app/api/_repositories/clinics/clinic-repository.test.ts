@@ -4,7 +4,7 @@ import {
   mapClinic,
   type ClinicRow,
 } from "./clinic-repository";
-import { createClinicService } from "../clinics/clinic-service";
+import { createClinicService } from "@/lib/clinics/clinic-service";
 
 const row: ClinicRow = {
   id: "9007199254740993",

@@ -1,6 +1,9 @@
 import "server-only";
 import postgres from "postgres";
-import type { ClinicClient, ClinicRow } from "./clinic-repository";
+import type {
+  ClinicClient,
+  ClinicRow,
+} from "../_repositories/clinics/clinic-repository";
 
 let sql: ReturnType<typeof postgres> | undefined;
 

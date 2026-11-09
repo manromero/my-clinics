@@ -1,7 +1,7 @@
-import type { ClinicRepository } from "../clinics/clinic-repository";
-import type { Clinic } from "../clinics/clinic";
-import { parseClinicPercentage } from "../clinics/clinic";
-import type { Database } from "./database.types";
+import type { ClinicRepository } from "@/lib/clinics/clinic-repository";
+import type { Clinic } from "@/lib/clinics/clinic";
+import { parseClinicPercentage } from "@/lib/clinics/clinic";
+import type { Database } from "@/lib/supabase/database.types";
 
 // PostgreSQL casts bigint to text before transport, overriding only its wire ID.
 export type ClinicRow = Omit<

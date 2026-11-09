@@ -17,21 +17,29 @@ Keep routes and layouts in `src/app`. Treat `src/lib` as the application's share
 ```text
 src/
   app/
+    api/
+      clinics/route.ts
+      _services/clinics/clinic-service.ts
+      _repositories/clinics/clinic-repository.ts
+      _repositories/clinics/clinic-repository.test.ts
+      _supabase/client.ts
     layout.tsx
     globals.css
     page.tsx
   lib/
+    clinics/
     components/
+    supabase/database.types.ts
 ```
 
 Use one folder per shared component, for example `src/lib/components/button/button.tsx` with `button.test.tsx` beside it. Keep catalogue specimens in the corresponding `src/app/components/<slug>` folder. Catalogue pages and specimens are tested live rather than with unit tests; reusable components retain their unit tests.
 
-| Location                                          | Responsibility                                                       | Examples                                                    |
-| ------------------------------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------- |
-| `src/app`                                         | Routing, layouts, loading and error boundaries, and page composition | Clinic list route                                           |
-| Route-local `_components` and `_lib`, when needed | UI and helpers used by a single route                                | Route-specific filter panel                                 |
-| `src/lib/components`                              | Components reused across screens                                     | Button, clinic selector, navigation                         |
-| `src/lib`                                         | Shared business logic, utilities, and infrastructure                 | Fee calculations, date formatting, external service clients |
+| Location                                          | Responsibility                                                       | Examples                                                      |
+| ------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `src/app`                                         | Routing, layouts, loading and error boundaries, and page composition | Clinic list route                                             |
+| Route-local `_components` and `_lib`, when needed | UI and helpers used by a single route                                | Route-specific filter panel                                   |
+| `src/lib/components`                              | Components reused across screens                                     | Button, clinic selector, navigation                           |
+| `src/lib`                                         | Shared business logic, utilities, and contracts                      | Fee calculations, date formatting, clinic repository contract |
 
 Start with route-local code for a small screen. Move reusable logic or UI into the shared library when it serves multiple screens. Keep related types and helpers close to the code that uses them.
 
@@ -42,10 +50,18 @@ desired schema SQL, reviewed migration history, synthetic seeds and database tes
 The [Supabase guide](supabase.md) covers hosted setup and operating procedures;
 [database agent rules](../supabase/AGENTS.md) govern automated changes.
 
-Generated database types and Supabase infrastructure code belong in
-`src/lib/supabase/`, separate from database assets. Keep application data access
-behind service/repository boundaries rather than importing database SQL or CLI
-configuration into routes.
+Generated database types live in `src/lib/supabase/database.types.ts`. Shared
+clinic types, service rules, the repository contract, and the memory preview
+implementation live in `src/lib/clinics/`.
+
+Route handlers under `src/app/api/` own the HTTP request and response. Keep the
+persistent service composition in `_services/`, database adapters and their
+tests in `_repositories/`, and the PostgreSQL client in `_supabase/`. Next.js
+excludes these underscore-prefixed folders from routing. The clinic handler
+calls the persistent service, which wires the shared clinic service to its
+Supabase repository and client. The repository maps database rows to clinic
+objects. Keep `server-only` guards on persistent composition and the database
+client. Browser code accesses persistent data through the HTTP endpoint.
 
 ## Component reuse
 

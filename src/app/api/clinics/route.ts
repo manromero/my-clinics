@@ -1,4 +1,4 @@
-import { persistentClinicService } from "@/lib/clinics/persistent-clinic-service";
+import { persistentClinicService } from "../_services/clinics/clinic-service";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
