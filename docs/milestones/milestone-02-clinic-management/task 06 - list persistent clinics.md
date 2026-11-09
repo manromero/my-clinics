@@ -7,7 +7,7 @@ Status: `in_progress`
 Deliver the first complete vertical slice from the Clinics screen to hosted development
 Supabase while establishing the required boundary for all later operations.
 
-## Scope
+## Original scope
 
 Implement a clinic service, a technology-independent repository contract, the
 Supabase repository implementation and typed client, and a server entry point
@@ -241,62 +241,26 @@ remain pending in PR #42.
 
 ## Browser Data API follow-up — 2026-11-09
 
-The user approved a simpler browser integration before persistent writes are
-implemented. This supersedes the earlier transport decision in this task. The
-browser uses a typed Supabase client with the project URL, publishable key, and
-signed-in user session. Keep clinic queries in one module, preserve shared clinic
-rules and the independent memory previews, and remove the app's clinic HTTP
-route and PostgreSQL connection setup. Preserve exact IDs, list states and retry.
+The user chose direct browser access for the synthetic clinics. Use the typed
+Supabase browser client with the project URL and publishable key. Keep the
+clinic query in one module, preserve exact IDs and list states, and keep the
+in-memory previews. This replaces the earlier PostgreSQL transport and app HTTP
+route. Task 06 displays the list. Tasks 07 and 08 implement the create and edit
+interfaces. Task 09 owns Google Auth and non-test access.
 
-Bring forward the read-access part of Task 09. Google sign-in and sign-out, access
-for Ana's authorized identity, and explicit read-only grants and Row Level
-Security must protect the persistent list. Validate denial for unauthenticated
-users and other accounts, including access through the Data API. Configure the
-shared project only after review and explicit target-specific authorization. Tasks
-07 and 08 still own persistent writes. Task 09 still verifies authorization for
-all supported operations before public use or real data.
+The user authorized anonymous listing, creation, editing, and deletion in
+shared development `my-clinics` (`lvqbrjybwstvdhaxyxyn`) while it contains
+synthetic data. Read-only inspection verified the three original synthetic rows
+and found only the clinic table, its sequence, and its normalization helper in
+the application schema. The reviewed migration grants anonymous CRUD on the
+clinic table within the authorized columns and enables RLS. The coordinator
+applies it before enabling the Data API for `public` with automatic new-table
+exposure disabled. Verify actual REST listing, create/update/delete on a new
+synthetic row, preservation of the three examples, and local browser behavior.
+Task 09 must replace the temporary grants and policies before real data or use
+outside this development test.
 
-Use the existing PR #42 and branch `feature/persistent-clinic-list` based on
+Use the existing PR #42 and branch `feature/persistent-clinic-list`, based on
 `67605dcf49f7d48922e683aeca467ea863ec8cd7`. The prior delivery is
-`ed73b69d7ac8c9ba01861b6b29006b4fe812ff6c`. The development project contains the
-three synthetic clinics from the previously authorized setup. Create an
-append-only security migration and preserve those rows. Hosted validation must
-respect the target guard and record any unavailable live Google or Data API
-checks. Review code, access control, build and visual evidence independently.
-
-### Temporary synthetic project decision
-
-The user chose to defer Google Auth and allow anonymous listing only in a
-separate temporary Supabase project with synthetic data. Keep all clinics in
-one list for Ana. This supersedes the Google and signed-session scope above
-for this follow-up. Task 09 still owns authentication and authorization for
-non-test use. The shared development Data API stays disabled.
-
-Keep the typed browser repository, exact IDs, list states, retry and independent
-memory previews. Remove the draft Google UI and owner-session dependency.
-Deploy schema and synthetic rows to one verified Free temporary target only.
-Keep anonymous SELECT grants and policies in isolated test setup. They must never
-be applied by a shared migration. Verify RLS, the SELECT-only grant and denied
-writes before enabling the temporary Data API. Confirm the application lists
-synthetic rows from that API. The local project URL and publishable key may point
-to the temporary target for the user's test. Retain the project until the user
-finishes testing, then remove it through a separately verified cleanup operation.
-
-### Shared development test decision
-
-The user superseded the separate temporary project decision and authorized
-anonymous read-only listing on `my-clinics` (`lvqbrjybwstvdhaxyxyn`) while it
-contains synthetic data. A read-only inspection verified that `public.clinics`
-is the only public table and its three rows match the synthetic seed. Do not
-provision a retained temporary project for the user. Task 09 will replace the
-anonymous policy with authenticated access.
-
-Implement the development read policy in the declarative schema and an
-append-only migration. Enable RLS and grant anonymous SELECT on clinics only.
-Deny anonymous writes and remove inherited application access to unrelated
-clinic objects. Browser configuration uses the project URL and publishable
-key. The coordinator applies the reviewed migration to the verified project
-before enabling the Data API for the public schema, with automatic exposure
-of new tables disabled. Verify the migration and three rows, actual REST
-listing, denied writes and local browser behavior. Keep synthetic data only
-until Task 09 closes this temporary access path.
+`ed73b69d7ac8c9ba01861b6b29006b4fe812ff6c`. Keep disposable SQL validation with
+the Data API disabled. Review code, SQL, build and visual evidence independently.

@@ -23,9 +23,7 @@ then complete authentication and authorization as the final release gate.
   migrations, synthetic seeds, validation in scripts/CI and generated database types.
 - Follow up with dedicated local/CI validation credentials and documented rotation
   in Task 10, without replacing Task 09's application security gate.
-- Require a service layer, repository contract, in-memory and Supabase repository
-  implementations, typed client and server entry points. UI and server entry points
-  call the service, never repositories directly; do not add a new framework.
+- Use the shared clinic service and repository contract with memory and typed Supabase browser implementations.
 - Complete Google sign-in/sign-out, Ana-only authorization, database RLS and
   permissions for every persistent operation before real data or public use.
 - Reuse [Milestone 01](../milestone-01-shared-components/readme.md) components and
@@ -128,16 +126,9 @@ Task 04 or authorize extracting credentials in future sessions without approval.
 
 ## Browser Data API decision — 2026-11-09
 
-The user approved direct browser access to Supabase for Clinics. Task 06 now
-includes Google sign-in and protected read access before any shared Data API
-activation. Tasks 07 and 08 introduce authenticated writes in order. Task 09
-verifies access for all supported operations before public use or real data.
-
-For the current follow-up, the user chose to defer Auth and limit anonymous
-listing to an isolated temporary project containing synthetic clinics. Shared
-development keeps the Data API disabled. Task 09 remains the access gate for
-non-test use.
-
-The user then chose the existing shared development project `my-clinics` for
-anonymous, read-only testing with synthetic data. This supersedes the isolated
-project choice. Auth and non-test access remain in Task 09.
+Task 06 uses the Supabase browser client. The user authorized anonymous clinic
+CRUD on `my-clinics` solely for synthetic development. Tasks 07 and 08 add
+persistent create and edit interfaces. Persistent deletion in the delivered
+application still depends on activity eligibility. Task 09 removes the temporary
+anonymous grants and policies and verifies authenticated access before real data
+or use outside the development test.
