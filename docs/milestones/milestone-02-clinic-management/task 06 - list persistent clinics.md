@@ -2,6 +2,9 @@
 
 Status: `done`
 
+[Supabase Data API delivery](#supabase-data-api-delivery--2026-11-09) records the
+final scope and validation. The original plan is preserved below for context.
+
 ## Objective
 
 Deliver the first complete vertical slice from the Clinics screen to hosted development
@@ -41,7 +44,7 @@ gate before real data or public use.
 - [Architecture](../../architecture.md), [S02](../../screens.md#s02--clinics),
   and [visual references](../../screens.md#visual-design-references).
 
-## Acceptance criteria
+## Original acceptance criteria
 
 - The hosted development persistent list shows active and inactive clinics with correct names,
   percentages and Spanish statuses through the complete approved layer sequence.
@@ -55,7 +58,7 @@ gate before real data or public use.
   secrets do not reach client imports or bundles. There are no direct repository
   calls from UI or server entry points and no added architecture framework.
 
-## Validation
+## Original validation
 
 Follow [milestone validation](readme.md#delivery-and-validation). Test service and
 repository behavior, DTO/domain and error mapping, and the Supabase list integration

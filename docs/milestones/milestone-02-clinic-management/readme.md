@@ -127,9 +127,8 @@ Task 04 or authorize extracting credentials in future sessions without approval.
 ## Supabase Data API decision — 2026-11-09
 
 Task 06 queries the Supabase Data API from a Next.js Server Component. The user
-authorized anonymous clinic
-CRUD on `my-clinics` solely for synthetic development. Tasks 07 and 08 add
-persistent create and edit interfaces. Persistent deletion in the delivered
-application still depends on activity eligibility. Task 09 removes the temporary
+authorized anonymous clinic CRUD on my-clinics solely for synthetic development.
+Tasks 07 and 08 add persistent create and edit interfaces. Persistent deletion in
+the delivered application still depends on activity eligibility. Task 09 removes the temporary
 anonymous grants and policies and verifies authenticated access before real data
 or use outside the development test.
