@@ -1,6 +1,6 @@
 # Task 06 — List persistent clinics through the service boundary
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -238,3 +238,28 @@ and verified the recorded disposable project cleanup. The UI showed no regressio
 Task and indexes return to `done`. R06-01 remains fixed and verified. No new
 findings or correction rounds were required. Human acceptance and manual merge
 remain pending in PR #42.
+
+## Browser Data API follow-up — 2026-11-09
+
+The user approved a simpler browser integration before persistent writes are
+implemented. This supersedes the earlier transport decision in this task. The
+browser uses a typed Supabase client with the project URL, publishable key, and
+signed-in user session. Keep clinic queries in one module, preserve shared clinic
+rules and the independent memory previews, and remove the app's clinic HTTP
+route and PostgreSQL connection setup. Preserve exact IDs, list states and retry.
+
+Bring forward the read-access part of Task 09. Google sign-in and sign-out, access
+for Ana's authorized identity, and explicit read-only grants and Row Level
+Security must protect the persistent list. Validate denial for unauthenticated
+users and other accounts, including access through the Data API. Configure the
+shared project only after review and explicit target-specific authorization. Tasks
+07 and 08 still own persistent writes. Task 09 still verifies authorization for
+all supported operations before public use or real data.
+
+Use the existing PR #42 and branch `feature/persistent-clinic-list` based on
+`67605dcf49f7d48922e683aeca467ea863ec8cd7`. The prior delivery is
+`ed73b69d7ac8c9ba01861b6b29006b4fe812ff6c`. The development project contains the
+three synthetic clinics from the previously authorized setup. Create an
+append-only security migration and preserve those rows. Hosted validation must
+respect the target guard and record any unavailable live Google or Data API
+checks. Review code, access control, build and visual evidence independently.

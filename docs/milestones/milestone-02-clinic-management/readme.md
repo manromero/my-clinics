@@ -37,19 +37,19 @@ then complete authentication and authorization as the final release gate.
 
 ## Task index
 
-| Task                                                                                                                | Status    | Direct dependencies |
-| ------------------------------------------------------------------------------------------------------------------- | --------- | ------------------- |
-| [00 — Build the Clinics screen with sample data](<task 00 - clinics screen.md>)                                     | `done`    | Milestone 01        |
-| [01 — Implement clinic interactions with an in-memory data source](<task 01 - clinic interactions.md>)              | `done`    | 00                  |
-| [02 — Validate clinic deletion with an in-memory data source](<task 02 - delete clinics.md>)                        | `done`    | 01                  |
-| [03 — Establish reproducible hosted Supabase foundations](<task 03 - supabase local foundations.md>)                | `done`    | 01, 02              |
-| [04 — Validate migrations and generated database types](<task 04 - database validation and types.md>)               | `done`    | 03                  |
-| [05 — Define and validate the clinic database model](<task 05 - clinic database model.md>)                          | `done`    | 04                  |
-| [06 — List persistent clinics through the service boundary](<task 06 - list persistent clinics.md>)                 | `done`    | 01, 02, 05          |
-| [07 — Create persistent clinics](<task 07 - create persistent clinics.md>)                                          | `pending` | 06                  |
-| [08 — Edit, deactivate and reactivate persistent clinics](<task 08 - update persistent clinics.md>)                 | `pending` | 07                  |
-| [09 — Secure persistent Clinics with Google authentication](<task 09 - clinic authentication and authorization.md>) | `pending` | 08                  |
-| [10 — Configure dedicated database validation credentials](<task 10 - dedicated validation credentials.md>)         | `pending` | 04                  |
+| Task                                                                                                                | Status        | Direct dependencies |
+| ------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------- |
+| [00 — Build the Clinics screen with sample data](<task 00 - clinics screen.md>)                                     | `done`        | Milestone 01        |
+| [01 — Implement clinic interactions with an in-memory data source](<task 01 - clinic interactions.md>)              | `done`        | 00                  |
+| [02 — Validate clinic deletion with an in-memory data source](<task 02 - delete clinics.md>)                        | `done`        | 01                  |
+| [03 — Establish reproducible hosted Supabase foundations](<task 03 - supabase local foundations.md>)                | `done`        | 01, 02              |
+| [04 — Validate migrations and generated database types](<task 04 - database validation and types.md>)               | `done`        | 03                  |
+| [05 — Define and validate the clinic database model](<task 05 - clinic database model.md>)                          | `done`        | 04                  |
+| [06 — List persistent clinics through the service boundary](<task 06 - list persistent clinics.md>)                 | `in_progress` | 01, 02, 05          |
+| [07 — Create persistent clinics](<task 07 - create persistent clinics.md>)                                          | `pending`     | 06                  |
+| [08 — Edit, deactivate and reactivate persistent clinics](<task 08 - update persistent clinics.md>)                 | `pending`     | 07                  |
+| [09 — Secure persistent Clinics with Google authentication](<task 09 - clinic authentication and authorization.md>) | `pending`     | 08                  |
+| [10 — Configure dedicated database validation credentials](<task 10 - dedicated validation credentials.md>)         | `pending`     | 04                  |
 
 ## Delivery and validation
 
@@ -125,3 +125,10 @@ The user authorized use of the current CLI token for Task 04 and its CI secret,
 then requested Task 10 at the end of this milestone to configure dedicated
 validation credentials later. Task 10 is pending assignment; it does not delay
 Task 04 or authorize extracting credentials in future sessions without approval.
+
+## Browser Data API decision — 2026-11-09
+
+The user approved direct browser access to Supabase for Clinics. Task 06 now
+includes Google sign-in and protected read access before any shared Data API
+activation. Tasks 07 and 08 introduce authenticated writes in order. Task 09
+verifies access for all supported operations before public use or real data.
