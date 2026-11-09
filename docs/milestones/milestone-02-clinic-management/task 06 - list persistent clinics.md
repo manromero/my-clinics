@@ -1,6 +1,6 @@
-# Task 06 — List persistent clinics through the service boundary
+# Task 06 — List persistent clinics from Supabase
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -239,28 +239,33 @@ Task and indexes return to `done`. R06-01 remains fixed and verified. No new
 findings or correction rounds were required. Human acceptance and manual merge
 remain pending in PR #42.
 
-## Browser Data API follow-up — 2026-11-09
+## Supabase Data API delivery — 2026-11-09
 
-The user chose direct browser access for the synthetic clinics. Use the typed
-Supabase browser client with the project URL and publishable key. Keep the
-clinic query in one module, preserve exact IDs and list states, and keep the
-in-memory previews. This replaces the earlier PostgreSQL transport and app HTTP
-route. Task 06 displays the list. Tasks 07 and 08 implement the create and edit
-interfaces. Task 09 owns Google Auth and non-test access.
+The user selected the Server Component pattern from the
+[official Supabase quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/nextjs#7-query-supabase-data-from-nextjs).
+The `/clinics` page uses a typed Supabase server client and Suspense. It lists
+saved clinics, preserves exact IDs, and retries failures by refreshing the
+server page. The in-memory clinic preview, mocks, browser transport and old
+HTTP route were removed. Tasks 07 and 08 own the create and edit interfaces.
 
-The user authorized anonymous listing, creation, editing, and deletion in
-shared development `my-clinics` (`lvqbrjybwstvdhaxyxyn`) while it contains
-synthetic data. Read-only inspection verified the three original synthetic rows
-and found only the clinic table, its sequence, and its normalization helper in
-the application schema. The reviewed migration grants anonymous CRUD on the
-clinic table within the authorized columns and enables RLS. The coordinator
-applies it before enabling the Data API for `public` with automatic new-table
-exposure disabled. Verify actual REST listing, create/update/delete on a new
-synthetic row, preservation of the three examples, and local browser behavior.
-Task 09 must replace the temporary grants and policies before real data or use
-outside this development test.
+The user authorized anonymous clinic CRUD solely for synthetic development in
+`my-clinics` (`lvqbrjybwstvdhaxyxyn`). The coordinator applied the reviewed
+`20261109220000_allow_synthetic_clinic_access.sql` migration, verified RLS and
+effective grants, and enabled the Data API for `public` with automatic table
+exposure disabled. A live SDK check listed the three synthetic clinics and
+created, updated and deleted one throwaway synthetic record. A final read
+verified the original three records. Task 09 replaces the temporary grants and
+policies before real data or non-test use.
 
-Use the existing PR #42 and branch `feature/persistent-clinic-list`, based on
-`67605dcf49f7d48922e683aeca467ea863ec8cd7`. The prior delivery is
-`ed73b69d7ac8c9ba01861b6b29006b4fe812ff6c`. Keep disposable SQL validation with
-the Data API disabled. Review code, SQL, build and visual evidence independently.
+The independent reviewer approved `a788b58e4490d442eb11a869effc476f62f082ee`.
+Lint, typecheck, format, build, 206 application tests, four tooling tests and
+10 documentation links passed. The unchanged migration, schema and database
+tests passed [hosted SQL validation](https://github.com/manromero/my-clinics/actions/runs/42710570520)
+at `ccf1c72c6a86e93142d362cd109aeca33879b39c`. The production build loaded the
+three clinics and recovered after a controlled transport failure. The reviewer
+inspected 1440 × 1000 and 390 × 844 Chrome captures. Empty, inactive and failure
+states used isolated transport responses. The Windows workstation required
+`NODE_USE_SYSTEM_CA=1` for HTTPS certificate trust.
+
+No blockers or optional findings remain. The follow-up used no additional
+correction round. Human acceptance and manual merge remain pending in PR #42.
