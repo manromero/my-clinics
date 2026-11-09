@@ -195,3 +195,18 @@ correction rounds was used.
 Task and milestone index are `done` for agent delivery in
 [PR #42](https://github.com/manromero/my-clinics/pull/42). Human acceptance and
 manual merge remain pending.
+
+## Environment template follow-up — 2026-11-09
+
+The user approved a root `.env.example` and ignored `.env.local` for local
+configuration. Commit `84c1a8dbd29debd8c2ea65cc0be448350e5a23b2` adds the blank
+server variable to the template and explains local and hosted configuration in
+[the Supabase guide](../../supabase.md#persistent-clinic-listing). The local
+file was created from the template. The user supplies the development connection
+URL privately.
+
+The independent reviewer confirmed the template and ignore rules, checked the
+Next.js environment guidance and passed formatting, diff and five local link
+checks. Application, database and visual evidence from the reviewed implementation
+still applies. This follow-up used no additional correction round. Human
+acceptance and manual merge remain pending in PR #42.
