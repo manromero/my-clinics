@@ -132,3 +132,8 @@ The user approved direct browser access to Supabase for Clinics. Task 06 now
 includes Google sign-in and protected read access before any shared Data API
 activation. Tasks 07 and 08 introduce authenticated writes in order. Task 09
 verifies access for all supported operations before public use or real data.
+
+For the current follow-up, the user chose to defer Auth and limit anonymous
+listing to an isolated temporary project containing synthetic clinics. Shared
+development keeps the Data API disabled. Task 09 remains the access gate for
+non-test use.

@@ -263,3 +263,21 @@ three synthetic clinics from the previously authorized setup. Create an
 append-only security migration and preserve those rows. Hosted validation must
 respect the target guard and record any unavailable live Google or Data API
 checks. Review code, access control, build and visual evidence independently.
+
+### Temporary synthetic project decision
+
+The user chose to defer Google Auth and allow anonymous listing only in a
+separate temporary Supabase project with synthetic data. Keep all clinics in
+one list for Ana. This supersedes the Google and signed-session scope above
+for this follow-up. Task 09 still owns authentication and authorization for
+non-test use. The shared development Data API stays disabled.
+
+Keep the typed browser repository, exact IDs, list states, retry and independent
+memory previews. Remove the draft Google UI and owner-session dependency.
+Deploy schema and synthetic rows to one verified Free temporary target only.
+Keep anonymous SELECT grants and policies in isolated test setup. They must never
+be applied by a shared migration. Verify RLS, the SELECT-only grant and denied
+writes before enabling the temporary Data API. Confirm the application lists
+synthetic rows from that API. The local project URL and publishable key may point
+to the temporary target for the user's test. Retain the project until the user
+finishes testing, then remove it through a separately verified cleanup operation.
