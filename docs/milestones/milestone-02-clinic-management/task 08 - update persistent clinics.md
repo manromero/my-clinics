@@ -1,6 +1,6 @@
 # Task 08 — Edit, deactivate and reactivate persistent clinics
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -97,7 +97,9 @@ review fixtures were removed and the six preexisting rows matched the baseline.
 No product blockers or optional findings remain. The schema and generated
 types did not change.
 
-The automatic approval review rejected the branch push to the public GitHub
-repository pending explicit authorization for that destination. The branch and
-visual evidence are available locally. PR publication and attachment verification
-remain pending, so this task stays `in_progress`.
+[PR #44](https://github.com/manromero/my-clinics/pull/44) targets `develop`.
+The user explicitly authorized publication to the public repository after the
+initial push was rejected by the automatic approval review. All ten desktop and
+mobile captures rendered inline in the PR and were independently retrieved and
+matched to the inspected originals. Human approval and manual merge remain
+pending in GitHub.
