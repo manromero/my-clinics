@@ -1,6 +1,6 @@
 # Task 07 — Create persistent clinics
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -101,3 +101,20 @@ The user approved both optional changes and a 200-character clinic name limit.
 - Validate the forward migration, schema parity, upgrade preservation and
   generated type freshness through the authorized disposable hosted CI workflow.
   The shared development schema is outside that validation target.
+
+Independent review passed implementation commit
+`c71613ead102c2fc14c65d668f17468270e3bce4`. Lint, typecheck, formatting, the
+production build, 224 application tests, four database tooling tests, and diff
+and documentation checks passed. Desktop and touch-emulated mobile verified
+typing and paste at the limit, counter updates, error clearing and focus,
+server rejection above the limit, and the save and retry flow with isolated
+synthetic responses. Four new PR captures document the form states.
+
+[Hosted validation](https://github.com/manromero/my-clinics/actions/runs/42880501650)
+verified the length constraint, replay, schema parity, generated type freshness,
+and upgrade preservation. The migration rejected an overlong legacy row without
+changing data, schema, or migration history. All disposable targets were removed.
+The migration has not been applied to shared development.
+
+No blockers or optional findings remain. Zero correction rounds were used.
+Human acceptance and manual merge remain pending in GitHub.
