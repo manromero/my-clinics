@@ -1,6 +1,6 @@
 # Task 07 — Create persistent clinics
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -81,3 +81,23 @@ with Alexandria and S02 and independently inspected all six PR attachments.
 
 There were no blockers and zero correction rounds were used. Human acceptance
 and manual merge remain pending in GitHub.
+
+## User-requested follow-up — 2026-11-10
+
+Reopen [PR #43](https://github.com/manromero/my-clinics/pull/43) at
+`c78fa4888195c9576958ccf764829126d1665846` on the same feature branch and base.
+The user approved both optional changes and a 200-character clinic name limit.
+
+- Clear the error for the field being edited, leaving other field errors in
+  place and keeping focus on the edited field. Update the umbrella milestones
+  summary to match the task status.
+- Limit entry to 200 characters, including pasted text, and show the current
+  count in Spanish. Validate the limit in the server action and PostgreSQL as
+  well. Use Unicode code points consistently with PostgreSQL `char_length`.
+- Verify the 200/201 boundary and non-ASCII names in the application and SQL.
+  Keep existing valid rows intact on upgrade and surface the database limit as
+  a name error. Repeat the affected desktop and mobile form checks and publish
+  updated inline evidence.
+- Validate the forward migration, schema parity, upgrade preservation and
+  generated type freshness through the authorized disposable hosted CI workflow.
+  The shared development schema is outside that validation target.
