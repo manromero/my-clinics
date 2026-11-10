@@ -1,6 +1,6 @@
 # Task 07 — Create persistent clinics
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -60,4 +60,24 @@ production build. No real data or public deployment is authorized.
   desktop and mobile viewports and publish evidence through the project skills.
 - Expected implementation path is application-only, subject to validation of
   the existing Data API grants and defaults. No open product decisions.
-- Correction rounds used: 0 of 2.
+
+## Progress notes
+
+[PR #43](https://github.com/manromero/my-clinics/pull/43) delivers the shared
+create dialog and typed server action. The dialog displays the database's
+initial active state and refreshes the saved list after a successful insert.
+
+Independent review passed implementation commit
+`e6924662ec80fc3db3787a3e069ea446fc10e440`. Lint, typecheck, formatting, the
+production build, 216 application tests, four database tooling tests, and the
+diff check passed. The schema and generated types did not change.
+
+Hosted checks verified cancellation, Spanish validation, duplicate prevention
+while saving, recovery after an injected save failure, and persistence after
+reload on desktop and touch-emulated mobile. Concurrent name variants produced
+one saved row and one name error. The temporary fixtures were removed and the
+original synthetic rows were unchanged. The reviewer compared both viewports
+with Alexandria and S02 and independently inspected all six PR attachments.
+
+There were no blockers and zero correction rounds were used. Human acceptance
+and manual merge remain pending in GitHub.
