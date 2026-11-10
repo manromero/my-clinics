@@ -1,6 +1,6 @@
 # Task 07 — Create persistent clinics
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -40,7 +40,24 @@ as applicable. Exercise create/save/cancel/error/retry and reload
 on desktop and mobile; compare S02 and capture evidence. Run application checks and
 production build. No real data or public deployment is authorized.
 
-## Progress notes
+## Execution context
 
-Implementation pending assignment. Planning decision recorded on 2026-11-07;
-this task definition does not start implementation.
+- Ready for implementation. Task 06 was merged in
+  [PR #42](https://github.com/manromero/my-clinics/pull/42). Branch
+  `feature/create-persistent-clinics` starts at
+  `81fd77d6d59d31d0ef24282aef2d525889dc4f84` on `develop`.
+- [Architecture](../../architecture.md) and [S02](../../screens.md#s02--clinics)
+  guide route-local composition and the use of shared components. The current
+  `src/app/clinics` route streams the saved list, which reads through
+  `src/lib/supabase/server-client.ts` and preserves bigint IDs as text.
+- The existing schema supplies the active default and generated ID. The
+  `clinics_name_key_unique` index is authoritative for duplicate names under
+  concurrency. Reuse the existing percentage parser and verify the server
+  validation path independently of browser controls.
+- The configured URL matches the approved synthetic development project.
+  Hosted checks must use identifiable synthetic fixtures, preserve existing
+  rows, and verify cleanup of their own fixtures. Verify live behavior at
+  desktop and mobile viewports and publish evidence through the project skills.
+- Expected implementation path is application-only, subject to validation of
+  the existing Data API grants and defaults. No open product decisions.
+- Correction rounds used: 0 of 2.
