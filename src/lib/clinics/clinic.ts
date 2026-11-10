@@ -7,6 +7,12 @@ export type Clinic = {
   active: boolean;
 };
 
+export const CLINIC_NAME_MAX_LENGTH = 200;
+
+export function countClinicNameCharacters(name: string) {
+  return [...name].length;
+}
+
 export function parseClinicPercentage(raw: string) {
   return parseDecimal(raw.trim(), { min: "0", max: "100" });
 }

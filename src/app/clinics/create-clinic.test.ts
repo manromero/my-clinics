@@ -12,6 +12,8 @@ vi.mock("@/lib/supabase/server-client", () => ({
 
 const fetch = vi.fn<typeof globalThis.fetch>();
 const getClient = vi.mocked(createSupabaseServerClient);
+const nameLengthError =
+  "El nombre de la clínica debe tener como máximo 200 caracteres.";
 
 function clinicForm(name: string, percentage: string) {
   const form = new FormData();
@@ -95,6 +97,51 @@ describe("create clinic server action", () => {
     expect(await createClinic(clinicForm("Clínica Sintética", "27"))).toEqual({
       status: "invalid",
       nameError: "Ya existe una clínica con ese nombre.",
+    });
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
+  it.each(["a", "🦷"])("accepts 200 characters of %s", async (character) => {
+    fetch.mockResolvedValue(new Response(null, { status: 201 }));
+    const name = character.repeat(200);
+    expect(await createClinic(clinicForm(name, "27"))).toEqual({
+      status: "saved",
+    });
+    expect(fetch).toHaveBeenCalledExactlyOnceWith(
+      "https://myclinics.example/rest/v1/clinics",
+      expect.objectContaining({
+        body: JSON.stringify({ name, percentage: 27 }),
+      }),
+    );
+  });
+
+  it.each(["a".repeat(201), "🦷".repeat(201), "🦷".repeat(200) + " "])(
+    "rejects a raw name of 201 code points before the write",
+    async (name) => {
+      expect(await createClinic(clinicForm(name, "100.01"))).toEqual({
+        status: "invalid",
+        nameError: nameLengthError,
+        percentageError: "Introduce un porcentaje entre 0 y 100.",
+      });
+      expect(getClient).not.toHaveBeenCalled();
+      expect(revalidatePath).not.toHaveBeenCalled();
+    },
+  );
+
+  it("maps the database name length constraint to the name field", async () => {
+    fetch.mockResolvedValue(
+      Response.json(
+        {
+          code: "23514",
+          message:
+            'new row for relation "clinics" violates check constraint "clinics_name_length"',
+        },
+        { status: 400 },
+      ),
+    );
+    expect(await createClinic(clinicForm("Clínica Sintética", "27"))).toEqual({
+      status: "invalid",
+      nameError: nameLengthError,
     });
     expect(revalidatePath).not.toHaveBeenCalled();
   });

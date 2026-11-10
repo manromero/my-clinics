@@ -1,6 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
+import {
+  CLINIC_NAME_MAX_LENGTH,
+  countClinicNameCharacters,
+} from "@/lib/clinics/clinic";
 import { Alert } from "@/lib/components/alert/alert";
 import { Badge } from "@/lib/components/badge/badge";
 import { Button } from "@/lib/components/button/button";
@@ -68,19 +78,50 @@ function ClinicForm({
   onCancel: () => void;
   onSaved: () => void;
 }) {
+  const [name, setName] = useState("");
   const [percentage, setPercentage] = useState("");
   const [result, setResult] = useState<CreateClinicResult | null>(null);
   const [pending, setPending] = useState(false);
   const saving = useRef(false);
   const nameInput = useRef<HTMLInputElement>(null);
   const percentageInput = useRef<HTMLInputElement>(null);
+  const focusError = useRef<"name" | "percentage" | null>(null);
   const fieldErrors = result?.status === "invalid" ? result : undefined;
 
   useEffect(() => {
     if (pending) return;
-    if (fieldErrors?.nameError) nameInput.current?.focus();
-    else if (fieldErrors?.percentageError) percentageInput.current?.focus();
-  }, [fieldErrors, pending]);
+    if (focusError.current === "name") nameInput.current?.focus();
+    else if (focusError.current === "percentage")
+      percentageInput.current?.focus();
+    focusError.current = null;
+  }, [result, pending]);
+
+  function clearFieldError(field: "nameError" | "percentageError") {
+    setResult((previous) =>
+      previous?.status === "invalid" && previous[field]
+        ? { ...previous, [field]: undefined }
+        : previous,
+    );
+  }
+
+  function handleNameChange(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget;
+    let value = input.value;
+    if (countClinicNameCharacters(value) > CLINIC_NAME_MAX_LENGTH) {
+      // Preserve text after the insertion point when a paste or edit exceeds the limit.
+      const cursor = input.selectionEnd ?? value.length;
+      const suffix = [...value.slice(cursor)].slice(0, CLINIC_NAME_MAX_LENGTH);
+      const remaining = CLINIC_NAME_MAX_LENGTH - suffix.length;
+      const prefix = [...value.slice(0, cursor)].slice(0, remaining).join("");
+      value = prefix + suffix.join("");
+      input.value = value;
+      input.setSelectionRange(prefix.length, prefix.length);
+    }
+    if (value !== name) {
+      setName(value);
+      clearFieldError("nameError");
+    }
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     if (saving.current) return;
@@ -90,8 +131,14 @@ function ClinicForm({
     setPending(true);
     try {
       const response = await createClinic(formData);
-      if (response.status === "saved") onSaved();
-      else setResult(response);
+      if (response.status === "saved") {
+        onSaved();
+      } else {
+        if (response.status === "invalid") {
+          focusError.current = response.nameError ? "name" : "percentage";
+        }
+        setResult(response);
+      }
     } catch {
       setResult({ status: "failed" });
     } finally {
@@ -121,6 +168,9 @@ function ClinicForm({
         ref={nameInput}
         name="name"
         label="Nombre de la clínica"
+        value={name}
+        onChange={handleNameChange}
+        help={`${countClinicNameCharacters(name)}/${CLINIC_NAME_MAX_LENGTH} caracteres`}
         required
         error={fieldErrors?.nameError}
       />
@@ -130,7 +180,10 @@ function ClinicForm({
         label="Porcentaje por defecto"
         help="Entre 0 y 100, con hasta dos decimales."
         value={percentage}
-        onValueChange={setPercentage}
+        onValueChange={(value) => {
+          setPercentage(value);
+          clearFieldError("percentageError");
+        }}
         min="0"
         max="100"
         adornment="%"

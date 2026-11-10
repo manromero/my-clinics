@@ -41,6 +41,8 @@ and over the workbook's structure.
   places.
 - Clinic names must be unique after trimming surrounding spaces and ignoring
   case.
+- Clinic names accept up to 200 Unicode code points. Count surrounding spaces
+  as part of the submitted name before trimming them for storage.
 - Each clinic has one default percentage representing the professional's share
   of an activity's price.
 - A clinic can be activated, deactivated, and reactivated.

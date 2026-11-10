@@ -1,12 +1,18 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { parseClinicPercentage } from "@/lib/clinics/clinic";
+import {
+  CLINIC_NAME_MAX_LENGTH,
+  countClinicNameCharacters,
+  parseClinicPercentage,
+} from "@/lib/clinics/clinic";
 import { createSupabaseServerClient } from "@/lib/supabase/server-client";
 
 export type CreateClinicResult =
   | { status: "saved" | "failed" }
   | { status: "invalid"; nameError?: string; percentageError?: string };
+
+const nameLengthError = `El nombre de la clínica debe tener como máximo ${CLINIC_NAME_MAX_LENGTH} caracteres.`;
 
 function percentageMessage(result: ReturnType<typeof parseClinicPercentage>) {
   switch (result.status) {
@@ -32,17 +38,24 @@ function percentageMessage(result: ReturnType<typeof parseClinicPercentage>) {
 export async function createClinic(
   formData: FormData,
 ): Promise<CreateClinicResult> {
-  const rawName = formData.get("name");
-  const name = typeof rawName === "string" ? rawName.trim() : "";
+  const nameField = formData.get("name");
+  const rawName = typeof nameField === "string" ? nameField : "";
+  const name = rawName.trim();
+  let nameError: string | undefined;
+  if (countClinicNameCharacters(rawName) > CLINIC_NAME_MAX_LENGTH) {
+    nameError = nameLengthError;
+  } else if (!name) {
+    nameError = "Introduce el nombre de la clínica.";
+  }
   const rawPercentage = formData.get("percentage");
   const percentage = parseClinicPercentage(
     typeof rawPercentage === "string" ? rawPercentage : "",
   );
 
-  if (!name || percentage.status !== "valid") {
+  if (nameError || percentage.status !== "valid") {
     return {
       status: "invalid",
-      nameError: name ? undefined : "Introduce el nombre de la clínica.",
+      nameError,
       percentageError: percentageMessage(percentage),
     };
   }
@@ -56,6 +69,12 @@ export async function createClinic(
       .insert({ name, percentage: Number(percentage.decimal) });
 
     if (error) {
+      if (
+        error.code === "23514" &&
+        error.message.includes('"clinics_name_length"')
+      ) {
+        return { status: "invalid", nameError: nameLengthError };
+      }
       if (
         error.code === "23505" &&
         error.message.includes('"clinics_name_key_unique"')
