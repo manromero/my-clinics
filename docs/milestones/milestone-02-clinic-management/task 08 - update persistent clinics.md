@@ -68,8 +68,26 @@ production build. Security acceptance remains pending the final task.
 - Run application checks and the production build. Verify hosted persistence,
   cancellation, conflicts, missing rows and failure/retry, plus desktop and
   mobile behavior and evidence. No open product decisions. Correction rounds
-  used: 0.
+  started: 1 of 2.
 
 ## Progress notes
 
 Implementation assigned on 2026-11-10.
+
+The initial independent review covered implementation commit
+`1854e6e2551c1373a5e2cfee9b21db110a418867`. Application checks, the production
+build, 235 application tests and four database tooling tests passed. Hosted
+synthetic and visual checks passed on desktop and touch mobile except for the
+following blocker. All task fixtures were removed and the six existing rows
+matched the baseline.
+
+- **T08-R1 — Open.** A successful update followed by a failed list read loses
+  the save confirmation. The reviewer verified persistence with a direct read
+  and reproduced the missing confirmation with a locally injected HTTP 503 on
+  the list request. Correction round 1 must preserve the save confirmation and
+  allow the list read to be retried.
+
+The automatic approval review rejected the branch push to the public GitHub
+repository pending explicit authorization for that destination. The branch and
+visual evidence are available locally. PR publication and attachment verification
+remain pending.
