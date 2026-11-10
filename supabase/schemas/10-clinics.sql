@@ -13,6 +13,7 @@ create table public.clinics (
   percentage numeric not null,
   active boolean default true not null,
   constraint clinics_name_nonblank check (public.clinic_name_key(name) <> ''),
+  constraint clinics_name_length check (char_length(name) <= 200),
   constraint clinics_percentage_range check (percentage >= 0 and percentage <= 100),
   constraint clinics_percentage_precision check (percentage = trunc(percentage, 2))
 );

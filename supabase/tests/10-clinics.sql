@@ -39,6 +39,11 @@ begin
   perform pg_temp.reject_clinic_write(format('insert into public.clinics(name,percentage) values (%L,20)',U&'\00A0Validation Clinic\3000'), '23505', 'clinics_name_key_unique');
   insert into public.clinics(name,percentage) values ('Clínica Validación',50);
   perform pg_temp.reject_clinic_write($s$insert into public.clinics(name,percentage) values (' CLÍNICA VALIDACIÓN ',20)$s$, '23505', 'clinics_name_key_unique');
+  foreach value in array array[repeat('a',200), repeat(U&'\+01F9B7',200)] loop
+    insert into public.clinics(name,percentage) values (value,20);
+    perform pg_temp.reject_clinic_write(format('insert into public.clinics(name,percentage) values (%L,20)',value || ' '), '23514', 'clinics_name_length');
+    perform pg_temp.reject_clinic_write(format('update public.clinics set name=%L where id=%L',value || U&'\+01F9B7',clinic_id), '23514', 'clinics_name_length');
+  end loop;
   foreach value in array array['-0.01','100.01','100.001','-0.001', '''NaN''','''Infinity''','''-Infinity'''] loop
     perform pg_temp.reject_clinic_write(format('insert into public.clinics(name,percentage) values (''Invalid range'',%s)',value), '23514');
     perform pg_temp.reject_clinic_write(format('update public.clinics set percentage=%s where id=%L',value,clinic_id), '23514');

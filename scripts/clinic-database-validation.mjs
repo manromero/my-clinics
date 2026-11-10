@@ -100,6 +100,7 @@ export async function clinicNegativeControls(query, sqlTests) {
     "alter table public.clinics drop constraint clinics_percentage_precision",
     "alter table public.clinics drop constraint clinics_percentage_range",
     "alter table public.clinics drop constraint clinics_name_nonblank",
+    "alter table public.clinics drop constraint clinics_name_length",
     "drop index public.clinics_name_key_unique",
   ]) {
     await assert.rejects(

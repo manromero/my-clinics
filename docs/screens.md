@@ -112,15 +112,16 @@ with recorded activity for the selected period.
 
 Use a dialog or panel opened from the list, adapting its size to mobile.
 
-| Field      | Behavior                                                                          |
-| ---------- | --------------------------------------------------------------------------------- |
-| Nombre     | Required; reject blank or duplicate names after trimming spaces and ignoring case |
-| Porcentaje | Required; 0–100%, with up to two decimal places                                   |
-| Estado     | Active/inactive; new clinics default to active                                    |
+| Field      | Behavior                                                                                                                                   |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Nombre     | Required; cap input at 200 Unicode code points and show the count. Reject blank or duplicate names after trimming spaces and ignoring case |
+| Porcentaje | Required; 0–100%, with up to two decimal places                                                                                            |
+| Estado     | Active/inactive; new clinics default to active                                                                                             |
 
 Provide `Guardar` and `Cancelar`. A changed percentage affects new activity;
 existing rows retain their applied percentage. Display validation beside the
-affected field. After a successful save, refresh the list and show confirmation.
+affected field. Clear that field's error as the user edits it. After a successful
+save, refresh the list and show confirmation.
 On failure, keep the form values available for retry.
 
 ### States

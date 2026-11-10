@@ -182,6 +182,12 @@ async function clinicUpgrade(ref) {
     securityPosition > position,
     "Clinic development access must follow the clinic migration",
   );
+  const lengthMigration = "20261110190000_limit_clinic_name_length.sql";
+  const lengthPosition = files.indexOf(lengthMigration);
+  assert.ok(
+    lengthPosition > securityPosition,
+    "Missing clinic name limit migration",
+  );
   await replay(ref, files.slice(0, position));
   // The previous public baseline was empty: no pre-existing clinics are possible.
   // Commit synthetic data in a separate schema before applying the real migration.
@@ -217,12 +223,50 @@ async function clinicUpgrade(ref) {
     3,
     "Synthetic pre-security rows must exist",
   );
-  await replay(ref, files.slice(securityPosition));
+  await replay(ref, files.slice(securityPosition, lengthPosition));
   assert.deepEqual(
     await query(ref, list),
     clinicsBefore,
     "Development access upgrade must preserve clinic rows",
   );
+  await query(
+    ref,
+    `insert into public.clinics(name,percentage,active)
+    values (repeat(U&'\\+01F9B7',200), 12.34, false)`,
+  );
+  const validRows = await query(ref, list);
+  assert.equal(validRows.length, clinicsBefore.length + 1);
+  const [legacy] = await query(
+    ref,
+    `insert into public.clinics(name,percentage)
+    values (repeat('x',201), 50) returning id::text as id`,
+  );
+  const legacyRows = await query(ref, list);
+  const beforeLengthMigration = await snapshot(ref);
+  const history =
+    "select version from supabase_migrations.schema_migrations order by version";
+  const beforeHistory = await query(ref, history);
+
+  await assert.rejects(replay(ref, [lengthMigration]), { sqlState: "23514" });
+  assert.deepEqual(await query(ref, list), legacyRows);
+  checkParity(await snapshot(ref), beforeLengthMigration);
+  assert.deepEqual(await query(ref, history), beforeHistory);
+  console.log(
+    "Clinic name limit upgrade rejected a legacy overlong name without changing rows, schema or history",
+  );
+
+  await query(
+    ref,
+    `delete from public.clinics where id = ${literal(legacy.id)}`,
+  );
+  await replay(ref, [lengthMigration]);
+  assert.deepEqual(await query(ref, list), validRows);
+  console.log(
+    "Clinic name limit upgrade preserved the valid existing rows, including the 200-code-point name",
+  );
+  if (lengthPosition < files.length - 1) {
+    await replay(ref, files.slice(lengthPosition + 1));
+  }
   await query(ref, "drop schema validation_preclinic cascade");
   console.log(
     "Actual clinic migration upgrade from previous empty baseline preserved committed synthetic data",
