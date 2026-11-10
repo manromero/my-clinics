@@ -68,7 +68,7 @@ production build. Security acceptance remains pending the final task.
 - Run application checks and the production build. Verify hosted persistence,
   cancellation, conflicts, missing rows and failure/retry, plus desktop and
   mobile behavior and evidence. No open product decisions. Correction rounds
-  started: 1 of 2.
+  used: 1 of 2.
 
 ## Progress notes
 
@@ -81,13 +81,23 @@ synthetic and visual checks passed on desktop and touch mobile except for the
 following blocker. All task fixtures were removed and the six existing rows
 matched the baseline.
 
-- **T08-R1 — Open.** A successful update followed by a failed list read loses
-  the save confirmation. The reviewer verified persistence with a direct read
-  and reproduced the missing confirmation with a locally injected HTTP 503 on
-  the list request. Correction round 1 must preserve the save confirmation and
-  allow the list read to be retried.
+- **T08-R1 — Fixed and independently verified.** The initial review reproduced a
+  lost confirmation after a successful write and a locally injected HTTP 503
+  on the subsequent list read. Correction round 1 preserves the confirmation
+  through the list error and retry. Desktop and touch mobile verified both
+  notices, persisted values and recovery without another write.
+
+Independent re-review passed product commit
+`c3b21e57eef115d48da5b30dc6b4cc64a27f6662`. Lint, typecheck, formatting, the
+production build, 236 application tests, four database tooling tests and the
+diff check passed. Hosted synthetic checks covered create, edit, deactivation,
+reactivation, cancel, validation, concurrent duplicates, missing records and
+failure recovery. Both viewports were checked against Alexandria and S02. The
+review fixtures were removed and the six preexisting rows matched the baseline.
+No product blockers or optional findings remain. The schema and generated
+types did not change.
 
 The automatic approval review rejected the branch push to the public GitHub
 repository pending explicit authorization for that destination. The branch and
 visual evidence are available locally. PR publication and attachment verification
-remain pending.
+remain pending, so this task stays `in_progress`.
