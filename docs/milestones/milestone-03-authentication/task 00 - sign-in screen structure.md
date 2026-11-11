@@ -1,6 +1,6 @@
 # Task 00 — Build the sign-in screen structure
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -30,6 +30,24 @@ Keep the control inactive until Task 02 connects it to Supabase Auth.
 Run the required application checks and build. Inspect the page live and capture
 desktop and mobile screenshots.
 
+## Execution context
+
+- Ready: the task scope, acceptance criteria, and shared-component dependency
+  are available. Assignment branch: `feature/sign-in-screen`; base:
+  `b1d47b4e8e9d077473800a73af09a1e360608f27` (`develop`).
+- Follow [S01](../../screens.md#s01--sign-in), the Stitch HTML and PNG, and
+  [Alexandria](../../screens/alexandria/DESIGN.md). Use the generic Spanish
+  Google label from S01 in place of the prototype's named account and omit its
+  authentication simulator. The prototype's PNG is cropped; use the HTML for
+  the rest of the composition.
+- Keep `/login` public and independent of Supabase configuration. Task 02 owns
+  the authentication behavior. No database, session, or protected-route work
+  is needed for this task.
+- Run lint, typecheck, format check and production build. Verify `/login` live
+  without Supabase Auth configuration, including the inactive control, and
+  capture desktop and mobile evidence.
+- Open questions: none. Correction rounds used: 0.
+
 ## Progress notes
 
-Implementation pending assignment.
+Implementation assigned; independent review pending.
