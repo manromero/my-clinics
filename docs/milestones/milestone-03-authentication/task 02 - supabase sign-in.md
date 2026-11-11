@@ -1,6 +1,6 @@
 # Task 02 — Integrate Supabase sign-in and sessions
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -73,8 +73,8 @@ Execution started on 2026-11-11. Correction rounds used: 1.
 - The protected Vercel Preview deployed application commit
   `84657fd80ff89bb16064f29e3f1279a3c7107c4d`. Lint, type checking, formatting,
   the production build, 259 tests, and HTTP-only OAuth checks passed.
-  Independent review found no code blockers. The account holder's Google
-  sign-in, reload, and sign-out on the protected Preview are pending.
+  Independent review found no code blockers. The account holder confirmed
+  Google sign-in, reload, and sign-out on the protected Preview.
 
 ## Execution context
 
