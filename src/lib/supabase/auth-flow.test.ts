@@ -10,12 +10,19 @@ import { createSupabaseAuthClient } from "./auth-client";
 
 const project = "https://auth-fixture.supabase.co";
 const origin = "http://localhost:3000";
+const previewOrigin = "https://myclinics-git-preview.example.test";
 const sessionCookie = "sb-auth-fixture-auth-token";
 const cookies = new Map<string, string>();
+let requestOrigin = origin;
 let failSessionCookieRemoval = false;
 
 vi.mock("server-only", () => ({}));
 vi.mock("next/headers", () => ({
+  headers: async () =>
+    new Headers({
+      origin: requestOrigin,
+      "x-forwarded-host": "untrusted.example.test",
+    }),
   cookies: async () => ({
     getAll: () => Array.from(cookies, ([name, value]) => ({ name, value })),
     set: (name: string, value: string, options: { maxAge?: number }) => {
@@ -60,6 +67,7 @@ function fixtureSession(expiresIn: number, refreshToken: string) {
 
 describe("Supabase SSR authentication with a controlled Auth transport", () => {
   beforeEach(() => {
+    vi.stubEnv("APP_ORIGIN", undefined);
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", project);
     vi.stubEnv(
       "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
@@ -69,11 +77,69 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
 
   afterEach(() => {
     cookies.clear();
+    requestOrigin = origin;
     failSessionCookieRemoval = false;
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
+
+  it.each([previewOrigin, "https://myclinics-production.example.test"])(
+    "starts PKCE on the configured HTTPS origin %s without using forwarded host headers",
+    async (configuredOrigin) => {
+      vi.stubEnv("APP_ORIGIN", `${configuredOrigin}/`);
+      requestOrigin = configuredOrigin;
+
+      const destination = await startGoogleSignIn().catch((error: Error) =>
+        error.message.replace("redirect: ", ""),
+      );
+      const authorizeUrl = new URL(destination!);
+      expect(authorizeUrl.origin + authorizeUrl.pathname).toBe(
+        `${project}/auth/v1/authorize`,
+      );
+      expect(authorizeUrl.searchParams.get("redirect_to")).toBe(
+        `${configuredOrigin}/auth/callback`,
+      );
+      expect(authorizeUrl.searchParams.get("code_challenge_method")).toBe(
+        "s256",
+      );
+      expect(
+        [...cookies.keys()].some((name) => name.includes("code-verifier")),
+      ).toBe(true);
+    },
+  );
+
+  it("sends another deployment alias to the canonical login before writing any PKCE cookie", async () => {
+    vi.stubEnv("APP_ORIGIN", previewOrigin);
+    requestOrigin = "https://alternate-deployment.example.test";
+
+    await expect(startGoogleSignIn()).rejects.toThrow(
+      `redirect: ${previewOrigin}/login`,
+    );
+    expect(cookies.size).toBe(0);
+  });
+
+  it.each([
+    undefined,
+    origin,
+    "http://myclinics.example.test",
+    "https://myclinics.example.test/login",
+    "https://myclinics.example.test/?next=elsewhere",
+    "https://user@myclinics.example.test",
+  ])(
+    "does not start deployed OAuth with an unset or invalid APP_ORIGIN (%s)",
+    async (configuredOrigin) => {
+      vi.stubEnv("APP_ORIGIN", configuredOrigin);
+      vi.stubEnv(
+        "VERCEL_PROJECT_PRODUCTION_URL",
+        "myclinics-production.example.test",
+      );
+      requestOrigin = previewOrigin;
+
+      await expect(startGoogleSignIn()).resolves.toBe("failed");
+      expect(cookies.size).toBe(0);
+    },
+  );
 
   it("persists a PKCE session and rotates an expired token for render and browser", async () => {
     const expired = fixtureSession(-1, "initial-fixture-refresh");

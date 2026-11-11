@@ -1,6 +1,6 @@
 # Task 02 — Integrate Supabase sign-in and sessions
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -67,6 +67,11 @@ Execution started on 2026-11-11. Correction rounds used: 1.
 - [PR #48](https://github.com/manromero/my-clinics/pull/48) targets `develop`.
   All 11 inline screenshots were retrieved and matched the inspected desktop
   and mobile captures. Human approval and manual merge are pending.
+- Reopened for the requested Vercel support. The Google start action currently
+  uses a fixed localhost callback. The branch already has a Vercel Preview
+  protected by Vercel authentication. Keep the localhost flow and support an
+  exact HTTPS callback for the approved Vercel origin. Task 03 remains the
+  prerequisite for public use and real clinic data.
 
 ## Execution context
 
