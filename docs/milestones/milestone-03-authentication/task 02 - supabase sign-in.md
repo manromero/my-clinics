@@ -67,11 +67,14 @@ Execution started on 2026-11-11. Correction rounds used: 1.
 - [PR #48](https://github.com/manromero/my-clinics/pull/48) targets `develop`.
   All 11 inline screenshots were retrieved and matched the inspected desktop
   and mobile captures. Human approval and manual merge are pending.
-- Reopened for the requested Vercel support. The Google start action currently
-  uses a fixed localhost callback. The branch already has a Vercel Preview
-  protected by Vercel authentication. Keep the localhost flow and support an
-  exact HTTPS callback for the approved Vercel origin. Task 03 remains the
-  prerequisite for public use and real clinic data.
+- Reopened for Vercel support because the original Google start action used a
+  fixed localhost callback. Task 03 remains the prerequisite for public use
+  and real clinic data.
+- The protected Vercel Preview deployed application commit
+  `84657fd80ff89bb16064f29e3f1279a3c7107c4d`. Lint, type checking, formatting,
+  the production build, 259 tests, and HTTP-only OAuth checks passed.
+  Independent review found no code blockers. The account holder's Google
+  sign-in, reload, and sign-out on the protected Preview are pending.
 
 ## Execution context
 
