@@ -53,10 +53,19 @@ Execution started on 2026-11-11. Correction rounds used: 1.
   and sign-out. Hosted refresh after expiry remains unverified.
 - Round 0 finding AUTH-01: when hosted logout responds with HTTP 503, the SDK
   clears the local session, but the application stays on `/clinics` and loses
-  the account control. Correction round 1 addresses this case.
-- The branch is published. Draft PR creation and inline screenshot publication
-  are awaiting explicit authorization for the public repository after automatic
-  approval review rejected both the combined and text-only attempts.
+  the account control. Fixed and independently verified at
+  `16616eecd51ba6e59363dcb0ec0eb16608cb3658`. Both roles passed `pnpm lint`,
+  `pnpm typecheck`, `pnpm format:check`, `pnpm build`, `pnpm test` (246 tests),
+  and `git diff --check`. Controlled HTTP 204 and 503 cleared the cookie and
+  returned to `/login` on desktop and mobile. The test for a retained session
+  verified that retry remains available. No new code findings or suggestions.
+- AUTH-02 remains open: account-holder verification of hosted reload, refresh
+  after expiry, and the full authenticated mobile flow is pending. Controlled
+  transport verified the application's refresh and reload behavior.
+- The initial implementation is published. The correction is local after
+  automatic approval review rejected its push. The review also rejected draft
+  PR creation with or without screenshots. Publishing the correction and draft
+  with synthetic evidence needs explicit authorization for the public repository.
 
 ## Execution context
 
