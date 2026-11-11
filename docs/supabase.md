@@ -352,6 +352,41 @@ CLI reports a TLS/transport error, use `$env:NODE_USE_SYSTEM_CA='1'` in that ter
 and retry. This adds system certificate trust without disabling TLS verification;
 see [Bun certificate support](https://bun.sh/docs/runtime/environment-variables).
 
+## Google OAuth for hosted development
+
+Use the Google Cloud project `myclinics-dev` and verify the hosted Supabase
+project ref is `lvqbrjybwstvdhaxyxyn` before editing Authentication settings.
+The app runs locally and uses the hosted Auth service.
+
+1. In Google Auth Platform, set the audience to **External** and leave the app
+   in **Testing**. Add the accounts intended for Task 02 under **Test users**.
+   Use the basic sign-in scopes. Google permits users outside the test list when
+   the app requests only basic identity scopes. [Google OAuth app states](https://developers.google.com/identity/protocols/oauth2/production-readiness/overview)
+2. Under **Clients**, create an OAuth client of type **Web application**. Set
+   **Authorized JavaScript origins** to `http://localhost:3000` and
+   **Authorized redirect URIs** to
+   `https://lvqbrjybwstvdhaxyxyn.supabase.co/auth/v1/callback`. Check the URI
+   against the callback shown in the Supabase Google provider panel. [Supabase Google sign-in setup](https://supabase.com/docs/guides/auth/social-sign-in/auth-google#project-setup)
+3. In Supabase **Authentication > Sign In / Providers > Google**, enable the
+   provider and enter the web client's ID and secret directly in the provider
+   settings. Save. Keep both values out of Git, application configuration and
+   validation evidence.
+4. In Supabase **Authentication > URL Configuration**, set **Site URL** to
+   `http://localhost:3000` and add `http://localhost:3000/auth/callback` as an
+   exact entry under **Redirect URLs**. Save and reopen the page to verify both
+   fields. [Supabase redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls)
+
+The Google client sends users back to the hosted Supabase callback.
+[Milestone 03 Task 02](<milestones/milestone-03-authentication/task 02 - supabase sign-in.md>)
+uses the local callback to exchange the code and verify the complete session flow.
+
+For general access after the
+[Milestone 03 security gate](<milestones/milestone-03-authentication/task 03 - authorize clinic access.md>),
+configure the approved production origin and callbacks, complete any Google
+verification that applies, and publish the production OAuth app through
+**Audience**. Verify sign-in with a Google account outside the test list.
+[Google OAuth app states](https://developers.google.com/identity/protocols/oauth2/production-readiness/overview)
+
 ## Persistent clinic listing
 
 `/clinics` lists saved clinics through the Supabase Data API in a Next.js
