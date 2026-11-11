@@ -1,6 +1,6 @@
 # Task 02 — Integrate Supabase sign-in and sessions
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -43,4 +43,54 @@ provider. Verify the live flow on desktop and mobile.
 
 ## Progress notes
 
-Implementation pending assignment.
+Execution started on 2026-11-11. Correction rounds used: 1.
+
+- Initial implementation and independent review at
+  `be51b33113423f7c394dcb067d7edaca45000eda` passed lint, type checking,
+  formatting, the production build, and 243 tests. Both verified OAuth start,
+  cancellation and retry on desktop and mobile, and reload and sign-out with
+  controlled Auth responses. The account holder confirmed hosted Google sign-in
+  and sign-out.
+- Round 0 finding AUTH-01: when hosted logout responds with HTTP 503, the SDK
+  clears the local session, but the application stays on `/clinics` and loses
+  the account control. Fixed and independently verified at
+  `16616eecd51ba6e59363dcb0ec0eb16608cb3658`. Both roles passed `pnpm lint`,
+  `pnpm typecheck`, `pnpm format:check`, `pnpm build`, `pnpm test` (246 tests),
+  and `git diff --check`. Controlled HTTP 204 and 503 cleared the cookie and
+  returned to `/login` on desktop and mobile. The test for a retained session
+  verified that retry remains available. No new code findings or suggestions.
+- AUTH-02: the account holder confirmed that the account menu and sign-out
+  control remained visible after reloading `/clinics` during the hosted expiry
+  test with a 300-second JWT lifetime. The account holder also confirmed Google
+  sign-in, reload, and sign-out in mobile view. Controlled transport separately
+  verified token rotation and sign-out behavior at desktop and mobile sizes.
+- [PR #48](https://github.com/manromero/my-clinics/pull/48) targets `develop`.
+  All 11 inline screenshots were retrieved and matched the inspected desktop
+  and mobile captures. Human approval and manual merge are pending.
+- Reopened for Vercel support because the original Google start action used a
+  fixed localhost callback. Task 03 remains the prerequisite for public use
+  and real clinic data.
+- The protected Vercel Preview deployed application commit
+  `84657fd80ff89bb16064f29e3f1279a3c7107c4d`. Lint, type checking, formatting,
+  the production build, 259 tests, and HTTP-only OAuth checks passed.
+  Independent review found no code blockers. The account holder confirmed
+  Google sign-in, reload, and sign-out on the protected Preview.
+
+## Execution context
+
+- Ready for implementation: Tasks 00 and 01 are merged into `develop` (PRs
+  #46 and #47). Branch `feature/supabase-sign-in` starts at remote `develop`
+  commit `e2e0f046261cb2ba1e9b0b6b5203f829b40eda11`.
+- `src/app/login/page.tsx` contains the sign-in specimen used by the app.
+  `src/app/clinics/page.tsx` currently uses the public header. Review both
+  routes against the screen references, and reuse shared controls.
+- The current clinic Data API client deliberately uses the anonymous role for
+  synthetic development data. The existing SQL grants clinic access to `anon`
+  only. Keep that client and its behavior separate from Auth in this task;
+  Task 03 owns the switch to authenticated, owner-scoped clinic access.
+- Use the hosted development provider configured by Task 01, with
+  `http://localhost:3000/auth/callback` as the registered local callback. Read
+  the official Supabase SSR guide and the installed Next.js guides before edits.
+- The required live success, refresh and sign-out checks need an interactive
+  Google test account. Verify the rest of the flow independently and record any
+  remaining account or environment limitations. No open product decisions.

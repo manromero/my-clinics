@@ -39,6 +39,19 @@ describe("MainNavigation", () => {
     );
   });
 
+  it("links only to available destinations when given a subset", () => {
+    render(
+      <MainNavigation
+        currentHref="/clinics"
+        availableDestinations={["/clinics"]}
+      />,
+    );
+    const links = screen.getAllByRole("link");
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveAccessibleName("Clínicas");
+    expect(links[0]).toHaveAttribute("aria-current", "page");
+  });
+
   it("preserves native sequential and reverse keyboard navigation and Enter activation", async () => {
     const user = userEvent.setup();
     const activate = vi.fn((event) => event.preventDefault());

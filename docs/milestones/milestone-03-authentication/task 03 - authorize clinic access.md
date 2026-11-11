@@ -54,6 +54,19 @@ with two signed-in accounts and a signed-out session. Check clinic operations,
 cross-device persistence, sign-out, expired sessions and the synthetic data
 transition. Verify the protected flow on desktop and mobile.
 
+## Production rollout reminder
+
+After verifying owner-only clinic access, configure the approved production
+Supabase URL and publishable key in Vercel Production and set
+`APP_ORIGIN=https://my-clinics.vercel.app`. Set the production Supabase
+**Site URL** to `https://my-clinics.vercel.app` and add the exact
+`https://my-clinics.vercel.app/auth/callback` under **Redirect URLs**.
+If production uses a separate Supabase project, configure Google for that
+project and register its `/auth/v1/callback` URL as the Google web client's
+authorized redirect URI. Redeploy and verify Google sign-in, reload, and
+sign-out on the production domain.
+[Vercel sign-in origins](../../supabase.md#vercel-sign-in-origins)
+
 ## Progress notes
 
 Implementation pending assignment.
