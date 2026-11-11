@@ -12,12 +12,19 @@ const project = "https://auth-fixture.supabase.co";
 const origin = "http://localhost:3000";
 const sessionCookie = "sb-auth-fixture-auth-token";
 const cookies = new Map<string, string>();
+let failSessionCookieRemoval = false;
 
 vi.mock("server-only", () => ({}));
 vi.mock("next/headers", () => ({
   cookies: async () => ({
     getAll: () => Array.from(cookies, ([name, value]) => ({ name, value })),
     set: (name: string, value: string, options: { maxAge?: number }) => {
+      if (
+        name === sessionCookie &&
+        options.maxAge === 0 &&
+        failSessionCookieRemoval
+      )
+        throw new Error("Could not remove session cookie");
       if (options.maxAge === 0) cookies.delete(name);
       else cookies.set(name, value);
     },
@@ -62,11 +69,13 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
 
   afterEach(() => {
     cookies.clear();
+    failSessionCookieRemoval = false;
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
-  it("persists a PKCE session, rotates an expired token for render and browser, and signs out locally", async () => {
+  it("persists a PKCE session and rotates an expired token for render and browser", async () => {
     const expired = fixtureSession(-1, "initial-fixture-refresh");
     const rotated = fixtureSession(3600, "rotated-fixture-refresh");
     const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
@@ -88,10 +97,8 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
       expect(new Headers(init?.headers).get("authorization")).toBe(
         `Bearer ${rotated.access_token}`,
       );
-      if (url.pathname === "/auth/v1/user") return Response.json(rotated.user);
-      expect(url.pathname).toBe("/auth/v1/logout");
-      expect(url.searchParams.get("scope")).toBe("local");
-      return new Response(null, { status: 204 });
+      expect(url.pathname).toBe("/auth/v1/user");
+      return Response.json(rotated.user);
     });
     vi.stubGlobal("fetch", fetch);
 
@@ -137,10 +144,38 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
         String(url).includes("grant_type=refresh_token"),
       ),
     ).toHaveLength(1);
+  });
 
-    cookies.set(sessionCookie, update!.value);
+  it.each([204, 503])(
+    "clears the local session and opens login when remote logout returns %i",
+    async (status) => {
+      const { fetch } = setupSignOut(status);
+
+      await expect(signOut()).rejects.toThrow("redirect: /login");
+
+      expect(fetch).toHaveBeenCalledOnce();
+      expect(cookies.has(sessionCookie)).toBe(false);
+    },
+  );
+
+  it("offers retry when session cookie removal fails", async () => {
+    const { fetch, cookie } = setupSignOut(204);
+    const reportError = vi.spyOn(console, "error").mockImplementation(() => {});
+    failSessionCookieRemoval = true;
+
+    await expect(signOut()).resolves.toBe(
+      "Vuelve a intentarlo en unos instantes.",
+    );
+    expect(reportError).toHaveBeenCalledWith(
+      new Error("Could not remove session cookie"),
+    );
+    expect(cookies.get(sessionCookie)).toBe(cookie);
+    expect(fetch).toHaveBeenCalledOnce();
+
+    failSessionCookieRemoval = false;
     await expect(signOut()).rejects.toThrow("redirect: /login");
     expect(cookies.has(sessionCookie)).toBe(false);
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   it.each([
@@ -158,3 +193,19 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 });
+
+function setupSignOut(status: number) {
+  const session = fixtureSession(3600, "fixture-refresh");
+  const cookie = `base64-${Buffer.from(JSON.stringify(session)).toString("base64url")}`;
+  cookies.set(sessionCookie, cookie);
+  const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
+    const url = new URL(String(input));
+    expect(url.href).toBe(`${project}/auth/v1/logout?scope=local`);
+    expect(new Headers(init?.headers).get("authorization")).toBe(
+      `Bearer ${session.access_token}`,
+    );
+    return new Response(null, { status });
+  });
+  vi.stubGlobal("fetch", fetch);
+  return { fetch, cookie };
+}

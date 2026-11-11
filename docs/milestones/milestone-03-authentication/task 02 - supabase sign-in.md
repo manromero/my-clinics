@@ -43,7 +43,20 @@ provider. Verify the live flow on desktop and mobile.
 
 ## Progress notes
 
-Execution started on 2026-11-11. Correction rounds used: 0.
+Execution started on 2026-11-11. Correction rounds used: 1.
+
+- Initial implementation and independent review at
+  `be51b33113423f7c394dcb067d7edaca45000eda` passed lint, type checking,
+  formatting, the production build, and 243 tests. Both verified OAuth start,
+  cancellation and retry on desktop and mobile, and reload and sign-out with
+  controlled Auth responses. The account holder confirmed hosted Google sign-in
+  and sign-out. Hosted refresh after expiry remains unverified.
+- Round 0 finding AUTH-01: when hosted logout responds with HTTP 503, the SDK
+  clears the local session, but the application stays on `/clinics` and loses
+  the account control. Correction round 1 addresses this case.
+- The branch is published. Draft PR creation and inline screenshot publication
+  are awaiting explicit authorization for the public repository after automatic
+  approval review rejected both the combined and text-only attempts.
 
 ## Execution context
 
