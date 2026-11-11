@@ -94,3 +94,32 @@ application authentication and authorization.
   [Supabase permissions reference](https://supabase.com/docs/guides/platform/personal-access-tokens#permission-scopes).
   Exercise credential failure paths, valid local and CI runs, and cleanup.
   UI review does not apply. Correction rounds used: 0 of 2.
+
+## Implementation and independent review — 2026-11-11
+
+[Draft PR #45](https://github.com/manromero/my-clinics/pull/45) targets `develop`.
+The implementation and independent review covered
+`80956b3d9bcafc2538151b8ca1cedad818937bb9`. The runner requires an
+explicit scoped token, passes it to the pinned CLI, and checks the inventory in
+the authorized organization without needing account-wide project listing.
+
+Local lint, typecheck, formatting, build, 236 application tests and five
+database tooling tests passed. Missing and synthetic invalid credentials failed
+with redacted diagnostics. The configuration is Git-ignored and tracked files
+and hosted logs contained no literal token. [Hosted CI](https://github.com/manromero/my-clinics/actions/runs/42982510269)
+passed with the existing repository secret and confirmed all three disposable
+projects were deleted and absent. The reviewer independently verified the run
+and cleanup, reran the tooling, lint, typecheck and formatting checks, and found
+no code or documentation defects.
+
+- **BLOCK-01:** The supplied local token received HTTP 401 on the initial
+  read-only organization check. No local disposable project was created. A
+  successful local run with a working dedicated token and cleanup evidence is
+  pending.
+- **BLOCK-02:** The required permission mapping and effective CI access are
+  verified. The token owner's confirmation or redacted Dashboard evidence of
+  the exact grants and organization scope is pending. No live credential
+  rotation or revocation was performed.
+
+The task remains `in_progress`. Correction rounds used: 0 of 2. Human approval
+and manual merge remain pending.
