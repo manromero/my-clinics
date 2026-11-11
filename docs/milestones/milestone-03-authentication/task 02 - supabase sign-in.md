@@ -1,6 +1,6 @@
 # Task 02 — Integrate Supabase sign-in and sessions
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -43,4 +43,23 @@ provider. Verify the live flow on desktop and mobile.
 
 ## Progress notes
 
-Implementation pending assignment.
+Execution started on 2026-11-11. Correction rounds used: 0.
+
+## Execution context
+
+- Ready for implementation: Tasks 00 and 01 are merged into `develop` (PRs
+  #46 and #47). Branch `feature/supabase-sign-in` starts at remote `develop`
+  commit `e2e0f046261cb2ba1e9b0b6b5203f829b40eda11`.
+- `src/app/login/page.tsx` contains the sign-in specimen used by the app.
+  `src/app/clinics/page.tsx` currently uses the public header. Review both
+  routes against the screen references, and reuse shared controls.
+- The current clinic Data API client deliberately uses the anonymous role for
+  synthetic development data. The existing SQL grants clinic access to `anon`
+  only. Keep that client and its behavior separate from Auth in this task;
+  Task 03 owns the switch to authenticated, owner-scoped clinic access.
+- Use the hosted development provider configured by Task 01, with
+  `http://localhost:3000/auth/callback` as the registered local callback. Read
+  the official Supabase SSR guide and the installed Next.js guides before edits.
+- The required live success, refresh and sign-out checks need an interactive
+  Google test account. Verify the rest of the flow independently and record any
+  remaining account or environment limitations. No open product decisions.

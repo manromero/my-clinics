@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppFooter } from "@/lib/components/app-footer/app-footer";
-import { AppHeader } from "@/lib/components/app-header/app-header";
 import { LoadingState } from "@/lib/components/loading-state/loading-state";
 import { PageContainer } from "@/lib/components/page-container/page-container";
 import { ClinicCreation } from "./clinic-creation";
+import { ClinicsHeader } from "./clinics-header";
 import { SavedClinics } from "./saved-clinics";
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function ClinicsPage() {
   return (
     <div className="flex min-h-dvh flex-col">
-      <AppHeader variant="public" />
+      <ClinicsHeader />
       <PageContainer as="main" className="flex-1 space-y-8">
         <ClinicCreation />
         <Suspense
