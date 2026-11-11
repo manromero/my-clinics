@@ -19,18 +19,21 @@ export type Database = {
           active: boolean;
           id: number;
           name: string;
+          owner_id: string | null;
           percentage: number;
         };
         Insert: {
           active?: boolean;
           id?: never;
           name: string;
+          owner_id?: string | null;
           percentage: number;
         };
         Update: {
           active?: boolean;
           id?: never;
           name?: string;
+          owner_id?: string | null;
           percentage?: number;
         };
         Relationships: [];

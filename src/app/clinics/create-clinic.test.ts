@@ -2,16 +2,19 @@ import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Database } from "@/lib/supabase/database.types";
-import { createSupabaseServerClient } from "@/lib/supabase/server-client";
+import { requireSupabaseActionSession } from "@/lib/supabase/session";
 import { createClinic } from "./create-clinic";
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
-vi.mock("@/lib/supabase/server-client", () => ({
-  createSupabaseServerClient: vi.fn(),
+vi.mock("@/lib/supabase/session", () => ({
+  requireSupabaseActionSession: vi.fn(),
 }));
 
 const fetch = vi.fn<typeof globalThis.fetch>();
-const getClient = vi.mocked(createSupabaseServerClient);
+const user = { id: "verified-user" } as Awaited<
+  ReturnType<typeof requireSupabaseActionSession>
+>["user"];
+const requireSession = vi.mocked(requireSupabaseActionSession);
 const nameLengthError =
   "El nombre de la clínica debe tener como máximo 200 caracteres.";
 
@@ -24,19 +27,29 @@ function clinicForm(name: string, percentage: string) {
 
 beforeEach(() => {
   vi.resetAllMocks();
-  getClient.mockReturnValue(
-    createClient<Database>(
+  requireSession.mockResolvedValue({
+    user,
+    client: createClient<Database>(
       "https://myclinics.example",
       "sb_publishable_fixture",
       {
-        accessToken: async () => null,
+        accessToken: async () => "verified-token",
         global: { fetch },
       },
     ),
-  );
+  });
 });
 
 describe("create clinic server action", () => {
+  it("rejects direct calls without a verified session before reaching the Data API", async () => {
+    requireSession.mockRejectedValue(new Error("redirect: /login"));
+    await expect(createClinic(clinicForm("Fixture", "27"))).rejects.toThrow(
+      "redirect: /login",
+    );
+    expect(fetch).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
   it.each([
     ["0", 0],
     [" 27,50 ", 27.5],
@@ -46,6 +59,7 @@ describe("create clinic server action", () => {
     async (raw, value) => {
       fetch.mockResolvedValue(new Response(null, { status: 201 }));
       const form = clinicForm("  Clínica Sintética  ", raw);
+      form.set("owner_id", "forged-user");
       form.set("id", "123");
       form.set("active", "false");
 
@@ -57,6 +71,7 @@ describe("create clinic server action", () => {
           body: JSON.stringify({
             name: "Clínica Sintética",
             percentage: value,
+            owner_id: user.id,
           }),
         }),
       );
@@ -78,7 +93,7 @@ describe("create clinic server action", () => {
         nameError: "Introduce el nombre de la clínica.",
         percentageError,
       });
-      expect(getClient).not.toHaveBeenCalled();
+      expect(fetch).not.toHaveBeenCalled();
       expect(revalidatePath).not.toHaveBeenCalled();
     },
   );
@@ -110,7 +125,7 @@ describe("create clinic server action", () => {
     expect(fetch).toHaveBeenCalledExactlyOnceWith(
       "https://myclinics.example/rest/v1/clinics",
       expect.objectContaining({
-        body: JSON.stringify({ name, percentage: 27 }),
+        body: JSON.stringify({ name, percentage: 27, owner_id: user.id }),
       }),
     );
   });
@@ -123,7 +138,7 @@ describe("create clinic server action", () => {
         nameError: nameLengthError,
         percentageError: "Introduce un porcentaje entre 0 y 100.",
       });
-      expect(getClient).not.toHaveBeenCalled();
+      expect(fetch).not.toHaveBeenCalled();
       expect(revalidatePath).not.toHaveBeenCalled();
     },
   );

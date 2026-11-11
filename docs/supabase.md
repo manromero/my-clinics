@@ -418,10 +418,13 @@ redirect URI** is still the corresponding Supabase provider callback
 
 ## Persistent clinic listing
 
-`/clinics` lists saved clinics through the Supabase Data API in a Next.js
-Server Component. It follows the [Supabase Next.js quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/nextjs#7-query-supabase-data-from-nextjs)
-query pattern. PostgreSQL grants and row-level security (RLS) govern Data API
-requests. The screen lists clinics and offers retry.
+`/clinics` verifies the user's session with Supabase Auth before rendering.
+Listing and Server Actions verify their own calls and use the signed-in SSR
+client for Data API requests. PostgreSQL grants limit the columns and operations
+available to authenticated users. Row-level security (RLS) restricts reads and
+writes to rows owned by the session user. The database enforces normalized name
+uniqueness per owner and denies application requests to delete or transfer rows.
+[Supabase SSR setup](https://supabase.com/docs/guides/auth/server-side/nextjs)
 
 Copy the [root template](../.env.example) to an ignored root `.env.local` if
 it does not exist. Set `NEXT_PUBLIC_SUPABASE_URL` to the approved development
@@ -466,7 +469,48 @@ also support synthetic insert, update and deletion requests.
 
 Authorized `pnpm db:validate` uses disposable projects with the Data API
 still disabled. It verifies replay, schema parity, committed type freshness,
-upgrade preservation, and anonymous CRUD and privilege limits under real SQL
-roles. The application unit tests verify the SDK request and row mapping with
-controlled HTTP responses. Live REST and local browser checks on the approved
-shared project verify the running Server Component.
+upgrade preservation, and owner isolation and privilege limits under real SQL
+roles. Application tests verify session checks, SDK requests and row mapping
+using controlled HTTP responses. Live acceptance requires browser and direct
+Data API checks in an approved synthetic environment.
+
+### Owner-only rollout
+
+Follow the [manual migration procedure](#5-manual-migration-application) for the
+exact approved target and commit. Complete hosted disposable validation first.
+
+1. Verify the target ref and migration history, disable the Data API, and record
+   an exact inventory of the existing synthetic clinics and their IDs. Obtain an
+   approved mapping of each row retained for application use to its owner in
+   that target's `auth.users`. Rows left unassigned remain inaccessible to all
+   application accounts. Keep the mapping in the operator's rollout record.
+2. Apply the reviewed owner migration. Verify that the original clinic rows and
+   IDs are preserved, `owner_id` is `NULL` for existing rows, and temporary
+   anonymous policies and column grants are gone. The migration does not assign
+   ownership automatically.
+3. If the approved mapping contains rows to assign, verify the Auth user IDs
+   against that project's Auth users. Apply only the approved mapping in a
+   reviewed transaction as the database operator. Match explicit clinic IDs and
+   require `owner_id is null` for each assignment. Check the number and IDs of
+   the updated rows, the resulting owner IDs and the untouched rows before
+   committing. A uniqueness or foreign-key failure must leave the mapping
+   unapplied. Keep the Data API disabled throughout this step.
+   For a separately approved deletion of synthetic rows, use an operator
+   transaction scoped to the approved IDs with `owner_id is null`. Compare the
+   locked inventory against the approval before deletion and verify the exact
+   returned IDs before commit. Roll back on any mismatch. Keep the Data API
+   disabled until the transaction and post-checks are complete.
+4. Verify owner policies and grants on the target before enabling the Data API
+   for approved synthetic acceptance. Keep automatic exposure of new tables
+   disabled. With two separate Google accounts, test listing, creation, editing,
+   deactivation, reactivation, reload and a second session for the same account.
+   Check normalized duplicates within each account and allow the same name in
+   the other account. Verify sign-out, expired sessions, save/cancel and retry
+   on desktop and mobile.
+5. Use the approved project's publishable key for direct REST checks and the
+   appropriate test session token in `Authorization: Bearer …` for authenticated
+   requests. Request `select=id,name,percentage,active` when listing. Verify
+   anonymous requests cannot read or mutate, each user cannot see or update the
+   other user's rows by ID, forged insert owners and ownership changes are
+   rejected, and deletion is denied. Compare the owner and unassigned rows after
+   these probes. Record the outcomes before real data or public use.

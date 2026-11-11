@@ -2,16 +2,19 @@ import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Database } from "@/lib/supabase/database.types";
-import { createSupabaseServerClient } from "@/lib/supabase/server-client";
+import { requireSupabaseActionSession } from "@/lib/supabase/session";
 import { updateClinic } from "./update-clinic";
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
-vi.mock("@/lib/supabase/server-client", () => ({
-  createSupabaseServerClient: vi.fn(),
+vi.mock("@/lib/supabase/session", () => ({
+  requireSupabaseActionSession: vi.fn(),
 }));
 
 const fetch = vi.fn<typeof globalThis.fetch>();
-const getClient = vi.mocked(createSupabaseServerClient);
+const user = { id: "verified-user" } as Awaited<
+  ReturnType<typeof requireSupabaseActionSession>
+>["user"];
+const requireSession = vi.mocked(requireSupabaseActionSession);
 const clinicId = "9223372036854775807";
 
 function clinicForm(name = "  Clínica Sintética  ", percentage = "27,50") {
@@ -24,19 +27,29 @@ function clinicForm(name = "  Clínica Sintética  ", percentage = "27,50") {
 
 beforeEach(() => {
   vi.resetAllMocks();
-  getClient.mockReturnValue(
-    createClient<Database>(
+  requireSession.mockResolvedValue({
+    user,
+    client: createClient<Database>(
       "https://myclinics.example",
       "sb_publishable_fixture",
       {
-        accessToken: async () => null,
+        accessToken: async () => "verified-token",
         global: { fetch },
       },
     ),
-  );
+  });
 });
 
 describe("update clinic server action", () => {
+  it("rejects direct calls without a verified session before reaching the Data API", async () => {
+    requireSession.mockRejectedValue(new Error("redirect: /login"));
+    await expect(updateClinic(clinicId, clinicForm())).rejects.toThrow(
+      "redirect: /login",
+    );
+    expect(fetch).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
   it.each([
     ["inactive", false],
     ["active", true],
@@ -46,6 +59,7 @@ describe("update clinic server action", () => {
       fetch.mockResolvedValue(Response.json([{ id: clinicId }]));
       const form = clinicForm();
       form.set("active", state);
+      form.set("owner_id", "forged-user");
       form.set("id", "1");
 
       expect(await updateClinic(clinicId, form)).toEqual({ status: "saved" });
@@ -73,7 +87,7 @@ describe("update clinic server action", () => {
         "El nombre de la clínica debe tener como máximo 200 caracteres.",
       percentageError: "Usa como máximo dos decimales.",
     });
-    expect(getClient).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
     expect(revalidatePath).not.toHaveBeenCalled();
   });
 
@@ -83,7 +97,7 @@ describe("update clinic server action", () => {
       expect(await updateClinic(id, clinicForm())).toEqual({
         status: "missing",
       });
-      expect(getClient).not.toHaveBeenCalled();
+      expect(fetch).not.toHaveBeenCalled();
       expect(revalidatePath).not.toHaveBeenCalled();
     },
   );
@@ -93,7 +107,7 @@ describe("update clinic server action", () => {
     form.delete("active");
 
     expect(await updateClinic(clinicId, form)).toEqual({ status: "failed" });
-    expect(getClient).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
     expect(revalidatePath).not.toHaveBeenCalled();
   });
 

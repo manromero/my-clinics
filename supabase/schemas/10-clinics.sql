@@ -12,6 +12,8 @@ create table public.clinics (
   -- No numeric(p,s): a typmod would round before CHECK constraints see input.
   percentage numeric not null,
   active boolean default true not null,
+  -- Legacy synthetic rows stay unowned until an approved operator maps them.
+  owner_id uuid constraint clinics_owner_id_fkey references auth.users(id),
   constraint clinics_name_nonblank check (public.clinic_name_key(name) <> ''),
   constraint clinics_name_length check (char_length(name) <= 200),
   constraint clinics_percentage_range check (percentage >= 0 and percentage <= 100),
@@ -19,4 +21,4 @@ create table public.clinics (
 );
 
 create unique index clinics_name_key_unique
-  on public.clinics (public.clinic_name_key(name));
+  on public.clinics (owner_id, public.clinic_name_key(name)) nulls not distinct;

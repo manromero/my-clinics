@@ -1,7 +1,13 @@
+// @vitest-environment node
+
 import { createClient } from "@supabase/supabase-js";
 import { describe, expect, it, vi } from "vitest";
 import type { Database } from "@/lib/supabase/database.types";
+import { requireSupabaseSession } from "@/lib/supabase/session";
 import { listClinics, type ClinicRow } from "./list-clinics";
+
+vi.mock("server-only", () => ({}));
+vi.mock("@/lib/supabase/session", () => ({ requireSupabaseSession: vi.fn() }));
 
 const row: ClinicRow = {
   id: "9007199254740993",
@@ -11,14 +17,19 @@ const row: ClinicRow = {
 };
 
 function testClient(fetch: typeof globalThis.fetch) {
-  return createClient<Database>(
-    "https://myclinics.example",
-    "sb_publishable_fixture",
-    {
-      accessToken: async () => null,
-      global: { fetch },
-    },
-  );
+  vi.mocked(requireSupabaseSession).mockResolvedValue({
+    client: createClient<Database>(
+      "https://myclinics.example",
+      "sb_publishable_fixture",
+      {
+        accessToken: async () => "verified-token",
+        global: { fetch },
+      },
+    ),
+    user: { id: "verified-user" } as Awaited<
+      ReturnType<typeof requireSupabaseSession>
+    >["user"],
+  });
 }
 
 function response(data: unknown, status = 200) {
@@ -29,7 +40,7 @@ function response(data: unknown, status = 200) {
 }
 
 describe("Supabase clinic listing", () => {
-  it("uses a publishable key with an exact ID cast and numeric server ordering", async () => {
+  it("uses the verified user's token with an exact ID cast and numeric server ordering", async () => {
     const fetch = vi
       .fn<typeof globalThis.fetch>()
       .mockImplementation(async (input, init) => {
@@ -43,17 +54,28 @@ describe("Supabase clinic listing", () => {
           "sb_publishable_fixture",
         );
         expect(new Headers(init?.headers).get("authorization")).toBe(
-          "Bearer sb_publishable_fixture",
+          "Bearer verified-token",
         );
         expect(init?.method).toBe("GET");
         return response([{ ...row, id: "9" }, { ...row, id: "10" }, row]);
       });
-    expect(await listClinics(testClient(fetch))).toEqual([
+    testClient(fetch);
+    expect(await listClinics()).toEqual([
       { ...row, id: "9" },
       { ...row, id: "10" },
       row,
     ]);
     expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("preserves the signed-out redirect instead of reporting a list failure", async () => {
+    const fetch = vi.fn();
+    testClient(fetch);
+    vi.mocked(requireSupabaseSession).mockRejectedValue(
+      new Error("redirect: /login"),
+    );
+    await expect(listClinics()).rejects.toThrow("redirect: /login");
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -64,14 +86,14 @@ describe("Supabase clinic listing", () => {
     { percentage: 1.001 },
     { active: null },
   ])("rejects invalid wire DTO %j without a partial list", async (invalid) => {
-    const client = testClient(
+    testClient(
       vi.fn().mockResolvedValue(response([row, { ...row, ...invalid }])),
     );
-    expect(await listClinics(client)).toBeNull();
+    expect(await listClinics()).toBeNull();
   });
 
   it("contains API errors and can retry", async () => {
-    const client = testClient(
+    testClient(
       vi
         .fn()
         .mockResolvedValueOnce(
@@ -79,7 +101,7 @@ describe("Supabase clinic listing", () => {
         )
         .mockResolvedValueOnce(response([])),
     );
-    expect(await listClinics(client)).toBeNull();
-    expect(await listClinics(client)).toEqual([]);
+    expect(await listClinics()).toBeNull();
+    expect(await listClinics()).toEqual([]);
   });
 });

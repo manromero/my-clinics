@@ -222,6 +222,12 @@ async function clinicUpgrade(ref) {
     lengthPosition > securityPosition,
     "Missing clinic name limit migration",
   );
+  const ownerMigration = "20261111120000_restrict_clinics_to_owners.sql";
+  const ownerPosition = files.indexOf(ownerMigration);
+  assert.ok(
+    ownerPosition > lengthPosition,
+    "Missing clinic ownership migration",
+  );
   await replay(ref, files.slice(0, position));
   // The previous public baseline was empty: no pre-existing clinics are possible.
   // Commit synthetic data in a separate schema before applying the real migration.
@@ -298,8 +304,22 @@ async function clinicUpgrade(ref) {
   console.log(
     "Clinic name limit upgrade preserved the valid existing rows, including the 200-code-point name",
   );
-  if (lengthPosition < files.length - 1) {
-    await replay(ref, files.slice(lengthPosition + 1));
+  await replay(ref, files.slice(lengthPosition + 1, ownerPosition + 1));
+  assert.deepEqual(await query(ref, list), validRows);
+  assert.deepEqual(
+    await query(
+      ref,
+      "select count(owner_id)::integer as count from public.clinics",
+    ),
+    [{ count: 0 }],
+    "The owner migration must not assign any legacy rows implicitly",
+  );
+  await databaseTests(ref, ["20-clinic-owner-access.sql"]);
+  console.log(
+    "Actual ownership upgrade preserved every clinic and isolated legacy rows under real SQL roles",
+  );
+  if (ownerPosition < files.length - 1) {
+    await replay(ref, files.slice(ownerPosition + 1));
   }
   await query(ref, "drop schema validation_preclinic cascade");
   console.log(
@@ -345,8 +365,8 @@ async function generateTypes(ref, accessToken) {
   return format(raw, { parser: "typescript" });
 }
 
-async function databaseTests(ref) {
-  const files = await sqlFiles("supabase/tests");
+async function databaseTests(ref, selectedFiles) {
+  const files = selectedFiles ?? (await sqlFiles("supabase/tests"));
   assert.ok(files.length, "At least one database test is required");
   for (const name of files) {
     await query(
@@ -444,7 +464,7 @@ export async function main(mode = process.argv[2]) {
       );
       await databaseTests(ref);
       console.log(
-        "Clinic development grants, RLS and anonymous CRUD verified with SQL role tests while the Data API was disabled.",
+        "Clinic owner grants and RLS verified with two authenticated subjects and the anon role while the Data API was disabled.",
       );
       await clinicConcurrencyTests((sql) => query(ref, sql));
       await clinicNegativeControls(

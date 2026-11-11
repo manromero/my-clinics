@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { isClinicId } from "@/lib/clinics/clinic";
-import { createSupabaseServerClient } from "@/lib/supabase/server-client";
+import { requireSupabaseActionSession } from "@/lib/supabase/session";
 import {
   clinicWriteError,
   validateClinicFields,
@@ -13,15 +13,13 @@ export async function updateClinic(
   id: string,
   formData: FormData,
 ): Promise<ClinicSaveResult> {
+  const { client } = await requireSupabaseActionSession();
   const fields = validateClinicFields(formData);
   if (fields.status === "invalid") return fields;
 
   if (!isClinicId(id)) return { status: "missing" };
   const state = formData.get("active");
   if (state !== "active" && state !== "inactive") return { status: "failed" };
-
-  const client = createSupabaseServerClient();
-  if (!client) return { status: "failed" };
 
   try {
     const { data, error } = await client

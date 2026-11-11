@@ -6,16 +6,18 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // Observe the contender waiting on the winner's transaction before accepting
 // a rejection as concurrency evidence; sequential duplicate tests are insufficient.
 export async function clinicConcurrencyTests(query) {
+  const owner = "00000000-0000-4000-8000-000000000003";
+  await query(`insert into auth.users(id) values ('${owner}')`);
   for (const scenario of ["insert-insert", "insert-update", "update-update"]) {
-    await query(`insert into public.clinics(id,name,percentage) overriding system value values
-      (-11,'Race original one',10), (-12,'Race original two',20)`);
+    await query(`insert into public.clinics(id,owner_id,name,percentage) overriding system value values
+      (-11,'${owner}','Race original one',10), (-12,'${owner}','Race original two',20)`);
     const firstWrite =
       scenario === "update-update"
         ? `update public.clinics set name='Race target' where id=-11`
-        : `insert into public.clinics(name,percentage) values ('Race target',30)`;
+        : `insert into public.clinics(owner_id,name,percentage) values ('${owner}','Race target',30)`;
     const secondWrite =
       scenario === "insert-insert"
-        ? `insert into public.clinics(name,percentage) values (E'\\tRACE TARGET\\n',40)`
+        ? `insert into public.clinics(owner_id,name,percentage) values ('${owner}',E'\\tRACE TARGET\\n',40)`
         : `update public.clinics set name=' RACE TARGET ' where id=-12`;
     const settle = (promise) =>
       promise.then(
@@ -60,7 +62,7 @@ export async function clinicConcurrencyTests(query) {
       );
       assert.deepEqual(
         await query(`select count(*)::integer as count from public.clinics
-        where public.clinic_name_key(name)='race target'`),
+        where owner_id='${owner}' and public.clinic_name_key(name)='race target'`),
         [{ count: 1 }],
       );
       console.log(
@@ -69,11 +71,10 @@ export async function clinicConcurrencyTests(query) {
     } finally {
       await first;
       if (second) await second;
-      await query(
-        `delete from public.clinics where public.clinic_name_key(name) like 'race %'`,
-      );
+      await query(`delete from public.clinics where owner_id='${owner}'`);
     }
   }
+  await query(`delete from auth.users where id='${owner}'`);
 }
 
 export async function clinicSeedTests(query, seed) {

@@ -8,10 +8,6 @@ import { SavedClinics } from "./saved-clinics";
 import { updateClinic } from "./update-clinic";
 
 vi.mock("next/navigation", () => ({ useRouter: vi.fn() }));
-vi.mock("next/server", () => ({ connection: vi.fn() }));
-vi.mock("@/lib/supabase/server-client", () => ({
-  createSupabaseServerClient: () => ({}),
-}));
 vi.mock("./list-clinics", () => ({ listClinics: vi.fn() }));
 vi.mock("./update-clinic", () => ({ updateClinic: vi.fn() }));
 

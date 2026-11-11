@@ -1,6 +1,6 @@
 # Task 03 — Restrict clinics to their owners
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -69,4 +69,59 @@ sign-out on the production domain.
 
 ## Progress notes
 
-Implementation pending assignment.
+Implementation started on 2026-11-11. Correction rounds used: 0 of 2.
+
+- [PR #49](https://github.com/manromero/my-clinics/pull/49) targets
+  `develop`. Implementation head `e44b0bd8f619c8a24a414fed08e8b5268cfb54ca`
+  passed lint, type checking, formatting, the production build, 266 application
+  tests, and five database tooling tests. Hosted validation passed clean replay,
+  generated-type freshness, owner policy and grant tests, the ownership upgrade,
+  schema parity, and disposable project cleanup. The PR includes desktop and
+  mobile evidence using controlled Auth and Data API responses.
+- The user approved deleting the existing synthetic clinics from shared
+  development during rollout. The owner mapping is empty for that inventory.
+  The migration preserves and isolates existing rows. Any approved deletion is
+  a separate operator transaction after preservation is verified.
+- The approved shared development rollout applied migrations `20261110190000`
+  and `20261111120000` from `7d6b259cf3a17d6f514c768783f0050700224ce7`.
+  The user approved keeping the Data API active for this rollout. Migration
+  history and the catalog check passed. The owner policies were in place, and
+  the anonymous Data API read returned HTTP 401 with SQLSTATE `42501`.
+  An operator transaction verified the unassigned inventory and removed all
+  seven approved synthetic clinics. A read-only check confirmed zero
+  remaining rows.
+- The user confirmed the manual acceptance checklist passed in the preview
+  with two Google accounts, including isolation, duplicate-name behavior,
+  clinic edits, persistence in a separate session, and sign-out. A read-only
+  query corroborated that saved clinics have two distinct owners. The live Data
+  API rejected anonymous reads, inserts, updates, and deletes with HTTP 401
+  and SQLSTATE `42501`.
+- Direct HTTP probes with both Google sessions confirmed that each account
+  could read its own clinics. Reads and updates targeting the other account's
+  clinic returned zero rows. Forged ownership on insert, attempts to update
+  the owner column, and deletion were denied in both directions.
+- Independent review at `634ad26ffcebca32e9c5d8a78401dca9c13aa868` repeated
+  the application and hosted validation checks. Desktop and mobile Chrome
+  verified the protected flow, account separation, clinic edits, and save
+  failure and retry with controlled responses, including rejection of an
+  expired session. The review found no code or visual blockers. The live
+  results close the remaining acceptance check. No correction rounds were
+  used. Human PR approval and manual merge remain pending.
+
+## Execution context
+
+- Task 02 is integrated in PR #48 and Milestone 02 Task 08 is complete.
+  The branch `feature/authorize-clinic-access` starts from `develop` at
+  `5e36dfb8d651e3998b59ecae2cfb97c5a4a74beb`.
+- Reuse the Supabase SSR session and refresh infrastructure in
+  `src/lib/supabase` and `src/proxy.ts`. The page and data operations are
+  in `src/app/clinics`. The current anonymous grants and policy tests are
+  in `supabase/`.
+- Use the [requirements](../../requirements.md#access-and-devices),
+  [architecture](../../architecture.md#supabase-boundaries), and
+  [sign-in and clinics references](../../screens.md#s01--sign-in).
+- Repository implementation can proceed with existing synthetic rows isolated
+  from application roles. The operator must confirm disposition and explicitly
+  map any rows retained for application use before rollout. Hosted checks
+  require disposable lifecycle authorization and live acceptance requires two
+  Google accounts in the approved synthetic environment.
