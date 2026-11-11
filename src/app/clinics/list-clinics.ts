@@ -1,15 +1,17 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import "server-only";
+
 import {
   isClinicId,
   parseClinicPercentage,
   type Clinic,
 } from "@/lib/clinics/clinic";
 import type { Database } from "@/lib/supabase/database.types";
+import { requireSupabaseSession } from "@/lib/supabase/session";
 
 // PostgreSQL casts bigint to text before transport, overriding only its wire ID.
-export type ClinicRow = Omit<
+export type ClinicRow = Pick<
   Database["public"]["Tables"]["clinics"]["Row"],
-  "id"
+  "name" | "percentage" | "active"
 > & { id: string };
 
 function mapClinic(row: ClinicRow): Clinic {
@@ -30,7 +32,8 @@ function mapClinic(row: ClinicRow): Clinic {
   };
 }
 
-export async function listClinics(client: SupabaseClient<Database>) {
+export async function listClinics() {
+  const { client } = await requireSupabaseSession();
   try {
     const { data, error } = await client
       .from("clinics")

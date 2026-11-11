@@ -3,18 +3,24 @@ import { Suspense } from "react";
 import { AppFooter } from "@/lib/components/app-footer/app-footer";
 import { LoadingState } from "@/lib/components/loading-state/loading-state";
 import { PageContainer } from "@/lib/components/page-container/page-container";
+import { requireSupabaseSession } from "@/lib/supabase/session";
 import { ClinicCreation } from "./clinic-creation";
-import { ClinicsHeader } from "./clinics-header";
 import { SavedClinics } from "./saved-clinics";
+import { SignedInClinicsHeader } from "./signed-in-clinics-header";
 
 export const metadata: Metadata = {
   title: "Clínicas | MyClinics",
 };
 
-export default function ClinicsPage() {
+export default async function ClinicsPage() {
+  const { user } = await requireSupabaseSession();
+  const name = user.user_metadata?.full_name;
+  const displayName =
+    (typeof name === "string" && name.trim()) || user.email || "Usuario";
+
   return (
     <div className="flex min-h-dvh flex-col">
-      <ClinicsHeader />
+      <SignedInClinicsHeader displayName={displayName} email={user.email} />
       <PageContainer as="main" className="flex-1 space-y-8">
         <ClinicCreation />
         <Suspense

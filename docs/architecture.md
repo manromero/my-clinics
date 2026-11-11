@@ -27,7 +27,7 @@ src/
   lib/
     clinics/
     components/
-    supabase/server-client.ts
+    supabase/session.ts
     supabase/database.types.ts
 ```
 
@@ -49,18 +49,18 @@ desired schema SQL, reviewed migration history, synthetic seeds and database tes
 The [Supabase guide](supabase.md) covers hosted setup and operating procedures;
 [database agent rules](../supabase/AGENTS.md) govern automated changes.
 
-The Supabase client in `src/lib/supabase/server-client.ts` uses the project's
-publishable key and generated types from `src/lib/supabase/database.types.ts`.
-The Clinics Server Component queries the Data API at request time. The query and
-row mapping live next to the route in `src/app/clinics/list-clinics.ts` and cast
-bigint IDs to text before transport. Suspense streams the loading state and the
-retry button refreshes the route.
+The Supabase SSR client uses the project's publishable key, request cookies and
+generated types from `src/lib/supabase/database.types.ts`. Proxy refreshes the
+session. The guards in `src/lib/supabase/session.ts` verify the session with
+Supabase Auth in the Clinics page, list query and each write action. The page and
+list share verification within the React render. Write actions verify each call
+using writable cookies, and creation uses the verified Auth user ID as owner.
 
-PostgreSQL grants and row-level security control access to the Data API. The
-approved development policy allows anonymous access to the synthetic clinic
-table until [Milestone 03 Task 03](<milestones/milestone-03-authentication/task 03 - authorize clinic access.md>)
-replaces it with access scoped to the signed-in owner. The Clinics screen
-exposes listing and retry for saved clinics.
+The same client sends the user's access token to the Data API. Column grants
+limit operations and row-level security restricts reads and writes to the owner.
+The route-local list query casts bigint IDs to text before transport and maps
+the selected fields to the clinic model. Suspense streams the loading state and
+the retry button refreshes the route.
 
 ## Component reuse
 

@@ -3,7 +3,10 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { GET as authCallback } from "@/app/auth/callback/route";
+import { createClinic } from "@/app/clinics/create-clinic";
+import { listClinics } from "@/app/clinics/list-clinics";
 import { signOut } from "@/app/clinics/sign-out";
+import { updateClinic } from "@/app/clinics/update-clinic";
 import { startGoogleSignIn } from "@/app/login/actions";
 import { proxy } from "@/proxy";
 import { createSupabaseAuthClient } from "./auth-client";
@@ -20,6 +23,7 @@ let requestOrigin = origin;
 let failSessionCookieRemoval = false;
 
 vi.mock("server-only", () => ({}));
+vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("next/headers", () => ({
   headers: async () =>
     new Headers({
@@ -252,6 +256,90 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
     },
   );
 
+  it.each(["missing", "expired", "rejected"])(
+    "denies every clinic data entry point when the session is %s",
+    async (state) => {
+      if (state !== "missing") {
+        storeSession(
+          fixtureSession(state === "expired" ? -1 : 3600, "invalid-refresh"),
+        );
+      }
+      const fetch = vi
+        .fn<typeof globalThis.fetch>()
+        .mockImplementation(async (input) => {
+          expect(new URL(String(input)).pathname).toBe(
+            state === "expired" ? "/auth/v1/token" : "/auth/v1/user",
+          );
+          return Response.json({ message: "Invalid session" }, { status: 401 });
+        });
+      vi.stubGlobal("fetch", fetch);
+
+      await expect(listClinics()).rejects.toThrow("redirect: /login");
+      await expect(createClinic(new FormData())).rejects.toThrow(
+        "redirect: /login",
+      );
+      await expect(updateClinic("1", new FormData())).rejects.toThrow(
+        "redirect: /login",
+      );
+      expect(
+        fetch.mock.calls.some(([url]) => String(url).includes("/rest/v1/")),
+      ).toBe(false);
+      if (state === "missing") expect(fetch).not.toHaveBeenCalled();
+      else expect(fetch).toHaveBeenCalled();
+    },
+  );
+
+  it("forwards the verified session token and ignores caller-supplied and cookie user IDs", async () => {
+    const session = fixtureSession(3600, "fixture-refresh");
+    storeSession({
+      ...session,
+      user: { ...session.user, id: "unverified-cookie-user" },
+    });
+    const fetch = vi
+      .fn<typeof globalThis.fetch>()
+      .mockImplementation(async (input, init) => {
+        const url = new URL(String(input));
+        expect(new Headers(init?.headers).get("authorization")).toBe(
+          `Bearer ${session.access_token}`,
+        );
+        if (url.pathname === "/auth/v1/user")
+          return Response.json(session.user);
+        expect(url.pathname).toBe("/rest/v1/clinics");
+        if (init?.method === "GET") return Response.json([]);
+        if (init?.method === "PATCH") {
+          expect(JSON.parse(String(init.body))).not.toHaveProperty("owner_id");
+          return Response.json([{ id: "1" }]);
+        }
+        expect(init?.method).toBe("POST");
+        expect(JSON.parse(String(init?.body))).toEqual({
+          name: "Fixture",
+          percentage: 27,
+          owner_id: session.user.id,
+        });
+        return new Response(null, { status: 201 });
+      });
+    vi.stubGlobal("fetch", fetch);
+
+    const form = new FormData();
+    form.set("name", "Fixture");
+    form.set("percentage", "27");
+    form.set("active", "inactive");
+    form.set("owner_id", "forged-user");
+    await expect(listClinics()).resolves.toEqual([]);
+    await expect(createClinic(form)).resolves.toEqual({ status: "saved" });
+    await expect(updateClinic("1", form)).resolves.toEqual({ status: "saved" });
+    expect(
+      fetch.mock.calls.map(([input]) => new URL(String(input)).pathname),
+    ).toEqual([
+      "/auth/v1/user",
+      "/rest/v1/clinics",
+      "/auth/v1/user",
+      "/rest/v1/clinics",
+      "/auth/v1/user",
+      "/rest/v1/clinics",
+    ]);
+  });
+
   it("offers retry when session cookie removal fails", async () => {
     const { fetch, cookie } = setupSignOut(204);
     const reportError = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -290,8 +378,7 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
 
 function setupSignOut(status: number) {
   const session = fixtureSession(3600, "fixture-refresh");
-  const cookie = `base64-${Buffer.from(JSON.stringify(session)).toString("base64url")}`;
-  cookies.set(sessionCookie, cookie);
+  const cookie = storeSession(session);
   const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
     const url = new URL(String(input));
     expect(url.href).toBe(`${project}/auth/v1/logout?scope=local`);
@@ -302,4 +389,10 @@ function setupSignOut(status: number) {
   });
   vi.stubGlobal("fetch", fetch);
   return { fetch, cookie };
+}
+
+function storeSession(session: ReturnType<typeof fixtureSession>) {
+  const cookie = `base64-${Buffer.from(JSON.stringify(session)).toString("base64url")}`;
+  cookies.set(sessionCookie, cookie);
+  return cookie;
 }

@@ -1,6 +1,6 @@
 # Task 03 — Restrict clinics to their owners
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -69,4 +69,22 @@ sign-out on the production domain.
 
 ## Progress notes
 
-Implementation pending assignment.
+Implementation started on 2026-11-11. Correction rounds used: 0 of 2.
+
+## Execution context
+
+- Task 02 is integrated in PR #48 and Milestone 02 Task 08 is complete.
+  The branch `feature/authorize-clinic-access` starts from `develop` at
+  `5e36dfb8d651e3998b59ecae2cfb97c5a4a74beb`.
+- Reuse the Supabase SSR session and refresh infrastructure in
+  `src/lib/supabase` and `src/proxy.ts`. The page and data operations are
+  in `src/app/clinics`. The current anonymous grants and policy tests are
+  in `supabase/`.
+- Use the [requirements](../../requirements.md#access-and-devices),
+  [architecture](../../architecture.md#supabase-boundaries), and
+  [sign-in and clinics references](../../screens.md#s01--sign-in).
+- Repository implementation can proceed with existing synthetic rows isolated
+  from application roles. The operator must confirm disposition and explicitly
+  map any rows retained for application use before rollout. Hosted checks
+  require disposable lifecycle authorization and live acceptance requires two
+  Google accounts in the approved synthetic environment.
