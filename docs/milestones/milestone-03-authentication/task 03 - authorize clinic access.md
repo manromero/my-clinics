@@ -82,8 +82,16 @@ Implementation started on 2026-11-11. Correction rounds used: 0 of 2.
   development during rollout. The owner mapping is empty for that inventory.
   The migration preserves and isolates existing rows. Any approved deletion is
   a separate operator transaction after preservation is verified.
-- Live acceptance with two Google accounts, direct Data API probes, and a
-  separate session or device remains pending.
+- The approved shared development rollout applied migrations `20261110190000`
+  and `20261111120000` from `7d6b259cf3a17d6f514c768783f0050700224ce7`.
+  The user approved keeping the Data API active for this rollout. Migration
+  history and the catalog check passed. The owner policies were in place, and
+  the anonymous Data API read returned HTTP 401 with SQLSTATE `42501`.
+  An operator transaction verified the unassigned inventory and removed all
+  seven approved synthetic clinics. A read-only check confirmed zero
+  remaining rows.
+- Live acceptance with two Google accounts, authenticated Data API probes, and
+  a separate session or device remains pending.
 - Independent review at `634ad26ffcebca32e9c5d8a78401dca9c13aa868` repeated
   the application and hosted validation checks. Desktop and mobile Chrome
   verified the protected flow, account separation, clinic edits, and save
