@@ -90,8 +90,13 @@ Implementation started on 2026-11-11. Correction rounds used: 0 of 2.
   An operator transaction verified the unassigned inventory and removed all
   seven approved synthetic clinics. A read-only check confirmed zero
   remaining rows.
-- Live acceptance with two Google accounts, authenticated Data API probes, and
-  a separate session or device remains pending.
+- The user confirmed the manual acceptance checklist passed in the preview
+  with two Google accounts, including isolation, duplicate-name behavior,
+  clinic edits, persistence in a separate session, and sign-out. A read-only
+  query corroborated that saved clinics have two distinct owners. The live Data
+  API rejected anonymous reads, inserts, updates, and deletes with HTTP 401
+  and SQLSTATE `42501`. Direct authenticated cross-account probes remain
+  pending.
 - Independent review at `634ad26ffcebca32e9c5d8a78401dca9c13aa868` repeated
   the application and hosted validation checks. Desktop and mobile Chrome
   verified the protected flow, account separation, clinic edits, and save
