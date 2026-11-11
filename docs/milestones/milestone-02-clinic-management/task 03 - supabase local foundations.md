@@ -25,7 +25,7 @@ Document a manual remote migration procedure with target verification, SQL revie
 preview and explicit write authorization. No remote mutation is performed here.
 Do not add business tables, authentication integration, app integration or real data.
 All pre-security data is synthetic in hosted development; public/production use
-remains prohibited before Task 09.
+remains prohibited before the [Milestone 03 security gate](<../milestone-03-authentication/task 03 - authorize clinic access.md>).
 
 ## Dependencies
 

@@ -6,10 +6,9 @@ Completed Tasks 00–02 retain their original scope, evidence and delivery recor
 
 ## Objective
 
-Deliver Clinics so Ana can sign in with her authorized Google account and manage
-the same saved clinics on desktop and mobile. Build on the completed visual and
-in-memory workflow with small, separately verifiable database and persistence tasks,
-then complete authentication and authorization as the final release gate.
+Deliver persistent clinic management on desktop and mobile and establish dedicated
+database validation credentials. [Milestone 03](../milestone-03-authentication/readme.md)
+covers sign-in and owner-only access before real data or public use.
 
 ## Scope
 
@@ -22,14 +21,12 @@ then complete authentication and authorization as the final release gate.
 - Establish reproducible hosted Supabase development, declarative schemas, reviewed
   migrations, synthetic seeds, validation in scripts/CI and generated database types.
 - Follow up with dedicated local/CI validation credentials and documented rotation
-  in Task 10, without replacing Task 09's application security gate.
+  in Task 09.
 - Use typed Supabase Data API access from Next.js server code. Use the hosted
-  synthetic development exception for Tasks 06–08, then replace its anonymous
-  access in Task 09.
-- Complete Google sign-in/sign-out, Ana-only authorization, database RLS and
-  permissions for every persistent operation before real data or public use.
+  synthetic development exception for Tasks 06–08. Milestone 03 Task 03
+  replaces its anonymous access.
 - Reuse [Milestone 01](../milestone-01-shared-components/readme.md) components and
-  follow [S02](../../screens.md#s02--clinics), [S01](../../screens.md#s01--sign-in),
+  follow [S02](../../screens.md#s02--clinics),
   the [visual references](../../screens.md#visual-design-references),
   [architecture](../../architecture.md) and
   [clinic requirements](../../requirements.md#clinics).
@@ -37,19 +34,18 @@ then complete authentication and authorization as the final release gate.
 
 ## Task index
 
-| Task                                                                                                                | Status    | Direct dependencies |
-| ------------------------------------------------------------------------------------------------------------------- | --------- | ------------------- |
-| [00 — Build the Clinics screen with sample data](<task 00 - clinics screen.md>)                                     | `done`    | Milestone 01        |
-| [01 — Implement clinic interactions with an in-memory data source](<task 01 - clinic interactions.md>)              | `done`    | 00                  |
-| [02 — Validate clinic deletion with an in-memory data source](<task 02 - delete clinics.md>)                        | `done`    | 01                  |
-| [03 — Establish reproducible hosted Supabase foundations](<task 03 - supabase local foundations.md>)                | `done`    | 01, 02              |
-| [04 — Validate migrations and generated database types](<task 04 - database validation and types.md>)               | `done`    | 03                  |
-| [05 — Define and validate the clinic database model](<task 05 - clinic database model.md>)                          | `done`    | 04                  |
-| [06 — List persistent clinics from Supabase](<task 06 - list persistent clinics.md>)                                | `done`    | 01, 02, 05          |
-| [07 — Create persistent clinics](<task 07 - create persistent clinics.md>)                                          | `done`    | 06                  |
-| [08 — Edit, deactivate and reactivate persistent clinics](<task 08 - update persistent clinics.md>)                 | `done`    | 07                  |
-| [09 — Secure persistent Clinics with Google authentication](<task 09 - clinic authentication and authorization.md>) | `pending` | 08                  |
-| [10 — Configure dedicated database validation credentials](<task 10 - dedicated validation credentials.md>)         | `pending` | 04                  |
+| Task                                                                                                        | Status    | Direct dependencies |
+| ----------------------------------------------------------------------------------------------------------- | --------- | ------------------- |
+| [00 — Build the Clinics screen with sample data](<task 00 - clinics screen.md>)                             | `done`    | Milestone 01        |
+| [01 — Implement clinic interactions with an in-memory data source](<task 01 - clinic interactions.md>)      | `done`    | 00                  |
+| [02 — Validate clinic deletion with an in-memory data source](<task 02 - delete clinics.md>)                | `done`    | 01                  |
+| [03 — Establish reproducible hosted Supabase foundations](<task 03 - supabase local foundations.md>)        | `done`    | 01, 02              |
+| [04 — Validate migrations and generated database types](<task 04 - database validation and types.md>)       | `done`    | 03                  |
+| [05 — Define and validate the clinic database model](<task 05 - clinic database model.md>)                  | `done`    | 04                  |
+| [06 — List persistent clinics from Supabase](<task 06 - list persistent clinics.md>)                        | `done`    | 01, 02, 05          |
+| [07 — Create persistent clinics](<task 07 - create persistent clinics.md>)                                  | `done`    | 06                  |
+| [08 — Edit, deactivate and reactivate persistent clinics](<task 08 - update persistent clinics.md>)         | `done`    | 07                  |
+| [09 — Configure dedicated database validation credentials](<task 09 - dedicated validation credentials.md>) | `pending` | 04                  |
 
 ## Delivery and validation
 
@@ -65,8 +61,7 @@ existing-data upgrades and generated type freshness after Task 04 establishes th
 For UI changes, verify live desktop/mobile interactions against Alexandria and the
 applicable Stitch reference, use `chrome-screenshots` for visual evidence and
 `github-pr` for PR publication. Infrastructure tasks explain why UI evidence does
-not apply. Missing infrastructure or Google credentials prevents claiming the
-corresponding validation passed.
+not apply.
 
 ## Completion criteria
 
@@ -76,22 +71,21 @@ status of `done` records completed agent delivery, with human acceptance and man
 merge tracked separately in task records and GitHub. This plan does not assert
 that currently delivered tasks have been accepted or merged.
 
-Ana can create a clinic on one device, find it on another, edit or deactivate it,
-and see the saved result after reload and sign-in again. Inactive clinics remain
-visible and can be reactivated. Save/cancel, validation and recoverable failure/retry
-work across every supported persistent operation. Unauthenticated users and other
-Google accounts cannot access the screen or data through direct requests or the
-database API. Final access tests cover all persistent reads and writes, RLS,
-permissions, sign-out and desktop/mobile behavior.
+In the approved synthetic development environment, a clinic created on one device
+can be listed, edited, deactivated and reactivated on another. Save/cancel,
+validation and recoverable failure/retry work across the supported operations.
+Local and CI database validation use dedicated credentials with documented
+rotation. [Milestone 03 Task 03](<../milestone-03-authentication/task 03 - authorize clinic access.md>)
+defines the access checks required before real data or public use.
 
-The application and its authenticated database permissions exclude persistent
-deletion until real activity references are available. Task 02 records the earlier
-in-memory deletion validation. Task 06 retired that preview.
+The application defers persistent deletion until real activity references are
+available. Task 02 records the earlier in-memory deletion validation. Task 06
+retired that preview.
 
 ## Original planning decisions — 2026-11-07
 
-- Split the previous pending Tasks 03/04 into Tasks 03–09 above. This is planning
-  only; implementation of every new task remains pending assignment.
+- Split the previous pending Tasks 03/04 into database, persistence and
+  authentication tasks. Authentication subsequently moved to Milestone 03.
 - Pin the CLI through pnpm and use the official version-appropriate declarative
   schema intent and manually reviewed SQL migrations where CLI generation requires
   a local shadow database, with focused `supabase/AGENTS.md` guidance and a minimal root
@@ -101,19 +95,19 @@ in-memory deletion validation. Task 06 retired that preview.
 - Introduce the complete service/repository/Supabase/server boundary in Task 06,
   move memory previews behind it, then enable persistent operations incrementally.
   Unavailable persistent actions cannot report successful in-memory writes.
-- Use only hosted development synthetic data before Task 09, with Data API disabled. Google authentication, authorization,
-  RLS and permissions are deferred, not abandoned; they are mandatory before real
-  data or public use.
+- The original plan kept the Data API disabled until authentication and
+  authorization were in place. The later Data API decision below records the
+  synthetic development exception.
 - The user reconfirmed that persistent deletion remains deferred. Do not add a
   minimal activity relation here; preserve the completed Task 02 record verbatim.
 
 ## Original hosted development decision — 2026-11-07
 
-The user rejected Docker and local Supabase/database runtimes. Tasks 03-09 use
+The user rejected Docker and local Supabase/database runtimes. Database tasks use
 hosted development and separately authorized disposable hosted validation targets,
 with synthetic data only. Schemas and migrations remain in Git; remote application
 is manually reviewed and target-verified, never an automatic CI deployment to the
-shared development project. Keep Data API disabled before Task 09's security gate.
+shared development project.
 CLI 3.0.0 declarative sync is local-only; use reviewed manual migration authoring
 and establish remote schema/history reconciliation in Task 04. This scope adaptation
 does not implement or start the later tasks.
@@ -121,15 +115,20 @@ does not implement or start the later tasks.
 ## Validation credential follow-up — 2026-11-07
 
 The user authorized use of the current CLI token for Task 04 and its CI secret,
-then requested Task 10 at the end of this milestone to configure dedicated
-validation credentials later. Task 10 is pending assignment; it does not delay
-Task 04 or authorize extracting credentials in future sessions without approval.
+then requested a follow-up to configure dedicated validation credentials.
+The follow-up is pending assignment as Task 09, formerly Task 10.
 
 ## Supabase Data API decision — 2026-11-09
 
 Task 06 queries the Supabase Data API from a Next.js Server Component. The user
 authorized anonymous clinic CRUD on my-clinics solely for synthetic development.
 Tasks 07 and 08 add persistent create and edit interfaces. Persistent deletion in
-the delivered application still depends on activity eligibility. Task 09 removes the temporary
-anonymous grants and policies and verifies authenticated access before real data
-or use outside the development test.
+the delivered application still depends on activity eligibility. Milestone 03
+Task 03 removes the temporary anonymous grants and policies and verifies
+authenticated access before real data or use outside the development test.
+
+## Remaining-task restructuring — 2026-11-11
+
+The former authentication Task 09 is now [Milestone 03](../milestone-03-authentication/readme.md).
+The dedicated validation credentials task moves from Task 10 to Task 09 with its
+existing scope.

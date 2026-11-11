@@ -49,8 +49,9 @@ validation with existing synthetic data. No UI capture is required.
 
 ## Progress boundary
 
-The model is a hosted development foundation only. Passing these checks is not evidence of
-Ana-only access or permission to use real data before the final security gate.
+The model is a hosted development foundation. Owner-only access and the checks
+required before real data are covered in
+[Milestone 03 Task 03](<../milestone-03-authentication/task 03 - authorize clinic access.md>).
 
 ## Progress notes
 

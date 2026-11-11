@@ -24,7 +24,7 @@ contract. Neither UI nor server entry points call repositories directly.
 Move the existing in-memory implementation behind the same service and repository
 boundary, preserving its synthetic preview scenarios and completed behavior. Keep
 this layering focused; do not introduce an additional application framework.
-Keep Data API disabled until Task 09; select and verify a server-only connection
+Keep Data API disabled until the security gate; select and verify a server-only connection
 compatible with that restriction when this task is assigned. Do not enable the API
 or weaken the security gate to make the integration pass.
 Keep credentials and privileged client setup in server-only modules, outside client
@@ -257,8 +257,9 @@ The user authorized anonymous clinic CRUD solely for synthetic development in
 effective grants, and enabled the Data API for `public` with automatic table
 exposure disabled. A live SDK check listed the three synthetic clinics and
 created, updated and deleted one throwaway synthetic record. A final read
-verified the original three records. Task 09 replaces the temporary grants and
-policies before real data or non-test use.
+verified the original three records.
+[Milestone 03 Task 03](<../milestone-03-authentication/task 03 - authorize clinic access.md>)
+replaces the temporary grants and policies before real data or non-test use.
 
 The independent reviewer approved `a788b58e4490d442eb11a869effc476f62f082ee`.
 Lint, typecheck, format, build, 206 application tests, four tooling tests and

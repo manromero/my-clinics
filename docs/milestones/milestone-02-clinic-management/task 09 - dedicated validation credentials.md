@@ -1,4 +1,4 @@
-# Task 10 — Configure dedicated database validation credentials
+# Task 09 — Configure dedicated database validation credentials
 
 Status: `pending`
 
@@ -67,6 +67,7 @@ permissions, authorized targets, cleanup and CI/head evidence. No UI review appl
 ## Progress notes
 
 Added at the user's request on 2026-11-07 as future work at the end of Milestone 02.
-Planning only; implementation has not been assigned. Task 04 continues with the
-explicitly authorized current CLI token and its CI secret. This follow-up does not
-block Task 04 or replace Task 09's application authentication and authorization gate.
+Renumbered from Task 10 to Task 09 on 2026-11-11. Implementation is pending assignment.
+Task 04 continues with the explicitly authorized current CLI token and its CI
+secret. [Milestone 03](../milestone-03-authentication/readme.md) covers application
+authentication and authorization.

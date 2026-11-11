@@ -164,7 +164,8 @@ Supabase CLI token to GitHub Actions secret `SUPABASE_ACCESS_TOKEN` in repositor
 pending; the prior automatic approval rejection has not been bypassed. No second
 correction round is needed for code at this point. Task/index remain
 `in_progress`; human acceptance and manual merge are pending. Correction rounds
-used: 1 of 2. Task 10 records dedicated credentials as future pending work.
+used: 1 of 2. [Task 09](<task 09 - dedicated validation credentials.md>) records
+dedicated credentials as future work.
 
 ## User-configured CI credential — 2026-11-08
 
@@ -206,5 +207,5 @@ Task and milestone index are `done` for agent delivery through
 [PR #40](https://github.com/manromero/my-clinics/pull/40). Final tracking changes
 receive focused review and final-head CI verification before handoff. Human
 acceptance and manual merge remain pending. Correction rounds used: 1 of 2.
-Task 10 remains pending and covers the remaining credential configuration and
+Task 09 remains pending and covers the remaining credential configuration and
 rotation follow-up; this CI setup does not claim that whole task is complete.

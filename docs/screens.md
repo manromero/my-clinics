@@ -58,15 +58,16 @@ description below.
 
 | ID  | Screen           | Spanish navigation label | Proposed route | Purpose                                            |
 | --- | ---------------- | ------------------------ | -------------- | -------------------------------------------------- |
-| S01 | Sign-in          | Acceder                  | `/login`       | Sign in with Ana's authorized Google account       |
+| S01 | Sign-in          | Acceder                  | `/login`       | Sign in with a Google account                      |
 | S02 | Clinics          | Clínicas                 | `/clinics`     | Manage clinic names, percentages, and active state |
 | S03 | Monthly activity | Actividad                | `/activity`    | Enter and correct activity for a selected month    |
 | S04 | Monthly summary  | Resumen                  | `/summary`     | Review monthly amounts and row counts by clinic    |
 | S05 | Settings         | Ajustes                  | `/settings`    | Change Ana's default IRPF rate and access sign-out |
 
-After successful sign-in, open Monthly activity for the current month in
-Europe/Madrid. Protected screens share navigation to Clinics, Activity, Summary,
-and Settings. Keep the signed-in identity and sign-out action accessible.
+After successful sign-in in Milestone 03, open Clinics. When Monthly activity
+is available, open it for the current month in Europe/Madrid. Protected screens
+share navigation to Clinics, Activity, Summary, and Settings. Keep the signed-in
+identity and sign-out action accessible.
 
 Use a shared year/month and clinic selection for Activity and Summary. Moving
 between those screens preserves that context. Initial entry defaults to the
@@ -75,22 +76,19 @@ with recorded activity for the selected period.
 
 ## S01 — Sign-in
 
-**Purpose:** grant Ana access to her saved data.
+**Purpose:** give users access to their own clinics through Google sign-in.
 
 ### Content and actions
 
 - Application name and a `Continuar con Google` button.
-- Start Google sign-in and validate that the account is authorized.
-- On success, open Monthly activity.
-- For a different Google account, show an access-denied state with an option to
-  try another account. Do not display application records.
+- Start Google sign-in through Supabase Auth.
+- On success, open Clinics in Milestone 03. Each account sees its own clinics.
 
 ### States
 
 - Ready to sign in.
 - Sign-in in progress, with repeated submission prevented.
 - Sign-in canceled or failed, with a retry action.
-- Account authenticated but not authorized.
 - Session expired: require sign-in before showing protected data again.
 
 ## S02 — Clinics
@@ -291,8 +289,8 @@ changes, deletions, or date changes affecting the month.
 
 ## Main user flows
 
-1. **Start working:** Sign-in → Google authorization → Monthly activity for the
-   current month.
+1. **Start working:** Sign-in → Google → Clinics in Milestone 03. Once
+   Monthly activity is available, sign-in opens it for the current month.
 2. **Prepare a clinic:** Clinics → New clinic → Save → Monthly activity.
 3. **Record work or an expense:** Monthly activity → New activity → Select a
    calculation mode → Review earnings → Save → Updated list and summary.

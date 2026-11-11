@@ -58,7 +58,8 @@ retry button refreshes the route.
 
 PostgreSQL grants and row-level security control access to the Data API. The
 approved development policy allows anonymous access to the synthetic clinic
-table until Task 09 adds authentication and authorization. The Clinics screen
+table until [Milestone 03 Task 03](<milestones/milestone-03-authentication/task 03 - authorize clinic access.md>)
+replaces it with access scoped to the signed-in owner. The Clinics screen
 exposes listing and retry for saved clinics.
 
 ## Component reuse

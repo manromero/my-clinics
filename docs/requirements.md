@@ -134,13 +134,12 @@ amounts. Calculations must preserve decimal monetary precision.
 
 ### Access and devices
 
-- Ana accesses the application through her personal account.
+- Users access the application through their own accounts.
 - The same saved data is available on desktop and mobile.
 - The interface adapts to both device sizes.
 - Authentication uses Google as the sign-in provider.
-- Access is restricted to Ana's authorized Google account, configured during
-  setup. Signing in with a different Google account does not grant access to her
-  data. Unauthenticated access must not expose her data either.
+- Anyone with a Google account can sign in. Each user can view and manage only
+  their own clinics. Signed-out requests cannot access clinic data.
 - The interface is in Spanish, with Spanish regional formatting for dates and
   euro amounts. Project documentation remains in English.
 - Use Europe/Madrid to determine today's date and the current month.
@@ -240,7 +239,7 @@ These views describe required capabilities, not a prescribed page layout.
 | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Clinic                | Stable identity, name, default percentage, active state                                                                                                                             |
 | Activity              | Stable identity, calendar date, clinic reference, price, calculation mode, stored clinic percentage, stored IRPF rate, direct earnings when using direct mode, optional description |
-| Professional settings | Authorized Google identity and current IRPF rate                                                                                                                                    |
+| Professional settings | Signed-in Google identity and current IRPF rate                                                                                                                                     |
 
 Gross and net earnings and monthly totals follow the formulas above. This table
 defines information requirements without prescribing database technology or
@@ -263,6 +262,6 @@ whether calculated amounts are persisted.
   retains the entered values and displays the failure.
 - Monthly summaries include all matching saved rows, without the fixed row-range
   limit found in the workbook.
-- Desktop and mobile sessions for the authorized account show the same saved
+- Desktop and mobile sessions for the same account show the same saved
   records. Other accounts cannot access them.
 - The interface presents negative rows with a clear distinguishing treatment.

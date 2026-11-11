@@ -12,7 +12,7 @@ workstation; the database and Studio run at Supabase. Desired schemas, migration
 synthetic seeds and tests live in `supabase/`. Supabase's own schemas/extensions
 are platform-managed; do not erase them to reproduce the application schema.
 
-Keep the hosted **Data API disabled** until authentication, Ana-only access,
+Keep the hosted **Data API disabled** until authentication, owner-only access,
 RLS and permissions have been verified. The user authorized a scoped
 [synthetic development exception](#synthetic-development-rollout) for
 `lvqbrjybwstvdhaxyxyn`. Do not deploy the persistent application publicly.
@@ -312,7 +312,8 @@ database passwords and Supabase secret keys in trusted operator settings.
 The user authorized anonymous access on `my-clinics` (`lvqbrjybwstvdhaxyxyn`)
 while it holds synthetic clinics. Anyone with the project's publishable key
 can read and change those rows through the API. Keep this project synthetic
-until Task 09 replaces the development policies with authenticated access. Task
+until [Milestone 03 Task 03](<milestones/milestone-03-authentication/task 03 - authorize clinic access.md>)
+replaces the development policies with owner-only access. Task
 06 exposes only listing and retry in the app. The temporary database grants
 also support synthetic insert, update and deletion requests.
 
@@ -335,7 +336,7 @@ also support synthetic insert, update and deletion requests.
    results separately. Leave existing synthetic rows untouched during rollout
    verification unless a separate probe mutation is authorized.
 4. Disable the Data API before introducing real data or widening access beyond
-   this synthetic exception. Task 09 owns the authenticated policy, access
+   this synthetic exception. Milestone 03 Task 03 owns the authenticated policy, access
    verification and public-use gate.
 
 ### Validation evidence

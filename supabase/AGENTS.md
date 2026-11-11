@@ -25,7 +25,7 @@ authorized disposable hosted projects.
 
 Every remote command names an explicit verified project ref. Linking a checkout
 is not approval to change that project. Keep the Data API disabled until
-authentication, Ana-only access, RLS and permissions are verified. Task 06 has
+authentication, owner-only access, RLS and permissions are verified. Task 06 has
 a user-authorized synthetic-development exception for `lvqbrjybwstvdhaxyxyn`
 under the [procedure in the Supabase guide](../docs/supabase.md#synthetic-development-rollout).
 The repository's `config.toml` does not configure a hosted project by itself.
