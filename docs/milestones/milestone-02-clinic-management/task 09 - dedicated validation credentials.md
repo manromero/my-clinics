@@ -123,3 +123,14 @@ no code or documentation defects.
 
 The task remains `in_progress`. Correction rounds used: 0 of 2. Human approval
 and manual merge remain pending.
+
+## Local replacement verification — 2026-11-11
+
+After receiving the organization and permission selections in the guide, the
+user provisioned a replacement locally. `pnpm db:validate` passed on
+`39866c4b7bffab20a283e110004fec2c75c6ffc5`, using the ignored file without a
+shell token override. Clean replay, SQL tests, type freshness, upgrade and
+schema parity passed. The runner deleted and verified absence of all three
+disposable projects: `dmmennnxgngvbyzfnvcx`, `gdnjugabcdxkyniwvegc` and
+`kwswdikyzjphvthalkrr`. This supersedes the local HTTP 401 in BLOCK-01.
+Verification of the replacement in GitHub Actions is pending.
