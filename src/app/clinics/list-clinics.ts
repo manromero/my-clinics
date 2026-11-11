@@ -1,5 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { parseClinicPercentage, type Clinic } from "@/lib/clinics/clinic";
+import {
+  isClinicId,
+  parseClinicPercentage,
+  type Clinic,
+} from "@/lib/clinics/clinic";
 import type { Database } from "@/lib/supabase/database.types";
 
 // PostgreSQL casts bigint to text before transport, overriding only its wire ID.
@@ -10,9 +14,7 @@ export type ClinicRow = Omit<
 
 function mapClinic(row: ClinicRow): Clinic {
   if (
-    typeof row.id !== "string" ||
-    !/^[1-9]\d*$/.test(row.id) ||
-    BigInt(row.id) > BigInt("9223372036854775807") ||
+    !isClinicId(row.id) ||
     typeof row.name !== "string" ||
     !row.name.trim() ||
     typeof row.percentage !== "number" ||
