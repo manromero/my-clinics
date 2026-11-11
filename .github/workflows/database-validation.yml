@@ -49,6 +49,7 @@ jobs:
       - name: Validate authorized disposable hosted targets
         run: pnpm db:${{ inputs.mode || 'validate' }}
         env:
+          # Dedicated scoped PAT for the disposable validation organization.
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           MYCLINICS_DISPOSABLE_AUTHORIZATION: njnmfutclorywskqrftd
       - name: Upload generated types from authorized hosted replay
