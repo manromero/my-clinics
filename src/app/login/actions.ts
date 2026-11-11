@@ -9,11 +9,18 @@ export type SignInIssue = "cancelled" | "failed" | null;
 const localOrigin = "http://localhost:3000";
 
 export async function startGoogleSignIn(): Promise<SignInIssue> {
-  const value = process.env.APP_ORIGIN || localOrigin;
+  const environment = process.env.VERCEL_ENV;
+  let value = localOrigin;
+  if (environment === "preview") {
+    value = `https://${process.env.VERCEL_BRANCH_URL ?? ""}`;
+  } else if (environment === "production") {
+    value = process.env.APP_ORIGIN ?? "";
+  }
   const origin = URL.parse(value);
   if (
     !origin ||
-    (origin.protocol !== "https:" && origin.origin !== localOrigin) ||
+    (origin.protocol !== "https:" &&
+      (environment === "preview" || environment === "production")) ||
     (value !== origin.origin && value !== `${origin.origin}/`)
   ) {
     return "failed";

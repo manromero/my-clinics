@@ -382,30 +382,30 @@ exchanges the returned code at the application's `/auth/callback`.
 
 ### Vercel sign-in origins
 
-Set the server-side `APP_ORIGIN` in **Vercel > Project > Settings >
-Environment Variables** to the canonical HTTPS origin for each deployment
-environment. Supply the Supabase URL and publishable key for the project
-assigned to that environment. Set values separately for Preview and Production
-and redeploy after changes. The local default is `http://localhost:3000`.
-[Vercel environment variables](https://vercel.com/docs/environment-variables)
-
-- **Preview.** For `feature/supabase-sign-in`, scope `APP_ORIGIN` to that
-  Preview branch and use
-  `https://my-clinics-git-feature-supabase-sign-in-manromeros-projects.vercel.app`.
-  Add that origin plus `/auth/callback` as an exact **Redirect URL** in the
-  hosted development Supabase project. Keep the Preview protected by Vercel
-  authentication and use synthetic clinic data. Open `/login` on that branch
-  URL after authenticating with Vercel.
-  [Vercel generated branch URLs](https://vercel.com/docs/deployments/generated-urls)
+- **Local development.** Open `http://localhost:3000/login` and keep
+  `http://localhost:3000/auth/callback` in the development Supabase **Redirect
+  URLs**.
+- **Preview.** Enable Vercel system environment variables. The app uses
+  `VERCEL_BRANCH_URL` when `VERCEL_ENV=preview`. Set the Preview Supabase URL
+  and publishable key for the hosted development project. Add
+  `https://my-clinics-git-*-manromeros-projects.vercel.app/auth/callback` to that
+  project's **Redirect URLs**. Keep the Preview protected by Vercel
+  authentication and use synthetic clinic data. Open `/login` on the stable
+  branch URL after authenticating with Vercel.
+  [Vercel system environment variables](https://vercel.com/docs/environment-variables/system-environment-variables)
 - **Production.** After the
   [Milestone 03 security gate](<milestones/milestone-03-authentication/task 03 - authorize clinic access.md>),
-  set Production `APP_ORIGIN` and the production Supabase **Site URL** to
-  `https://my-clinics.vercel.app`. Add
+  set the Production Supabase URL and publishable key for the approved
+  production project. Set the server-side Production `APP_ORIGIN` and the
+  production Supabase **Site URL** to `https://my-clinics.vercel.app`. Add
   `https://my-clinics.vercel.app/auth/callback` under **Redirect URLs** in the
   approved production Supabase project. Complete any Google verification that
   applies, publish the production OAuth app through **Audience**, and verify
   sign-in with a Google account outside the test list.
   [Google OAuth app states](https://developers.google.com/identity/protocols/oauth2/production-readiness/overview)
+
+Redeploy after changing Vercel environment values.
+[Vercel environment variables](https://vercel.com/docs/environment-variables)
 
 Start and finish OAuth on the canonical application origin so the browser can
 send the PKCE verifier cookie back to the application callback. Submitting

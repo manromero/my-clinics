@@ -10,7 +10,10 @@ import { createSupabaseAuthClient } from "./auth-client";
 
 const project = "https://auth-fixture.supabase.co";
 const origin = "http://localhost:3000";
-const previewOrigin = "https://myclinics-git-preview.example.test";
+const previewHost =
+  "my-clinics-git-feature-supabase-sign-in-manromeros-projects.vercel.app";
+const previewOrigin = `https://${previewHost}`;
+const productionOrigin = "https://my-clinics.vercel.app";
 const sessionCookie = "sb-auth-fixture-auth-token";
 const cookies = new Map<string, string>();
 let requestOrigin = origin;
@@ -68,6 +71,8 @@ function fixtureSession(expiresIn: number, refreshToken: string) {
 describe("Supabase SSR authentication with a controlled Auth transport", () => {
   beforeEach(() => {
     vi.stubEnv("APP_ORIGIN", undefined);
+    vi.stubEnv("VERCEL_ENV", undefined);
+    vi.stubEnv("VERCEL_BRANCH_URL", undefined);
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", project);
     vi.stubEnv(
       "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
@@ -84,11 +89,16 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
     vi.restoreAllMocks();
   });
 
-  it.each([previewOrigin, "https://myclinics-production.example.test"])(
-    "starts PKCE on the configured HTTPS origin %s without using forwarded host headers",
-    async (configuredOrigin) => {
-      vi.stubEnv("APP_ORIGIN", `${configuredOrigin}/`);
-      requestOrigin = configuredOrigin;
+  it.each([
+    { environment: "preview", expectedOrigin: previewOrigin },
+    { environment: "production", expectedOrigin: productionOrigin },
+  ])(
+    "starts PKCE on the trusted $environment origin",
+    async ({ environment, expectedOrigin }) => {
+      vi.stubEnv("VERCEL_ENV", environment);
+      vi.stubEnv("VERCEL_BRANCH_URL", previewHost);
+      vi.stubEnv("APP_ORIGIN", `${productionOrigin}/`);
+      requestOrigin = expectedOrigin;
 
       const destination = await startGoogleSignIn().catch((error: Error) =>
         error.message.replace("redirect: ", ""),
@@ -98,7 +108,7 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
         `${project}/auth/v1/authorize`,
       );
       expect(authorizeUrl.searchParams.get("redirect_to")).toBe(
-        `${configuredOrigin}/auth/callback`,
+        `${expectedOrigin}/auth/callback`,
       );
       expect(authorizeUrl.searchParams.get("code_challenge_method")).toBe(
         "s256",
@@ -110,7 +120,9 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
   );
 
   it("sends another deployment alias to the canonical login before writing any PKCE cookie", async () => {
-    vi.stubEnv("APP_ORIGIN", previewOrigin);
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("VERCEL_BRANCH_URL", previewHost);
+    vi.stubEnv("APP_ORIGIN", productionOrigin);
     requestOrigin = "https://alternate-deployment.example.test";
 
     await expect(startGoogleSignIn()).rejects.toThrow(
@@ -118,6 +130,21 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
     );
     expect(cookies.size).toBe(0);
   });
+
+  it.each([undefined, "", "user@example.test", "example.test/some-path"])(
+    "refuses Preview OAuth without a valid branch hostname (%s)",
+    async (branchHost) => {
+      vi.stubEnv("VERCEL_ENV", "preview");
+      vi.stubEnv("VERCEL_BRANCH_URL", branchHost);
+      vi.stubEnv("VERCEL_URL", "unique-deployment.example.test");
+      vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "my-clinics.vercel.app");
+      vi.stubEnv("APP_ORIGIN", productionOrigin);
+      requestOrigin = previewOrigin;
+
+      await expect(startGoogleSignIn()).resolves.toBe("failed");
+      expect(cookies.size).toBe(0);
+    },
+  );
 
   it.each([
     undefined,
@@ -127,14 +154,15 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
     "https://myclinics.example.test/?next=elsewhere",
     "https://user@myclinics.example.test",
   ])(
-    "does not start deployed OAuth with an unset or invalid APP_ORIGIN (%s)",
+    "refuses Production OAuth with an unset or invalid APP_ORIGIN (%s)",
     async (configuredOrigin) => {
+      vi.stubEnv("VERCEL_ENV", "production");
       vi.stubEnv("APP_ORIGIN", configuredOrigin);
       vi.stubEnv(
         "VERCEL_PROJECT_PRODUCTION_URL",
         "myclinics-production.example.test",
       );
-      requestOrigin = previewOrigin;
+      requestOrigin = productionOrigin;
 
       await expect(startGoogleSignIn()).resolves.toBe("failed");
       expect(cookies.size).toBe(0);
