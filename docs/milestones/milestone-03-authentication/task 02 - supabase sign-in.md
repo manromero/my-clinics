@@ -1,6 +1,6 @@
 # Task 02 — Integrate Supabase sign-in and sessions
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -64,10 +64,9 @@ Execution started on 2026-11-11. Correction rounds used: 1.
   test with a 300-second JWT lifetime. The account holder also confirmed Google
   sign-in, reload, and sign-out in mobile view. Controlled transport separately
   verified token rotation and sign-out behavior at desktop and mobile sizes.
-- The initial implementation is published. The correction is local after
-  automatic approval review rejected its push. The review also rejected draft
-  PR creation with or without screenshots. Publishing the correction and draft
-  with synthetic evidence needs explicit authorization for the public repository.
+- [PR #48](https://github.com/manromero/my-clinics/pull/48) targets `develop`.
+  All 11 inline screenshots were retrieved and matched the inspected desktop
+  and mobile captures. Human approval and manual merge are pending.
 
 ## Execution context
 
