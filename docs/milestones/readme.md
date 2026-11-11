@@ -11,7 +11,7 @@ before implementation begins.
 | [00 — Development workflow](milestone-00-development-workflow/readme.md)                  | Coordinator, implementer, and reviewer workflow with human PR review and merge        | All agent tasks done; human acceptance tracked in GitHub PR #4                                                        |
 | [01 — Visual foundations and shared components](milestone-01-shared-components/readme.md) | Components catalogue, visual foundations, basic controls and shared screen structure  | Complete. All 28 tasks are done and merged into `develop`.                                                            |
 | [02 — Clinic management](milestone-02-clinic-management/readme.md)                        | Clinic management, Supabase persistence and dedicated database validation credentials | All tasks done. Human approval and manual merge of [PR #45](https://github.com/manromero/my-clinics/pull/45) pending. |
-| [03 — Authentication](milestone-03-authentication/readme.md)                              | Google sign-in with Supabase Auth and owner-only access to clinics                    | Tasks 00–03 pending.                                                                                                  |
+| [03 — Authentication](milestone-03-authentication/readme.md)                              | Google sign-in with Supabase Auth and owner-only access to clinics                    | Task 00 done. Tasks 01–03 pending.                                                                                    |
 
 Further milestones will be added after the user validates their scope and order.
 
