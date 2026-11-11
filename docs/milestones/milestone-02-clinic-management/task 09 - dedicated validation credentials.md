@@ -1,6 +1,6 @@
 # Task 09 — Configure dedicated database validation credentials
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -134,3 +134,23 @@ schema parity passed. The runner deleted and verified absence of all three
 disposable projects: `dmmennnxgngvbyzfnvcx`, `gdnjugabcdxkyniwvegc` and
 `kwswdikyzjphvthalkrr`. This supersedes the local HTTP 401 in BLOCK-01.
 Verification of the replacement in GitHub Actions is pending.
+
+## Replacement and final review — 2026-11-11
+
+The user provisioned the scoped token with the five permission selections
+listed in the [Supabase guide](../../supabase.md#validation-token-and-permissions)
+and updated the existing GitHub Actions secret. The
+[hosted validation run](https://github.com/manromero/my-clinics/actions/runs/42986461454)
+passed on `99f759741ade5715805661e543661d2a5b1d4898` after the secret update.
+The independent reviewer confirmed tooling, build and hosted validation passed,
+including replay, SQL tests, type freshness, upgrades, negative controls and
+parity. The runner deleted and confirmed absence of the three CI projects
+`edwewqngogermeaqkloc`, `skujyaurgaoyjttyyjvg` and `vmwlfzeohqdgnnaevkyb`.
+The workflow masked the credential, and the log scan found no literal token.
+
+The independent reviewer closed BLOCK-01 with the successful local run and
+BLOCK-02 with the owner's configuration, confirmed secret update and successful
+CI run. Credential replacement was verified locally and in CI. Revocation of
+retired credentials is documented and was not performed. No open review
+findings remain. Correction rounds used: 0 of 2. Human approval and manual
+merge of [PR #45](https://github.com/manromero/my-clinics/pull/45) remain pending.
