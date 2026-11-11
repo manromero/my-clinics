@@ -1,6 +1,6 @@
 # Task 01 — Configure Google in Supabase Auth
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -47,17 +47,26 @@ Execution started on 2026-11-11. The user created the Google OAuth web client
 and identified the Google Cloud project as `myclinics-dev`. The hosted Auth
 endpoint now redirects to Google with the expected provider callback.
 The user confirmed External / Testing and that the intended test users were
-added. Independent review remains open. Correction rounds used: 0.
+added. [PR #47](https://github.com/manromero/my-clinics/pull/47) targets
+`develop`. Human approval and manual merge remain pending. Correction rounds
+used: 0.
 
 The [hosted Google OAuth procedure](../../supabase.md#google-oauth-for-hosted-development)
 records the settings needed to reproduce the setup. Credential-free HTTP checks
 confirmed that the provider starts with the expected Supabase callback and that a
 simulated cancellation returns to the requested local application callback or
 falls back to `http://localhost:3000/` when no redirect is supplied or a foreign
-origin is requested. Dashboard confirmation remains open for the exact Supabase
-allowlist entry and the saved Google client origin and redirect URI. The same-origin
-redirect check cannot distinguish an explicit entry from Supabase's built-in
-Site URL rule. [Supabase redirect selection](https://github.com/supabase/auth/blob/master/internal/utilities/request.go)
+origin is requested. The same-origin redirect check cannot distinguish an
+explicit entry from Supabase's built-in Site URL rule.
+[Supabase redirect selection](https://github.com/supabase/auth/blob/master/internal/utilities/request.go)
+
+Independent review at `436eda5995b58fae5b49beac4cb73417947a4c1c` reproduced
+the live checks and passed formatting, link and whitespace checks. It reported
+no documentation defects. The user checked both dashboards and confirmed that
+Supabase lists `http://localhost:3000/auth/callback` (GOOGLE-01) and that the
+Google web client lists `http://localhost:3000` as the authorized origin and
+`https://lvqbrjybwstvdhaxyxyn.supabase.co/auth/v1/callback` as the authorized
+redirect URI (GOOGLE-02). The full application sign-in flow is Task 02.
 
 ## Execution context
 
