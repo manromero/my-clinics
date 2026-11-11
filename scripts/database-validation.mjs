@@ -314,7 +314,7 @@ async function clinicUpgrade(ref) {
     [{ count: 0 }],
     "The owner migration must not assign any legacy rows implicitly",
   );
-  await databaseTests(ref);
+  await databaseTests(ref, ["20-clinic-owner-access.sql"]);
   console.log(
     "Actual ownership upgrade preserved every clinic and isolated legacy rows under real SQL roles",
   );
@@ -365,8 +365,8 @@ async function generateTypes(ref, accessToken) {
   return format(raw, { parser: "typescript" });
 }
 
-async function databaseTests(ref) {
-  const files = await sqlFiles("supabase/tests");
+async function databaseTests(ref, selectedFiles) {
+  const files = selectedFiles ?? (await sqlFiles("supabase/tests"));
   assert.ok(files.length, "At least one database test is required");
   for (const name of files) {
     await query(
