@@ -1,6 +1,6 @@
 # Task 09 — Configure dedicated database validation credentials
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -67,7 +67,30 @@ permissions, authorized targets, cleanup and CI/head evidence. No UI review appl
 ## Progress notes
 
 Added at the user's request on 2026-11-07 as future work at the end of Milestone 02.
-Renumbered from Task 10 to Task 09 on 2026-11-11. Implementation is pending assignment.
-Task 04 continues with the explicitly authorized current CLI token and its CI
-secret. [Milestone 03](../milestone-03-authentication/readme.md) covers application
-authentication and authorization.
+Renumbered from Task 10 to Task 09 on 2026-11-11. Task 04 originally used the
+then-authorized credential. At Task 09 intake, the user confirmed the existing
+CI secret contains a dedicated scoped token and supplied an explicit local token.
+The assignment preserves the existing secret configuration while verifying the
+dedicated path. [Milestone 03](../milestone-03-authentication/readme.md) covers
+application authentication and authorization.
+
+## Execution context
+
+- Assignment branch: `feature/dedicated-validation-credentials`, based on
+  `develop` at `ff91234b8caaad089f500bc0207af11ea458d06a`.
+- Task 04 is merged. Its successful [hosted run](https://github.com/manromero/my-clinics/actions/runs/42490668690)
+  followed the user's configuration of an organization-scoped CI credential.
+  The repository still has a `SUPABASE_ACCESS_TOKEN` secret. The user supplied a
+  scoped token for local validation through the ignored configuration and
+  explicitly authorized local and CI validation on disposable targets in
+  `njnmfutclorywskqrftd`.
+- Inspect the validation runner, database workflow, local example and Supabase
+  guide together. The scoped token needs to reach projects created after
+  issuance, so its organization scope includes the existing shared project.
+  Keep the runner's target guard and retain the existing CI secret if the
+  dedicated configuration and validation are verified. The current token's
+  exact permission selections remain to be verified.
+- Compare required Management API operations against the
+  [Supabase permissions reference](https://supabase.com/docs/guides/platform/personal-access-tokens#permission-scopes).
+  Exercise credential failure paths, valid local and CI runs, and cleanup.
+  UI review does not apply. Correction rounds used: 0 of 2.

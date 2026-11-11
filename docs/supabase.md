@@ -135,15 +135,49 @@ write and delete disposable projects in the explicitly authorized organization
 `njnmfutclorywskqrftd`. They never link, reset or deploy to shared development
 `lvqbrjybwstvdhaxyxyn`. Obtain authorization for this lifecycle before running it.
 Only the Free organization plan is accepted; no paid upgrade is performed. One
-free project slot is required. Existing projects are never removed for capacity.
+free project slot is required. The runner checks capacity in the validation
+organization. Supabase applies the [full Free plan quota](https://supabase.com/docs/guides/platform/billing-on-supabase#free-plan)
+when creating a project, including usage across organizations. Resolve capacity
+errors with the organization owner. Existing projects are never removed for capacity.
 
-Provide `SUPABASE_ACCESS_TOKEN` through a temporary shell environment. An optional
-ignored repository-root `.env.database-validation` is also loaded by the scripts;
-copy field names from [validation.env.example](../supabase/validation.env.example).
-Never copy a secret into Next.js environment files, logs or Git. Set
-`MYCLINICS_DISPOSABLE_AUTHORIZATION=njnmfutclorywskqrftd` to acknowledge the authorized
-lifecycle. The runner does not extract stored CLI credentials; supplying a token
-requires separate authorization for its use and the disposable target lifecycle.
+### Validation token and permissions
+
+Use a dedicated scoped personal access token (PAT) from [Supabase Access Tokens](https://supabase.com/dashboard/account/tokens).
+Select **all projects in selected organizations**, select only `njnmfutclorywskqrftd`,
+and start with **No access**. Grant the following access and set an expiry suited
+to the validation window. The token owner's current Supabase role must also allow
+these operations. See the [Supabase permission scopes](https://supabase.com/docs/guides/platform/personal-access-tokens#permission-scopes).
+
+| Permission            | Access     | Management API operations                                                                                                                             |
+| --------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Organization Settings | Read       | `GET /v1/organizations/{slug}` verifies the Free plan.                                                                                                |
+| Organization Projects | Read-write | `GET /v1/organizations/{slug}/projects` checks capacity and confirms cleanup. `POST /v1/projects` creates a project in the selected organization.     |
+| Project Settings      | Read-write | `GET /v1/projects/{ref}` verifies identity and readiness. `DELETE /v1/projects/{ref}` removes the verified disposable project.                        |
+| Data API Config       | Read-write | `PATCH` and `GET /v1/projects/{ref}/postgrest` disable and verify the Data API.                                                                       |
+| Database              | Read-write | `POST /v1/projects/{ref}/database/query` runs SQL including writes. The pinned CLI calls `GET /v1/projects/{ref}/types/typescript` to generate types. |
+
+The runner uses the organization-specific inventory, so **Projects (account-wide)**
+can stay disabled. Leave other permissions disabled, including Data API JWT Secret,
+API Keys and Migrations. Validation replays migrations as SQL.
+
+New disposable projects need access as soon as they are created. Supabase offers
+fixed project selections or all projects in selected organizations. The organization
+selection also reaches the shared development project under the granted permissions.
+Supabase cannot scope the token to the `myclinics-validation-` name prefix or to
+projects created by one invocation. The runner enforces that boundary by checking
+identity, rejecting the shared ref and targeting only projects created by the
+current process.
+
+For local use, copy [validation.env.example](../supabase/validation.env.example)
+to the ignored repository-root `.env.database-validation` and enter the token under
+`SUPABASE_ACCESS_TOKEN`. Alternatively provide the token in a temporary shell used
+only for validation. Shell values take precedence over the file. Set
+`MYCLINICS_DISPOSABLE_AUTHORIZATION=njnmfutclorywskqrftd` after the disposable lifecycle
+is authorized. Keep the token out of Git, logs and Next.js configuration and
+environment files. CI supplies its dedicated PAT through the repository Actions
+secret `SUPABASE_ACCESS_TOKEN`. The runner requires the scoped `sbp_fc` format and
+passes the same value explicitly to the pinned CLI for type generation. Manual
+`supabase login` remains a separate workflow.
 
 ```powershell
 pnpm db:test-tooling
@@ -231,6 +265,31 @@ secret and uploads only `src/lib/supabase/database.types.ts` as
 file, then dispatch `mode: validate` on the resulting head. The types artifact is
 not evidence of committed-type freshness; the subsequent validation run provides
 that check. No token extraction or automatic commit is involved.
+
+### Renew or recover a validation token
+
+1. Before expiry, review the token's organization, permissions and expiry in
+   [Supabase Access Tokens](https://supabase.com/dashboard/account/tokens). Generate
+   a replacement with the scope above and store its value in the approved secret
+   manager when Supabase displays it. A token's scope and permissions are fixed
+   at creation.
+2. Supply the replacement locally. With disposable lifecycle authorization, run
+   `pnpm db:validate` and confirm the run deletes its targets before proceeding.
+3. Update the existing `SUPABASE_ACCESS_TOKEN` repository secret in GitHub Settings
+   under **Secrets and variables > Actions**. Dispatch the database workflow in
+   `validate` mode on the approved branch and confirm successful hosted validation
+   and cleanup. Keep the prior dedicated token available until the replacement has
+   passed both checks. If CI fails and the prior dedicated token is still valid,
+   restore it from the approved secret manager while diagnosing the failure.
+4. Delete the retired validation token by its name in Supabase Access Tokens once
+   the replacement is verified. Leave the token for interactive CLI login in place.
+
+For HTTP 401, check for an expired, revoked or incorrectly copied token and check
+whether a shell value overrides the file. For HTTP 403, review organization scope,
+the operation's permission and the owner's current role. Replace an unusable token
+through the steps above. If a token is exposed, revoke that validation token
+immediately, then replace the affected local and CI values. Use the logged ref and
+name to verify and clean up any stranded disposable project before retrying.
 
 ## 5. Manual migration application
 

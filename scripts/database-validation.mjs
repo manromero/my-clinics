@@ -13,6 +13,7 @@ import {
 
 export const organization = "njnmfutclorywskqrftd";
 const protectedRef = "lvqbrjybwstvdhaxyxyn";
+const organizationPath = `/organizations/${organization}`;
 const root = fileURLToPath(new URL("../", import.meta.url));
 const typesPath = new URL(
   "../src/lib/supabase/database.types.ts",
@@ -51,21 +52,54 @@ async function api(path, method = "GET", body) {
       "Content-Type": "application/json",
     },
     body: body === undefined ? undefined : JSON.stringify(body),
+    redirect: "error",
     signal: AbortSignal.timeout(120_000),
   });
   // Never emit response bodies: management responses can contain credentials.
   if (!response.ok) {
+    const credentialHint = {
+      401: ". Supabase rejected the validation token (invalid, expired or revoked)",
+      403: ". Check the validation token's organization scope, permissions and owner's role",
+    }[response.status];
     const sqlState = path.endsWith("/database/query")
       ? (await response.text()).match(/ERROR:\s+([A-Z0-9]{5}):/)?.[1]
       : undefined;
     const error = new Error(
-      `Management API ${method} ${path}: HTTP ${response.status}${sqlState ? ` SQLSTATE ${sqlState}` : ""}`,
+      `Management API ${method} ${path}: HTTP ${response.status}${sqlState ? ` SQLSTATE ${sqlState}` : ""}${credentialHint ?? ""}`,
     );
     error.status = response.status;
     error.sqlState = sqlState;
     throw error;
   }
   return response.status === 204 ? undefined : response.json();
+}
+
+async function organizationProjects() {
+  const projects = [];
+  let offset = 0;
+  while (true) {
+    const page = await api(
+      `${organizationPath}/projects?limit=50&offset=${offset}`,
+    );
+    assert.ok(
+      Number.isSafeInteger(page.pagination?.count) &&
+        Array.isArray(page.projects) &&
+        page.projects.every(
+          (item) =>
+            typeof item.ref === "string" &&
+            /^[a-z]{20}$/.test(item.ref) &&
+            typeof item.status === "string",
+        ),
+      "Could not verify the organization project inventory",
+    );
+    projects.push(...page.projects);
+    offset += page.projects.length;
+    if (offset >= page.pagination.count) return projects;
+    assert.ok(
+      page.projects.length,
+      "Organization project inventory was incomplete",
+    );
+  }
 }
 
 export function verifyTarget(project, name) {
@@ -125,9 +159,9 @@ async function disposable(label, run) {
     const current = await api(`/projects/${ref}`);
     verifyTarget(current, name);
     await api(`/projects/${ref}`, "DELETE");
-    const projects = await api("/projects");
+    const projects = await organizationProjects();
     assert.ok(
-      !projects.some((item) => item.id === ref),
+      !projects.some((item) => item.ref === ref),
       `Cleanup not confirmed: ${ref}`,
     );
     owned.delete(ref);
@@ -277,18 +311,32 @@ async function clinicUpgrade(ref) {
   return snapshot(ref);
 }
 
-async function generateTypes(ref) {
+async function generateTypes(ref, accessToken) {
+  assert.ok(
+    owned.has(ref),
+    "Type generation requires a target created by this process",
+  );
   const raw = execFileSync(
     process.execPath,
     [
       `${root}node_modules/supabase/dist/supabase.js`,
       "gen",
       "types",
+      "--profile=supabase",
       "--lang=typescript",
       "--schema=public",
       `--remote=${ref}`,
     ],
-    { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+    {
+      cwd: root,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        SUPABASE_ACCESS_TOKEN: accessToken,
+        SUPABASE_CLI_BINARY_OVERRIDE: "",
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+    },
   );
   assert.ok(
     raw.includes("export type Database"),
@@ -352,32 +400,39 @@ async function negativeControls(ref, baseline, generated) {
 
 export async function main(mode = process.argv[2]) {
   assert.ok(["validate", "types"].includes(mode), "Use validate or types");
+  const accessToken = process.env.SUPABASE_ACCESS_TOKEN;
   assert.ok(
-    process.env.SUPABASE_ACCESS_TOKEN,
-    "Set SUPABASE_ACCESS_TOKEN in the shell or .env.database-validation",
+    accessToken,
+    "Set SUPABASE_ACCESS_TOKEN to a dedicated scoped PAT in the validation environment or .env.database-validation",
+  );
+  assert.ok(
+    /^sbp_fc[a-f0-9]{38}$/.test(accessToken),
+    "SUPABASE_ACCESS_TOKEN must be a dedicated scoped Supabase PAT (sbp_fc prefix and valid CLI token format)",
   );
   assert.equal(
     process.env.MYCLINICS_DISPOSABLE_AUTHORIZATION,
     organization,
     "Explicit disposable-target authorization is required",
   );
-  const org = await api(`/organizations/${organization}`);
+  const org = await api(organizationPath);
   assert.equal(
     org.plan,
     "free",
     "Only the verified Free plan is authorized; no paid upgrades",
   );
-  const projects = await api("/projects");
+  const projects = await organizationProjects();
   assert.ok(
     projects.filter((item) => item.status !== "INACTIVE").length < 2,
-    "No free project capacity; never delete an existing project",
+    "No free project capacity in the validation organization; never delete an existing project",
   );
-  console.log("Verified Free plan and one sequential disposable project slot");
+  console.log(
+    "Verified Free plan and checked project count in the validation organization",
+  );
   const result = await disposable("replay", async (ref) => {
     await replay(ref);
     const catalog = await snapshot(ref);
-    const generated = await generateTypes(ref);
-    checkTypes(await generateTypes(ref), generated);
+    const generated = await generateTypes(ref, accessToken);
+    checkTypes(await generateTypes(ref, accessToken), generated);
     if (mode === "validate") {
       checkTypes(generated, await readFile(typesPath, "utf8"));
       await clinicSeedTests(
