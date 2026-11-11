@@ -71,6 +71,20 @@ sign-out on the production domain.
 
 Implementation started on 2026-11-11. Correction rounds used: 0 of 2.
 
+- [Draft PR #49](https://github.com/manromero/my-clinics/pull/49) targets
+  `develop`. Implementation head `e44b0bd8f619c8a24a414fed08e8b5268cfb54ca`
+  passed lint, type checking, formatting, the production build, 266 application
+  tests, and five database tooling tests. Hosted validation passed clean replay,
+  generated-type freshness, owner policy and grant tests, the ownership upgrade,
+  schema parity, and disposable project cleanup. The PR includes desktop and
+  mobile evidence using controlled Auth and Data API responses.
+- The user approved deleting the existing synthetic clinics from shared
+  development during rollout. The owner mapping is empty for that inventory.
+  The migration preserves and isolates existing rows. Any approved deletion is
+  a separate operator transaction after preservation is verified.
+- Live acceptance with two Google accounts, direct Data API probes, and a
+  separate session or device remains pending.
+
 ## Execution context
 
 - Task 02 is integrated in PR #48 and Milestone 02 Task 08 is complete.

@@ -495,6 +495,11 @@ exact approved target and commit. Complete hosted disposable validation first.
    the updated rows, the resulting owner IDs and the untouched rows before
    committing. A uniqueness or foreign-key failure must leave the mapping
    unapplied. Keep the Data API disabled throughout this step.
+   For a separately approved deletion of synthetic rows, use an operator
+   transaction scoped to the approved IDs with `owner_id is null`. Compare the
+   locked inventory against the approval before deletion and verify the exact
+   returned IDs before commit. Roll back on any mismatch. Keep the Data API
+   disabled until the transaction and post-checks are complete.
 4. Verify owner policies and grants on the target before enabling the Data API
    for approved synthetic acceptance. Keep automatic exposure of new tables
    disabled. With two separate Google accounts, test listing, creation, editing,
