@@ -50,7 +50,7 @@ Execution started on 2026-11-11. Correction rounds used: 1.
   formatting, the production build, and 243 tests. Both verified OAuth start,
   cancellation and retry on desktop and mobile, and reload and sign-out with
   controlled Auth responses. The account holder confirmed hosted Google sign-in
-  and sign-out. Hosted refresh after expiry remains unverified.
+  and sign-out.
 - Round 0 finding AUTH-01: when hosted logout responds with HTTP 503, the SDK
   clears the local session, but the application stays on `/clinics` and loses
   the account control. Fixed and independently verified at
@@ -59,9 +59,11 @@ Execution started on 2026-11-11. Correction rounds used: 1.
   and `git diff --check`. Controlled HTTP 204 and 503 cleared the cookie and
   returned to `/login` on desktop and mobile. The test for a retained session
   verified that retry remains available. No new code findings or suggestions.
-- AUTH-02 remains open: account-holder verification of hosted reload, refresh
-  after expiry, and the full authenticated mobile flow is pending. Controlled
-  transport verified the application's refresh and reload behavior.
+- AUTH-02: the account holder confirmed that the account menu and sign-out
+  control remained visible after reloading `/clinics` during the hosted expiry
+  test with a 300-second JWT lifetime. The account holder also confirmed Google
+  sign-in, reload, and sign-out in mobile view. Controlled transport separately
+  verified token rotation and sign-out behavior at desktop and mobile sizes.
 - The initial implementation is published. The correction is local after
   automatic approval review rejected its push. The review also rejected draft
   PR creation with or without screenshots. Publishing the correction and draft
