@@ -22,12 +22,12 @@ Each user can list, create, edit, deactivate and reactivate only their own clini
 
 ## Task index
 
-| Task                                                                               | Status        | Direct dependencies                                                                                    |
-| ---------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------ |
-| [00 — Build the sign-in screen structure](<task 00 - sign-in screen structure.md>) | `done`        | Milestone 01                                                                                           |
-| [01 — Configure Google in Supabase Auth](<task 01 - configure google provider.md>) | `done`        | [Milestone 02 Task 03](<../milestone-02-clinic-management/task 03 - supabase local foundations.md>)    |
-| [02 — Integrate Supabase sign-in and sessions](<task 02 - supabase sign-in.md>)    | `done`        | 00, 01                                                                                                 |
-| [03 — Restrict clinics to their owners](<task 03 - authorize clinic access.md>)    | `in_progress` | 02, [Milestone 02 Task 08](<../milestone-02-clinic-management/task 08 - update persistent clinics.md>) |
+| Task                                                                               | Status | Direct dependencies                                                                                    |
+| ---------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------ |
+| [00 — Build the sign-in screen structure](<task 00 - sign-in screen structure.md>) | `done` | Milestone 01                                                                                           |
+| [01 — Configure Google in Supabase Auth](<task 01 - configure google provider.md>) | `done` | [Milestone 02 Task 03](<../milestone-02-clinic-management/task 03 - supabase local foundations.md>)    |
+| [02 — Integrate Supabase sign-in and sessions](<task 02 - supabase sign-in.md>)    | `done` | 00, 01                                                                                                 |
+| [03 — Restrict clinics to their owners](<task 03 - authorize clinic access.md>)    | `done` | 02, [Milestone 02 Task 08](<../milestone-02-clinic-management/task 08 - update persistent clinics.md>) |
 
 ## Delivery and validation
 

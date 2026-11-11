@@ -1,6 +1,6 @@
 # Task 03 — Restrict clinics to their owners
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -71,7 +71,7 @@ sign-out on the production domain.
 
 Implementation started on 2026-11-11. Correction rounds used: 0 of 2.
 
-- [Draft PR #49](https://github.com/manromero/my-clinics/pull/49) targets
+- [PR #49](https://github.com/manromero/my-clinics/pull/49) targets
   `develop`. Implementation head `e44b0bd8f619c8a24a414fed08e8b5268cfb54ca`
   passed lint, type checking, formatting, the production build, 266 application
   tests, and five database tooling tests. Hosted validation passed clean replay,
@@ -95,14 +95,18 @@ Implementation started on 2026-11-11. Correction rounds used: 0 of 2.
   clinic edits, persistence in a separate session, and sign-out. A read-only
   query corroborated that saved clinics have two distinct owners. The live Data
   API rejected anonymous reads, inserts, updates, and deletes with HTTP 401
-  and SQLSTATE `42501`. Direct authenticated cross-account probes remain
-  pending.
+  and SQLSTATE `42501`.
+- Direct HTTP probes with both Google sessions confirmed that each account
+  could read its own clinics. Reads and updates targeting the other account's
+  clinic returned zero rows. Forged ownership on insert, attempts to update
+  the owner column, and deletion were denied in both directions.
 - Independent review at `634ad26ffcebca32e9c5d8a78401dca9c13aa868` repeated
   the application and hosted validation checks. Desktop and mobile Chrome
   verified the protected flow, account separation, clinic edits, and save
-  failure and retry with controlled responses. No code or visual blocker was
-  found. Live acceptance remains the blocking check. No correction rounds
-  were used.
+  failure and retry with controlled responses, including rejection of an
+  expired session. The review found no code or visual blockers. The live
+  results close the remaining acceptance check. No correction rounds were
+  used. Human PR approval and manual merge remain pending.
 
 ## Execution context
 
