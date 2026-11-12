@@ -191,7 +191,7 @@ export function ActivityList({
                   <div key="mode">
                     <span>{mode}</span>
                     {rate && (
-                      <div className="text-caption text-on-surface-variant">
+                      <div className="text-caption whitespace-nowrap text-on-surface-variant">
                         {rate} aplicado
                       </div>
                     )}
@@ -270,7 +270,7 @@ export function ActivityList({
                   <summary className="min-h-11 cursor-pointer content-center rounded-sm font-label font-medium text-primary">
                     Detalles del cálculo
                   </summary>
-                  <dl className="space-y-2 pb-1">
+                  <dl className="mt-2 space-y-2 pb-1">
                     <div>
                       <dt className="text-caption text-on-surface-variant">
                         Modo de cálculo
