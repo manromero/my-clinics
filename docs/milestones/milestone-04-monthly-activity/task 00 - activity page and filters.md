@@ -1,6 +1,6 @@
 # Task 00 — Define the activity page and filters
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -49,4 +49,35 @@ desktop and mobile evidence.
 
 ## Progress notes
 
-Proposed; implementation has not started.
+Implementation is in [PR #50](https://github.com/manromero/my-clinics/pull/50).
+
+- Initial independent review of `1afa19a70bab75be9ffe2e9eca2990546c56488c`:
+  lint, typecheck, format, 266 tests, production build and fixture isolation
+  passed. Chrome verified Madrid rollover, URL and clinic eligibility, and the
+  desktop and narrow layouts.
+- Blocking finding R50-01: successful keyboard filter navigation removes focus
+  from the controls, including when an inactive clinic becomes ineligible.
+  Fixed and independently verified in correction round 1.
+- Independent re-review of `d3f3ab4671541060392e6c838763c12ceb6d4a4a`
+  passed lint, typecheck, format, all 266 tests and the production build. Live
+  checks covered URL recovery, clinic eligibility, Madrid rollover, production
+  isolation and keyboard focus after month steps and filter submission. Desktop
+  and mobile captures are recorded in the PR. Google OAuth was not exercised.
+- No open blockers or optional findings. Human PR approval and manual merge
+  into `develop` remain pending.
+
+## Execution context
+
+- Ready: approved scope and acceptance criteria; the shared components and
+  signed-in Clinics flow are present on the updated integration branch.
+- Branch: `feature/activity-page-filters`; base:
+  `07b860c384ffac80b8ae454483c3d361472c2eae` on `develop`.
+- References: the S03 specification and supplied Stitch HTML and PNG in
+  [Screens](../../screens.md#visual-design-references), Alexandria, and the
+  existing shared controls and signed-in header.
+- The preview uses synthetic data and must not change the signed-in route,
+  navigation, or persistence. Tasks 01 and 02 own the list and form behavior.
+- Validate the URL contract and Europe/Madrid boundary independently of the
+  browser timezone, and exercise keyboard, refresh, history, and responsive
+  layout in the live preview. Capture desktop and mobile evidence.
+- No open product questions. Correction rounds used: 1 (of 2).

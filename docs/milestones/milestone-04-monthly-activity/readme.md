@@ -58,7 +58,7 @@ the reference's sample fixed-rate labels and export control do not define scope.
 
 | Task                                                                                                    | Status    | Direct dependencies                                                                                             |
 | ------------------------------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------- |
-| [00 — Define the activity page and filters](<task 00 - activity page and filters.md>)                   | `pending` | Milestones [01](../milestone-01-shared-components/readme.md) and [03](../milestone-03-authentication/readme.md) |
+| [00 — Define the activity page and filters](<task 00 - activity page and filters.md>)                   | `done`    | Milestones [01](../milestone-01-shared-components/readme.md) and [03](../milestone-03-authentication/readme.md) |
 | [01 — Build the activity list and totals](<task 01 - activity list and totals.md>)                      | `pending` | 00                                                                                                              |
 | [02 — Build the activity form and deletion confirmation](<task 02 - activity form and confirmation.md>) | `pending` | 01                                                                                                              |
 | [03 — Create the activity database model](<task 03 - activity database model.md>)                       | `pending` | 02; [Milestone 03 Task 03](<../milestone-03-authentication/task 03 - authorize clinic access.md>)               |

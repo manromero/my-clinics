@@ -14,7 +14,7 @@ export type UserMenuProps = {
   identity: Omit<UserIdentityProps, "variant">;
   variant?: UserIdentityProps["variant"];
   accountLink?: { href: string; label: string };
-  onSignOut: () => void;
+  onSignOut?: () => void;
   signOutPending?: boolean;
   signOutError?: string;
 };
@@ -124,17 +124,19 @@ export function UserMenu({
               {accountLink.label}
             </ActionLink>
           )}
-          <Button
-            variant="tertiary"
-            className="text-error! aria-disabled:cursor-default aria-disabled:opacity-60"
-            aria-disabled={signOutPending}
-            aria-busy={signOutPending}
-            onClick={() => {
-              if (!signOutPending) onSignOut();
-            }}
-          >
-            {signOutPending ? "Cerrando sesión…" : "Cerrar sesión"}
-          </Button>
+          {onSignOut && (
+            <Button
+              variant="tertiary"
+              className="text-error! aria-disabled:cursor-default aria-disabled:opacity-60"
+              aria-disabled={signOutPending}
+              aria-busy={signOutPending}
+              onClick={() => {
+                if (!signOutPending) onSignOut();
+              }}
+            >
+              {signOutPending ? "Cerrando sesión…" : "Cerrar sesión"}
+            </Button>
+          )}
           {signOutPending && (
             <p role="status" className="text-sm text-on-surface-variant">
               Cierre de sesión en curso. Espera un momento.

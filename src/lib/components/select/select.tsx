@@ -24,6 +24,7 @@ export type SelectProps = Omit<
   help?: ReactNode;
   error?: ReactNode;
   invalid?: boolean;
+  showRequirement?: boolean;
 };
 
 export function Select({
@@ -37,6 +38,7 @@ export function Select({
   invalid = false,
   id,
   required = false,
+  showRequirement = true,
   disabled,
   className = "",
   "aria-describedby": describedBy,
@@ -67,7 +69,7 @@ export function Select({
     <div className="min-w-0 space-y-2">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <FieldLabel htmlFor={controlId}>{label}</FieldLabel>
-        <FieldRequirement required={required} />
+        {showRequirement && <FieldRequirement required={required} />}
       </div>
       <select
         {...props}
