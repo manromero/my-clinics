@@ -57,6 +57,12 @@ on desktop and mobile; capture the form and confirmation.
 Implementation started after [Task 01 PR #51](https://github.com/manromero/my-clinics/pull/51)
 merged into `develop`.
 
+- Implementation and visual evidence are in [PR #52](https://github.com/manromero/my-clinics/pull/52).
+- Initial independent review of `e74f32001f8a5758f41ff2cceeb05767bf72f174`
+  passed the application checks, 273 tests, the production build and isolation,
+  and desktop and mobile visual inspection. B1 remains open: Tab can move focus
+  out of a pending save or deletion dialog, leaving focus outside after failure.
+
 ## Execution context
 
 - Ready. The approved scope and criteria are complete and the dependency is on
@@ -72,4 +78,4 @@ merged into `develop`.
 - Verify session behavior across period and clinic filter navigation, focus
   after disappearing rows, and production isolation. Capture both overlays on
   desktop and mobile and exercise the operation states live.
-- Correction rounds used: 0 of 2.
+- Correction round 1 of 2 started to address B1.
