@@ -25,12 +25,14 @@ create table public.activity (
     references public.clinics (owner_id, id) on delete restrict,
   constraint activity_date_range check (activity_date between date '0001-01-01' and date '9999-12-31'),
   -- An unconstrained numeric preserves input scale for these checks.
+  -- Reserve 19 of PostgreSQL's 131072 integer digits for a bigint row count.
+  -- Rates from 0 to 100 and rounding to cents cannot increase a cent-aligned
+  -- input's magnitude, so this also bounds gross and net.
   constraint activity_price_amount check (
-    price > '-Infinity'::numeric and price < 'Infinity'::numeric and scale(price) <= 2
+    abs(price) < 1e131053 and scale(price) <= 2
   ),
   constraint activity_direct_amount check (
-    direct_amount > '-Infinity'::numeric and direct_amount < 'Infinity'::numeric
-    and scale(direct_amount) <= 2
+    abs(direct_amount) < 1e131053 and scale(direct_amount) <= 2
   ),
   constraint activity_calculation_mode check (
     (calculation_mode = 'percentage' and direct_amount is null)
@@ -60,6 +62,10 @@ as $$
 begin
   if amount !~ '^[+-]?[0-9]+([.][0-9]{1,2})?$' then
     raise exception 'Expected a signed decimal with up to two decimal places' using errcode = '22023';
+  end if;
+  -- Match the table bound before casting, even beyond numeric's native range.
+  if length(split_part(ltrim(amount, '+-0'), '.', 1)) > 131053 then
+    raise exception 'Activity amount exceeds the supported range' using errcode = '22003';
   end if;
   return amount::numeric;
 end;

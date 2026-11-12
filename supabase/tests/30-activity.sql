@@ -114,7 +114,6 @@ declare direct_id text;
 declare zero_id text;
 declare positive_id text;
 declare large_id text;
-declare max_width_id text;
 begin
   if exists (select id from public.activity) then
     raise exception 'Owner A saw owner B activity';
@@ -158,17 +157,38 @@ begin
     select 1 from public.activity_period_totals('2026-01-01', '2026-02-01', '-33')
     where price = '0' and gross = '0' and net = '0' and row_count = '0' and clinics = '[]'
   ) then raise exception 'Clinic filter or empty totals exposed the wrong rows'; end if;
-
-  -- Converting the rate before multiplying avoids an overflowing intermediate.
-  max_width_id := public.create_activity(
-    '9007199254740993', '2026-02-01', null, repeat('9', 131072), 'percentage', null
-  );
-  if not exists (select id from public.activity where id::text = max_width_id
-    and gross::text = repeat('9', 131071) || '.90') then
-    raise exception 'Percentage gross lost precision at the numeric width limit';
-  end if;
-  perform public.delete_activity(max_width_id);
 end $$;
+
+-- Sum two maximum accepted rows without losing a digit or a cent.
+update public.clinics set percentage = 100 where id = -32;
+do $$
+declare amount text := repeat('9', 131053) || '.99';
+declare expected_price text := '1' || repeat('9', 131053) || '.98';
+declare expected_net text := '16' || repeat('9', 131052) || '.98';
+declare direct_id text;
+begin
+  perform public.create_activity('-32', '2026-04-01', null, '+00' || amount, 'percentage', null);
+  direct_id := public.create_activity('-32', '2026-04-01', null, amount, 'direct', amount);
+  perform pg_temp.expect_activity_error($s$select public.create_activity(
+    '-32', '2026-04-01', null, '1' || repeat('0', 131053), 'percentage', null
+  )$s$, '22003');
+  perform pg_temp.expect_activity_error($s$select public.create_activity(
+    '-32', '2026-04-01', null, '1', 'direct', '-1' || repeat('0', 131053)
+  )$s$, '22003');
+  perform pg_temp.expect_activity_error(format($s$select public.update_activity(
+    %L, '-32', '2026-04-01', null, '1', 'direct', repeat('9', 131073)
+  )$s$, direct_id), '22003');
+
+  if not exists (
+    select 1 from public.activity_period_totals('2026-04-01', '2026-05-01')
+    where price = expected_price and gross = expected_price and net = expected_net and row_count = '2'
+      and clinics = jsonb_build_array(jsonb_build_object(
+        'clinic_id', '-32', 'price', expected_price, 'gross', expected_price,
+        'net', expected_net, 'row_count', '2'
+      ))
+  ) then raise exception 'Overall or clinic totals lost precision at the supported amount limit'; end if;
+end $$;
+update public.clinics set percentage = 40 where id = -32;
 
 update public.clinics set percentage = 75, active = false where id = 9007199254740993;
 select pg_temp.expect_activity_error($s$select public.create_activity(
@@ -198,6 +218,10 @@ select pg_temp.expect_activity_error($s$update public.activity set price = 'NaN'
   where id::text = current_setting('validation.activity_a')$s$, '23514');
 select pg_temp.expect_activity_error($s$update public.activity set price = 1.000
   where id::text = current_setting('validation.activity_a')$s$, '23514');
+select pg_temp.expect_activity_error($s$update public.activity set price = 1e131053
+  where id::text = current_setting('validation.activity_a')$s$, '23514');
+select pg_temp.expect_activity_error($s$update public.activity set direct_amount = -1e131053
+  where description = 'Refund'$s$, '23514');
 select pg_temp.expect_activity_error($s$update public.activity set gross = 100
   where id::text = current_setting('validation.activity_a')$s$, '428C9');
 
