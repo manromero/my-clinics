@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { format } from "prettier";
+import { activityConcurrencyTests } from "./activity-database-validation.mjs";
 import { catalogRegressions } from "./database-catalog-regressions.mjs";
 import {
   clinicConcurrencyTests,
@@ -228,6 +229,11 @@ async function clinicUpgrade(ref) {
     ownerPosition > lengthPosition,
     "Missing clinic ownership migration",
   );
+  const activityPosition = files.indexOf("20261112120000_create_activity.sql");
+  assert.ok(
+    activityPosition > ownerPosition,
+    "Missing activity migration after clinic ownership",
+  );
   await replay(ref, files.slice(0, position));
   // The previous public baseline was empty: no pre-existing clinics are possible.
   // Commit synthetic data in a separate schema before applying the real migration.
@@ -318,9 +324,9 @@ async function clinicUpgrade(ref) {
   console.log(
     "Actual ownership upgrade preserved every clinic and isolated legacy rows under real SQL roles",
   );
-  if (ownerPosition < files.length - 1) {
-    await replay(ref, files.slice(ownerPosition + 1));
-  }
+  await replay(ref, files.slice(ownerPosition + 1, activityPosition));
+  await activityUpgrade(ref, files[activityPosition]);
+  await replay(ref, files.slice(activityPosition + 1));
   await query(ref, "drop schema validation_preclinic cascade");
   console.log(
     "Actual clinic migration upgrade from previous empty baseline preserved committed synthetic data",
@@ -329,6 +335,50 @@ async function clinicUpgrade(ref) {
     "Actual development access upgrade preserved three existing synthetic clinics",
   );
   return snapshot(ref);
+}
+
+async function activityUpgrade(ref, migration) {
+  await query(
+    ref,
+    `insert into auth.users(id) values
+      ('00000000-0000-4000-8000-000000000041'),
+      ('00000000-0000-4000-8000-000000000042');
+    insert into public.clinics(owner_id,name,percentage,active) values
+      ('00000000-0000-4000-8000-000000000041','Pre-activity clinic A',34.25,true),
+      ('00000000-0000-4000-8000-000000000042','Pre-activity clinic B',60.50,false);`,
+  );
+  const listClinics = `select id::text,owner_id,name,percentage::text,active
+    from public.clinics order by id`;
+  const listOwners = `select id from auth.users where id in
+    ('00000000-0000-4000-8000-000000000041','00000000-0000-4000-8000-000000000042')
+    order by id`;
+  const clinics = await query(ref, listClinics);
+  const owners = await query(ref, listOwners);
+  const catalog = await snapshot(ref);
+  const existingObjects = new Set(
+    catalog.map(({ kind, name }) => `${kind}:${name}`),
+  );
+  await replay(ref, [migration]);
+  assert.deepEqual(
+    await query(ref, listClinics),
+    clinics,
+    "Activity migration changed existing clinics",
+  );
+  assert.deepEqual(
+    await query(ref, listOwners),
+    owners,
+    "Activity migration changed existing owners",
+  );
+  checkParity(
+    (await snapshot(ref)).filter(({ kind, name }) =>
+      existingObjects.has(`${kind}:${name}`),
+    ),
+    catalog,
+  );
+  await databaseTests(ref, ["20-clinic-owner-access.sql", "30-activity.sql"]);
+  console.log(
+    "Activity upgrade preserved existing clinic rows, owners, grants and policies",
+  );
 }
 
 async function generateTypes(ref, accessToken) {
@@ -467,6 +517,7 @@ export async function main(mode = process.argv[2]) {
         "Clinic owner grants and RLS verified with two authenticated subjects and the anon role while the Data API was disabled.",
       );
       await clinicConcurrencyTests((sql) => query(ref, sql));
+      await activityConcurrencyTests((sql) => query(ref, sql));
       await clinicNegativeControls(
         (sql) => query(ref, sql),
         await readFile(

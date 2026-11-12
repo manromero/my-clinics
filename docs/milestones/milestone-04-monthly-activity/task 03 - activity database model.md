@@ -1,6 +1,6 @@
 # Task 03 — Create the activity database model
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -67,4 +67,19 @@ target; approval for the task plan does not authorize applying a migration.
 
 ## Progress notes
 
-Proposed; implementation has not started.
+Implementation and independent review are in progress.
+
+## Execution context
+
+- Ready for implementation: the approved scope and rounding contract are
+  documented, Task 02 is merged, and clinic ownership policies are present.
+- Branch: `feature/activity-database-model`; base:
+  `459d0bcf7884d1a5d3084b40b97bf78ac74348cf` on `develop`.
+- The fixture preview uses integer cents and basis points, rounding each row
+  away from zero at a half-cent. Match this behavior without changing the UI.
+- Extend the existing public schema, catalog, replay, and upgrade coverage as
+  applicable. Prove role isolation and verify a clinic's current state under
+  concurrent writes. Keep reads and totals independent of pagination.
+- Run hosted validation only through the authorized disposable lifecycle in
+  the Supabase guide. Do not apply the migration to shared development.
+- No open product questions. Correction rounds used: 0.
