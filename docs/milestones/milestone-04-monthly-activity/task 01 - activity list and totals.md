@@ -1,6 +1,6 @@
 # Task 01 — Build the activity list and totals
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -47,6 +47,18 @@ keyboard access, and row details live. Capture desktop and mobile evidence.
 ## Progress notes
 
 Implementation assigned after Task 00 merged in [PR #50](https://github.com/manromero/my-clinics/pull/50).
+
+- Implementation and desktop and mobile evidence are in
+  [PR #51](https://github.com/manromero/my-clinics/pull/51).
+- Independent review of `b8ea4a00d2f980d38e939b2b1902b2b15e1baf39`
+  passed lint, typecheck, formatting, all 269 tests, and the production build.
+  The preview returned HTTP 404 in production, including its fixture scenarios.
+- Live Chrome review verified the desktop table and narrow cards, exact signed
+  totals, Spanish formatting, stable row order, scope changes and keyboard
+  focus, empty results, inactive clinic history, loading, and error with retry.
+  Narrow viewport checks used desktop input.
+- No blocking or optional findings. Correction rounds used: 0 of 2. Human
+  approval and manual merge into `develop` are pending.
 
 ## Execution context
 
