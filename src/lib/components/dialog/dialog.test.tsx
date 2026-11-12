@@ -126,6 +126,7 @@ describe("Dialog", () => {
       screen.queryByRole("button", { name: "Cerrar diálogo" }),
     ).not.toBeInTheDocument();
     const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveAttribute("closedby", "none");
     fireEvent(dialog, new Event("cancel", { cancelable: true }));
     fireEvent.pointerDown(dialog, { clientX: -5, clientY: -5 });
     fireEvent.pointerUp(dialog, { clientX: -5, clientY: -5 });

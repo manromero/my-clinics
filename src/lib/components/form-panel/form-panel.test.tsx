@@ -59,21 +59,29 @@ describe("FormPanel", () => {
     const user = userEvent.setup();
     const submit = vi.fn();
     const cancel = vi.fn();
-    render(
+    const modal = (pending: boolean, error?: string) => (
       <FormPanel
         presentation="modal"
         open
-        pending
+        pending={pending}
+        error={error}
         title="Editar"
         onSubmit={submit}
         onCancel={cancel}
       >
         <input aria-label="Nombre" defaultValue="Conservado" />
-      </FormPanel>,
+      </FormPanel>
     );
+    const { rerender } = render(modal(true));
     expect(screen.getByRole("form")).toHaveAttribute("aria-busy", "true");
     expect(screen.getByRole("textbox")).toBeDisabled();
     expect(screen.getByRole("status")).toHaveTextContent("Guardando…");
+    const title = screen.getByRole("heading", { name: "Editar" });
+    expect(title).toHaveFocus();
+    await user.tab();
+    expect(title).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(title).toHaveFocus();
     await user.click(screen.getByRole("button", { name: "Guardando…" }));
     await user.click(screen.getByRole("button", { name: "Cancelar" }));
     fireEvent.submit(screen.getByRole("form"));
@@ -86,6 +94,11 @@ describe("FormPanel", () => {
     ).not.toBeInTheDocument();
     expect(submit).not.toHaveBeenCalled();
     expect(cancel).not.toHaveBeenCalled();
+    rerender(modal(false, "Conexión interrumpida"));
+    expect(screen.getByRole("button", { name: "Guardar" })).toHaveFocus();
+    expect(screen.getByRole("textbox")).toHaveValue("Conservado");
+    await user.keyboard("{Enter}");
+    expect(submit).toHaveBeenCalledTimes(1);
   });
 
   it("retains caller-owned values through pending, failure and successful retry", async () => {

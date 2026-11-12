@@ -2,6 +2,7 @@
 
 import {
   useId,
+  useRef,
   type ReactNode,
   type RefObject,
   type FormEventHandler,
@@ -53,12 +54,13 @@ export function FormPanel({
   const id = useId();
   const titleId = `${id}-title`;
   const descriptionId = `${id}-description`;
+  const saveRef = useRef<HTMLButtonElement>(null);
   const actions = (
     <>
       <Button variant="secondary" disabled={pending} onClick={onCancel}>
         {cancelLabel}
       </Button>
-      <Button type="submit" form={id} pending={pending}>
+      <Button ref={saveRef} type="submit" form={id} pending={pending}>
         {pending ? pendingLabel : saveLabel}
       </Button>
     </>
@@ -108,8 +110,9 @@ export function FormPanel({
         }}
         title={title}
         description={description}
-        dismissible={!pending}
+        pending={pending}
         initialFocusRef={initialFocusRef}
+        resumeFocusRef={saveRef}
         actions={actions}
       >
         {form}

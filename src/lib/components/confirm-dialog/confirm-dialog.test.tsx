@@ -112,6 +112,12 @@ describe("ConfirmDialog", () => {
     expect(screen.getByRole("button", { name: "Procesando…" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Cancelar" })).toBeDisabled();
     expect(screen.getByRole("status")).toHaveTextContent("Procesando…");
+    const title = screen.getByRole("heading", { name: "Eliminar ejemplo" });
+    expect(title).toHaveFocus();
+    await user.tab();
+    expect(title).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(title).toHaveFocus();
     expect(
       screen.queryByRole("button", { name: "Cerrar diálogo" }),
     ).not.toBeInTheDocument();
@@ -145,7 +151,8 @@ describe("ConfirmDialog", () => {
     expect(scrollIntoView.mock.contexts[0]).toContainElement(
       screen.getByRole("alert"),
     );
-    await user.click(screen.getByRole("button", { name: "Eliminar" }));
+    expect(screen.getByRole("button", { name: "Eliminar" })).toHaveFocus();
+    await user.keyboard("{Enter}");
     expect(confirm).toHaveBeenCalledTimes(2);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });

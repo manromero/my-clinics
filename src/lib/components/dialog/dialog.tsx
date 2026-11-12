@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   type ReactNode,
   type RefObject,
@@ -20,6 +20,8 @@ export type DialogProps = {
   size?: "sm" | "md";
   dismissible?: boolean;
   initialFocusRef?: RefObject<HTMLElement | null>;
+  pending?: boolean;
+  resumeFocusRef?: RefObject<HTMLElement | null>;
 };
 
 export function Dialog({
@@ -32,14 +34,19 @@ export function Dialog({
   size = "md",
   dismissible = true,
   initialFocusRef,
+  pending = false,
+  resumeFocusRef,
 }: DialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const titleId = useId();
   const descriptionId = useId();
   const backdropPress = useRef(false);
+  const wasPending = useRef(false);
+  const canDismiss = dismissible && !pending;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open) return;
     const dialog = dialogRef.current!;
     const opener = document.activeElement;
@@ -70,6 +77,18 @@ export function Dialog({
     };
   }, [open, initialFocusRef]);
 
+  useLayoutEffect(() => {
+    if (open && pending) {
+      // The action that started the operation may have just become disabled.
+      titleRef.current?.focus({ preventScroll: true });
+    } else if (open && wasPending.current) {
+      (resumeFocusRef?.current ?? initialFocusRef?.current)?.focus({
+        preventScroll: true,
+      });
+    }
+    wasPending.current = open && pending;
+  }, [open, pending, initialFocusRef, resumeFocusRef]);
+
   function outside(event: PointerEvent<HTMLDialogElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
     return (
@@ -86,9 +105,16 @@ export function Dialog({
       aria-labelledby={titleId}
       aria-describedby={description ? descriptionId : undefined}
       aria-modal="true"
+      closedby={canDismiss ? undefined : "none"}
       onCancel={(event) => {
         event.preventDefault();
-        if (dismissible) onOpenChange(false);
+        if (canDismiss) onOpenChange(false);
+      }}
+      onKeyDown={(event) => {
+        if (pending && event.key === "Tab") {
+          event.preventDefault();
+          titleRef.current?.focus({ preventScroll: true });
+        }
       }}
       onClose={() => {
         if (dialogRef.current && !dialogRef.current.open && open)
@@ -100,7 +126,7 @@ export function Dialog({
       }}
       onPointerUp={(event) => {
         if (
-          dismissible &&
+          canDismiss &&
           backdropPress.current &&
           event.target === event.currentTarget &&
           outside(event)
@@ -113,7 +139,12 @@ export function Dialog({
       <div className="flex max-h-[calc(100dvh-2rem)] flex-col">
         <header className="flex shrink-0 items-start gap-4 px-6 pt-6 pb-4 sm:px-8 sm:pt-8">
           <div className="min-w-0 flex-1 wrap-anywhere">
-            <h2 id={titleId} className="font-headline text-title">
+            <h2
+              ref={titleRef}
+              id={titleId}
+              tabIndex={pending ? -1 : undefined}
+              className="font-headline text-title"
+            >
               {title}
             </h2>
             {description && (
@@ -125,7 +156,7 @@ export function Dialog({
               </p>
             )}
           </div>
-          {dismissible && (
+          {canDismiss && (
             <IconButton
               label="Cerrar diálogo"
               size="sm"

@@ -1,7 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { fixtureActivity } from "./fixture-activity";
+import {
+  activityPeriodFromQuery,
+  activityView,
+  type ActivityPreview,
+  type ActivityQuery,
+} from "./activity-view";
+import { fixtureClinics, fixtureRows } from "./fixture-activity";
 
 const october = { year: "2026", month: "10" };
+
+function fixtureActivity(query: ActivityQuery, preview?: ActivityPreview) {
+  return activityView(
+    activityPeriodFromQuery(query),
+    query.clinic,
+    fixtureClinics(preview),
+    fixtureRows,
+  );
+}
 
 describe("activity preview fixtures", () => {
   it("orders dates newest first, breaks same-day ties and sums signed row cents", () => {

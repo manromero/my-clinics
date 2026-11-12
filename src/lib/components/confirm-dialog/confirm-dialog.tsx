@@ -37,6 +37,7 @@ export function ConfirmDialog({
   pendingLabel = "Procesando…",
 }: ConfirmDialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
   const inFlight = useRef(false);
   const [confirming, setConfirming] = useState(false);
@@ -70,8 +71,9 @@ export function ConfirmDialog({
       title={title}
       description={description}
       size="sm"
-      dismissible={!busy}
+      pending={busy}
       initialFocusRef={cancelRef}
+      resumeFocusRef={confirmRef}
       actions={
         <>
           <Button
@@ -83,6 +85,7 @@ export function ConfirmDialog({
             {cancelLabel}
           </Button>
           <Button
+            ref={confirmRef}
             variant={destructive ? "destructive" : "primary"}
             pending={busy}
             onClick={confirm}

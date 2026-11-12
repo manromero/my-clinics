@@ -4,12 +4,14 @@ import { AppFooter } from "@/lib/components/app-footer/app-footer";
 import { AppHeader } from "@/lib/components/app-header/app-header";
 import { ActivityScreen } from "./_components/activity-screen";
 import {
+  activityPeriodFromQuery,
   activityPeriodParams,
   activityScopeParams,
+  resolveActivityScope,
 } from "./_lib/activity-view";
 import {
   activityPreviewFromQuery,
-  fixtureActivity,
+  fixtureClinics,
 } from "./_lib/fixture-activity";
 
 export const metadata: Metadata = {
@@ -24,16 +26,24 @@ export default async function ActivityPage({
 
   const query = await searchParams;
   const preview = activityPreviewFromQuery(query.preview);
-  const data = fixtureActivity(query, preview);
-  const { year, month } = activityPeriodParams(data.scope);
+  const period = activityPeriodFromQuery(query);
+  const clinics = fixtureClinics(preview);
+  // Historical eligibility depends on the edited rows in the client session.
+  const scope = resolveActivityScope(period, query.clinic, clinics);
+  const { year, month } = activityPeriodParams(period);
   if (
     query.year !== year ||
     query.month !== month ||
-    query.clinic !== (data.scope.clinicId ?? undefined) ||
+    query.clinic !== (scope.clinicId ?? undefined) ||
     query.preview !== preview
   ) {
-    redirect(`/activity?${activityScopeParams(data.scope, preview)}`);
+    redirect(`/activity?${activityScopeParams(scope, preview)}`);
   }
+
+  const loading =
+    preview === "loading"
+      ? new Promise<void>((resolve) => setTimeout(resolve, 1500))
+      : undefined;
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -48,7 +58,12 @@ export default async function ActivityPage({
           },
         }}
       />
-      <ActivityScreen data={data} preview={preview} />
+      <ActivityScreen
+        scope={scope}
+        clinics={clinics}
+        preview={preview}
+        loading={loading}
+      />
       <AppFooter
         identity="MyClinics"
         metadata="Vista previa · Datos sintéticos"

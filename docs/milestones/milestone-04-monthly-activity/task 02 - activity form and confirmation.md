@@ -1,6 +1,6 @@
 # Task 02 — Build the activity form and deletion confirmation
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -54,4 +54,34 @@ on desktop and mobile; capture the form and confirmation.
 
 ## Progress notes
 
-Proposed; implementation has not started.
+Implementation started after [Task 01 PR #51](https://github.com/manromero/my-clinics/pull/51)
+merged into `develop`.
+
+- Implementation and visual evidence are in [PR #52](https://github.com/manromero/my-clinics/pull/52).
+- Initial independent review of `e74f32001f8a5758f41ff2cceeb05767bf72f174`
+  passed the application checks, 273 tests, the production build and isolation,
+  and desktop and mobile visual inspection. It found B1: Tab could move focus
+  out of a pending save or deletion dialog and leave focus outside after failure.
+- Independent re-review of `31746c475e24cae72a1f8953f6c7054ae475beca` verified
+  the focus fix during pending writes, after failure, and after closing the
+  dialogs. Lint, typecheck, formatting, 273 tests, the production build, and six
+  production 404 probes passed. Desktop and touch-emulated mobile captures
+  passed visual review. Physical-device keyboard behavior remains unverified.
+- Correction rounds used: 1 of 2. No blockers or optional findings remain.
+  Human approval and manual merge into `develop` are pending in PR #52.
+
+## Execution context
+
+- Ready. The approved scope and criteria are complete and the dependency is on
+  `develop`. No open product questions.
+- Branch: `feature/activity-form-and-confirmation`; base:
+  `1a1db53adcedb5f9a4f10d8cbd3a8be82aa1d272`.
+- Extend the development-only route in `src/app/activity/`, the responsive
+  controls in `activity-list.tsx`, and the scope, totals, and fixtures in `_lib/`.
+  Reuse the shared form and dialog components in `src/lib/components/`.
+- Follow the [activity requirements](../../requirements.md#activity),
+  [S03 form specification](../../screens.md#create-and-edit-activity), and
+  [S03 design references](../../screens.md#visual-design-references).
+- Verify session behavior across period and clinic filter navigation, focus
+  after disappearing rows, and production isolation. Capture both overlays on
+  desktop and mobile and exercise the operation states live.
