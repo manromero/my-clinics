@@ -1,6 +1,6 @@
 # Task 01 — Build the activity list and totals
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -46,4 +46,32 @@ keyboard access, and row details live. Capture desktop and mobile evidence.
 
 ## Progress notes
 
-Proposed; implementation has not started.
+Implementation assigned after Task 00 merged in [PR #50](https://github.com/manromero/my-clinics/pull/50).
+
+- Implementation and desktop and mobile evidence are in
+  [PR #51](https://github.com/manromero/my-clinics/pull/51).
+- Independent review of `b8ea4a00d2f980d38e939b2b1902b2b15e1baf39`
+  passed lint, typecheck, formatting, all 269 tests, and the production build.
+  The preview returned HTTP 404 in production, including its fixture scenarios.
+- Live Chrome review verified the desktop table and narrow cards, exact signed
+  totals, Spanish formatting, stable row order, scope changes and keyboard
+  focus, empty results, inactive clinic history, loading, and error with retry.
+  Narrow viewport checks used desktop input.
+- No blocking or optional findings. Correction rounds used: 0 of 2. Human
+  approval and manual merge into `develop` are pending.
+
+## Execution context
+
+- Ready. The approved scope, acceptance criteria and Task 00 dependency are
+  available on `develop`.
+- Branch: `feature/activity-list-and-totals`; base:
+  `42c155519297470ed89c4e48b79ba9b0d8863be8`.
+- Reuse the normalized scope and view data in `src/app/activity/_lib/`, and
+  the route composition and shared components in `src/app/activity/`.
+- Follow the [currency and rounding requirements](../../requirements.md#currency-and-rounding)
+  and the [S03 specification and supplied design references](../../screens.md#s03--monthly-activity).
+  Keep signed totals in exact cents and use stored applied rates.
+- Keep fixture states within the development preview. Exercise loading,
+  failure, empty results and inactive-only history live, alongside the
+  populated fixtures and keyboard filter navigation. Check production isolation.
+- No open product questions. Correction rounds used: 0 (of 2).

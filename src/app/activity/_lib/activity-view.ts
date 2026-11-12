@@ -1,6 +1,7 @@
 export type ActivityPeriod = { year: number; month: number };
 export type ActivityScope = ActivityPeriod & { clinicId: string | null };
 export type ActivityQuery = Record<string, string | string[] | undefined>;
+export type ActivityPreview = "inactive" | "loading" | "error";
 
 export type ActivityClinicOption = {
   id: string;
@@ -96,9 +97,13 @@ export function activityPeriodParams({ year, month }: ActivityPeriod) {
   };
 }
 
-export function activityScopeParams(scope: ActivityScope) {
+export function activityScopeParams(
+  scope: ActivityScope,
+  preview?: ActivityPreview,
+) {
   const params = new URLSearchParams(activityPeriodParams(scope));
   if (scope.clinicId !== null) params.set("clinic", scope.clinicId);
+  if (preview) params.set("preview", preview);
   return params.toString();
 }
 

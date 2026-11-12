@@ -1,33 +1,51 @@
+import { Suspense } from "react";
+import { ActionLink } from "@/lib/components/action-link/action-link";
+import { Alert } from "@/lib/components/alert/alert";
 import { Button } from "@/lib/components/button/button";
+import { EmptyState } from "@/lib/components/empty-state/empty-state";
+import { LoadingState } from "@/lib/components/loading-state/loading-state";
 import { PageContainer } from "@/lib/components/page-container/page-container";
 import { PageHeader } from "@/lib/components/page-header/page-header";
 import { Surface } from "@/lib/components/surface/surface";
 import {
   activityMonthName,
+  activityScopeParams,
+  type ActivityPreview,
   type ActivityViewData,
 } from "../_lib/activity-view";
+import { activityCount, formatEuroCents } from "../_lib/activity-format";
 import { ActivityFilters } from "./activity-filters";
+import { ActivityList } from "./activity-list";
 
-const euros = new Intl.NumberFormat("es-ES", {
-  style: "currency",
-  currency: "EUR",
-});
-
-function formatEuroCents(cents: `${bigint}`) {
-  const sign = cents.startsWith("-") ? "-" : "";
-  const digits = cents.replace(/^-/, "").padStart(3, "0");
-  const amount =
-    `${sign}${digits.slice(0, -2)}.${digits.slice(-2)}` as `${number}`;
-  return euros.format(amount);
-}
-
-export function ActivityScreen({ data }: { data: ActivityViewData }) {
-  const { scope, clinicOptions, totals, canCreate } = data;
-  const clinic = clinicOptions.find(({ id }) => id === scope.clinicId);
+async function ActivityPreviewResults({
+  data,
+  preview,
+}: {
+  data: ActivityViewData;
+  preview?: ActivityPreview;
+}) {
+  const { scope, clinicOptions, rows, totals, canCreate } = data;
+  if (preview === "loading") {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+  }
+  if (preview === "error") {
+    return (
+      <Alert
+        title="No se pudo cargar la actividad"
+        variant="error"
+        announcement="assertive"
+      >
+        <p>Vuelve a intentarlo para consultar los registros del periodo.</p>
+        <ActionLink href={`/activity?${activityScopeParams(scope)}`}>
+          Reintentar
+        </ActionLink>
+      </Alert>
+    );
+  }
   const cards = [
     { label: "Facturación total", value: formatEuroCents(totals.priceCents) },
     { label: "Ganancia bruta", value: formatEuroCents(totals.grossCents) },
-    { label: "Registros", value: totals.rowCount },
+    { label: "Registros", value: activityCount.format(totals.rowCount) },
     {
       label: "Ganancia tras IRPF",
       value: formatEuroCents(totals.netCents),
@@ -36,24 +54,7 @@ export function ActivityScreen({ data }: { data: ActivityViewData }) {
   ];
 
   return (
-    <PageContainer as="main" className="flex-1 space-y-8">
-      <div className="grid items-end gap-6 xl:grid-cols-[1fr_auto]">
-        <PageHeader
-          title="Actividad mensual"
-          metadata={
-            <p role="status">
-              <span className="inline-block first-letter:uppercase">
-                {activityMonthName(scope.month)} de {scope.year}
-              </span>
-              {" · "}
-              {clinic ? clinic.name : "Todas las clínicas"}
-              {clinic && !clinic.active && " (inactiva)"}
-            </p>
-          }
-        />
-        <ActivityFilters scope={scope} clinicOptions={clinicOptions} />
-      </div>
-
+    <>
       <section aria-labelledby="activity-totals">
         <h2 id="activity-totals" className="sr-only">
           Totales del periodo
@@ -78,36 +79,91 @@ export function ActivityScreen({ data }: { data: ActivityViewData }) {
         </div>
       </section>
 
-      <div className="space-y-3">
-        <Surface as="section" variant="tonal" aria-labelledby="activity-entry">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="space-y-2">
-              <h2 id="activity-entry" className="font-headline text-title">
-                Registrar actividad
-              </h2>
-              <p className="text-label text-on-surface-variant">
-                {canCreate
-                  ? "El formulario aún no está disponible en esta vista previa."
-                  : "Necesitas una clínica activa para registrar actividad."}
-              </p>
-            </div>
-            <Button disabled>Nueva actividad</Button>
-          </div>
-        </Surface>
+      {!canCreate && (
+        <Alert title="No hay clínicas activas" variant="warning">
+          <p>
+            Crea una clínica o reactiva una existente para registrar actividad.
+          </p>
+          <ActionLink href="/clinics">Ir a Clínicas</ActionLink>
+        </Alert>
+      )}
+      <Surface
+        as="section"
+        aria-labelledby="activity-list"
+        className="sm:p-6 xl:p-0"
+      >
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 xl:px-6 xl:pt-6">
+          <h2 id="activity-list" className="font-headline text-title">
+            Registros de actividad
+          </h2>
+          <Button disabled>Nueva actividad</Button>
+        </div>
+        {rows.length > 0 ? (
+          <ActivityList rows={rows} clinicOptions={clinicOptions} />
+        ) : (
+          <EmptyState
+            className="xl:mx-6 xl:mb-6"
+            headingLevel={3}
+            title={
+              scope.clinicId
+                ? "No hay registros para esta clínica"
+                : "No hay registros este mes"
+            }
+            explanation={
+              scope.clinicId
+                ? "Selecciona otra clínica o cambia el periodo."
+                : "Selecciona otro periodo para consultar el historial."
+            }
+          />
+        )}
+      </Surface>
+    </>
+  );
+}
 
-        <Surface as="section" aria-labelledby="activity-list">
-          <div className="space-y-2">
-            <h2 id="activity-list" className="font-headline text-title">
-              Registros de actividad
-            </h2>
-            <p className="text-label text-on-surface-variant">
-              {totals.rowCount > 0
-                ? "El detalle de los registros aún no está disponible en esta vista previa."
-                : "No hay actividad para el periodo y la clínica seleccionados."}
+export function ActivityScreen({
+  data,
+  preview,
+}: {
+  data: ActivityViewData;
+  preview?: ActivityPreview;
+}) {
+  const { scope, clinicOptions } = data;
+  const clinic = clinicOptions.find(({ id }) => id === scope.clinicId);
+  return (
+    <PageContainer as="main" className="flex-1 space-y-8">
+      <div className="grid items-end gap-6 xl:grid-cols-[1fr_auto]">
+        <PageHeader
+          title="Actividad mensual"
+          metadata={
+            <p role="status">
+              <span className="inline-block first-letter:uppercase">
+                {activityMonthName(scope.month)} de {scope.year}
+              </span>
+              {" · "}
+              {clinic ? clinic.name : "Todas las clínicas"}
+              {clinic && !clinic.active && " (inactiva)"}
             </p>
-          </div>
-        </Surface>
+          }
+        />
+        <ActivityFilters
+          scope={scope}
+          clinicOptions={clinicOptions}
+          preview={preview}
+        />
       </div>
+      <Suspense
+        key={activityScopeParams(scope, preview)}
+        fallback={
+          <LoadingState
+            label="Cargando actividad…"
+            variant="region"
+            indicator="skeleton"
+          />
+        }
+      >
+        <ActivityPreviewResults data={data} preview={preview} />
+      </Suspense>
     </PageContainer>
   );
 }

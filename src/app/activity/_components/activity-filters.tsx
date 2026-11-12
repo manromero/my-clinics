@@ -12,6 +12,7 @@ import {
   activityScopeParams,
   adjacentActivityPeriod,
   type ActivityPeriod,
+  type ActivityPreview,
   type ActivityScope,
   type ActivityViewData,
 } from "../_lib/activity-view";
@@ -25,10 +26,12 @@ const monthOptions = Array.from({ length: 12 }, (_, index) => ({
 function AdjacentMonth({
   scope,
   direction,
+  preview,
   rememberFocus,
 }: {
   scope: ActivityScope;
   direction: -1 | 1;
+  preview?: ActivityPreview;
   rememberFocus: (target: ActivityPeriod) => void;
 }) {
   const period = adjacentActivityPeriod(scope, direction);
@@ -36,7 +39,7 @@ function AdjacentMonth({
   return (
     <ActionLink
       id={direction === -1 ? "activity-previous-month" : "activity-next-month"}
-      href={`/activity?${activityScopeParams({ ...(period ?? scope), clinicId: scope.clinicId })}`}
+      href={`/activity?${activityScopeParams({ ...(period ?? scope), clinicId: scope.clinicId }, preview)}`}
       scroll={false}
       aria-disabled={period === null || undefined}
       onClick={(event) => {
@@ -69,7 +72,10 @@ function AdjacentMonth({
 export function ActivityFilters({
   scope,
   clinicOptions,
-}: Pick<ActivityViewData, "scope" | "clinicOptions">) {
+  preview,
+}: Pick<ActivityViewData, "scope" | "clinicOptions"> & {
+  preview?: ActivityPreview;
+}) {
   const pendingFocusRef = useContext(ActivityNavigationFocus);
   const appliedScope = activityScopeParams(scope);
   const appliedFields = {
@@ -138,10 +144,12 @@ export function ActivityFilters({
       }}
       className="flex flex-wrap items-end gap-x-4 gap-y-3"
     >
+      {preview && <input type="hidden" name="preview" value={preview} />}
       <div className="flex w-full min-w-0 items-end gap-2 sm:w-auto">
         <AdjacentMonth
           scope={scope}
           direction={-1}
+          preview={preview}
           rememberFocus={rememberFocus}
         />
         <div className="min-w-0 flex-1 sm:w-34">
@@ -177,6 +185,7 @@ export function ActivityFilters({
         <AdjacentMonth
           scope={scope}
           direction={1}
+          preview={preview}
           rememberFocus={rememberFocus}
         />
       </div>
