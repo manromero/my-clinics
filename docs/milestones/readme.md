@@ -12,7 +12,7 @@ before implementation begins.
 | [01 — Visual foundations and shared components](milestone-01-shared-components/readme.md) | Components catalogue, visual foundations, basic controls and shared screen structure             | Complete. All 28 tasks are done and merged into `develop`.                                                            |
 | [02 — Clinic management](milestone-02-clinic-management/readme.md)                        | Clinic management, Supabase persistence and dedicated database validation credentials            | All tasks done. Human approval and manual merge of [PR #45](https://github.com/manromero/my-clinics/pull/45) pending. |
 | [03 — Authentication](milestone-03-authentication/readme.md)                              | Google sign-in with Supabase Auth and owner-only access to clinics                               | Complete. [PR #49](https://github.com/manromero/my-clinics/pull/49) is merged into `develop`.                         |
-| [04 — Monthly activity](milestone-04-monthly-activity/readme.md)                          | Filter, record, edit, and delete monthly activity with private persistence and accurate earnings | Plan approved. Implementation pending.                                                                                |
+| [04 — Monthly activity](milestone-04-monthly-activity/readme.md)                          | Filter, record, edit, and delete monthly activity with private persistence and accurate earnings | Task 00 is in progress.                                                                                               |
 
 Draft milestones remain subject to user approval of their scope and order.
 

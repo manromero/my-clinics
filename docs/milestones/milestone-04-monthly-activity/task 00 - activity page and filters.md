@@ -1,6 +1,6 @@
 # Task 00 — Define the activity page and filters
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -49,4 +49,20 @@ desktop and mobile evidence.
 
 ## Progress notes
 
-Proposed; implementation has not started.
+Implementation started on the approved scope.
+
+## Execution context
+
+- Ready: approved scope and acceptance criteria; the shared components and
+  signed-in Clinics flow are present on the updated integration branch.
+- Branch: `feature/activity-page-filters`; base:
+  `07b860c384ffac80b8ae454483c3d361472c2eae` on `develop`.
+- References: the S03 specification and desktop/mobile Stitch exports in
+  [Screens](../../screens.md#visual-design-references), Alexandria, and the
+  existing shared controls and signed-in header.
+- The preview uses synthetic data and must not change the signed-in route,
+  navigation, or persistence. Tasks 01 and 02 own the list and form behavior.
+- Validate the URL contract and Europe/Madrid boundary independently of the
+  browser timezone, and exercise keyboard, refresh, history, and responsive
+  layout in the live preview. Capture desktop and mobile evidence.
+- No open product questions. Correction rounds used: 0.
