@@ -1,6 +1,6 @@
 # Task 03 — Create the activity database model
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -74,7 +74,16 @@ Implementation is in [PR #53](https://github.com/manromero/my-clinics/pull/53).
   type freshness, upgrade preservation, schema parity, and disposable cleanup.
 - Blocking finding B1: two prices at PostgreSQL's maximum numeric width can
   be saved individually but overflow the period totals. Correction round 1
-  will reserve room for aggregation and verify the supported boundary.
+  reserved enough numeric digits for aggregation.
+- Independent re-review of `d1532557d841df3aca0e7c8bbfee329968d71af8`
+  verified B1 is fixed: the hosted SQL suite checked exact overall and per-clinic
+  totals at the supported boundary and rejected out-of-range writes. Hosted
+  replay, type freshness, role and concurrency tests, upgrade preservation,
+  schema parity, and disposable cleanup passed. Lint, typecheck, formatting,
+  five tooling tests, 273 application tests, and the production build passed.
+- No open blockers or optional findings. No UI changed, and the migration was
+  not applied to shared development. Human PR approval and manual merge into
+  `develop` remain pending.
 
 ## Execution context
 
@@ -89,4 +98,4 @@ Implementation is in [PR #53](https://github.com/manromero/my-clinics/pull/53).
   concurrent writes. Keep reads and totals independent of pagination.
 - Run hosted validation only through the authorized disposable lifecycle in
   the Supabase guide. Do not apply the migration to shared development.
-- No open product questions. Correction round 1 is in progress (maximum: 2).
+- No open product questions. Correction rounds used: 1 of 2.
