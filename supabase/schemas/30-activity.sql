@@ -14,11 +14,11 @@ create table public.activity (
   applied_irpf numeric not null,
   -- Store rates as percentages. NUMERIC round moves signed ties away from zero.
   gross numeric generated always as (
-    round(coalesce(direct_amount, price * applied_percentage * 0.01), 2)
+    round(coalesce(direct_amount, price * (applied_percentage * 0.01)), 2)
   ) stored,
   -- A generated column cannot reference another generated column.
   net numeric generated always as (
-    round(round(coalesce(direct_amount, price * applied_percentage * 0.01), 2)
+    round(round(coalesce(direct_amount, price * (applied_percentage * 0.01)), 2)
       * (1 - applied_irpf * 0.01), 2)
   ) stored,
   constraint activity_clinic_owner_fkey foreign key (owner_id, clinic_id)

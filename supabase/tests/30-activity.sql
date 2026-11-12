@@ -114,6 +114,7 @@ declare direct_id text;
 declare zero_id text;
 declare positive_id text;
 declare large_id text;
+declare max_width_id text;
 begin
   if exists (select id from public.activity) then
     raise exception 'Owner A saw owner B activity';
@@ -157,6 +158,16 @@ begin
     select 1 from public.activity_period_totals('2026-01-01', '2026-02-01', '-33')
     where price = '0' and gross = '0' and net = '0' and row_count = '0' and clinics = '[]'
   ) then raise exception 'Clinic filter or empty totals exposed the wrong rows'; end if;
+
+  -- Converting the rate before multiplying avoids an overflowing intermediate.
+  max_width_id := public.create_activity(
+    '9007199254740993', '2026-02-01', null, repeat('9', 131072), 'percentage', null
+  );
+  if not exists (select id from public.activity where id::text = max_width_id
+    and gross::text = repeat('9', 131071) || '.90') then
+    raise exception 'Percentage gross lost precision at the numeric width limit';
+  end if;
+  perform public.delete_activity(max_width_id);
 end $$;
 
 update public.clinics set percentage = 75, active = false where id = 9007199254740993;
