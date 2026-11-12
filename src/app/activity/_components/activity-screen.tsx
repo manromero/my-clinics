@@ -2,8 +2,11 @@ import { Button } from "@/lib/components/button/button";
 import { PageContainer } from "@/lib/components/page-container/page-container";
 import { PageHeader } from "@/lib/components/page-header/page-header";
 import { Surface } from "@/lib/components/surface/surface";
-import type { ActivityViewData } from "../_lib/activity-view";
-import { ActivityFilters, activityMonthName } from "./activity-filters";
+import {
+  activityMonthName,
+  type ActivityViewData,
+} from "../_lib/activity-view";
+import { ActivityFilters } from "./activity-filters";
 
 const euros = new Intl.NumberFormat("es-ES", {
   style: "currency",

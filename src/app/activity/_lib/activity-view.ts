@@ -44,6 +44,15 @@ const madridCalendar = new Intl.DateTimeFormat("es-ES", {
   month: "numeric",
 });
 
+const monthFormatter = new Intl.DateTimeFormat("es-ES", {
+  month: "long",
+  timeZone: "UTC",
+});
+
+export function activityMonthName(month: number) {
+  return monthFormatter.format(new Date(Date.UTC(2000, month - 1, 1)));
+}
+
 // `year` and `month` are a pair. Missing, duplicate or invalid values use the Madrid month.
 export function activityPeriodFromQuery(
   { year, month }: ActivityQuery,
