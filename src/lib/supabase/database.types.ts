@@ -14,6 +14,59 @@ export type Database = {
   };
   public: {
     Tables: {
+      activity: {
+        Row: {
+          activity_date: string;
+          applied_irpf: number;
+          applied_percentage: number;
+          calculation_mode: string;
+          clinic_id: number;
+          description: string | null;
+          direct_amount: number | null;
+          gross: number | null;
+          id: number;
+          net: number | null;
+          owner_id: string;
+          price: number;
+        };
+        Insert: {
+          activity_date: string;
+          applied_irpf: number;
+          applied_percentage: number;
+          calculation_mode: string;
+          clinic_id: number;
+          description?: string | null;
+          direct_amount?: number | null;
+          gross?: number | null;
+          id?: never;
+          net?: number | null;
+          owner_id: string;
+          price: number;
+        };
+        Update: {
+          activity_date?: string;
+          applied_irpf?: number;
+          applied_percentage?: number;
+          calculation_mode?: string;
+          clinic_id?: number;
+          description?: string | null;
+          direct_amount?: number | null;
+          gross?: number | null;
+          id?: never;
+          net?: number | null;
+          owner_id?: string;
+          price?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "activity_clinic_owner_fkey";
+            columns: ["owner_id", "clinic_id"];
+            isOneToOne: false;
+            referencedRelation: "clinics";
+            referencedColumns: ["owner_id", "id"];
+          },
+        ];
+      };
       clinics: {
         Row: {
           active: boolean;
@@ -43,7 +96,46 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      activity_clinic_percentage: {
+        Args: { clinic: number; owner: string };
+        Returns: number;
+      };
+      activity_period_totals: {
+        Args: { p_clinic_id?: string; p_end: string; p_start: string };
+        Returns: {
+          clinics: Json;
+          gross: string;
+          net: string;
+          price: string;
+          row_count: string;
+        }[];
+      };
       clinic_name_key: { Args: { value: string }; Returns: string };
+      create_activity: {
+        Args: {
+          p_activity_date: string;
+          p_calculation_mode: string;
+          p_clinic_id: string;
+          p_description: string;
+          p_direct_amount: string;
+          p_price: string;
+        };
+        Returns: string;
+      };
+      delete_activity: { Args: { p_id: string }; Returns: string };
+      parse_activity_amount: { Args: { amount: string }; Returns: number };
+      update_activity: {
+        Args: {
+          p_activity_date: string;
+          p_calculation_mode: string;
+          p_clinic_id: string;
+          p_description: string;
+          p_direct_amount: string;
+          p_id: string;
+          p_price: string;
+        };
+        Returns: string;
+      };
     };
     Enums: {
       [_ in never]: never;
