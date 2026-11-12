@@ -1,6 +1,6 @@
 # Task 00 — Define the activity page and filters
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -57,7 +57,14 @@ Implementation is in [PR #50](https://github.com/manromero/my-clinics/pull/50).
   desktop and narrow layouts.
 - Blocking finding R50-01: successful keyboard filter navigation removes focus
   from the controls, including when an inactive clinic becomes ineligible.
-  Correction round 1 is in progress.
+  Fixed and independently verified in correction round 1.
+- Independent re-review of `d3f3ab4671541060392e6c838763c12ceb6d4a4a`
+  passed lint, typecheck, format, all 266 tests and the production build. Live
+  checks covered URL recovery, clinic eligibility, Madrid rollover, production
+  isolation and keyboard focus after month steps and filter submission. Desktop
+  and mobile captures are recorded in the PR. Google OAuth was not exercised.
+- No open blockers or optional findings. Human PR approval and manual merge
+  into `develop` remain pending.
 
 ## Execution context
 
@@ -73,4 +80,4 @@ Implementation is in [PR #50](https://github.com/manromero/my-clinics/pull/50).
 - Validate the URL contract and Europe/Madrid boundary independently of the
   browser timezone, and exercise keyboard, refresh, history, and responsive
   layout in the live preview. Capture desktop and mobile evidence.
-- No open product questions. Correction round: 1 (of 2).
+- No open product questions. Correction rounds used: 1 (of 2).
