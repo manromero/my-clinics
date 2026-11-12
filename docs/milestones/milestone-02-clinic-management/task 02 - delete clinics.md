@@ -12,7 +12,7 @@ clinic linked to activity history.
 Add an `Eliminar clínica` action to the edit form, separate from `Guardar`.
 Use the shared confirmation dialog and extend the in-memory clinic contract with
 a delete operation. Use synthetic activity links to exercise eligibility without
-building the Activity screen. Persistent deletion belongs to the work that
+building the Activity screen. [Milestone 04 Task 07](<../milestone-04-monthly-activity/task 07 - delete clinics without activity.md>)
 connects the rule to real activity records. Keep the action unavailable on the
 Supabase-backed screen until that rule can be enforced by the data source.
 
