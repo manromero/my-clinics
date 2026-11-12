@@ -1,22 +1,38 @@
 import {
-  activityPeriodFromQuery,
-  activityPeriodParams,
-  resolveActivityScope,
   type ActivityClinicOption,
   type ActivityPreview,
   type ActivityQuery,
   type ActivityRow,
-  type ActivityViewData,
 } from "./activity-view";
 
 const clinics: readonly ActivityClinicOption[] = [
-  { id: "gran-via", name: "Gran Vía", active: true },
-  { id: "dental-norte", name: "Dental Norte", active: true },
-  { id: "san-jeronimo", name: "Dental San Jerónimo", active: false },
-  { id: "clinica-centro", name: "Clínica Centro", active: false },
+  {
+    id: "gran-via",
+    name: "Gran Vía",
+    active: true,
+    percentageBasisPoints: 3500,
+  },
+  {
+    id: "dental-norte",
+    name: "Dental Norte",
+    active: true,
+    percentageBasisPoints: 3250,
+  },
+  {
+    id: "san-jeronimo",
+    name: "Dental San Jerónimo",
+    active: false,
+    percentageBasisPoints: 2800,
+  },
+  {
+    id: "clinica-centro",
+    name: "Clínica Centro",
+    active: false,
+    percentageBasisPoints: 3000,
+  },
 ];
 
-const activities: readonly ActivityRow[] = [
+export const fixtureRows: readonly ActivityRow[] = [
   {
     id: "revision-octubre",
     date: "2026-10-15",
@@ -118,49 +134,18 @@ const activities: readonly ActivityRow[] = [
 export function activityPreviewFromQuery(
   value: ActivityQuery["preview"],
 ): ActivityPreview | undefined {
-  if (value === "inactive" || value === "loading" || value === "error") {
+  if (
+    value === "inactive" ||
+    value === "loading" ||
+    value === "error" ||
+    value === "write-error"
+  ) {
     return value;
   }
 }
 
-export function fixtureActivity(
-  query: ActivityQuery,
-  preview?: ActivityPreview,
-): ActivityViewData {
-  const period = activityPeriodFromQuery(query);
-  const accountClinics =
-    preview === "inactive"
-      ? clinics.map((clinic) => ({ ...clinic, active: false }))
-      : clinics;
-  const { year, month } = activityPeriodParams(period);
-  const periodRows = activities.filter(({ date }) =>
-    date.startsWith(`${year}-${month}-`),
-  );
-  const clinicIdsWithActivity = new Set(
-    periodRows.map(({ clinicId }) => clinicId),
-  );
-  const clinicOptions = accountClinics.filter(
-    ({ id, active }) => active || clinicIdsWithActivity.has(id),
-  );
-  const scope = resolveActivityScope(period, query.clinic, clinicOptions);
-  const rows = periodRows
-    .filter(
-      ({ clinicId }) => scope.clinicId === null || scope.clinicId === clinicId,
-    )
-    .sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
-  const sum = (key: "priceCents" | "grossCents" | "netCents") =>
-    `${rows.reduce((total, row) => total + BigInt(row[key]), BigInt(0))}` as const;
-
-  return {
-    scope,
-    clinicOptions,
-    rows,
-    totals: {
-      priceCents: sum("priceCents"),
-      grossCents: sum("grossCents"),
-      netCents: sum("netCents"),
-      rowCount: rows.length,
-    },
-    canCreate: accountClinics.some(({ active }) => active),
-  };
+export function fixtureClinics(preview?: ActivityPreview) {
+  return preview === "inactive"
+    ? clinics.map((clinic) => ({ ...clinic, active: false }))
+    : clinics;
 }

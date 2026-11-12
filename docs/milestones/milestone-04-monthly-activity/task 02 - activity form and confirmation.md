@@ -1,6 +1,6 @@
 # Task 02 — Build the activity form and deletion confirmation
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -54,4 +54,22 @@ on desktop and mobile; capture the form and confirmation.
 
 ## Progress notes
 
-Proposed; implementation has not started.
+Implementation started after [Task 01 PR #51](https://github.com/manromero/my-clinics/pull/51)
+merged into `develop`.
+
+## Execution context
+
+- Ready. The approved scope and criteria are complete and the dependency is on
+  `develop`. No open product questions.
+- Branch: `feature/activity-form-and-confirmation`; base:
+  `1a1db53adcedb5f9a4f10d8cbd3a8be82aa1d272`.
+- Extend the development-only route in `src/app/activity/`, the responsive
+  controls in `activity-list.tsx`, and the scope, totals, and fixtures in `_lib/`.
+  Reuse the shared form and dialog components in `src/lib/components/`.
+- Follow the [activity requirements](../../requirements.md#activity),
+  [S03 form specification](../../screens.md#create-and-edit-activity), and
+  [S03 design references](../../screens.md#visual-design-references).
+- Verify session behavior across period and clinic filter navigation, focus
+  after disappearing rows, and production isolation. Capture both overlays on
+  desktop and mobile and exercise the operation states live.
+- Correction rounds used: 0 of 2.

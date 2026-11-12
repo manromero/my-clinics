@@ -11,17 +11,25 @@ import type {
   ActivityViewData,
 } from "../_lib/activity-view";
 
+export type ActivityRowAction = (
+  kind: "edit" | "delete",
+  row: ActivityRow,
+  trigger: HTMLButtonElement,
+) => void;
+
 function ActivityRowActions({
   row,
   label,
+  onAction,
 }: {
   row: ActivityRow;
   label: string;
+  onAction: ActivityRowAction;
 }) {
   return (
     <div className="flex shrink-0 justify-end" data-activity-id={row.id}>
       <IconButton
-        disabled
+        onClick={(event) => onAction("edit", row, event.currentTarget)}
         size="sm"
         label={`Editar actividad de ${label}`}
         icon={
@@ -38,7 +46,7 @@ function ActivityRowActions({
         }
       />
       <IconButton
-        disabled
+        onClick={(event) => onAction("delete", row, event.currentTarget)}
         size="sm"
         className="text-error"
         label={`Eliminar actividad de ${label}`}
@@ -86,6 +94,7 @@ const columnAlignment = [
 function activityRowDisplay(
   row: ActivityRow,
   clinic: ActivityClinicOption | undefined,
+  onAction: ActivityRowAction,
 ) {
   const date = formatActivityDate(row.date);
   const clinicName = clinic?.name ?? row.clinicId;
@@ -134,6 +143,7 @@ function activityRowDisplay(
     actions: (
       <ActivityRowActions
         row={row}
+        onAction={onAction}
         label={`${clinicName}, ${date}${row.description ? `, ${row.description}` : ""}`}
       />
     ),
@@ -143,13 +153,16 @@ function activityRowDisplay(
 export function ActivityList({
   rows,
   clinicOptions,
-}: Pick<ActivityViewData, "rows" | "clinicOptions">) {
+  onAction,
+}: Pick<ActivityViewData, "rows" | "clinicOptions"> & {
+  onAction: ActivityRowAction;
+}) {
   const clinicsById = new Map(
     clinicOptions.map((clinic) => [clinic.id, clinic]),
   );
   const entries = rows.map((row) => ({
     id: row.id,
-    ...activityRowDisplay(row, clinicsById.get(row.clinicId)),
+    ...activityRowDisplay(row, clinicsById.get(row.clinicId), onAction),
   }));
 
   return (

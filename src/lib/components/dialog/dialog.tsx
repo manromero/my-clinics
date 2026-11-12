@@ -86,6 +86,7 @@ export function Dialog({
       aria-labelledby={titleId}
       aria-describedby={description ? descriptionId : undefined}
       aria-modal="true"
+      closedby={dismissible ? undefined : "none"}
       onCancel={(event) => {
         event.preventDefault();
         if (dismissible) onOpenChange(false);

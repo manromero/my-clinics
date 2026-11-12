@@ -1,15 +1,16 @@
 export type ActivityPeriod = { year: number; month: number };
 export type ActivityScope = ActivityPeriod & { clinicId: string | null };
 export type ActivityQuery = Record<string, string | string[] | undefined>;
-export type ActivityPreview = "inactive" | "loading" | "error";
+export type ActivityPreview = "inactive" | "loading" | "error" | "write-error";
 
 export type ActivityClinicOption = {
   id: string;
   name: string;
   active: boolean;
+  percentageBasisPoints: number;
 };
 
-type EuroCents = `${bigint}`;
+export type EuroCents = `${bigint}`;
 
 type ActivityAmounts = {
   priceCents: EuroCents;
@@ -43,6 +44,7 @@ const madridCalendar = new Intl.DateTimeFormat("es-ES", {
   timeZone: "Europe/Madrid",
   year: "numeric",
   month: "numeric",
+  day: "numeric",
 });
 
 const monthFormatter = new Intl.DateTimeFormat("es-ES", {
@@ -69,10 +71,60 @@ export function activityPeriodFromQuery(
     return { year: Number(year), month: Number(month) };
   }
 
+  const { year: madridYear, month: madridMonth } = madridDateParts(now);
+  return { year: madridYear, month: madridMonth };
+}
+
+export function madridDateParts(now = new Date()) {
   const parts = madridCalendar.formatToParts(now);
   return {
     year: Number(parts.find((part) => part.type === "year")?.value),
     month: Number(parts.find((part) => part.type === "month")?.value),
+    day: Number(parts.find((part) => part.type === "day")?.value),
+  };
+}
+
+export function activityMonthKey(period: ActivityPeriod) {
+  const { year, month } = activityPeriodParams(period);
+  return `${year}-${month}`;
+}
+
+export function activityView(
+  period: ActivityPeriod,
+  requestedClinic: ActivityQuery["clinic"],
+  accountClinics: readonly ActivityClinicOption[],
+  activities: readonly ActivityRow[],
+): ActivityViewData {
+  const month = activityMonthKey(period);
+  const periodRows = activities.filter(({ date }) =>
+    date.startsWith(`${month}-`),
+  );
+  const clinicIdsWithActivity = new Set(
+    periodRows.map(({ clinicId }) => clinicId),
+  );
+  const clinicOptions = accountClinics.filter(
+    ({ id, active }) => active || clinicIdsWithActivity.has(id),
+  );
+  const scope = resolveActivityScope(period, requestedClinic, clinicOptions);
+  const rows = periodRows
+    .filter(
+      ({ clinicId }) => scope.clinicId === null || scope.clinicId === clinicId,
+    )
+    .sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
+  const sum = (key: keyof ActivityAmounts) =>
+    `${rows.reduce((total, row) => total + BigInt(row[key]), BigInt(0))}` as const;
+
+  return {
+    scope,
+    clinicOptions,
+    rows,
+    totals: {
+      priceCents: sum("priceCents"),
+      grossCents: sum("grossCents"),
+      netCents: sum("netCents"),
+      rowCount: rows.length,
+    },
+    canCreate: accountClinics.some(({ active }) => active),
   };
 }
 
