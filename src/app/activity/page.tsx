@@ -7,7 +7,10 @@ import {
   activityPeriodParams,
   activityScopeParams,
 } from "./_lib/activity-view";
-import { fixtureActivity } from "./_lib/fixture-activity";
+import {
+  activityPreviewFromQuery,
+  fixtureActivity,
+} from "./_lib/fixture-activity";
 
 export const metadata: Metadata = {
   title: "Actividad mensual | MyClinics",
@@ -20,14 +23,16 @@ export default async function ActivityPage({
   if (process.env.NODE_ENV !== "development") notFound();
 
   const query = await searchParams;
-  const data = fixtureActivity(query);
+  const preview = activityPreviewFromQuery(query.preview);
+  const data = fixtureActivity(query, preview);
   const { year, month } = activityPeriodParams(data.scope);
   if (
     query.year !== year ||
     query.month !== month ||
-    query.clinic !== (data.scope.clinicId ?? undefined)
+    query.clinic !== (data.scope.clinicId ?? undefined) ||
+    query.preview !== preview
   ) {
-    redirect(`/activity?${activityScopeParams(data.scope)}`);
+    redirect(`/activity?${activityScopeParams(data.scope, preview)}`);
   }
 
   return (
@@ -43,7 +48,7 @@ export default async function ActivityPage({
           },
         }}
       />
-      <ActivityScreen data={data} />
+      <ActivityScreen data={data} preview={preview} />
       <AppFooter
         identity="MyClinics"
         metadata="Vista previa · Datos sintéticos"

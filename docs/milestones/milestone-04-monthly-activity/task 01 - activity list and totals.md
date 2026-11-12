@@ -1,6 +1,6 @@
 # Task 01 — Build the activity list and totals
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -46,4 +46,20 @@ keyboard access, and row details live. Capture desktop and mobile evidence.
 
 ## Progress notes
 
-Proposed; implementation has not started.
+Implementation assigned after Task 00 merged in [PR #50](https://github.com/manromero/my-clinics/pull/50).
+
+## Execution context
+
+- Ready. The approved scope, acceptance criteria and Task 00 dependency are
+  available on `develop`.
+- Branch: `feature/activity-list-and-totals`; base:
+  `42c155519297470ed89c4e48b79ba9b0d8863be8`.
+- Reuse the normalized scope and view data in `src/app/activity/_lib/`, and
+  the route composition and shared components in `src/app/activity/`.
+- Follow the [currency and rounding requirements](../../requirements.md#currency-and-rounding)
+  and the [S03 specification and supplied design references](../../screens.md#s03--monthly-activity).
+  Keep signed totals in exact cents and use stored applied rates.
+- Keep fixture states within the development preview. Exercise loading,
+  failure, empty results and inactive-only history live, alongside the
+  populated fixtures and keyboard filter navigation. Check production isolation.
+- No open product questions. Correction rounds used: 0 (of 2).
