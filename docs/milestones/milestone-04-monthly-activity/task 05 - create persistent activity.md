@@ -1,6 +1,6 @@
 # Task 05 — Connect activity creation
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -50,7 +50,7 @@ environment on desktop and mobile.
 Implementation assigned after [PR #54](https://github.com/manromero/my-clinics/pull/54)
 was merged into `develop`.
 
-Implementation is available in draft [PR #55](https://github.com/manromero/my-clinics/pull/55).
+Implementation is available in [PR #55](https://github.com/manromero/my-clinics/pull/55).
 Independent review of `2d35711ef594c29b8fde17a631ebf538451f3955` passed lint,
 type checking, formatting, the production build, and all 276 tests. Controlled
 Chrome checks at 1440 × 900 and 390 × 844 covered both modes, the authoritative
@@ -58,9 +58,12 @@ rate, duplicate submission prevention, retry, the month boundary, creation-order
 date suggestions, cancel, filter retention, and a separate browser context.
 No code or visual findings and no correction rounds used.
 
-B55-01 remains open: real hosted desktop and mobile save and a second signed-in
-session have not been verified. The approved synthetic project's permissions
-were verified read-only, but this does not demonstrate hosted persistence.
+B55-01 is closed. The user verified both modes, creation-order date suggestions,
+scope retention, reload, and a separate Google session in the approved synthetic
+environment. At a 390 × 844 viewport in an isolated Chromium session, the
+coordinator saved a negative direct entry and verified its row and totals after
+reload. A read-only Supabase query confirmed the five saved rows across two
+clinics and the exact stored amounts. Human approval and manual merge are pending.
 
 ## Execution context
 
