@@ -1,6 +1,6 @@
 # Task 04 — Connect the activity list and totals
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -61,7 +61,7 @@ clinics, activity RLS and its authenticated owner read policy, and authenticated
 grants for reads and totals. Both anonymous Data API reads returned HTTP 401
 with SQLSTATE `42501`.
 
-Implementation is in [draft PR #54](https://github.com/manromero/my-clinics/pull/54).
+Implementation is in [PR #54](https://github.com/manromero/my-clinics/pull/54).
 Initial independent review of `fb4f517131be56b23f720c4a97b1c0b6f8aedbf8` passed
 lint, type checking, formatting, the production build, all 275 tests, and
 desktop/mobile inspection with controlled responses. B54-01 reproduced
@@ -73,9 +73,15 @@ Independent re-review of `40dc08c063880149bd4b87a84892742ded4fa33d`
 verified B54-01 is fixed in controlled Chrome tests, including Back and
 Forward after an account change, Back from Clinics, and expired sessions.
 Lint, type checking, formatting, the production build, all 275 tests, and
-desktop and mobile inspection passed. B54-02 remains open and the PR stays
-in draft pending validation with two authorized synthetic accounts and
-populated activity in hosted Supabase.
+desktop and mobile inspection passed. No additional code or visual findings.
+
+B54-02 is closed. The coordinator loaded and verified 51 synthetic December
+2026 rows for clinic 55 in hosted Supabase. On `10a1840dddc0253da9870b82b2058d8614627d25`,
+the user confirmed that both browser checks passed: 50 rows on page one and
+one on page two with identical totals, and isolation after switching accounts,
+including Back navigation and a direct link to the first account's clinic.
+The coordinator verified the saved row count and totals independently through
+a read-only database query. Human PR approval and manual merge are pending.
 
 ## Execution context
 
