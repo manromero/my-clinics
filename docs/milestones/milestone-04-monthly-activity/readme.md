@@ -45,7 +45,8 @@ the reference's sample fixed-rate labels and export control do not define scope.
    exact arithmetic where writes are enforced. The browser's calculation is a
    preview; a client cannot supply authoritative earnings or snapshots.
 3. **Integration (04–06).** Replace fixture reads, then deliver creation as the
-   first complete persisted flow. Then integrate activity corrections and deletion;
+   first complete persisted flow. Automate its hosted browser acceptance in
+   Task 05a before integrating activity corrections and deletion. Those flows
    they introduce historical-rate rules, cross-month moves, and confirmation.
    Enable S03 in the normal signed-in journey only after the complete flow is
    verified. Database design can be prepared once the contract in Task 00 is
@@ -64,7 +65,8 @@ the reference's sample fixed-rate labels and export control do not define scope.
 | [03 — Create the activity database model](<task 03 - activity database model.md>)                       | `done`    | 02; [Milestone 03 Task 03](<../milestone-03-authentication/task 03 - authorize clinic access.md>)               |
 | [04 — Connect the activity list and totals](<task 04 - read persistent activity.md>)                    | `done`    | 03                                                                                                              |
 | [05 — Connect activity creation](<task 05 - create persistent activity.md>)                             | `done`    | 04                                                                                                              |
-| [06 — Connect edits and deletion and enable Activity](<task 06 - edit delete and enable activity.md>)   | `pending` | 05                                                                                                              |
+| [05a — Automate hosted activity acceptance](<task 05a - automate hosted activity acceptance.md>)        | `pending` | 05                                                                                                              |
+| [06 — Connect edits and deletion and enable Activity](<task 06 - edit delete and enable activity.md>)   | `pending` | 05, 05a                                                                                                         |
 | [07 — Delete clinics without activity](<task 07 - delete clinics without activity.md>)                  | `pending` | 06; [Milestone 02 Task 02](<../milestone-02-clinic-management/task 02 - delete clinics.md>)                     |
 
 ## Completion criteria
