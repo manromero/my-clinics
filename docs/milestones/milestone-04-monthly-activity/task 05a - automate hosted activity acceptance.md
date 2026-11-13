@@ -1,6 +1,6 @@
 # Task 05a — Automate hosted activity acceptance
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -46,3 +46,27 @@ cleans up. Verify that an unapproved target is rejected before any write.
 
 Defined after the user-assisted hosted acceptance of Task 05 in
 [PR #55](https://github.com/manromero/my-clinics/pull/55). Implementation has not started.
+
+The user approved reusing synthetic development project `lvqbrjybwstvdhaxyxyn`
+for unattended acceptance, with exclusive test accounts and cleanup limited to
+activities created by each run. [PR #55](https://github.com/manromero/my-clinics/pull/55)
+is merged into `develop`. Its hosted acceptance used interactive Google sessions.
+
+## Execution context
+
+- Ready for implementation. Branch: `feature/hosted-activity-acceptance`.
+  Base: `c6903e46034aa5847cef4f69fa6c06f35517ec65` (`origin/develop`).
+- The route is `src/app/activity`. Reuse the Supabase SSR session format and
+  existing server checks. Keep test sign-in outside the application and leave
+  Google OAuth acceptance separate.
+
+- `supabase/schemas/30-activity.sql` grants `delete_activity` to authenticated
+  owners. Provision reusable synthetic clinic fixtures once. Isolate the tested
+  totals and clean up only rows matching the run marker and expected scope.
+  Verify the exact target and dedicated account before any activity write.
+
+- GitHub's default branch is `main`. Provide a trusted pre-merge trigger and
+  restrict the GitHub environment to allowed refs before storing credentials.
+  Dedicated accounts, fixture clinics, and GitHub environment setup remain to
+  be provisioned and verified for live validation.
+- No open product decisions. Correction rounds used: 0.

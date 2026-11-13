@@ -1,0 +1,84 @@
+name: Hosted Activity acceptance
+
+on:
+  push:
+    branches: [develop, feature/hosted-activity-acceptance]
+  workflow_dispatch:
+    inputs:
+      diagnostic_probe:
+        description: Verify diagnostics and cleanup with an intentional post-save failure
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# The two owner accounts are exclusive to this workflow. Finish a running suite
+# and its cleanup before another trusted run can use the same fixtures.
+concurrency:
+  group: hosted-activity-acceptance
+  cancel-in-progress: false
+
+jobs:
+  acceptance:
+    if: >-
+      github.repository == 'manromero/my-clinics' &&
+      (github.ref == 'refs/heads/develop' ||
+      github.ref == 'refs/heads/feature/hosted-activity-acceptance')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: hosted-activity-acceptance
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:hosted-activity-tooling
+      - run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://lvqbrjybwstvdhaxyxyn.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.ACTIVITY_SUPABASE_PUBLISHABLE_KEY }}
+      - run: pnpm exec playwright install --with-deps chrome
+      - name: Verify desktop and mobile persistent activity
+        run: |
+          unset DEBUG PWDEBUG
+          pnpm test:hosted-activity
+          echo 'Desktop and mobile passed, including cleanup.' >> "$GITHUB_STEP_SUMMARY"
+        env: &acceptance-settings
+          NEXT_PUBLIC_SUPABASE_URL: https://lvqbrjybwstvdhaxyxyn.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.ACTIVITY_SUPABASE_PUBLISHABLE_KEY }}
+          ACTIVITY_DESKTOP_EMAIL: ${{ secrets.ACTIVITY_DESKTOP_EMAIL }}
+          ACTIVITY_DESKTOP_PASSWORD: ${{ secrets.ACTIVITY_DESKTOP_PASSWORD }}
+          ACTIVITY_DESKTOP_USER_ID: ${{ secrets.ACTIVITY_DESKTOP_USER_ID }}
+          ACTIVITY_DESKTOP_CLINIC_ID: ${{ secrets.ACTIVITY_DESKTOP_CLINIC_ID }}
+          ACTIVITY_MOBILE_EMAIL: ${{ secrets.ACTIVITY_MOBILE_EMAIL }}
+          ACTIVITY_MOBILE_PASSWORD: ${{ secrets.ACTIVITY_MOBILE_PASSWORD }}
+          ACTIVITY_MOBILE_USER_ID: ${{ secrets.ACTIVITY_MOBILE_USER_ID }}
+          ACTIVITY_MOBILE_CLINIC_ID: ${{ secrets.ACTIVITY_MOBILE_CLINIC_ID }}
+      - name: Verify deliberate failure diagnostics and cleanup
+        if: success() && (github.ref == 'refs/heads/feature/hosted-activity-acceptance' || inputs.diagnostic_probe)
+        env: *acceptance-settings
+        run: |
+          unset DEBUG PWDEBUG
+          if ACTIVITY_DIAGNOSTIC_PROBE=1 pnpm test:hosted-activity --project=desktop; then
+            echo 'The diagnostic probe unexpectedly passed.' >&2
+            exit 1
+          fi
+          node e2e/hosted-activity/verify-probe.mjs
+          echo 'Intentional desktop failure produced diagnostics and verified cleanup.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish safe results and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hosted-activity-acceptance
+          path: |
+            hosted-activity-results/artifacts/*-result.json
+            hosted-activity-results/artifacts/*.trace.json
+            hosted-activity-results/artifacts/*.png
+          if-no-files-found: warn
+          retention-days: 7

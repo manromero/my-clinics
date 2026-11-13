@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/hosted-activity-results/
 
 # next.js
 /.next/

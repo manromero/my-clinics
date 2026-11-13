@@ -12,6 +12,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:hosted-activity": "playwright test --config=playwright.hosted-activity.config.ts",
+    "test:hosted-activity-tooling": "node --test e2e/hosted-activity/*.test.mjs",
     "supabase": "supabase",
     "db:validate": "node --env-file-if-exists=.env.database-validation scripts/database-validation.mjs validate",
     "db:types": "node --env-file-if-exists=.env.database-validation scripts/database-validation.mjs types",
@@ -25,6 +27,7 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
