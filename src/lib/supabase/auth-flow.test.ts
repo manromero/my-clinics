@@ -2,6 +2,7 @@
 
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createActivity } from "@/app/activity/_lib/create-activity";
 import { readActivity } from "@/app/activity/_lib/read-activity";
 import { GET as authCallback } from "@/app/auth/callback/route";
 import { createClinic } from "@/app/clinics/create-clinic";
@@ -351,6 +352,15 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
           "gte.9999-12-01",
           "lt.10000-01-01",
         ]);
+        if (url.searchParams.get("select") === "activity_date") {
+          expect(url.searchParams.get("order")).toBe("id.desc");
+          expect(url.searchParams.get("limit")).toBe("1");
+          expect(url.searchParams.has("clinic_id")).toBe(false);
+          expect(url.searchParams.has("offset")).toBe(false);
+          return Response.json(
+            secondAccount ? [] : [{ activity_date: "9999-12-02" }],
+          );
+        }
         expect(url.searchParams.get("clinic_id")).toBe(`eq.${historicalId}`);
         expect(url.searchParams.get("order")).toBe("activity_date.desc,id.asc");
         expect(url.searchParams.get("select")).toContain(
@@ -391,6 +401,7 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
       },
     ]);
     expect(first?.totals.priceCents).toBe("900719925474099327");
+    expect(first?.lastEntered).toBe("9999-12-02");
     const laterSession = fixtureSession(7200, "second-account");
     session = {
       ...laterSession,
@@ -403,6 +414,7 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
       rows: [],
       clinicOptions: [],
       totals: { rowCount: 0, priceCents: "0", grossCents: "0", netCents: "0" },
+      lastEntered: undefined,
     });
     expect(calls).toEqual(["all", historicalId, "all"]);
   });
@@ -440,6 +452,8 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
             clinics: [{ clinic_id: "1" }],
           });
         expect(url.pathname).toBe("/rest/v1/activity");
+        if (url.searchParams.get("select") === "activity_date")
+          return Response.json([{ activity_date: "2026-12-01" }]);
         const offset = Number(url.searchParams.get("offset"));
         const limit = Number(url.searchParams.get("limit"));
         offsets.push(offset);
@@ -484,6 +498,97 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
       "9007199254741093",
       "9007199254741094",
       "9007199254741095",
+    ]);
+  });
+
+  it("writes only validated activity inputs through the verified owner's RPC", async () => {
+    const session = fixtureSession(3600, "activity-refresh");
+    storeSession(session);
+    const payloads: unknown[] = [];
+    const clinicId = "9007199254740993";
+    const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
+      const url = new URL(String(input));
+      expect(new Headers(init?.headers).get("authorization")).toBe(
+        `Bearer ${session.access_token}`,
+      );
+      if (url.pathname === "/auth/v1/user") return Response.json(session.user);
+      expect(url.pathname).toBe("/rest/v1/rpc/create_activity");
+      const payload = JSON.parse(String(init?.body));
+      payloads.push(payload);
+      return payload.p_clinic_id === clinicId
+        ? Response.json("9007199254740995")
+        : Response.json(
+            { code: "42501", message: "Clinic is unavailable" },
+            { status: 403 },
+          );
+    });
+    vi.stubGlobal("fetch", fetch);
+
+    const month = "2026-12";
+    const owner = session.user.id;
+    const draft = {
+      date: "2026-12-01",
+      clinicId,
+      description: null,
+      calculationMode: "percentage",
+      priceCents: "-900719925474099327",
+      directCents: null,
+      appliedPercentageBasisPoints: 9999,
+      grossCents: "99999",
+    };
+    await expect(
+      createActivity(month, owner, { ...draft, date: "2027-01-01" }),
+    ).resolves.toEqual({ status: "invalid" });
+    await expect(
+      createActivity(month, owner, { ...draft, directCents: "0" }),
+    ).resolves.toEqual({ status: "invalid" });
+    await expect(
+      createActivity(month, owner, { ...draft, clinicId: null }),
+    ).resolves.toEqual({ status: "invalid" });
+    await expect(
+      createActivity(month, "previous-owner", draft),
+    ).resolves.toEqual({ status: "session-changed" });
+    expect(payloads).toEqual([]);
+
+    await expect(createActivity(month, owner, draft)).resolves.toEqual({
+      status: "saved",
+    });
+    await expect(
+      createActivity(month, owner, {
+        ...draft,
+        calculationMode: "direct",
+        priceCents: "0",
+        directCents: "0",
+      }),
+    ).resolves.toEqual({ status: "saved" });
+    await expect(
+      createActivity(month, owner, { ...draft, clinicId: "22" }),
+    ).resolves.toEqual({ status: "clinic-unavailable" });
+    expect(payloads).toEqual([
+      {
+        p_clinic_id: clinicId,
+        p_activity_date: draft.date,
+        p_description: null,
+        p_price: "-9007199254740993.27",
+        p_calculation_mode: "percentage",
+        p_direct_amount: null,
+      },
+      {
+        p_clinic_id: clinicId,
+        p_activity_date: draft.date,
+        p_description: null,
+        p_price: "0.00",
+        p_calculation_mode: "direct",
+        p_direct_amount: "0.00",
+      },
+      {
+        p_clinic_id: "22",
+        p_activity_date: draft.date,
+        p_description: null,
+        p_price: "-9007199254740993.27",
+        p_calculation_mode: "percentage",
+        p_direct_amount: null,
+      },
     ]);
   });
 

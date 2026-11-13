@@ -1,6 +1,6 @@
 # Task 05 — Connect activity creation
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -47,4 +47,40 @@ environment on desktop and mobile.
 
 ## Progress notes
 
-Proposed; implementation has not started.
+Implementation assigned after [PR #54](https://github.com/manromero/my-clinics/pull/54)
+was merged into `develop`.
+
+Implementation is available in [PR #55](https://github.com/manromero/my-clinics/pull/55).
+Independent review of `2d35711ef594c29b8fde17a631ebf538451f3955` passed lint,
+type checking, formatting, the production build, and all 276 tests. Controlled
+Chrome checks at 1440 × 900 and 390 × 844 covered both modes, the authoritative
+rate, duplicate submission prevention, retry, the month boundary, creation-order
+date suggestions, cancel, filter retention, and a separate browser context.
+No code or visual findings and no correction rounds used.
+
+B55-01 is closed. The user verified both modes, creation-order date suggestions,
+scope retention, reload, and a separate Google session in the approved synthetic
+environment. At a 390 × 844 viewport in an isolated Chromium session, the
+coordinator saved a negative direct entry and verified its row and totals after
+reload. A read-only Supabase query confirmed the five saved rows across two
+clinics and the exact stored amounts. Human approval and manual merge are pending.
+
+## Execution context
+
+- Ready. Branch: `feature/create-persistent-activity`; base:
+  `07ddf3a477978fca4cd86732a13fe598051e8718` on `develop`.
+- Reuse the route-local form and activity results in `src/app/activity`, the
+  writable session verification in `src/lib/supabase/session.ts`, and the
+  `create_activity` RPC in `supabase/schemas/30-activity.sql`. The RPC checks
+  clinic ownership and active state and records current rates under a lock.
+  The action must enforce the selected-month boundary before calling it.
+- The activity identity is immutable and provides creation order. Use it to
+  obtain the suggested date from an owner-scoped month query independent of
+  clinic and pagination. Continue using exact values from the persisted read.
+- Follow the [S03 specification and references](../../screens.md#s03--monthly-activity)
+  and [hosted Supabase guide](../../supabase.md). Task 04 verified the activity
+  schema and persistent reads on the approved synthetic development target.
+  Verify new writes and reload/second-session behavior there; distinguish
+  controlled browser checks from hosted evidence. No migration, edit, delete,
+  or navigation rollout is planned for this task.
+- No open product decisions. Correction rounds used: 0.

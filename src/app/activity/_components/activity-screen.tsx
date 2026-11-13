@@ -9,6 +9,10 @@ import { ConfirmDialog } from "@/lib/components/confirm-dialog/confirm-dialog";
 import { LoadingState } from "@/lib/components/loading-state/loading-state";
 import { PageContainer } from "@/lib/components/page-container/page-container";
 import { PageHeader } from "@/lib/components/page-header/page-header";
+import type {
+  ActivityDraft,
+  ActivityPreviewAmounts,
+} from "../_lib/activity-entry";
 import {
   activityMonthName,
   activityMonthKey,
@@ -104,14 +108,14 @@ function ActivityPreviewResults({
     setOperation(null);
   }
 
-  function save(entry: Omit<ActivityRow, "id">) {
+  function save(draft: ActivityDraft, previewAmounts: ActivityPreviewAmounts) {
     const row = operation?.kind === "edit" ? operation.row : undefined;
     void simulateWrite(() => {
-      session.save(entry, row?.id);
-      if (!entry.date.startsWith(`${activityMonthKey(scope)}-`)) {
-        return `Actividad guardada en el periodo de la nueva fecha (${formatActivityDate(entry.date)}).`;
+      session.save({ ...draft, ...previewAmounts }, row?.id);
+      if (!draft.date.startsWith(`${activityMonthKey(scope)}-`)) {
+        return `Actividad guardada en el periodo de la nueva fecha (${formatActivityDate(draft.date)}).`;
       }
-      if (scope.clinicId && entry.clinicId !== scope.clinicId) {
+      if (scope.clinicId && draft.clinicId !== scope.clinicId) {
         return "Actividad guardada en otra clínica. Cambia el filtro para verla.";
       }
       return "Actividad guardada.";

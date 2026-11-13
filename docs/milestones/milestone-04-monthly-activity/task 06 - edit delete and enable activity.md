@@ -25,6 +25,8 @@ default screen for the signed-in user.
 
 - Task 05, the confirmation from Task 02, and the authorized edit and delete
   operations from Task 03.
+- [Task 05a](<task 05a - automate hosted activity acceptance.md>) for the hosted
+  browser suite used in Activity acceptance.
 
 ## Acceptance criteria
 

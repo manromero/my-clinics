@@ -9,6 +9,19 @@ import {
 
 export const defaultIrpfBasisPoints = 1500;
 
+export type ActivityDraft = Pick<
+  ActivityRow,
+  "date" | "clinicId" | "description" | "calculationMode" | "priceCents"
+> & { directCents: EuroCents | null };
+
+export type ActivityPreviewAmounts = Pick<
+  ActivityRow,
+  | "grossCents"
+  | "netCents"
+  | "appliedPercentageBasisPoints"
+  | "appliedIrpfBasisPoints"
+>;
+
 export function newActivityDate(
   period: ActivityPeriod,
   lastEntered?: ActivityRow["date"],
@@ -52,9 +65,13 @@ export function parseActivityAmount(raw: string) {
 }
 
 export function activityAmountInput(cents: EuroCents) {
+  return activityAmountDecimal(cents).replace(".", ",");
+}
+
+export function activityAmountDecimal(cents: EuroCents) {
   const digits = cents.replace(/^-/, "").padStart(3, "0");
   const sign = cents.startsWith("-") ? "-" : "";
-  return `${sign}${digits.slice(0, -2)},${digits.slice(-2)}`;
+  return `${sign}${digits.slice(0, -2)}.${digits.slice(-2)}`;
 }
 
 function roundedRate(cents: EuroCents, basisPoints: number): EuroCents {
