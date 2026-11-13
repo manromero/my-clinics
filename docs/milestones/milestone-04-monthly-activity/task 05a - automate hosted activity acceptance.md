@@ -1,6 +1,6 @@
 # Task 05a — Automate hosted activity acceptance
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -45,12 +45,28 @@ cleans up. Verify that an unapproved target is rejected before any write.
 ## Progress notes
 
 Defined after the user-assisted hosted acceptance of Task 05 in
-[PR #55](https://github.com/manromero/my-clinics/pull/55). Implementation has not started.
+[PR #55](https://github.com/manromero/my-clinics/pull/55).
 
 The user approved reusing synthetic development project `lvqbrjybwstvdhaxyxyn`
 for unattended acceptance, with exclusive test accounts and cleanup limited to
 activities created by each run. [PR #55](https://github.com/manromero/my-clinics/pull/55)
 is merged into `develop`. Its hosted acceptance used interactive Google sessions.
+
+Implementation and review are recorded in
+[PR #56](https://github.com/manromero/my-clinics/pull/56). Independent review of
+`7ef352e6a91ccf4fde10641c19e38a7ee1dc0836` found no remaining blockers or optional
+findings after two correction rounds. An ambiguous save now reports unresolved
+cleanup and retains the run's exact recovery scope.
+
+[Application checks](https://github.com/manromero/my-clinics/actions/runs/43429844727)
+passed lint, type checking, formatting, all 276 tests, and the production build.
+The four hosted tooling checks passed, and the Playwright entry point rejected an
+unapproved project before launch. The
+[hosted run](https://github.com/manromero/my-clinics/actions/runs/43429836945)
+passed desktop and mobile persistence, independent sign-in, and cleanup. The
+deliberate desktop failure produced redacted diagnostics and verified removal of
+its row. A read-only hosted query found zero suite rows and 56 other rows. Human
+approval and manual merge are pending.
 
 ## Execution context
 
@@ -67,6 +83,6 @@ is merged into `develop`. Its hosted acceptance used interactive Google sessions
 
 - GitHub's default branch is `main`. Provide a trusted pre-merge trigger and
   restrict the GitHub environment to allowed refs before storing credentials.
-  Dedicated accounts, fixture clinics, and GitHub environment setup remain to
-  be provisioned and verified for live validation.
-- No open product decisions. Correction rounds used: 0.
+  The two dedicated accounts and clinics are provisioned. GitHub environment
+  secrets are restricted to `develop` and the exact feature branch for validation.
+- No open product decisions. Correction rounds used: 2.
