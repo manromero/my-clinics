@@ -1,6 +1,6 @@
 # Task 03 — Create the activity database model
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -67,4 +67,35 @@ target; approval for the task plan does not authorize applying a migration.
 
 ## Progress notes
 
-Proposed; implementation has not started.
+Implementation is in [PR #53](https://github.com/manromero/my-clinics/pull/53).
+
+- Initial independent review of `08d6e3623665c4e0af09daab4899cd9b960afa2f`
+  verified the application checks and hosted replay, role and concurrency tests,
+  type freshness, upgrade preservation, schema parity, and disposable cleanup.
+- Blocking finding B1: two prices at PostgreSQL's maximum numeric width can
+  be saved individually but overflow the period totals. Correction round 1
+  reserved enough numeric digits for aggregation.
+- Independent re-review of `d1532557d841df3aca0e7c8bbfee329968d71af8`
+  verified B1 is fixed: the hosted SQL suite checked exact overall and per-clinic
+  totals at the supported boundary and rejected out-of-range writes. Hosted
+  replay, type freshness, role and concurrency tests, upgrade preservation,
+  schema parity, and disposable cleanup passed. Lint, typecheck, formatting,
+  five tooling tests, 273 application tests, and the production build passed.
+- No open blockers or optional findings. No UI changed, and the migration was
+  not applied to shared development. Human PR approval and manual merge into
+  `develop` remain pending.
+
+## Execution context
+
+- Ready for implementation: the approved scope and rounding contract are
+  documented, Task 02 is merged, and clinic ownership policies are present.
+- Branch: `feature/activity-database-model`; base:
+  `459d0bcf7884d1a5d3084b40b97bf78ac74348cf` on `develop`.
+- The fixture preview uses integer cents and basis points, rounding each row
+  away from zero at a half-cent. Match this behavior without changing the UI.
+- Extend the existing public schema, catalog, replay, and upgrade coverage as
+  applicable. Prove role isolation and verify a clinic's current state under
+  concurrent writes. Keep reads and totals independent of pagination.
+- Run hosted validation only through the authorized disposable lifecycle in
+  the Supabase guide. Do not apply the migration to shared development.
+- No open product questions. Correction rounds used: 1 of 2.
