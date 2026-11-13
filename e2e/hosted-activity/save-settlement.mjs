@@ -16,12 +16,18 @@ export function waitForSettlement(settlement, timeoutMs) {
   });
 }
 
-export async function settleAndClean(settlement, timeoutMs, removeRows) {
+export async function settleAndClean(
+  settlement,
+  timeoutMs,
+  { confirmSave, removeRows },
+) {
   const submission = await waitForSettlement(settlement, timeoutMs);
+  const acknowledged = submission === "settled" && (await confirmSave());
   const removed = await removeRows();
   return {
     submission,
+    acknowledged,
     removed,
-    cleanup: submission === "settled" ? "verified" : "unresolved",
+    cleanup: acknowledged && removed === 1 ? "verified" : "unresolved",
   };
 }

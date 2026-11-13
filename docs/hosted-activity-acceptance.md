@@ -76,9 +76,12 @@ exact clinic ID, date and marker, deletes through `delete_activity` and checks
 that the matching rows are gone. It runs after attempted saves even when an
 assertion fails. The test tracks the exact submitted browser action through
 its complete response. If the assertion deadline elapses, cleanup waits up to
-40 more seconds for settlement before attempting scoped removal. A disconnected,
-failed, or still-pending action leaves cleanup `unresolved`, even when its row
-is absent from a read at that moment.
+40 more seconds for settlement before attempting scoped removal. Cleanup is
+verified only after the application displays its saved confirmation and exactly
+one matching row is removed and checked for absence. A completed HTTP response
+can still carry an application error if the upstream database response was lost.
+Without the saved confirmation, the suite attempts scoped removal and reports
+`unresolved`, including when the matching row is absent at the time of the read.
 
 For `unresolved` cleanup, use the artifact's project, marker and date to identify
 the affected scope. After the action has settled, sign in as the matching fixture

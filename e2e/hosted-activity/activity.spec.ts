@@ -55,6 +55,7 @@ test("persists a new activity and exact totals across sessions", async ({
   let failed = false;
   let probeTriggered = false;
   let screenshot = false;
+  const savedNotice = page.getByText("Actividad guardada.", { exact: true });
 
   async function step<T>(name: string, run: () => Promise<T>) {
     return test.step(name, async () => {
@@ -128,9 +129,7 @@ test("persists a new activity and exact totals across sessions", async ({
       if ((await waitForSettlement(save.settlement, 15_000)) !== "settled") {
         throw new Error("The save did not return a complete response in time.");
       }
-      await expect(
-        page.getByText("Actividad guardada.", { exact: true }),
-      ).toBeVisible();
+      await expect(savedNotice).toBeVisible();
       saveConfirmed = true;
     });
     await step("Check saved row and exact totals", async () => {
@@ -182,17 +181,24 @@ test("persists a new activity and exact totals across sessions", async ({
             const result = await settleAndClean(
               submittedSave.settlement,
               40_000,
-              () => removeCreatedRows(cleanupClient, scope),
+              {
+                confirmSave: async () => {
+                  if (saveConfirmed) return true;
+                  return savedNotice
+                    .waitFor({ state: "visible", timeout: 5_000 })
+                    .then(
+                      () => true,
+                      () => false,
+                    );
+                },
+                removeRows: () => removeCreatedRows(cleanupClient, scope),
+              },
             );
             ({ submission, removed } = result);
+            saveConfirmed = result.acknowledged;
             if (result.cleanup !== "verified") {
               throw new Error(
-                "Cleanup is unresolved because the save may still commit.",
-              );
-            }
-            if (saveConfirmed && removed !== 1) {
-              throw new Error(
-                "Expected exactly one run-owned activity to be removed.",
+                "Cleanup is unresolved without a confirmed save and exactly one verified removal.",
               );
             }
             cleanup = result.cleanup;
