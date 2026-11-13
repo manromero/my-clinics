@@ -61,6 +61,14 @@ clinics, activity RLS and its authenticated owner read policy, and authenticated
 grants for reads and totals. Both anonymous Data API reads returned HTTP 401
 with SQLSTATE `42501`.
 
+Implementation is in [draft PR #54](https://github.com/manromero/my-clinics/pull/54).
+Initial independent review of `fb4f517131be56b23f720c4a97b1c0b6f8aedbf8` passed
+lint, type checking, formatting, the production build, all 275 tests, and
+desktop/mobile inspection with controlled responses. B54-01 reproduced
+exposure of the previous account’s rows and totals on same-document Back
+navigation. B54-02 tracks pending hosted two-account validation with
+populated synthetic data.
+
 ## Execution context
 
 - Ready. The reviewed activity migration is available on the approved synthetic
@@ -73,4 +81,4 @@ with SQLSTATE `42501`.
   date and immutable ID ordering and avoid per-row clinic lookups.
 - Exercise the approved criteria and capture the persistent view on desktop and
   mobile. The anonymous checks above are separate from live account isolation
-  and do not verify it. No open product questions. Correction rounds used: 0.
+  and do not verify it. No open product questions. Correction rounds used: 1.

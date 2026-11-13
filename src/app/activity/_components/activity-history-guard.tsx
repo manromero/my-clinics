@@ -1,11 +1,21 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
+
+function verifyActivityHistory(event: PopStateEvent) {
+  if (window.location.pathname !== "/activity") return;
+
+  // The router can restore a cached Activity payload without a server request.
+  // Intercept before its popstate handler runs and verify the current session.
+  event.stopImmediatePropagation();
+  document.documentElement.style.visibility = "hidden";
+  window.location.reload();
+}
 
 export function ActivityHistoryGuard({ children }: { children: ReactNode }) {
   const content = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // Hide the saved document before the browser stores it in its history
     // cache. A restored document must verify the current account again.
     const hide = () => {
@@ -16,6 +26,9 @@ export function ActivityHistoryGuard({ children }: { children: ReactNode }) {
     };
     window.addEventListener("pagehide", hide);
     window.addEventListener("pageshow", verifyRestoredSession);
+    // Keep this listener for the document's lifetime, including after client
+    // navigation to Clinics. Registering the same function again is a no-op.
+    window.addEventListener("popstate", verifyActivityHistory, true);
     return () => {
       window.removeEventListener("pagehide", hide);
       window.removeEventListener("pageshow", verifyRestoredSession);
