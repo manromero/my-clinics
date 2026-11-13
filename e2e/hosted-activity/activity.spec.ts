@@ -52,15 +52,16 @@ test("persists a new activity and exact totals across sessions", async ({
   let probeTriggered = false;
   let screenshot = false;
 
-  async function step(name: string, run: () => Promise<void>) {
-    await test.step(name, async () => {
+  async function step<T>(name: string, run: () => Promise<T>) {
+    return test.step(name, async () => {
       try {
-        await run();
+        const result = await run();
         trace.push({
           step: name,
           ms: Date.now() - startedAt,
           result: "passed",
         });
+        return result;
       } catch {
         trace.push({
           step: name,
@@ -85,11 +86,16 @@ test("persists a new activity and exact totals across sessions", async ({
 
   await mkdir(artifactDir, { recursive: true });
   try {
-    await step("Verify dedicated owner and clinic", async () => {
-      client = await signIn(project, page.context());
-      await verifyFixture(client, project);
-      await verifyEmptyPeriod(client, scope);
-    });
+    const owner = await step("Verify Supabase password session", () =>
+      signIn(project, page.context()),
+    );
+    client = owner;
+    await step("Verify the active 25% fixture clinic", () =>
+      verifyFixture(owner, project),
+    );
+    await step("Check that the synthetic clinic period is unused", () =>
+      verifyEmptyPeriod(owner, scope),
+    );
     await step(
       "Open authenticated activity and check zero totals",
       async () => {
@@ -203,6 +209,8 @@ test("persists a new activity and exact totals across sessions", async ({
             page.getByRole("banner"),
             page.getByText(fixture.email, { exact: true }),
           ],
+          maskColor: "#e8e8e8",
+          fullPage: true,
           scale: "css",
           timeout: 5_000,
         });
