@@ -74,8 +74,18 @@ a random marker. Before saving it verifies the target, account, active fixture
 and empty period. Cleanup uses the ordinary owner session and finds rows by
 exact clinic ID, date and marker, deletes through `delete_activity` and checks
 that the matching rows are gone. It runs after attempted saves even when an
-assertion fails. The artifact's synthetic marker and date identify the affected
-scope for investigation if a runner is interrupted or cleanup fails.
+assertion fails. The test tracks the exact submitted browser action through
+its complete response. If the assertion deadline elapses, cleanup waits up to
+40 more seconds for settlement before attempting scoped removal. A disconnected,
+failed, or still-pending action leaves cleanup `unresolved`, even when its row
+is absent from a read at that moment.
+
+For `unresolved` cleanup, use the artifact's project, marker and date to identify
+the affected scope. After the action has settled, sign in as the matching fixture
+owner, query by the configured clinic ID, exact date and exact description,
+and remove only the returned IDs using `delete_activity`. Query the same scope
+again to verify absence. Investigate a runner interruption the same way when
+the trace was published.
 
 For local diagnosis, coordinate with the operator so that no Actions job or
 other local suite is using these fixtures. Load the same settings into a

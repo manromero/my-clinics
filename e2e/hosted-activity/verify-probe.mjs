@@ -15,6 +15,8 @@ assert.equal(result.tests[0].project, "desktop");
 assert.equal(result.tests[0].status, "failed");
 assert.equal(trace.probeTriggered, true);
 assert.equal(trace.saveConfirmed, true);
+assert.equal(trace.submission, "settled");
+assert.equal(trace.cleanup, "verified");
 assert.equal(trace.removed, 1);
 assert.deepEqual(
   trace.steps

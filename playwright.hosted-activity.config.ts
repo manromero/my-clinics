@@ -10,7 +10,8 @@ export default defineConfig({
   outputDir: "hosted-activity-results/internal",
   reporter: "./e2e/hosted-activity/reporter.ts",
   retries: 0,
-  timeout: 90_000,
+  // Keep headroom for bounded save settlement and owner cleanup after failures.
+  timeout: 180_000,
   forbidOnly: true,
   use: {
     baseURL: appOrigin,

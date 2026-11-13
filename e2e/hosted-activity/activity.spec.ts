@@ -6,7 +6,9 @@ import {
   verifyEmptyPeriod,
 } from "./activity-data";
 import { account, artifactDir, type ProjectName } from "./config";
+import { settleAndClean, waitForSettlement } from "./save-settlement.mjs";
 import { signIn, verifyFixture, type OwnerClient } from "./session";
+import { trackSave } from "./track-save";
 
 const amounts = ["120,00 €", "30,00 €", "25,50 €"];
 const zero = "0,00 €";
@@ -44,7 +46,9 @@ test("persists a new activity and exact totals across sessions", async ({
   const trace: { step: string; ms: number; result: "passed" | "failed" }[] = [];
   const startedAt = Date.now();
   let client: OwnerClient | undefined;
-  let saveAttempted = false;
+  let save: ReturnType<typeof trackSave> | undefined;
+  let submission: "not-attempted" | "settled" | "unresolved" = "not-attempted";
+  let cleanup: "not-needed" | "verified" | "unresolved" = "not-needed";
   let saveConfirmed = false;
   let screenVerified = false;
   let removed: number | null = null;
@@ -119,16 +123,11 @@ test("persists a new activity and exact totals across sessions", async ({
         .selectOption({ label: fixture.clinicName });
       await form.getByLabel("Concepto").fill(scope.marker);
       await form.getByLabel("Importe", { exact: true }).fill("120,00");
-      saveAttempted = true;
-      await Promise.all([
-        page.waitForResponse(
-          (response) =>
-            new URL(response.url()).pathname === "/activity" &&
-            response.request().method() === "POST",
-          { timeout: 15_000 },
-        ),
-        form.getByRole("button", { name: "Guardar" }).click(),
-      ]);
+      save = trackSave(page);
+      await form.getByRole("button", { name: "Guardar" }).click();
+      if ((await waitForSettlement(save.settlement, 15_000)) !== "settled") {
+        throw new Error("The save did not return a complete response in time.");
+      }
       await expect(
         page.getByText("Actividad guardada.", { exact: true }),
       ).toBeVisible();
@@ -173,21 +172,37 @@ test("persists a new activity and exact totals across sessions", async ({
   } finally {
     try {
       const cleanupClient = client;
-      if (cleanupClient && saveAttempted) {
+      const submittedSave = save;
+      if (cleanupClient && submittedSave) {
+        submission = "unresolved";
+        cleanup = "unresolved";
         await step(
           "Remove only run-owned activity and verify absence",
           async () => {
-            removed = await removeCreatedRows(cleanupClient, scope);
+            const result = await settleAndClean(
+              submittedSave.settlement,
+              40_000,
+              () => removeCreatedRows(cleanupClient, scope),
+            );
+            ({ submission, removed } = result);
+            if (result.cleanup !== "verified") {
+              throw new Error(
+                "Cleanup is unresolved because the save may still commit.",
+              );
+            }
             if (saveConfirmed && removed !== 1) {
               throw new Error(
                 "Expected exactly one run-owned activity to be removed.",
               );
             }
+            cleanup = result.cleanup;
           },
         );
       }
     } catch {
       failed = true;
+    } finally {
+      save?.stop();
     }
 
     let browserEvidence:
@@ -234,6 +249,8 @@ test("persists a new activity and exact totals across sessions", async ({
           steps: trace,
           probeTriggered,
           saveConfirmed,
+          submission,
+          cleanup,
           removed,
           screenshot,
           browserEvidence,
