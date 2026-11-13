@@ -2,6 +2,7 @@
 
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { readActivity } from "@/app/activity/_lib/read-activity";
 import { GET as authCallback } from "@/app/auth/callback/route";
 import { createClinic } from "@/app/clinics/create-clinic";
 import { listClinics } from "@/app/clinics/list-clinics";
@@ -257,7 +258,7 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
   );
 
   it.each(["missing", "expired", "rejected"])(
-    "denies every clinic data entry point when the session is %s",
+    "denies clinic and activity data entry points when the session is %s",
     async (state) => {
       if (state !== "missing") {
         storeSession(
@@ -275,6 +276,9 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
       vi.stubGlobal("fetch", fetch);
 
       await expect(listClinics()).rejects.toThrow("redirect: /login");
+      await expect(
+        readActivity({ year: 2026, month: 12 }, undefined, undefined),
+      ).rejects.toThrow("redirect: /login");
       await expect(createClinic(new FormData())).rejects.toThrow(
         "redirect: /login",
       );
@@ -288,6 +292,200 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
       else expect(fetch).toHaveBeenCalled();
     },
   );
+
+  it("reads exact scoped activity using the current owner after an account change", async () => {
+    const activeId = "9007199254740993";
+    const historicalId = "9007199254740995";
+    const clinic = (clinic_key: string, active: boolean) => ({
+      clinic_key,
+      name: clinic_key,
+      percentage: "30.5000",
+      active,
+    });
+    const exact = "9007199254740993.27";
+    const totals = (row_count: string, clinics: { clinic_id: string }[]) => ({
+      price: row_count === "0" ? "0" : exact,
+      gross: "0",
+      net: "0",
+      row_count,
+      clinics,
+    });
+    let session = fixtureSession(3600, "first-account");
+    storeSession(session);
+    const calls: string[] = [];
+    const fetch = vi
+      .fn<typeof globalThis.fetch>()
+      .mockImplementation(async (input, init) => {
+        const url = new URL(String(input));
+        expect(new Headers(init?.headers).get("authorization")).toBe(
+          `Bearer ${session.access_token}`,
+        );
+        if (url.pathname === "/auth/v1/user")
+          return Response.json(session.user);
+        const secondAccount = session.refresh_token === "second-account";
+        if (url.pathname === "/rest/v1/clinics") {
+          if (url.searchParams.has("id")) return Response.json([]);
+          return Response.json(
+            secondAccount
+              ? []
+              : [
+                  clinic(activeId, true),
+                  clinic(historicalId, false),
+                  clinic("9007199254740996", false),
+                ],
+          );
+        }
+        if (url.pathname.endsWith("/activity_period_totals")) {
+          const { p_start, p_end, p_clinic_id } = JSON.parse(
+            String(init?.body),
+          );
+          expect([p_start, p_end]).toEqual(["9999-12-01", "10000-01-01"]);
+          calls.push(p_clinic_id ?? "all");
+          if (secondAccount) return Response.json(totals("0", []));
+          return Response.json(
+            totals(p_clinic_id ? "1" : "53", [{ clinic_id: historicalId }]),
+          );
+        }
+        expect(url.pathname).toBe("/rest/v1/activity");
+        expect(url.searchParams.getAll("activity_date")).toEqual([
+          "gte.9999-12-01",
+          "lt.10000-01-01",
+        ]);
+        expect(url.searchParams.get("clinic_id")).toBe(`eq.${historicalId}`);
+        expect(url.searchParams.get("order")).toBe("activity_date.desc,id.asc");
+        expect(url.searchParams.get("select")).toContain(
+          "activity_key:id::text",
+        );
+        return Response.json([
+          {
+            activity_key: activeId,
+            clinic_key: historicalId,
+            activity_date: "9999-12-31",
+            description: null,
+            calculation_mode: "direct",
+            price: exact,
+            gross: "-0.10",
+            net: "-0.09",
+            applied_percentage: "30.5000",
+            applied_irpf: "15",
+          },
+        ]);
+      });
+    vi.stubGlobal("fetch", fetch);
+
+    const period = { year: 9999, month: 12 };
+    const first = await readActivity(period, historicalId, undefined);
+    expect(first?.scope.clinicId).toBe(historicalId);
+    expect(first?.clinicOptions.map(({ id }) => id)).toEqual([
+      activeId,
+      historicalId,
+    ]);
+    expect(first?.rows).toMatchObject([
+      {
+        id: activeId,
+        date: "9999-12-31",
+        priceCents: "900719925474099327",
+        grossCents: "-10",
+        netCents: "-9",
+        appliedPercentageBasisPoints: 3050,
+      },
+    ]);
+    expect(first?.totals.priceCents).toBe("900719925474099327");
+    const laterSession = fixtureSession(7200, "second-account");
+    session = {
+      ...laterSession,
+      user: { id: "second-owner", email: "second@example.test" },
+    };
+    storeSession(session);
+    const second = await readActivity(period, historicalId, undefined);
+    expect(second).toMatchObject({
+      scope: { clinicId: null },
+      rows: [],
+      clinicOptions: [],
+      totals: { rowCount: 0, priceCents: "0", grossCents: "0", netCents: "0" },
+    });
+    expect(calls).toEqual(["all", historicalId, "all"]);
+  });
+
+  it("fills each activity page past the API response cap and retains complete totals", async () => {
+    const session = fixtureSession(3600, "fixture-refresh");
+    storeSession(session);
+    const offsets: number[] = [];
+    let fail = true;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof globalThis.fetch>().mockImplementation(async (input) => {
+        const url = new URL(String(input));
+        if (url.pathname === "/auth/v1/user")
+          return Response.json(session.user);
+        if (url.pathname === "/rest/v1/clinics")
+          return Response.json(
+            url.searchParams.has("id")
+              ? []
+              : [
+                  {
+                    clinic_key: "1",
+                    name: "Test clinic",
+                    active: true,
+                    percentage: "0",
+                  },
+                ],
+          );
+        if (url.pathname.endsWith("/activity_period_totals"))
+          return Response.json({
+            price: "103.00",
+            gross: "0",
+            net: "0",
+            row_count: "103",
+            clinics: [{ clinic_id: "1" }],
+          });
+        expect(url.pathname).toBe("/rest/v1/activity");
+        const offset = Number(url.searchParams.get("offset"));
+        const limit = Number(url.searchParams.get("limit"));
+        offsets.push(offset);
+        if (fail)
+          return Response.json(
+            { message: "Fixture read failure" },
+            { status: 400 },
+          );
+        return Response.json(
+          Array.from(
+            { length: Math.min(limit, 2, 103 - offset) },
+            (_, index) => ({
+              activity_key: String(
+                BigInt("9007199254740993") + BigInt(offset + index),
+              ),
+              clinic_key: "1",
+              activity_date: "2026-12-31",
+              description: null,
+              calculation_mode: "percentage",
+              price: "1",
+              gross: "0",
+              net: "0",
+              applied_percentage: "0",
+              applied_irpf: "15",
+            }),
+          ),
+        );
+      }),
+    );
+    const period = { year: 2026, month: 12 };
+    await expect(readActivity(period, "1", "3")).resolves.toBeNull();
+    fail = false;
+    const result = await readActivity(period, "1", "3");
+    expect(result).toMatchObject({
+      scope: { clinicId: "1" },
+      page: 3,
+      pageCount: 3,
+      totals: { rowCount: 103, priceCents: "10300" },
+    });
+    expect(offsets).toEqual([100, 100, 102]);
+    expect(result?.rows.map(({ id }) => id)).toEqual([
+      "9007199254741093",
+      "9007199254741094",
+      "9007199254741095",
+    ]);
+  });
 
   it("forwards the verified session token and ignores caller-supplied and cookie user IDs", async () => {
     const session = fixtureSession(3600, "fixture-refresh");

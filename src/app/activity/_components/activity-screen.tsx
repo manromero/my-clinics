@@ -6,11 +6,9 @@ import { ActionLink } from "@/lib/components/action-link/action-link";
 import { Alert } from "@/lib/components/alert/alert";
 import { Button } from "@/lib/components/button/button";
 import { ConfirmDialog } from "@/lib/components/confirm-dialog/confirm-dialog";
-import { EmptyState } from "@/lib/components/empty-state/empty-state";
 import { LoadingState } from "@/lib/components/loading-state/loading-state";
 import { PageContainer } from "@/lib/components/page-container/page-container";
 import { PageHeader } from "@/lib/components/page-header/page-header";
-import { Surface } from "@/lib/components/surface/surface";
 import {
   activityMonthName,
   activityMonthKey,
@@ -22,15 +20,12 @@ import {
   type ActivityScope,
   type ActivityViewData,
 } from "../_lib/activity-view";
-import {
-  activityCount,
-  formatActivityDate,
-  formatEuroCents,
-} from "../_lib/activity-format";
+import { formatActivityDate, formatEuroCents } from "../_lib/activity-format";
 import { ActivityFilters } from "./activity-filters";
 import { useActivityFixtureSession } from "./activity-fixture-session";
 import { ActivityForm } from "./activity-form";
-import { ActivityList, type ActivityRowAction } from "./activity-list";
+import type { ActivityRowAction } from "./activity-list";
+import { ActivityResults } from "./activity-results";
 
 type Operation =
   { kind: "create" } | { kind: "edit" | "delete"; row: ActivityRow };
@@ -47,7 +42,7 @@ function ActivityPreviewResults({
   loading?: Promise<void>;
 }) {
   if (loading) use(loading);
-  const { scope, clinicOptions, rows, totals, canCreate } = data;
+  const { scope, canCreate } = data;
   const session = useActivityFixtureSession();
   const [operation, setOperation] = useState<Operation | null>(null);
   const [pending, setPending] = useState(false);
@@ -131,49 +126,14 @@ function ActivityPreviewResults({
         announcement="assertive"
       >
         <p>Vuelve a intentarlo para consultar los registros del periodo.</p>
-        <ActionLink href={`/activity?${activityScopeParams(scope)}`}>
+        <ActionLink href={`/activity/preview?${activityScopeParams(scope)}`}>
           Reintentar
         </ActionLink>
       </Alert>
     );
   }
-  const cards = [
-    { label: "Facturación total", value: formatEuroCents(totals.priceCents) },
-    { label: "Ganancia bruta", value: formatEuroCents(totals.grossCents) },
-    { label: "Registros", value: activityCount.format(totals.rowCount) },
-    {
-      label: "Ganancia tras IRPF",
-      value: formatEuroCents(totals.netCents),
-      highlighted: true,
-    },
-  ];
-
   return (
     <>
-      <section aria-labelledby="activity-totals">
-        <h2 id="activity-totals" className="sr-only">
-          Totales del periodo
-        </h2>
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
-          {cards.map(({ label, value, highlighted }) => (
-            <Surface
-              key={label}
-              variant={highlighted ? "highlighted" : "white"}
-              className="p-4 sm:p-6"
-            >
-              <dl className="space-y-2">
-                <dt className="font-label text-caption font-semibold tracking-wide uppercase">
-                  {label}
-                </dt>
-                <dd className="font-headline text-lg font-semibold tabular-nums sm:text-title">
-                  {value}
-                </dd>
-              </dl>
-            </Surface>
-          ))}
-        </div>
-      </section>
-
       {!canCreate && (
         <Alert title="No hay clínicas activas" variant="warning">
           <p>
@@ -182,20 +142,11 @@ function ActivityPreviewResults({
           <ActionLink href="/clinics">Ir a Clínicas</ActionLink>
         </Alert>
       )}
-      <Surface
-        as="section"
-        aria-labelledby="activity-list"
-        className="sm:p-6 xl:p-0"
-      >
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 xl:px-6 xl:pt-6">
-          <h2
-            ref={listHeading}
-            id="activity-list"
-            tabIndex={-1}
-            className="font-headline text-title"
-          >
-            Registros de actividad
-          </h2>
+      <ActivityResults
+        data={data}
+        listHeading={listHeading}
+        onAction={openRowAction}
+        toolbar={
           <Button
             ref={createButton}
             disabled={!canCreate}
@@ -205,41 +156,21 @@ function ActivityPreviewResults({
           >
             Nueva actividad
           </Button>
-        </div>
-        <div
-          role="status"
-          aria-atomic="true"
-          className={
-            notice
-              ? "mb-4 rounded-lg bg-success-container px-4 py-3 text-label text-success xl:mx-6"
-              : "sr-only"
-          }
-        >
-          {notice}
-        </div>
-        {rows.length > 0 ? (
-          <ActivityList
-            rows={rows}
-            clinicOptions={clinicOptions}
-            onAction={openRowAction}
-          />
-        ) : (
-          <EmptyState
-            className="xl:mx-6 xl:mb-6"
-            headingLevel={3}
-            title={
-              scope.clinicId
-                ? "No hay registros para esta clínica"
-                : "No hay registros este mes"
+        }
+        notice={
+          <div
+            role="status"
+            aria-atomic="true"
+            className={
+              notice
+                ? "mb-4 rounded-lg bg-success-container px-4 py-3 text-label text-success xl:mx-6"
+                : "sr-only"
             }
-            explanation={
-              scope.clinicId
-                ? "Selecciona otra clínica o cambia el periodo."
-                : "Selecciona otro periodo para consultar el historial."
-            }
-          />
-        )}
-      </Surface>
+          >
+            {notice}
+          </div>
+        }
+      />
       {operation?.kind === "delete" && (
         <ConfirmDialog
           open
@@ -321,7 +252,7 @@ export function ActivityScreen({
 
   useEffect(() => {
     if (requestedClinic !== scope.clinicId) {
-      window.history.replaceState(null, "", `/activity?${canonical}`);
+      window.history.replaceState(null, "", `/activity/preview?${canonical}`);
     }
   }, [requestedClinic, scope.clinicId, canonical]);
   return (
@@ -344,6 +275,7 @@ export function ActivityScreen({
           scope={scope}
           clinicOptions={clinicOptions}
           preview={preview}
+          pathname="/activity/preview"
         />
       </div>
       <Suspense

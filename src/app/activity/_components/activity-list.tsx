@@ -94,7 +94,7 @@ const columnAlignment = [
 function activityRowDisplay(
   row: ActivityRow,
   clinic: ActivityClinicOption | undefined,
-  onAction: ActivityRowAction,
+  onAction?: ActivityRowAction,
 ) {
   const date = formatActivityDate(row.date);
   const clinicName = clinic?.name ?? row.clinicId;
@@ -140,7 +140,7 @@ function activityRowDisplay(
       row.calculationMode === "percentage" ? "Porcentaje" : "Importe directo",
     rate,
     irpf: formatActivityRate(row.appliedIrpfBasisPoints),
-    actions: (
+    actions: onAction && (
       <ActivityRowActions
         row={row}
         onAction={onAction}
@@ -155,7 +155,7 @@ export function ActivityList({
   clinicOptions,
   onAction,
 }: Pick<ActivityViewData, "rows" | "clinicOptions"> & {
-  onAction: ActivityRowAction;
+  onAction?: ActivityRowAction;
 }) {
   const clinicsById = new Map(
     clinicOptions.map((clinic) => [clinic.id, clinic]),
@@ -164,6 +164,7 @@ export function ActivityList({
     id: row.id,
     ...activityRowDisplay(row, clinicsById.get(row.clinicId), onAction),
   }));
+  const visibleColumns = onAction ? columns : columns.slice(0, -1);
 
   return (
     <>
@@ -171,7 +172,7 @@ export function ActivityList({
         <table aria-labelledby="activity-list" className="w-full text-label">
           <thead className="font-label text-caption font-semibold tracking-wide text-on-surface-variant uppercase">
             <tr>
-              {columns.map((label, index) => (
+              {visibleColumns.map((label, index) => (
                 <th
                   key={label}
                   scope="col"
@@ -212,8 +213,8 @@ export function ActivityList({
                   amounts[1],
                   irpf,
                   <strong key="net">{amounts[2]}</strong>,
-                  actions,
                 ];
+                if (actions) cells.push(actions);
                 return (
                   <tr
                     key={id}

@@ -1,6 +1,6 @@
 # Task 04 — Connect the activity list and totals
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -52,4 +52,25 @@ synthetic data. Inspect and capture the persistent view on desktop and mobile.
 
 ## Progress notes
 
-Proposed; implementation has not started.
+[PR #53](https://github.com/manromero/my-clinics/pull/53) is merged into
+`develop`. On 2026-11-13, the user authorized applying the reviewed migration
+`20261112120000_create_activity.sql` to synthetic development
+(`lvqbrjybwstvdhaxyxyn`) with its Data API active. The dry run listed only that
+migration. The postcheck confirmed the migration history, all four existing
+clinics, activity RLS and its authenticated owner read policy, and authenticated
+grants for reads and totals. Both anonymous Data API reads returned HTTP 401
+with SQLSTATE `42501`.
+
+## Execution context
+
+- Ready. The reviewed activity migration is available on the approved synthetic
+  integration target. Branch: `feature/read-persistent-activity`. Base:
+  `3339ab23e04b69e44c456d467b75f0a7e636eebd` on `develop`.
+- Follow the activity route and view model, the Clinics session and list pattern,
+  and the [S03 specification and visual references](../../screens.md#s03--monthly-activity).
+- The activity totals RPC returns exact text amounts and all clinic IDs with
+  activity for an unfiltered month. Use the owner-scoped activity table with
+  date and immutable ID ordering and avoid per-row clinic lookups.
+- Exercise the approved criteria and capture the persistent view on desktop and
+  mobile. The anonymous checks above are separate from live account isolation
+  and do not verify it. No open product questions. Correction rounds used: 0.

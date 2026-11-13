@@ -25,11 +25,23 @@ export function newActivityDate(
 
 export function isActivityDate(date: string): date is ActivityRow["date"] {
   if (!/^(?!0000)\d{4}-\d{2}-\d{2}$/.test(date)) return false;
-  const parsed = new Date(`${date}T00:00:00Z`);
-  return (
-    !Number.isNaN(parsed.valueOf()) &&
-    parsed.toISOString().slice(0, 10) === date
-  );
+  const [year, month, day] = date.split("-").map(Number);
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const monthDays = [
+    31,
+    leapYear ? 29 : 28,
+    31,
+    30,
+    31,
+    30,
+    31,
+    31,
+    30,
+    31,
+    30,
+    31,
+  ];
+  return day >= 1 && day <= monthDays[month - 1];
 }
 
 export function parseActivityAmount(raw: string) {
