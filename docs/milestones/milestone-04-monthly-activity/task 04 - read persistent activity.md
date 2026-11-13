@@ -69,6 +69,14 @@ exposure of the previous account’s rows and totals on same-document Back
 navigation. B54-02 tracks pending hosted two-account validation with
 populated synthetic data.
 
+Independent re-review of `40dc08c063880149bd4b87a84892742ded4fa33d`
+verified B54-01 is fixed in controlled Chrome tests, including Back and
+Forward after an account change, Back from Clinics, and expired sessions.
+Lint, type checking, formatting, the production build, all 275 tests, and
+desktop and mobile inspection passed. B54-02 remains open and the PR stays
+in draft pending validation with two authorized synthetic accounts and
+populated activity in hosted Supabase.
+
 ## Execution context
 
 - Ready. The reviewed activity migration is available on the approved synthetic
