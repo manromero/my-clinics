@@ -50,6 +50,18 @@ environment on desktop and mobile.
 Implementation assigned after [PR #54](https://github.com/manromero/my-clinics/pull/54)
 was merged into `develop`.
 
+Implementation is available in draft [PR #55](https://github.com/manromero/my-clinics/pull/55).
+Independent review of `2d35711ef594c29b8fde17a631ebf538451f3955` passed lint,
+type checking, formatting, the production build, and all 276 tests. Controlled
+Chrome checks at 1440 × 900 and 390 × 844 covered both modes, the authoritative
+rate, duplicate submission prevention, retry, the month boundary, creation-order
+date suggestions, cancel, filter retention, and a separate browser context.
+No code or visual findings and no correction rounds used.
+
+B55-01 remains open: real hosted desktop and mobile save and a second signed-in
+session have not been verified. The approved synthetic project's permissions
+were verified read-only, but this does not demonstrate hosted persistence.
+
 ## Execution context
 
 - Ready. Branch: `feature/create-persistent-activity`; base:
