@@ -26,6 +26,11 @@ Missing information that changes product behavior or scope returns to the user.
 Routine technical choices remain with the responsible agent. Continue independent work
 while awaiting a decision, without implementing the undecided behavior.
 
+For work that requires signed-in browser checks, verify the synthetic target,
+fixture accounts and controllable local browser before handing off implementation
+or review. Use the [agent session procedure](supabase.md#local-signed-in-validation).
+Validate Google OAuth separately when it is part of the assigned behavior.
+
 ## Roles and coordination
 
 The primary agent is the coordinator. It checks readiness, creates the assignment
@@ -41,6 +46,13 @@ Only the implementer edits application code, runs implementation checks,
 and creates the PR; the reviewer independently reports findings and evidence.
 The coordinator preserves those conclusions and does not replace either role.
 Use sequential handoffs and one writer at a time in a shared checkout.
+
+The implementer runs the implementation checks and collects the evidence. The
+reviewer opens a fresh session and verifies the relevant behavior independently.
+Both agents operate the application themselves, diagnose recoverable failures,
+and keep working on available checks if one check is blocked. The coordinator
+requests only the specific access the user alone can grant, then resumes the
+affected check when access is available. Final human acceptance is separate.
 
 Project-scoped native role instructions are versioned in
 [`implementer.toml`](../.codex/agents/implementer.toml) and

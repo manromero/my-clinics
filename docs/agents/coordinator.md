@@ -24,6 +24,10 @@ sandbox. Never merge PRs or perform release operations.
    [Git workflow](../git-workflow.md), and relevant requirements, architecture,
    and design references. Verify scope, exclusions, testable acceptance criteria,
    dependencies, validation expectations, and necessary tools/access.
+   For signed-in validation, confirm the synthetic target and usable fixture
+   access for both roles before dispatch. Include the
+   [local session procedure](../supabase.md#local-signed-in-validation) in each
+   handoff so the agents can run their own browser checks.
 2. Investigate missing technical facts using repository evidence and relevant
    primary sources. Resolve routine choices autonomously. Ask the user only for
    a decision needed to complete the assigned scope, such as ambiguous product

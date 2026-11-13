@@ -78,6 +78,80 @@ belong in a temporary local shell session or a secret manager, not committed fil
 Database validation credentials are separate from application configuration.
 Never place secrets in `NEXT_PUBLIC_*` or Next.js `env` config (both can be bundled).
 
+### Local signed-in validation
+
+Use this procedure for signed-in application behavior on the approved synthetic
+project `lvqbrjybwstvdhaxyxyn`. Each agent signs in as a dedicated, ordinary
+Supabase Auth fixture user. Changes to the Google OAuth flow require the
+[separate provider checks](#google-oauth-for-hosted-development).
+
+Provision one confirmed password account with an active owned synthetic clinic
+for each role. Keep the account email, password, Auth user UUID and clinic ID in
+the ignored `.env.agent-validation` file at the repository root. The role prefixes
+are `AGENT_VALIDATION` for the implementer and `REVIEW_VALIDATION` for the
+reviewer. Each prefix has the suffixes `_EMAIL`, `_PASSWORD`, `_USER_ID` and
+`_CLINIC_ID`. The launcher reads the file directly. Keep its values out of shell
+commands, chat, Git, browser scripts and Next.js configuration. `.env.local`
+must name the approved project URL and its publishable key.
+
+Build and start the app on loopback. Use a separate terminal for the launcher.
+
+```powershell
+pnpm build
+pnpm start --hostname 127.0.0.1 --port 3205
+```
+
+```powershell
+node scripts/agent-validation.mjs implementer 3205 '/activity?year=2026&month=10'
+```
+
+Use `reviewer` for independent review. The launcher verifies the account and
+active clinic, opens an isolated headless Chrome context and prints its loopback
+DevTools endpoint. Connect the browser automation tool to that endpoint and use
+the tab for the requested path. Use `MYCLINICS_CHROME_PATH` when Chrome is
+installed outside the default location. Run the launcher again with the same role
+for a separate sign-in and a fresh context. Close each launcher with Ctrl+C
+after checking the results. Keep DevTools local and avoid recording cookies,
+session storage or raw network traces.
+
+Node 24 can attach without extra dependencies. Set `$debugPort` to the printed
+port and `$appPort` to the local app port. This example prints only the page
+heading. Use the same page connection for DevTools input and DOM inspection.
+
+```powershell
+@'
+const [debugPort, appPort] = process.argv.slice(2);
+const pages = await fetch(`http://127.0.0.1:${debugPort}/json/list`).then(r => r.json());
+const page = pages.find(tab => tab.type === "page" &&
+  tab.url.startsWith(`http://127.0.0.1:${appPort}/`));
+if (!page) throw new Error("Validation page not found");
+const socket = new WebSocket(page.webSocketDebuggerUrl);
+socket.addEventListener("open", () => socket.send(JSON.stringify({
+  id: 1,
+  method: "Runtime.evaluate",
+  params: { expression: "document.querySelector('h1')?.textContent", returnByValue: true },
+})));
+socket.addEventListener("message", event => {
+  const reply = JSON.parse(event.data);
+  if (reply.id !== 1) return;
+  console.log(reply.result?.result?.value ?? "Page heading unavailable");
+  socket.close();
+});
+'@ | node --input-type=module - $debugPort $appPort
+```
+
+For write checks, use the fixture clinic and a unique marker in an unused
+period. Confirm the saved row and exact totals in the UI, after reload, and in
+the independent session as the task requires. Track the created row ID and
+remove only the matching fixture rows through the owner session. Verify removal
+even when an assertion fails. Use the authenticated `delete_activity` RPC for
+cleanup when the UI does not yet expose deletion.
+
+If the launcher fails, check the local app target, network access, the role's
+credential file and clinic ownership. Check that Chrome is installed and that
+the local automation tool can connect to the printed endpoint. Ask for a
+specific access grant only if the coordinator cannot resolve the missing access.
+
 ## 3. Verify connectivity without writes
 
 After verifying the project ref and authenticating locally:
