@@ -1,73 +1,139 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { AppFooter } from "@/lib/components/app-footer/app-footer";
-import { AppHeader } from "@/lib/components/app-header/app-header";
-import { ActivityScreen } from "./_components/activity-screen";
+import { LoadingState } from "@/lib/components/loading-state/loading-state";
+import { PageContainer } from "@/lib/components/page-container/page-container";
+import { PageHeader } from "@/lib/components/page-header/page-header";
+import { requireSupabaseSession } from "@/lib/supabase/session";
+import { SignedInHeader } from "../_components/signed-in-header";
+import { ActivityFilters } from "./_components/activity-filters";
+import { ActivityLoadError } from "./_components/activity-load-error";
+import { ActivityPageLinks } from "./_components/activity-page-links";
+import { ActivityResults } from "./_components/activity-results";
+import { ActivityHistoryGuard } from "./_components/activity-history-guard";
 import {
+  activityMonthName,
   activityPeriodFromQuery,
   activityPeriodParams,
   activityScopeParams,
-  resolveActivityScope,
+  type ActivityPeriod,
+  type ActivityQuery,
 } from "./_lib/activity-view";
-import {
-  activityPreviewFromQuery,
-  fixtureClinics,
-} from "./_lib/fixture-activity";
+import { readActivity } from "./_lib/read-activity";
 
 export const metadata: Metadata = {
   title: "Actividad mensual | MyClinics",
   robots: { index: false },
 };
 
-export default async function ActivityPage({
-  searchParams,
-}: PageProps<"/activity">) {
-  if (process.env.NODE_ENV !== "development") notFound();
+async function SavedActivity({
+  query,
+  period,
+}: {
+  query: ActivityQuery;
+  period: ActivityPeriod;
+}) {
+  const data = await readActivity(period, query.clinic, query.page);
+  if (!data) {
+    return (
+      <>
+        <PageHeader title="Actividad mensual" />
+        <ActivityLoadError />
+      </>
+    );
+  }
 
-  const query = await searchParams;
-  const preview = activityPreviewFromQuery(query.preview);
-  const period = activityPeriodFromQuery(query);
-  const clinics = fixtureClinics(preview);
-  // Historical eligibility depends on the edited rows in the client session.
-  const scope = resolveActivityScope(period, query.clinic, clinics);
-  const { year, month } = activityPeriodParams(period);
+  const { scope, clinicOptions, page, pageCount } = data;
+  const { year, month } = activityPeriodParams(scope);
+  const pageParam = page === 1 ? undefined : String(page);
   if (
     query.year !== year ||
     query.month !== month ||
     query.clinic !== (scope.clinicId ?? undefined) ||
-    query.preview !== preview
+    query.page !== pageParam ||
+    query.preview !== undefined
   ) {
-    redirect(`/activity?${activityScopeParams(scope, preview)}`);
+    const canonical = activityScopeParams(scope);
+    redirect(`/activity?${canonical}${pageParam ? `&page=${pageParam}` : ""}`);
   }
 
-  const loading =
-    preview === "loading"
-      ? new Promise<void>((resolve) => setTimeout(resolve, 1500))
-      : undefined;
+  const clinic = clinicOptions.find(({ id }) => id === scope.clinicId);
+  return (
+    <>
+      <div className="grid items-end gap-6 xl:grid-cols-[1fr_auto]">
+        <PageHeader
+          title="Actividad mensual"
+          metadata={
+            <p role="status">
+              <span className="inline-block first-letter:uppercase">
+                {activityMonthName(scope.month)} de {scope.year}
+              </span>
+              {" · "}
+              {clinic ? clinic.name : "Todas las clínicas"}
+              {clinic && !clinic.active && " (inactiva)"}
+            </p>
+          }
+        />
+        <ActivityFilters scope={scope} clinicOptions={clinicOptions} />
+      </div>
+      <ActivityResults
+        data={data}
+        pagination={
+          pageCount > 1 && (
+            <ActivityPageLinks
+              scope={scope}
+              page={page}
+              pageCount={pageCount}
+            />
+          )
+        }
+      />
+    </>
+  );
+}
+
+export default async function ActivityPage({
+  searchParams,
+}: PageProps<"/activity">) {
+  const { user } = await requireSupabaseSession();
+  const query = await searchParams;
+  const period = activityPeriodFromQuery(query);
+  const name = user.user_metadata?.full_name;
+  const displayName =
+    (typeof name === "string" && name.trim()) || user.email || "Usuario";
+  const loadKey = JSON.stringify([
+    period.year,
+    period.month,
+    query.clinic,
+    query.page,
+  ]);
 
   return (
-    <div className="flex min-h-dvh flex-col">
-      <AppHeader
-        variant="signed-in"
+    <ActivityHistoryGuard key={user.id}>
+      <SignedInHeader
         currentHref="/activity"
-        availableDestinations={["/activity", "/clinics"]}
-        account={{
-          identity: {
-            displayName: "Ana · Vista previa",
-            timezone: "Europe/Madrid",
-          },
-        }}
+        displayName={displayName}
+        email={user.email}
       />
-      <ActivityScreen
-        scope={scope}
-        clinics={clinics}
-        preview={preview}
-        loading={loading}
-      />
+      <PageContainer as="main" className="flex-1 space-y-8">
+        <Suspense
+          key={loadKey}
+          fallback={
+            <LoadingState
+              label="Cargando actividad…"
+              variant="region"
+              indicator="skeleton"
+            />
+          }
+        >
+          <SavedActivity query={query} period={period} />
+        </Suspense>
+      </PageContainer>
       <AppFooter
         identity="MyClinics"
-        metadata="Vista previa · Datos sintéticos"
+        metadata="Entorno de desarrollo · Datos sintéticos"
       />
-    </div>
+    </ActivityHistoryGuard>
   );
 }

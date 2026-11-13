@@ -27,11 +27,13 @@ function AdjacentMonth({
   scope,
   direction,
   preview,
+  pathname,
   rememberFocus,
 }: {
   scope: ActivityScope;
   direction: -1 | 1;
   preview?: ActivityPreview;
+  pathname: string;
   rememberFocus: (target: ActivityPeriod) => void;
 }) {
   const period = adjacentActivityPeriod(scope, direction);
@@ -39,7 +41,8 @@ function AdjacentMonth({
   return (
     <ActionLink
       id={direction === -1 ? "activity-previous-month" : "activity-next-month"}
-      href={`/activity?${activityScopeParams({ ...(period ?? scope), clinicId: scope.clinicId }, preview)}`}
+      href={`${pathname}?${activityScopeParams({ ...(period ?? scope), clinicId: scope.clinicId }, preview)}`}
+      prefetch={false}
       scroll={false}
       aria-disabled={period === null || undefined}
       onClick={(event) => {
@@ -73,8 +76,10 @@ export function ActivityFilters({
   scope,
   clinicOptions,
   preview,
+  pathname = "/activity",
 }: Pick<ActivityViewData, "scope" | "clinicOptions"> & {
   preview?: ActivityPreview;
+  pathname?: string;
 }) {
   const pendingFocusRef = useContext(ActivityNavigationFocus);
   const appliedScope = activityScopeParams(scope);
@@ -133,7 +138,8 @@ export function ActivityFilters({
   return (
     <Form
       id="activity-filters"
-      action="/activity"
+      action={pathname}
+      prefetch={false}
       aria-label="Filtros de actividad"
       scroll={false}
       onSubmit={() => {
@@ -150,6 +156,7 @@ export function ActivityFilters({
           scope={scope}
           direction={-1}
           preview={preview}
+          pathname={pathname}
           rememberFocus={rememberFocus}
         />
         <div className="min-w-0 flex-1 sm:w-34">
@@ -186,6 +193,7 @@ export function ActivityFilters({
           scope={scope}
           direction={1}
           preview={preview}
+          pathname={pathname}
           rememberFocus={rememberFocus}
         />
       </div>

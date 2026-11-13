@@ -20,9 +20,12 @@ export async function proxy(request: NextRequest) {
     },
   });
   await supabase?.auth.getClaims();
+  if (request.nextUrl.pathname === "/activity") {
+    response.headers.set("Cache-Control", "private, no-store");
+  }
   return response;
 }
 
 export const config = {
-  matcher: "/clinics",
+  matcher: ["/clinics", "/activity"],
 };

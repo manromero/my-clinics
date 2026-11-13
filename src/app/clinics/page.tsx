@@ -6,7 +6,7 @@ import { PageContainer } from "@/lib/components/page-container/page-container";
 import { requireSupabaseSession } from "@/lib/supabase/session";
 import { ClinicCreation } from "./clinic-creation";
 import { SavedClinics } from "./saved-clinics";
-import { SignedInClinicsHeader } from "./signed-in-clinics-header";
+import { SignedInHeader } from "../_components/signed-in-header";
 
 export const metadata: Metadata = {
   title: "Clínicas | MyClinics",
@@ -20,7 +20,7 @@ export default async function ClinicsPage() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <SignedInClinicsHeader displayName={displayName} email={user.email} />
+      <SignedInHeader displayName={displayName} email={user.email} />
       <PageContainer as="main" className="flex-1 space-y-8">
         <ClinicCreation />
         <Suspense

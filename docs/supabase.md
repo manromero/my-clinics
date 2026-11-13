@@ -296,9 +296,9 @@ name to verify and clean up any stranded disposable project before retrying.
 The procedure itself does not authorize remote writes.
 
 1. Obtain approval for the exact project ref, migration set/commit and intended
-   changes. Verify name/ref/organization/environment in Dashboard. Ensure Data API
-   remains disabled during migration. Confirm only synthetic data. Use the scoped
-   development rollout below for any separately authorized enablement.
+   changes. Verify name/ref/organization/environment in Dashboard. Confirm only
+   synthetic data. Use the scoped development rollout below for any separately
+   authorized enablement.
 2. Review every pending SQL file, destructive effects, data preservation, seed and
    schema agreement. Complete database validation on an authorized disposable hosted
    target before applying business migrations. Arrange an appropriate backup and

@@ -2,14 +2,16 @@
 
 import { useState, useTransition } from "react";
 import { AppHeader } from "@/lib/components/app-header/app-header";
-import { signOut } from "./sign-out";
+import { signOut } from "../clinics/sign-out";
 
-export function SignedInClinicsHeader({
+export function SignedInHeader({
   displayName,
   email,
+  currentHref = "/clinics",
 }: {
   displayName: string;
   email?: string;
+  currentHref?: "/clinics" | "/activity";
 }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string>();
@@ -17,7 +19,7 @@ export function SignedInClinicsHeader({
   return (
     <AppHeader
       variant="signed-in"
-      currentHref="/clinics"
+      currentHref={currentHref}
       availableDestinations={["/clinics"]}
       account={{
         identity: { displayName, email },
