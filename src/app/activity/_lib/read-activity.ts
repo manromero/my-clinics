@@ -208,17 +208,44 @@ async function readRows(
   return rows;
 }
 
+async function readLastEnteredDate(
+  client: Client,
+  range: ReturnType<typeof activityRange>,
+) {
+  const { data, error } = await client
+    .from("activity")
+    .select("activity_date")
+    .gte("activity_date", range.p_start)
+    .lt("activity_date", range.p_end)
+    .order("id", { ascending: false })
+    .limit(1);
+  if (error || !data) throw new Error("Could not read the last activity date");
+  const date = data[0]?.activity_date;
+  if (date !== undefined && !isActivityDate(date)) {
+    throw new Error("Invalid last activity date");
+  }
+  return date;
+}
+
 export async function readActivity(
   period: ActivityPeriod,
   requestedClinic: ActivityQuery["clinic"],
   requestedPage: ActivityQuery["page"],
-): Promise<(ActivityViewData & { page: number; pageCount: number }) | null> {
+): Promise<
+  | (ActivityViewData & {
+      page: number;
+      pageCount: number;
+      lastEntered?: ActivityRow["date"];
+    })
+  | null
+> {
   const { client } = await requireSupabaseSession();
   try {
     const range = activityRange(period);
-    const [accountClinics, monthlyTotals] = await Promise.all([
+    const [accountClinics, monthlyTotals, lastEntered] = await Promise.all([
       readClinics(client),
       readTotals(client, range, null),
+      readLastEnteredDate(client, range),
     ]);
     const historicalClinics = clinicIdsWithActivity(monthlyTotals.clinics);
     const clinicOptions = accountClinics.filter(
@@ -261,6 +288,7 @@ export async function readActivity(
       canCreate: accountClinics.some(({ active }) => active),
       page,
       pageCount,
+      lastEntered,
     };
   } catch {
     return null;

@@ -13,6 +13,8 @@ import {
   isActivityDate,
   newActivityDate,
   parseActivityAmount,
+  type ActivityDraft,
+  type ActivityPreviewAmounts,
 } from "../_lib/activity-entry";
 import { formatActivityRate, formatEuroCents } from "../_lib/activity-format";
 import {
@@ -46,7 +48,7 @@ export function ActivityForm({
   lastEntered?: ActivityRow["date"];
   pending: boolean;
   error?: string;
-  onSave: (entry: Omit<ActivityRow, "id">) => void;
+  onSave: (entry: ActivityDraft, preview: ActivityPreviewAmounts) => void;
   onCancel: () => void;
 }) {
   const [date, setDate] = useState(
@@ -132,16 +134,21 @@ export function ActivityForm({
     )
       return;
 
-    onSave({
-      date: validDate,
-      clinicId,
-      description: description.trim() || null,
-      calculationMode: mode,
-      appliedPercentageBasisPoints: percentage,
-      appliedIrpfBasisPoints: irpf,
-      priceCents,
-      ...earnings,
-    });
+    onSave(
+      {
+        date: validDate,
+        clinicId,
+        description: description.trim() || null,
+        calculationMode: mode,
+        priceCents,
+        directCents,
+      },
+      {
+        appliedPercentageBasisPoints: percentage,
+        appliedIrpfBasisPoints: irpf,
+        ...earnings,
+      },
+    );
   }
 
   const preview = [

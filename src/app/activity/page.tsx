@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AppFooter } from "@/lib/components/app-footer/app-footer";
@@ -10,9 +11,11 @@ import { SignedInHeader } from "../_components/signed-in-header";
 import { ActivityFilters } from "./_components/activity-filters";
 import { ActivityLoadError } from "./_components/activity-load-error";
 import { ActivityPageLinks } from "./_components/activity-page-links";
-import { ActivityResults } from "./_components/activity-results";
 import { ActivityHistoryGuard } from "./_components/activity-history-guard";
+import { SavedActivityResults } from "./_components/saved-activity-results";
+import type { ActivityDraft } from "./_lib/activity-entry";
 import {
+  activityMonthKey,
   activityMonthName,
   activityPeriodFromQuery,
   activityPeriodParams,
@@ -20,6 +23,7 @@ import {
   type ActivityPeriod,
   type ActivityQuery,
 } from "./_lib/activity-view";
+import { createActivity } from "./_lib/create-activity";
 import { readActivity } from "./_lib/read-activity";
 
 export const metadata: Metadata = {
@@ -30,9 +34,11 @@ export const metadata: Metadata = {
 async function SavedActivity({
   query,
   period,
+  ownerId,
 }: {
   query: ActivityQuery;
   period: ActivityPeriod;
+  ownerId: string;
 }) {
   const data = await readActivity(period, query.clinic, query.page);
   if (!data) {
@@ -44,7 +50,7 @@ async function SavedActivity({
     );
   }
 
-  const { scope, clinicOptions, page, pageCount } = data;
+  const { scope, clinicOptions, page, pageCount, lastEntered } = data;
   const { year, month } = activityPeriodParams(scope);
   const pageParam = page === 1 ? undefined : String(page);
   if (
@@ -56,6 +62,14 @@ async function SavedActivity({
   ) {
     const canonical = activityScopeParams(scope);
     redirect(`/activity?${canonical}${pageParam ? `&page=${pageParam}` : ""}`);
+  }
+
+  const selectedMonth = activityMonthKey(scope);
+  async function createActivityAction(draft: ActivityDraft) {
+    "use server";
+    const result = await createActivity(selectedMonth, ownerId, draft);
+    if (result.status === "saved") refresh();
+    return result;
   }
 
   const clinic = clinicOptions.find(({ id }) => id === scope.clinicId);
@@ -77,8 +91,10 @@ async function SavedActivity({
         />
         <ActivityFilters scope={scope} clinicOptions={clinicOptions} />
       </div>
-      <ActivityResults
+      <SavedActivityResults
         data={data}
+        lastEntered={lastEntered}
+        createActivityAction={createActivityAction}
         pagination={
           pageCount > 1 && (
             <ActivityPageLinks
@@ -127,7 +143,7 @@ export default async function ActivityPage({
             />
           }
         >
-          <SavedActivity query={query} period={period} />
+          <SavedActivity query={query} period={period} ownerId={user.id} />
         </Suspense>
       </PageContainer>
       <AppFooter
