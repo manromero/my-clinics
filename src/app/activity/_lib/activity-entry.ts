@@ -14,14 +14,6 @@ export type ActivityDraft = Pick<
   "date" | "clinicId" | "description" | "calculationMode" | "priceCents"
 > & { directCents: EuroCents | null };
 
-export type ActivityPreviewAmounts = Pick<
-  ActivityRow,
-  | "grossCents"
-  | "netCents"
-  | "appliedPercentageBasisPoints"
-  | "appliedIrpfBasisPoints"
->;
-
 export function newActivityDate(
   period: ActivityPeriod,
   lastEntered?: ActivityRow["date"],

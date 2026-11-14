@@ -2,8 +2,11 @@
 
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createActivity } from "@/app/activity/_lib/create-activity";
 import { readActivity } from "@/app/activity/_lib/read-activity";
+import {
+  deleteActivity,
+  saveActivity,
+} from "@/app/activity/_lib/write-activity";
 import { GET as authCallback } from "@/app/auth/callback/route";
 import { createClinic } from "@/app/clinics/create-clinic";
 import { listClinics } from "@/app/clinics/list-clinics";
@@ -93,6 +96,7 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it.each([
@@ -176,6 +180,8 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
   );
 
   it("persists a PKCE session and rotates an expired token for render and browser", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-31T23:30:00Z"));
     const expired = fixtureSession(-1, "initial-fixture-refresh");
     const rotated = fixtureSession(3600, "rotated-fixture-refresh");
     const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
@@ -218,7 +224,7 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
     const result = await callback(
       "code=fixture-code&next=//external.example/path",
     );
-    expect(result.headers.get("location")).toBe("/clinics");
+    expect(result.headers.get("location")).toBe("/activity?year=2026&month=11");
     expect(result.headers.get("cache-control")).toContain("no-store");
 
     const request = new NextRequest(`${origin}/clinics`);
@@ -524,7 +530,7 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
     });
     vi.stubGlobal("fetch", fetch);
 
-    const month = "2026-12";
+    const target = { month: "2026-12" };
     const owner = session.user.id;
     const draft = {
       date: "2026-12-01",
@@ -537,33 +543,31 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
       grossCents: "99999",
     };
     await expect(
-      createActivity(month, owner, { ...draft, date: "2027-01-01" }),
-    ).resolves.toEqual({ status: "invalid" });
+      saveActivity(target, owner, { ...draft, date: "2027-01-01" }),
+    ).resolves.toBe("invalid");
     await expect(
-      createActivity(month, owner, { ...draft, directCents: "0" }),
-    ).resolves.toEqual({ status: "invalid" });
+      saveActivity(target, owner, { ...draft, directCents: "0" }),
+    ).resolves.toBe("invalid");
     await expect(
-      createActivity(month, owner, { ...draft, clinicId: null }),
-    ).resolves.toEqual({ status: "invalid" });
-    await expect(
-      createActivity(month, "previous-owner", draft),
-    ).resolves.toEqual({ status: "session-changed" });
+      saveActivity(target, owner, { ...draft, clinicId: null }),
+    ).resolves.toBe("invalid");
+    await expect(saveActivity(target, "previous-owner", draft)).resolves.toBe(
+      "session-changed",
+    );
     expect(payloads).toEqual([]);
 
-    await expect(createActivity(month, owner, draft)).resolves.toEqual({
-      status: "saved",
-    });
+    await expect(saveActivity(target, owner, draft)).resolves.toBe("saved");
     await expect(
-      createActivity(month, owner, {
+      saveActivity(target, owner, {
         ...draft,
         calculationMode: "direct",
         priceCents: "0",
         directCents: "0",
       }),
-    ).resolves.toEqual({ status: "saved" });
+    ).resolves.toBe("saved");
     await expect(
-      createActivity(month, owner, { ...draft, clinicId: "22" }),
-    ).resolves.toEqual({ status: "clinic-unavailable" });
+      saveActivity(target, owner, { ...draft, clinicId: "22" }),
+    ).resolves.toBe("clinic-unavailable");
     expect(payloads).toEqual([
       {
         p_clinic_id: clinicId,
@@ -590,6 +594,75 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
         p_direct_amount: null,
       },
     ]);
+  });
+
+  it("passes only editable values and the exact row ID to the owner RPCs", async () => {
+    const session = fixtureSession(3600, "activity-correction-refresh");
+    storeSession(session);
+    const id = "9007199254740995";
+    const calls: [string, unknown][] = [];
+    const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
+      const { pathname } = new URL(String(input));
+      expect(new Headers(init?.headers).get("authorization")).toBe(
+        `Bearer ${session.access_token}`,
+      );
+      if (pathname === "/auth/v1/user") return Response.json(session.user);
+      const body = JSON.parse(String(init?.body));
+      calls.push([pathname, body]);
+      return body.p_id === id
+        ? Response.json(id)
+        : Response.json(
+            { code: "42501", message: "Activity is unavailable" },
+            { status: 403 },
+          );
+    });
+    vi.stubGlobal("fetch", fetch);
+
+    const owner = session.user.id;
+    const draft = {
+      date: "2022-01-28",
+      clinicId: "9007199254740993",
+      description: "  Corrección  ",
+      calculationMode: "direct",
+      priceCents: "-12000",
+      directCents: "-802",
+      appliedPercentageBasisPoints: 9999,
+      appliedIrpfBasisPoints: 9999,
+    };
+    await expect(saveActivity({ id }, "previous-owner", draft)).resolves.toBe(
+      "session-changed",
+    );
+    await expect(deleteActivity(id, "previous-owner")).resolves.toBe(
+      "session-changed",
+    );
+    await expect(deleteActivity("9223372036854775808", owner)).resolves.toBe(
+      "invalid",
+    );
+    expect(calls).toEqual([]);
+
+    await expect(saveActivity({ id }, owner, draft)).resolves.toBe("saved");
+    await expect(deleteActivity(id, owner)).resolves.toBe("saved");
+    expect(calls).toEqual([
+      [
+        "/rest/v1/rpc/update_activity",
+        {
+          p_id: id,
+          p_clinic_id: draft.clinicId,
+          p_activity_date: draft.date,
+          p_description: "Corrección",
+          p_price: "-120.00",
+          p_calculation_mode: "direct",
+          p_direct_amount: "-8.02",
+        },
+      ],
+      ["/rest/v1/rpc/delete_activity", { p_id: id }],
+    ]);
+    await expect(saveActivity({ id: "7" }, owner, draft)).resolves.toBe(
+      "edit-unavailable",
+    );
+    await expect(deleteActivity("7", owner)).resolves.toBe(
+      "activity-unavailable",
+    );
   });
 
   it("forwards the verified session token and ignores caller-supplied and cookie user IDs", async () => {

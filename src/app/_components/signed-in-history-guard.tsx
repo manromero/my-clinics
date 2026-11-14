@@ -2,17 +2,18 @@
 
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 
-function verifyActivityHistory(event: PopStateEvent) {
-  if (window.location.pathname !== "/activity") return;
+function verifySignedInHistory(event: PopStateEvent) {
+  const { pathname } = window.location;
+  if (pathname !== "/activity" && pathname !== "/clinics") return;
 
-  // The router can restore a cached Activity payload without a server request.
+  // The router can restore a cached signed-in payload without a server request.
   // Intercept before its popstate handler runs and verify the current session.
   event.stopImmediatePropagation();
   document.documentElement.style.visibility = "hidden";
   window.location.reload();
 }
 
-export function ActivityHistoryGuard({ children }: { children: ReactNode }) {
+export function SignedInHistoryGuard({ children }: { children: ReactNode }) {
   const content = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -27,8 +28,8 @@ export function ActivityHistoryGuard({ children }: { children: ReactNode }) {
     window.addEventListener("pagehide", hide);
     window.addEventListener("pageshow", verifyRestoredSession);
     // Keep this listener for the document's lifetime, including after client
-    // navigation to Clinics. Registering the same function again is a no-op.
-    window.addEventListener("popstate", verifyActivityHistory, true);
+    // navigation to Login. Registering the same function again is a no-op.
+    window.addEventListener("popstate", verifySignedInHistory, true);
     return () => {
       window.removeEventListener("pagehide", hide);
       window.removeEventListener("pageshow", verifyRestoredSession);

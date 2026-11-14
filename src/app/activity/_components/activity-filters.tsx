@@ -12,7 +12,6 @@ import {
   activityScopeParams,
   adjacentActivityPeriod,
   type ActivityPeriod,
-  type ActivityPreview,
   type ActivityScope,
   type ActivityViewData,
 } from "../_lib/activity-view";
@@ -26,14 +25,10 @@ const monthOptions = Array.from({ length: 12 }, (_, index) => ({
 function AdjacentMonth({
   scope,
   direction,
-  preview,
-  pathname,
   rememberFocus,
 }: {
   scope: ActivityScope;
   direction: -1 | 1;
-  preview?: ActivityPreview;
-  pathname: string;
   rememberFocus: (target: ActivityPeriod) => void;
 }) {
   const period = adjacentActivityPeriod(scope, direction);
@@ -41,7 +36,7 @@ function AdjacentMonth({
   return (
     <ActionLink
       id={direction === -1 ? "activity-previous-month" : "activity-next-month"}
-      href={`${pathname}?${activityScopeParams({ ...(period ?? scope), clinicId: scope.clinicId }, preview)}`}
+      href={`/activity?${activityScopeParams({ ...(period ?? scope), clinicId: scope.clinicId })}`}
       prefetch={false}
       scroll={false}
       aria-disabled={period === null || undefined}
@@ -75,12 +70,7 @@ function AdjacentMonth({
 export function ActivityFilters({
   scope,
   clinicOptions,
-  preview,
-  pathname = "/activity",
-}: Pick<ActivityViewData, "scope" | "clinicOptions"> & {
-  preview?: ActivityPreview;
-  pathname?: string;
-}) {
+}: Pick<ActivityViewData, "scope" | "clinicOptions">) {
   const pendingFocusRef = useContext(ActivityNavigationFocus);
   const appliedScope = activityScopeParams(scope);
   const appliedFields = {
@@ -138,7 +128,7 @@ export function ActivityFilters({
   return (
     <Form
       id="activity-filters"
-      action={pathname}
+      action="/activity"
       prefetch={false}
       aria-label="Filtros de actividad"
       scroll={false}
@@ -150,13 +140,10 @@ export function ActivityFilters({
       }}
       className="flex flex-wrap items-end gap-x-4 gap-y-3"
     >
-      {preview && <input type="hidden" name="preview" value={preview} />}
       <div className="flex w-full min-w-0 items-end gap-2 sm:w-auto">
         <AdjacentMonth
           scope={scope}
           direction={-1}
-          preview={preview}
-          pathname={pathname}
           rememberFocus={rememberFocus}
         />
         <div className="min-w-0 flex-1 sm:w-34">
@@ -192,8 +179,6 @@ export function ActivityFilters({
         <AdjacentMonth
           scope={scope}
           direction={1}
-          preview={preview}
-          pathname={pathname}
           rememberFocus={rememberFocus}
         />
       </div>

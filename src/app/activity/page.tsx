@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { refresh } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AppFooter } from "@/lib/components/app-footer/app-footer";
@@ -8,10 +8,10 @@ import { PageContainer } from "@/lib/components/page-container/page-container";
 import { PageHeader } from "@/lib/components/page-header/page-header";
 import { requireSupabaseSession } from "@/lib/supabase/session";
 import { SignedInHeader } from "../_components/signed-in-header";
+import { SignedInHistoryGuard } from "../_components/signed-in-history-guard";
 import { ActivityFilters } from "./_components/activity-filters";
 import { ActivityLoadError } from "./_components/activity-load-error";
 import { ActivityPageLinks } from "./_components/activity-page-links";
-import { ActivityHistoryGuard } from "./_components/activity-history-guard";
 import { SavedActivityResults } from "./_components/saved-activity-results";
 import type { ActivityDraft } from "./_lib/activity-entry";
 import {
@@ -23,8 +23,8 @@ import {
   type ActivityPeriod,
   type ActivityQuery,
 } from "./_lib/activity-view";
-import { createActivity } from "./_lib/create-activity";
 import { readActivity } from "./_lib/read-activity";
+import { deleteActivity, saveActivity } from "./_lib/write-activity";
 
 export const metadata: Metadata = {
   title: "Actividad mensual | MyClinics",
@@ -65,10 +65,21 @@ async function SavedActivity({
   }
 
   const selectedMonth = activityMonthKey(scope);
-  async function createActivityAction(draft: ActivityDraft) {
+  async function saveActivityAction(draft: ActivityDraft, id?: string) {
     "use server";
-    const result = await createActivity(selectedMonth, ownerId, draft);
-    if (result.status === "saved") refresh();
+    const result = await saveActivity(
+      id === undefined ? { month: selectedMonth } : { id },
+      ownerId,
+      draft,
+    );
+    if (result === "saved") revalidatePath("/activity");
+    return result;
+  }
+
+  async function deleteActivityAction(id: string) {
+    "use server";
+    const result = await deleteActivity(id, ownerId);
+    if (result === "saved") revalidatePath("/activity");
     return result;
   }
 
@@ -94,7 +105,8 @@ async function SavedActivity({
       <SavedActivityResults
         data={data}
         lastEntered={lastEntered}
-        createActivityAction={createActivityAction}
+        saveActivityAction={saveActivityAction}
+        deleteActivityAction={deleteActivityAction}
         pagination={
           pageCount > 1 && (
             <ActivityPageLinks
@@ -126,7 +138,7 @@ export default async function ActivityPage({
   ]);
 
   return (
-    <ActivityHistoryGuard key={user.id}>
+    <SignedInHistoryGuard key={user.id}>
       <SignedInHeader
         currentHref="/activity"
         displayName={displayName}
@@ -150,6 +162,6 @@ export default async function ActivityPage({
         identity="MyClinics"
         metadata="Entorno de desarrollo · Datos sintéticos"
       />
-    </ActivityHistoryGuard>
+    </SignedInHistoryGuard>
   );
 }

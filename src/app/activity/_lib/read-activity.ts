@@ -249,7 +249,10 @@ export async function readActivity(
     ]);
     const historicalClinics = clinicIdsWithActivity(monthlyTotals.clinics);
     const clinicOptions = accountClinics.filter(
-      ({ id, active }) => active || historicalClinics.has(id),
+      // Keep an explicitly selected, owned clinic available if its last row
+      // moves or is deleted, so the current filter can show its empty state.
+      ({ id, active }) =>
+        active || historicalClinics.has(id) || id === requestedClinic,
     );
     const scope = resolveActivityScope(period, requestedClinic, clinicOptions);
     const savedTotals = scope.clinicId

@@ -1,4 +1,5 @@
 import { createWritableSupabaseAuthClient } from "@/lib/supabase/auth-actions-client";
+import { currentActivityHref } from "../../activity/_lib/activity-view";
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
@@ -15,7 +16,8 @@ export async function GET(request: Request) {
   if (!providerError && !providerErrorCode && code) {
     const supabase = await createWritableSupabaseAuthClient();
     const result = await supabase?.auth.exchangeCodeForSession(code);
-    if (result?.data.session && !result.error) return redirectTo("/clinics");
+    if (result?.data.session && !result.error)
+      return redirectTo(currentActivityHref());
   }
 
   return redirectTo("/login?signIn=failed");
