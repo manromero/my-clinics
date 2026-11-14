@@ -326,7 +326,13 @@ async function clinicUpgrade(ref) {
   );
   await replay(ref, files.slice(ownerPosition + 1, activityPosition));
   await activityUpgrade(ref, files[activityPosition]);
-  await replay(ref, files.slice(activityPosition + 1));
+  const clinicDeletionPosition = files.indexOf(
+    "20261114120000_allow_owner_clinic_deletion.sql",
+  );
+  assert.ok(clinicDeletionPosition > activityPosition);
+  await replay(ref, files.slice(activityPosition + 1, clinicDeletionPosition));
+  await clinicDeletionUpgrade(ref, files[clinicDeletionPosition]);
+  await replay(ref, files.slice(clinicDeletionPosition + 1));
   await query(ref, "drop schema validation_preclinic cascade");
   console.log(
     "Actual clinic migration upgrade from previous empty baseline preserved committed synthetic data",
@@ -378,6 +384,29 @@ async function activityUpgrade(ref, migration) {
   await databaseTests(ref, ["20-clinic-owner-access.sql", "30-activity.sql"]);
   console.log(
     "Activity upgrade preserved existing clinic rows, owners, grants and policies",
+  );
+}
+
+async function clinicDeletionUpgrade(ref, migration) {
+  await query(
+    ref,
+    `begin; set local role authenticated;
+    set local request.jwt.claims = '{"sub":"00000000-0000-4000-8000-000000000041","role":"authenticated"}';
+    select public.create_activity(
+      (select id::text from public.clinics where name='Pre-activity clinic A'),
+      '2026-01-01', 'Before clinic deletion migration', '0', 'percentage', null
+    ); commit;`,
+  );
+  const clinicsQuery = "select * from public.clinics order by id";
+  const activityQuery = "select * from public.activity order by id";
+  const clinics = await query(ref, clinicsQuery);
+  const activity = await query(ref, activityQuery);
+  await replay(ref, [migration]);
+  assert.deepEqual(await query(ref, clinicsQuery), clinics);
+  assert.deepEqual(await query(ref, activityQuery), activity);
+  await databaseTests(ref, ["40-clinic-deletion.sql"]);
+  console.log(
+    "Clinic deletion upgrade preserved existing clinics and activity",
   );
 }
 

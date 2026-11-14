@@ -123,6 +123,7 @@ export type Database = {
         Returns: string;
       };
       delete_activity: { Args: { p_id: string }; Returns: string };
+      delete_clinic: { Args: { p_id: string }; Returns: string };
       parse_activity_amount: { Args: { amount: string }; Returns: number };
       update_activity: {
         Args: {

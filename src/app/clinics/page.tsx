@@ -29,7 +29,7 @@ export default async function ClinicsPage() {
             <LoadingState label="Cargando clínicas…" variant="region" />
           }
         >
-          <SavedClinics />
+          <SavedClinics ownerId={user.id} />
         </Suspense>
       </PageContainer>
       <AppFooter
