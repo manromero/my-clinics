@@ -66,7 +66,15 @@ an existing tab still showed the former account's Activity draft, rows, totals
 and identity after a rejected stale write, and Clinics showed the former
 account's records on returning to the tab after a same-origin account switch.
 The reviewer independently passed application checks and verified the remaining
-hosted and visual cases. Correction round 1 is in progress.
+hosted and visual cases.
+
+Correction round 1 at `04434dd` fixed R06-01. Independent review passed lint,
+type checking, formatting, 275 tests and the production build. The reviewer
+verified that stale writes, real tab switches and cross-tab sign-out clear the
+prior account from both signed-in routes. The reviewer found blocker R06-02:
+pressing Escape while the session retry dialog is visible can close a concealed
+Activity dialog and discard a draft before retry succeeds. Correction round 2
+is in progress.
 
 ## Execution context
 
@@ -87,4 +95,4 @@ hosted and visual cases. Correction round 1 is in progress.
   On this workstation, Node requests required the Windows system trust store.
   Each role establishes its own fresh sessions and verifies hosted results
   without retaining credentials or modifying unrelated fixtures.
-- Open blocker: R06-01. Correction rounds started: 1 of 2.
+- Open blocker: R06-02. Correction rounds started: 2 of 2.
