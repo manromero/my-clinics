@@ -1,6 +1,6 @@
 # Task 06 — Connect edits and deletion and enable Activity
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -72,9 +72,17 @@ Correction round 1 at `04434dd` fixed R06-01. Independent review passed lint,
 type checking, formatting, 275 tests and the production build. The reviewer
 verified that stale writes, real tab switches and cross-tab sign-out clear the
 prior account from both signed-in routes. The reviewer found blocker R06-02:
-pressing Escape while the session retry dialog is visible can close a concealed
-Activity dialog and discard a draft before retry succeeds. Correction round 2
-is in progress.
+pressing Escape while the session retry dialog is visible could close a
+concealed Activity dialog and discard a draft before retry succeeds.
+
+Correction round 2 fixed R06-02 at `c971175`. Independent review verified both
+findings closed and repeated the keyboard and touch recovery checks for create,
+edit and delete, stale writes, account switches and cross-tab sign-out. Lint,
+type checking, formatting, 275 tests and the production build passed. The
+reviewer inspected fresh desktop and mobile captures. All marked activity was
+removed. Two empty, owner-scoped synthetic clinics remain for reassignment
+validation. [PR #57](https://github.com/manromero/my-clinics/pull/57) holds the
+detailed validation and evidence. Human approval and manual merge are pending.
 
 ## Execution context
 
@@ -95,4 +103,4 @@ is in progress.
   On this workstation, Node requests required the Windows system trust store.
   Each role establishes its own fresh sessions and verifies hosted results
   without retaining credentials or modifying unrelated fixtures.
-- Open blocker: R06-02. Correction rounds started: 2 of 2.
+- No open blockers. Correction rounds used: 2 of 2.
