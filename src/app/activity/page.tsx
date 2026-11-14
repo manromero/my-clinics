@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { ActionLink } from "@/lib/components/action-link/action-link";
 import { AppFooter } from "@/lib/components/app-footer/app-footer";
 import { LoadingState } from "@/lib/components/loading-state/loading-state";
 import { PageContainer } from "@/lib/components/page-container/page-container";
@@ -72,14 +73,20 @@ async function SavedActivity({
       ownerId,
       draft,
     );
-    if (result === "saved") revalidatePath("/activity");
+    if (result === "saved") {
+      revalidatePath("/activity");
+      revalidatePath("/summary");
+    }
     return result;
   }
 
   async function deleteActivityAction(id: string) {
     "use server";
     const result = await deleteActivity(id, ownerId);
-    if (result === "saved") revalidatePath("/activity");
+    if (result === "saved") {
+      revalidatePath("/activity");
+      revalidatePath("/summary");
+    }
     return result;
   }
 
@@ -87,19 +94,27 @@ async function SavedActivity({
   return (
     <>
       <div className="grid items-end gap-6 xl:grid-cols-[1fr_auto]">
-        <PageHeader
-          title="Actividad mensual"
-          metadata={
-            <p role="status">
-              <span className="inline-block first-letter:uppercase">
-                {monthName(scope.month)} de {scope.year}
-              </span>
-              {" · "}
-              {clinic ? clinic.name : "Todas las clínicas"}
-              {clinic && !clinic.active && " (inactiva)"}
-            </p>
-          }
-        />
+        <div className="space-y-3">
+          <PageHeader
+            title="Actividad mensual"
+            metadata={
+              <p role="status">
+                <span className="inline-block first-letter:uppercase">
+                  {monthName(scope.month)} de {scope.year}
+                </span>
+                {" · "}
+                {clinic ? clinic.name : "Todas las clínicas"}
+                {clinic && !clinic.active && " (inactiva)"}
+              </p>
+            }
+          />
+          <ActionLink
+            href={`/summary?${monthlyScopeParams(scope)}`}
+            variant="secondary"
+          >
+            Ver resumen del periodo
+          </ActionLink>
+        </div>
         <MonthlyScopeFilters
           path="/activity"
           label="Filtros de actividad"

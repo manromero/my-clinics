@@ -1,15 +1,21 @@
+import { ActionLink } from "@/lib/components/action-link/action-link";
 import { Badge } from "@/lib/components/badge/badge";
+import { monthlyScopeParams } from "@/lib/monthly-scope/monthly-scope";
 import { summaryMeasures, type SummaryViewData } from "../_lib/summary-view";
 
 export function SummaryBreakdown({
   clinics,
+  scope,
   totals,
-}: Pick<SummaryViewData, "clinics" | "totals">) {
+}: Pick<SummaryViewData, "clinics" | "scope" | "totals">) {
   const totalMeasures = summaryMeasures(totals);
   const entries = [
     ...clinics.map(({ clinic, totals }) => ({
       id: clinic.id,
       title: clinic.name,
+      href: totals.rowCount
+        ? `/activity?${monthlyScopeParams({ ...scope, clinicId: clinic.id })}`
+        : null,
       status: !clinic.active
         ? "Inactiva"
         : totals.rowCount === 0
@@ -20,6 +26,7 @@ export function SummaryBreakdown({
     {
       id: "total",
       title: "Total consolidado",
+      href: null,
       status: null,
       measures: totalMeasures,
     },
@@ -47,15 +54,18 @@ export function SummaryBreakdown({
                 <th
                   key={label}
                   scope="col"
-                  className="px-3 py-4 text-right last:pr-5"
+                  className="px-3 py-4 text-right [overflow-wrap:normal]"
                 >
                   {label}
                 </th>
               ))}
+              <th scope="col" className="px-5 py-4 text-right">
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody>
-            {entries.map(({ id, title, status, measures }) => (
+            {entries.map(({ id, title, status, measures, href }) => (
               <tr
                 key={id}
                 className={
@@ -80,13 +90,18 @@ export function SummaryBreakdown({
                     {value}
                   </td>
                 ))}
+                <td className="px-5 text-right">
+                  {href && (
+                    <ClinicActivityLink href={href} clinicName={title} />
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <ul className="space-y-3 lg:hidden">
-        {entries.map(({ id, title, status, measures }) => (
+        {entries.map(({ id, title, status, measures, href }) => (
           <li
             key={id}
             className={`rounded-xl p-4 ${id === "total" ? "bg-primary text-on-primary" : "bg-surface-container-lowest"}`}
@@ -110,9 +125,24 @@ export function SummaryBreakdown({
                 </div>
               ))}
             </dl>
+            {href && <ClinicActivityLink href={href} clinicName={title} />}
           </li>
         ))}
       </ul>
     </section>
+  );
+}
+
+function ClinicActivityLink({
+  href,
+  clinicName,
+}: {
+  href: string;
+  clinicName: string;
+}) {
+  return (
+    <ActionLink href={href} className="lg:whitespace-nowrap">
+      Ver actividad<span className="sr-only"> de {clinicName}</span>
+    </ActionLink>
   );
 }

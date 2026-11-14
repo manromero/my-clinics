@@ -87,3 +87,15 @@ export function adjacentMonthlyPeriod(
   if (adjacentYear < 1 || adjacentYear > 9999) return null;
   return { year: adjacentYear, month: (index % 12) + 1 };
 }
+
+export function monthlyClinicOptions<T extends { id: string; active: boolean }>(
+  clinics: readonly T[],
+  clinicIdsWithRows: ReadonlySet<string>,
+  requestedClinic: MonthlyQuery["clinic"],
+) {
+  // Keep an explicitly selected, owned inactive clinic when its last row leaves.
+  return clinics.filter(
+    ({ id, active }) =>
+      active || clinicIdsWithRows.has(id) || id === requestedClinic,
+  );
+}

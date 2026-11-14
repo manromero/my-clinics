@@ -1,20 +1,21 @@
 import "server-only";
 
+import {
+  monthlyDateRange,
+  readMonthlyClinics,
+  readMonthlyTotals,
+} from "@/lib/monthly-scope/read-monthly-activity";
 import { isClinicId } from "@/lib/clinics/clinic";
 import type { Database } from "@/lib/supabase/database.types";
 import { requireSupabaseSession } from "@/lib/supabase/session";
 import { isActivityDate, parseActivityAmount } from "./activity-entry";
 import {
-  monthKey,
+  monthlyClinicOptions,
   resolveMonthlyScope,
   type MonthlyPeriod,
   type MonthlyQuery,
 } from "@/lib/monthly-scope/monthly-scope";
-import {
-  type ActivityClinicOption,
-  type ActivityRow,
-  type ActivityViewData,
-} from "./activity-view";
+import { type ActivityRow, type ActivityViewData } from "./activity-view";
 
 type Client = Awaited<ReturnType<typeof requireSupabaseSession>>["client"];
 type ActivityRecord = Pick<
@@ -29,25 +30,7 @@ type ActivityRecord = Pick<
   applied_percentage: string;
   applied_irpf: string;
 };
-type ClinicRecord = {
-  clinic_key: string;
-  name: string;
-  percentage: string;
-  active: boolean;
-};
-
 const activityPageSize = 50;
-
-function activityRange(period: MonthlyPeriod) {
-  const next =
-    period.month === 12
-      ? { year: period.year + 1, month: 1 }
-      : { year: period.year, month: period.month + 1 };
-  return {
-    p_start: `${monthKey(period)}-01`,
-    p_end: `${monthKey(next)}-01`,
-  };
-}
 
 function cents(decimal: string) {
   // Rates may have trailing fractional zeros beyond their two meaningful digits.
@@ -93,61 +76,8 @@ function mapActivity(record: ActivityRecord): ActivityRow {
   };
 }
 
-async function readClinics(client: Client) {
-  const clinics: ActivityClinicOption[] = [];
-  for (;;) {
-    const query = client
-      .from("clinics")
-      .select("clinic_key:id::text,name,percentage::text,active")
-      .order("id")
-      .limit(100);
-    const last = clinics.at(-1);
-    if (last) query.gt("id", last.id);
-    const { data, error } = await query.overrideTypes<
-      ClinicRecord[],
-      { merge: false }
-    >();
-    if (error || !data) throw new Error("Could not read activity clinics");
-    if (data.length === 0) return clinics;
-
-    for (const { clinic_key: id, name, percentage, active } of data) {
-      const previous = clinics.at(-1);
-      if (
-        !isClinicId(id) ||
-        (previous && BigInt(id) <= BigInt(previous.id)) ||
-        typeof name !== "string" ||
-        !name.trim() ||
-        typeof active !== "boolean"
-      ) {
-        throw new Error("Invalid activity clinic");
-      }
-      clinics.push({
-        id,
-        name,
-        active,
-        percentageBasisPoints: basisPoints(percentage),
-      });
-    }
-  }
-}
-
-async function readTotals(
-  client: Client,
-  range: ReturnType<typeof activityRange>,
-  clinicId: string | null,
-) {
-  const { data, error } = await client
-    .rpc("activity_period_totals", {
-      ...range,
-      ...(clinicId === null ? {} : { p_clinic_id: clinicId }),
-    })
-    .single();
-  if (error || !data) throw new Error("Could not read activity totals");
-  return data;
-}
-
 function clinicIdsWithActivity(
-  groups: Awaited<ReturnType<typeof readTotals>>["clinics"],
+  groups: Awaited<ReturnType<typeof readMonthlyTotals>>["clinics"],
 ) {
   if (!Array.isArray(groups)) throw new Error("Invalid activity clinic totals");
   return new Set(
@@ -167,7 +97,7 @@ function clinicIdsWithActivity(
 
 async function readRows(
   client: Client,
-  range: ReturnType<typeof activityRange>,
+  range: ReturnType<typeof monthlyDateRange>,
   clinicId: string | null,
   first: number,
   size: number,
@@ -212,7 +142,7 @@ async function readRows(
 
 async function readLastEnteredDate(
   client: Client,
-  range: ReturnType<typeof activityRange>,
+  range: ReturnType<typeof monthlyDateRange>,
 ) {
   const { data, error } = await client
     .from("activity")
@@ -243,22 +173,24 @@ export async function readActivity(
 > {
   const { client } = await requireSupabaseSession();
   try {
-    const range = activityRange(period);
+    const range = monthlyDateRange(period);
     const [accountClinics, monthlyTotals, lastEntered] = await Promise.all([
-      readClinics(client),
-      readTotals(client, range, null),
+      readMonthlyClinics(client),
+      readMonthlyTotals(client, range, null),
       readLastEnteredDate(client, range),
     ]);
     const historicalClinics = clinicIdsWithActivity(monthlyTotals.clinics);
-    const clinicOptions = accountClinics.filter(
-      // Keep an explicitly selected, owned clinic available if its last row
-      // moves or is deleted, so the current filter can show its empty state.
-      ({ id, active }) =>
-        active || historicalClinics.has(id) || id === requestedClinic,
-    );
+    const clinicOptions = monthlyClinicOptions(
+      accountClinics,
+      historicalClinics,
+      requestedClinic,
+    ).map(({ percentage, ...clinic }) => ({
+      ...clinic,
+      percentageBasisPoints: basisPoints(percentage),
+    }));
     const scope = resolveMonthlyScope(period, requestedClinic, clinicOptions);
     const savedTotals = scope.clinicId
-      ? await readTotals(client, range, scope.clinicId)
+      ? await readMonthlyTotals(client, range, scope.clinicId)
       : monthlyTotals;
     const rowCount = Number(savedTotals.row_count);
     if (
