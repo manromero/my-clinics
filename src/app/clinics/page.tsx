@@ -7,6 +7,7 @@ import { requireSupabaseSession } from "@/lib/supabase/session";
 import { ClinicCreation } from "./clinic-creation";
 import { SavedClinics } from "./saved-clinics";
 import { SignedInHeader } from "../_components/signed-in-header";
+import { SignedInHistoryGuard } from "../_components/signed-in-history-guard";
 
 export const metadata: Metadata = {
   title: "Clínicas | MyClinics",
@@ -19,7 +20,7 @@ export default async function ClinicsPage() {
     (typeof name === "string" && name.trim()) || user.email || "Usuario";
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <SignedInHistoryGuard key={user.id} ownerId={user.id}>
       <SignedInHeader displayName={displayName} email={user.email} />
       <PageContainer as="main" className="flex-1 space-y-8">
         <ClinicCreation />
@@ -35,6 +36,6 @@ export default async function ClinicsPage() {
         identity="MyClinics"
         metadata="Entorno de desarrollo · Datos sintéticos"
       />
-    </div>
+    </SignedInHistoryGuard>
   );
 }

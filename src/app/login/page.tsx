@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { AppFooter } from "@/lib/components/app-footer/app-footer";
 import { AppHeader } from "@/lib/components/app-header/app-header";
 import { Badge } from "@/lib/components/badge/badge";
 import { PageContainer } from "@/lib/components/page-container/page-container";
 import { Surface } from "@/lib/components/surface/surface";
+import { readSupabaseSession } from "@/lib/supabase/session";
+import { currentActivityHref } from "../activity/_lib/activity-view";
 import { GoogleSignInForm } from "./google-sign-in-form";
 
 export const metadata: Metadata = {
@@ -11,6 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
+  if (await readSupabaseSession()) redirect(currentActivityHref());
   const { signIn } = await searchParams;
   const issue = signIn === "cancelled" || signIn === "failed" ? signIn : null;
 
