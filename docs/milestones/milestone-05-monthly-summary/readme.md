@@ -1,6 +1,7 @@
 # Milestone 05 — Monthly summary
 
-The user approved the plan. Both implementation tasks are pending.
+Task 00 is ready for human review in
+[PR #59](https://github.com/manromero/my-clinics/pull/59). Task 01 is pending.
 
 ## Objective
 
@@ -40,7 +41,7 @@ same period and clinic filter.
 
 | Task                                                                                   | Status    | Direct dependencies                                         |
 | -------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------- |
-| [00 — Build the summary with fixtures](<task 00 - summary with fixtures.md>)           | `pending` | [Milestone 04](../milestone-04-monthly-activity/readme.md)  |
+| [00 — Build the summary with fixtures](<task 00 - summary with fixtures.md>)           | `done`    | [Milestone 04](../milestone-04-monthly-activity/readme.md)  |
 | [01 — Connect the summary to Supabase](<task 01 - connect the summary to supabase.md>) | `pending` | 00 and the hosted Milestone 04 activity data and totals RPC |
 
 Task 00 can be reviewed with clearly labeled synthetic figures on development.

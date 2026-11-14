@@ -1,11 +1,10 @@
 import { parseDecimal } from "@/lib/components/decimal-input/parse-decimal";
 import {
-  activityMonthKey,
+  monthKey,
   madridDateParts,
-  type ActivityPeriod,
-  type ActivityRow,
-  type EuroCents,
-} from "./activity-view";
+  type MonthlyPeriod,
+} from "@/lib/monthly-scope/monthly-scope";
+import { type ActivityRow, type EuroCents } from "./activity-view";
 
 export const defaultIrpfBasisPoints = 1500;
 
@@ -15,15 +14,15 @@ export type ActivityDraft = Pick<
 > & { directCents: EuroCents | null };
 
 export function newActivityDate(
-  period: ActivityPeriod,
+  period: MonthlyPeriod,
   lastEntered?: ActivityRow["date"],
   now = new Date(),
 ) {
-  const month = activityMonthKey(period);
+  const month = monthKey(period);
   if (lastEntered?.startsWith(`${month}-`)) return lastEntered;
 
   const today = madridDateParts(now);
-  return activityMonthKey(today) === month
+  return monthKey(today) === month
     ? `${month}-${String(today.day).padStart(2, "0")}`
     : "";
 }

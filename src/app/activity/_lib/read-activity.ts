@@ -5,11 +5,13 @@ import type { Database } from "@/lib/supabase/database.types";
 import { requireSupabaseSession } from "@/lib/supabase/session";
 import { isActivityDate, parseActivityAmount } from "./activity-entry";
 import {
-  activityMonthKey,
-  resolveActivityScope,
+  monthKey,
+  resolveMonthlyScope,
+  type MonthlyPeriod,
+  type MonthlyQuery,
+} from "@/lib/monthly-scope/monthly-scope";
+import {
   type ActivityClinicOption,
-  type ActivityPeriod,
-  type ActivityQuery,
   type ActivityRow,
   type ActivityViewData,
 } from "./activity-view";
@@ -36,14 +38,14 @@ type ClinicRecord = {
 
 const activityPageSize = 50;
 
-function activityRange(period: ActivityPeriod) {
+function activityRange(period: MonthlyPeriod) {
   const next =
     period.month === 12
       ? { year: period.year + 1, month: 1 }
       : { year: period.year, month: period.month + 1 };
   return {
-    p_start: `${activityMonthKey(period)}-01`,
-    p_end: `${activityMonthKey(next)}-01`,
+    p_start: `${monthKey(period)}-01`,
+    p_end: `${monthKey(next)}-01`,
   };
 }
 
@@ -228,9 +230,9 @@ async function readLastEnteredDate(
 }
 
 export async function readActivity(
-  period: ActivityPeriod,
-  requestedClinic: ActivityQuery["clinic"],
-  requestedPage: ActivityQuery["page"],
+  period: MonthlyPeriod,
+  requestedClinic: MonthlyQuery["clinic"],
+  requestedPage: MonthlyQuery["page"],
 ): Promise<
   | (ActivityViewData & {
       page: number;
@@ -254,7 +256,7 @@ export async function readActivity(
       ({ id, active }) =>
         active || historicalClinics.has(id) || id === requestedClinic,
     );
-    const scope = resolveActivityScope(period, requestedClinic, clinicOptions);
+    const scope = resolveMonthlyScope(period, requestedClinic, clinicOptions);
     const savedTotals = scope.clinicId
       ? await readTotals(client, range, scope.clinicId)
       : monthlyTotals;

@@ -1,9 +1,9 @@
 import { Badge } from "@/lib/components/badge/badge";
 import { IconButton } from "@/lib/components/icon-button/icon-button";
+import { formatEuroCents } from "@/lib/format/amounts";
 import {
   formatActivityDate,
   formatActivityRate,
-  formatEuroCents,
 } from "../_lib/activity-format";
 import type {
   ActivityClinicOption,

@@ -15,13 +15,16 @@ import {
   parseActivityAmount,
   type ActivityDraft,
 } from "../_lib/activity-entry";
-import { formatActivityRate, formatEuroCents } from "../_lib/activity-format";
+import { formatEuroCents } from "@/lib/format/amounts";
+import { formatActivityRate } from "../_lib/activity-format";
 import {
-  activityMonthKey,
-  activityMonthName,
+  monthKey,
+  monthName,
+  type MonthlyScope,
+} from "@/lib/monthly-scope/monthly-scope";
+import {
   type ActivityClinicOption,
   type ActivityRow,
-  type ActivityScope,
 } from "../_lib/activity-view";
 
 const modeOptions = [
@@ -42,7 +45,7 @@ export function ActivityForm({
   onCancel,
 }: {
   row?: ActivityRow;
-  scope: ActivityScope;
+  scope: MonthlyScope;
   clinics: readonly ActivityClinicOption[];
   lastEntered?: ActivityRow["date"];
   pending: boolean;
@@ -93,8 +96,8 @@ export function ActivityForm({
   const irpf = row?.appliedIrpfBasisPoints ?? defaultIrpfBasisPoints;
   const priceCents = parseActivityAmount(price);
   const directCents = mode === "direct" ? parseActivityAmount(direct) : null;
-  const month = activityMonthKey(scope);
-  const monthLabel = `${activityMonthName(scope.month)} de ${scope.year}`;
+  const month = monthKey(scope);
+  const monthLabel = `${monthName(scope.month)} de ${scope.year}`;
   const validDate = isActivityDate(date) ? date : null;
   const dateError = !validDate
     ? "Introduce una fecha válida."
