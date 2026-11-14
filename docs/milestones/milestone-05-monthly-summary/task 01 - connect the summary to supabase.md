@@ -1,6 +1,6 @@
 # Task 01 — Connect the summary to Supabase
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -58,4 +58,26 @@ capture desktop and mobile with saved data.
 
 ## Progress notes
 
-The user approved the milestone plan. Implementation is pending.
+The user assigned implementation under the project workflow.
+
+## Execution context
+
+- Ready: Task 00 is merged in [PR #59](https://github.com/manromero/my-clinics/pull/59).
+  Branch: `feature/saved-monthly-summary`. Base: `8434e63ecb8e806fb6bbef6f616efd212d0ded47`.
+- Activity already reads all owned clinics by keyset and uses a half-open
+  calendar range and `activity_period_totals`. The hosted RPC contract in
+  `supabase/schemas/30-activity.sql` carries amounts, counts, and clinic keys
+  as strings, including in its grouped JSON. Reuse the shared scope controls
+  and preserve the existing signed-in session/history protection.
+- Entry points: `src/app/summary`, `src/app/activity`,
+  `src/lib/monthly-scope`, and the signed-in history guard. Use the
+  [S03 and S04 screen specifications](../../screens.md#s03--monthly-activity)
+  and the [visual references](../../screens.md#visual-design-references).
+- No schema, migration, or generated type change is expected. Verify freshness
+  after writes through actual history navigation; whether additional route
+  invalidation is needed is an implementation question.
+- Readiness: both dedicated fixture accounts independently signed in, verified
+  their active clinic, and loaded Activity in isolated Chrome sessions against
+  the approved hosted synthetic project. Follow the
+  [local signed-in procedure](../../supabase.md#local-signed-in-validation).
+- Open product questions: none. Correction rounds used: 0 of 2.
