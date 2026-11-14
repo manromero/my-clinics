@@ -10,6 +10,7 @@ import { EmptyState } from "@/lib/components/empty-state/empty-state";
 import { Surface } from "@/lib/components/surface/surface";
 import { ClinicForm } from "./clinic-form";
 import { ClinicLoadError } from "./clinic-load-error";
+import { deleteClinic } from "./delete-clinic";
 import { updateClinic } from "./update-clinic";
 
 const percentageFormat = new Intl.NumberFormat("es-ES", {
@@ -35,10 +36,16 @@ function ClinicIcon() {
   );
 }
 
-export function ClinicList({ clinics }: { clinics: Clinic[] | null }) {
+export function ClinicList({
+  clinics,
+  ownerId,
+}: {
+  clinics: Clinic[] | null;
+  ownerId: string;
+}) {
   const router = useRouter();
   const [editing, setEditing] = useState<Clinic | null>(null);
-  const [saved, setSaved] = useState(false);
+  const [notice, setNotice] = useState<"saved" | "deleted" | null>(null);
   const hasClinics = clinics !== null && clinics.length > 0;
 
   return (
@@ -56,26 +63,33 @@ export function ClinicList({ clinics }: { clinics: Clinic[] | null }) {
           No hay clínicas activas disponibles para registrar nueva actividad.
         </Alert>
       )}
-      {saved && (
+      {notice && (
         <Alert
-          title="Cambios guardados"
+          title={notice === "saved" ? "Cambios guardados" : "Clínica eliminada"}
           variant="success"
           announcement="polite"
         >
-          La clínica se ha actualizado.
+          {notice === "saved" ? "La clínica se ha actualizado." : undefined}
         </Alert>
       )}
       {editing && (
         <ClinicForm
           clinic={editing}
           save={(formData) => updateClinic(editing.id, formData)}
+          deletion={{
+            remove: () => deleteClinic(editing.id, ownerId),
+            onDeleted: () => {
+              setEditing(null);
+              setNotice("deleted");
+            },
+          }}
           onCancel={(result) => {
             setEditing(null);
             if (result?.status === "missing") router.refresh();
           }}
           onSaved={() => {
             setEditing(null);
-            setSaved(true);
+            setNotice("saved");
           }}
         />
       )}
@@ -85,7 +99,7 @@ export function ClinicList({ clinics }: { clinics: Clinic[] | null }) {
         <ClinicRows
           clinics={clinics}
           onEdit={(clinic) => {
-            setSaved(false);
+            setNotice(null);
             setEditing(clinic);
           }}
         />

@@ -1,6 +1,6 @@
 # Task 07 — Delete clinics without activity
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -53,6 +53,22 @@ with activity in a prior month, competing create/delete requests, and successful
 deletion after the last linked row is removed. Exercise confirmation, cancel,
 failure, and the empty clinic list on desktop and mobile; capture evidence.
 
-## Progress notes
+## Execution context
 
-Proposed; implementation has not started.
+- Task 06 is integrated in [PR #57](https://github.com/manromero/my-clinics/pull/57).
+  Branch `feature/delete-persistent-clinics` starts from `develop` at
+  `a0ea87039e66e6ac4b4acab3c007373e1b27549a`.
+- Reuse the Milestone 02 Task 02 interaction and the shared `ConfirmDialog`.
+  Follow [S02](../../screens.md#s02--clinics), the Alexandria and Stitch
+  references, and the existing signed-in session guard.
+- The current application grants clinic reads and writes by owner. The
+  composite activity foreign key in `supabase/schemas/30-activity.sql` uses
+  `ON DELETE RESTRICT`; enforce eligibility through that constraint during
+  deletion. Verify the new access boundary through the Data API and cover
+  both orders of competing requests.
+- Both ordinary synthetic accounts can sign in and read their active fixture
+  clinics in isolated Chrome sessions. Use the
+  [local signed-in procedure](../../supabase.md#local-signed-in-validation)
+  and the Windows system trust store for local Node requests. Hosted migration
+  validation follows the [Supabase guide](../../supabase.md).
+- No open product questions. Correction rounds used: 0 of 2.

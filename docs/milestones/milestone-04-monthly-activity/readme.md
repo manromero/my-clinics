@@ -56,17 +56,17 @@ the reference's sample fixed-rate labels and export control do not define scope.
 
 ## Task index
 
-| Task                                                                                                    | Status    | Direct dependencies                                                                                             |
-| ------------------------------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------- |
-| [00 — Define the activity page and filters](<task 00 - activity page and filters.md>)                   | `done`    | Milestones [01](../milestone-01-shared-components/readme.md) and [03](../milestone-03-authentication/readme.md) |
-| [01 — Build the activity list and totals](<task 01 - activity list and totals.md>)                      | `done`    | 00                                                                                                              |
-| [02 — Build the activity form and deletion confirmation](<task 02 - activity form and confirmation.md>) | `done`    | 01                                                                                                              |
-| [03 — Create the activity database model](<task 03 - activity database model.md>)                       | `done`    | 02; [Milestone 03 Task 03](<../milestone-03-authentication/task 03 - authorize clinic access.md>)               |
-| [04 — Connect the activity list and totals](<task 04 - read persistent activity.md>)                    | `done`    | 03                                                                                                              |
-| [05 — Connect activity creation](<task 05 - create persistent activity.md>)                             | `done`    | 04                                                                                                              |
-| [05a — Validate signed-in work autonomously](<task 05a - validate signed-in work autonomously.md>)      | `done`    | 05                                                                                                              |
-| [06 — Connect edits and deletion and enable Activity](<task 06 - edit delete and enable activity.md>)   | `done`    | 05                                                                                                              |
-| [07 — Delete clinics without activity](<task 07 - delete clinics without activity.md>)                  | `pending` | 06; [Milestone 02 Task 02](<../milestone-02-clinic-management/task 02 - delete clinics.md>)                     |
+| Task                                                                                                    | Status        | Direct dependencies                                                                                             |
+| ------------------------------------------------------------------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------- |
+| [00 — Define the activity page and filters](<task 00 - activity page and filters.md>)                   | `done`        | Milestones [01](../milestone-01-shared-components/readme.md) and [03](../milestone-03-authentication/readme.md) |
+| [01 — Build the activity list and totals](<task 01 - activity list and totals.md>)                      | `done`        | 00                                                                                                              |
+| [02 — Build the activity form and deletion confirmation](<task 02 - activity form and confirmation.md>) | `done`        | 01                                                                                                              |
+| [03 — Create the activity database model](<task 03 - activity database model.md>)                       | `done`        | 02; [Milestone 03 Task 03](<../milestone-03-authentication/task 03 - authorize clinic access.md>)               |
+| [04 — Connect the activity list and totals](<task 04 - read persistent activity.md>)                    | `done`        | 03                                                                                                              |
+| [05 — Connect activity creation](<task 05 - create persistent activity.md>)                             | `done`        | 04                                                                                                              |
+| [05a — Validate signed-in work autonomously](<task 05a - validate signed-in work autonomously.md>)      | `done`        | 05                                                                                                              |
+| [06 — Connect edits and deletion and enable Activity](<task 06 - edit delete and enable activity.md>)   | `done`        | 05                                                                                                              |
+| [07 — Delete clinics without activity](<task 07 - delete clinics without activity.md>)                  | `in_progress` | 06; [Milestone 02 Task 02](<../milestone-02-clinic-management/task 02 - delete clinics.md>)                     |
 
 ## Completion criteria
 
