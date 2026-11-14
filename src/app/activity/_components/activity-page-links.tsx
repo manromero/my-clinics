@@ -1,17 +1,20 @@
 import { ActionLink } from "@/lib/components/action-link/action-link";
-import { activityCount } from "../_lib/activity-format";
-import { activityScopeParams, type ActivityScope } from "../_lib/activity-view";
+import { recordCount } from "@/lib/format/amounts";
+import {
+  monthlyScopeParams,
+  type MonthlyScope,
+} from "@/lib/monthly-scope/monthly-scope";
 
 export function ActivityPageLinks({
   scope,
   page,
   pageCount,
 }: {
-  scope: ActivityScope;
+  scope: MonthlyScope;
   page: number;
   pageCount: number;
 }) {
-  const query = activityScopeParams(scope);
+  const query = monthlyScopeParams(scope);
   return (
     <nav
       aria-label="Páginas de actividad"
@@ -26,7 +29,7 @@ export function ActivityPageLinks({
         </ActionLink>
       )}
       <span className="font-label text-label tabular-nums">
-        Página {activityCount.format(page)} de {activityCount.format(pageCount)}
+        Página {recordCount.format(page)} de {recordCount.format(pageCount)}
       </span>
       {page < pageCount && (
         <ActionLink

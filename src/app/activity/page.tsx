@@ -9,20 +9,20 @@ import { PageHeader } from "@/lib/components/page-header/page-header";
 import { requireSupabaseSession } from "@/lib/supabase/session";
 import { SignedInHeader } from "../_components/signed-in-header";
 import { SignedInHistoryGuard } from "../_components/signed-in-history-guard";
-import { ActivityFilters } from "./_components/activity-filters";
+import { MonthlyScopeFilters } from "@/lib/components/monthly-scope-filters/monthly-scope-filters";
 import { ActivityLoadError } from "./_components/activity-load-error";
 import { ActivityPageLinks } from "./_components/activity-page-links";
 import { SavedActivityResults } from "./_components/saved-activity-results";
 import type { ActivityDraft } from "./_lib/activity-entry";
 import {
-  activityMonthKey,
-  activityMonthName,
-  activityPeriodFromQuery,
-  activityPeriodParams,
-  activityScopeParams,
-  type ActivityPeriod,
-  type ActivityQuery,
-} from "./_lib/activity-view";
+  monthKey,
+  monthName,
+  monthlyPeriodFromQuery,
+  monthlyPeriodParams,
+  monthlyScopeParams,
+  type MonthlyPeriod,
+  type MonthlyQuery,
+} from "@/lib/monthly-scope/monthly-scope";
 import { readActivity } from "./_lib/read-activity";
 import { deleteActivity, saveActivity } from "./_lib/write-activity";
 
@@ -36,8 +36,8 @@ async function SavedActivity({
   period,
   ownerId,
 }: {
-  query: ActivityQuery;
-  period: ActivityPeriod;
+  query: MonthlyQuery;
+  period: MonthlyPeriod;
   ownerId: string;
 }) {
   const data = await readActivity(period, query.clinic, query.page);
@@ -51,7 +51,7 @@ async function SavedActivity({
   }
 
   const { scope, clinicOptions, page, pageCount, lastEntered } = data;
-  const { year, month } = activityPeriodParams(scope);
+  const { year, month } = monthlyPeriodParams(scope);
   const pageParam = page === 1 ? undefined : String(page);
   if (
     query.year !== year ||
@@ -60,11 +60,11 @@ async function SavedActivity({
     query.page !== pageParam ||
     query.preview !== undefined
   ) {
-    const canonical = activityScopeParams(scope);
+    const canonical = monthlyScopeParams(scope);
     redirect(`/activity?${canonical}${pageParam ? `&page=${pageParam}` : ""}`);
   }
 
-  const selectedMonth = activityMonthKey(scope);
+  const selectedMonth = monthKey(scope);
   async function saveActivityAction(draft: ActivityDraft, id?: string) {
     "use server";
     const result = await saveActivity(
@@ -92,7 +92,7 @@ async function SavedActivity({
           metadata={
             <p role="status">
               <span className="inline-block first-letter:uppercase">
-                {activityMonthName(scope.month)} de {scope.year}
+                {monthName(scope.month)} de {scope.year}
               </span>
               {" · "}
               {clinic ? clinic.name : "Todas las clínicas"}
@@ -100,7 +100,12 @@ async function SavedActivity({
             </p>
           }
         />
-        <ActivityFilters scope={scope} clinicOptions={clinicOptions} />
+        <MonthlyScopeFilters
+          path="/activity"
+          label="Filtros de actividad"
+          scope={scope}
+          clinicOptions={clinicOptions}
+        />
       </div>
       <SavedActivityResults
         data={data}
@@ -126,7 +131,7 @@ export default async function ActivityPage({
 }: PageProps<"/activity">) {
   const { user } = await requireSupabaseSession();
   const query = await searchParams;
-  const period = activityPeriodFromQuery(query);
+  const period = monthlyPeriodFromQuery(query);
   const name = user.user_metadata?.full_name;
   const displayName =
     (typeof name === "string" && name.trim()) || user.email || "Usuario";

@@ -7,36 +7,37 @@ import { Button } from "@/lib/components/button/button";
 import { FieldLabel } from "@/lib/components/field-label/field-label";
 import { Select } from "@/lib/components/select/select";
 import {
-  activityMonthName,
-  activityPeriodParams,
-  activityScopeParams,
-  adjacentActivityPeriod,
-  type ActivityPeriod,
-  type ActivityScope,
-  type ActivityViewData,
-} from "../_lib/activity-view";
-import { ActivityNavigationFocus } from "./activity-navigation-focus";
+  monthName,
+  monthlyPeriodParams,
+  monthlyScopeParams,
+  adjacentMonthlyPeriod,
+  type MonthlyPeriod,
+  type MonthlyScope,
+} from "@/lib/monthly-scope/monthly-scope";
+import { MonthlyScopeFocus } from "./monthly-scope-focus";
 
 const monthOptions = Array.from({ length: 12 }, (_, index) => ({
-  label: activityMonthName(index + 1),
+  label: monthName(index + 1),
   value: String(index + 1).padStart(2, "0"),
 }));
 
 function AdjacentMonth({
+  path,
   scope,
   direction,
   rememberFocus,
 }: {
-  scope: ActivityScope;
+  path: string;
+  scope: MonthlyScope;
   direction: -1 | 1;
-  rememberFocus: (target: ActivityPeriod) => void;
+  rememberFocus: (target: MonthlyPeriod) => void;
 }) {
-  const period = adjacentActivityPeriod(scope, direction);
+  const period = adjacentMonthlyPeriod(scope, direction);
 
   return (
     <ActionLink
-      id={direction === -1 ? "activity-previous-month" : "activity-next-month"}
-      href={`/activity?${activityScopeParams({ ...(period ?? scope), clinicId: scope.clinicId })}`}
+      id={`${path.slice(1)}-${direction === -1 ? "previous" : "next"}-month`}
+      href={`${path}?${monthlyScopeParams({ ...(period ?? scope), clinicId: scope.clinicId })}`}
       prefetch={false}
       scroll={false}
       aria-disabled={period === null || undefined}
@@ -67,14 +68,23 @@ function AdjacentMonth({
   );
 }
 
-export function ActivityFilters({
+export function MonthlyScopeFilters({
+  path,
+  label,
   scope,
   clinicOptions,
-}: Pick<ActivityViewData, "scope" | "clinicOptions">) {
-  const pendingFocusRef = useContext(ActivityNavigationFocus);
-  const appliedScope = activityScopeParams(scope);
+}: {
+  path: "/activity" | "/summary";
+  label: string;
+  scope: MonthlyScope;
+  clinicOptions: readonly { id: string; name: string; active: boolean }[];
+}) {
+  const prefix = path.slice(1);
+  const formId = `${prefix}-filters`;
+  const pendingFocusRef = useContext(MonthlyScopeFocus);
+  const appliedScope = monthlyScopeParams(scope);
   const appliedFields = {
-    ...activityPeriodParams(scope),
+    ...monthlyPeriodParams(scope),
     clinic: scope.clinicId ?? "",
   };
   const [draft, setDraft] = useState({
@@ -106,13 +116,13 @@ export function ActivityFilters({
     }
   }, [pendingFocusRef, year, month, clinicId]);
 
-  function rememberFocus(target: ActivityPeriod) {
+  function rememberFocus(target: MonthlyPeriod) {
     if (!pendingFocusRef) return;
     const control = document.activeElement;
     pendingFocusRef.current =
       control instanceof HTMLElement &&
       control.id &&
-      control.closest("#activity-filters") &&
+      control.closest(`#${formId}`) &&
       control.matches(":focus-visible")
         ? { target, control }
         : null;
@@ -127,10 +137,10 @@ export function ActivityFilters({
 
   return (
     <Form
-      id="activity-filters"
-      action="/activity"
+      id={formId}
+      action={path}
       prefetch={false}
-      aria-label="Filtros de actividad"
+      aria-label={label}
       scroll={false}
       onSubmit={() => {
         rememberFocus({
@@ -142,13 +152,14 @@ export function ActivityFilters({
     >
       <div className="flex w-full min-w-0 items-end gap-2 sm:w-auto">
         <AdjacentMonth
+          path={path}
           scope={scope}
           direction={-1}
           rememberFocus={rememberFocus}
         />
         <div className="min-w-0 flex-1 sm:w-34">
           <Select
-            id="activity-month"
+            id={`${prefix}-month`}
             name="month"
             label="Mes"
             className="capitalize"
@@ -159,11 +170,11 @@ export function ActivityFilters({
           />
         </div>
         <div className="w-16 shrink-0 space-y-2">
-          <FieldLabel htmlFor="activity-year" className="block">
+          <FieldLabel htmlFor={`${prefix}-year`} className="block">
             Año
           </FieldLabel>
           <input
-            id="activity-year"
+            id={`${prefix}-year`}
             name="year"
             type="text"
             inputMode="numeric"
@@ -177,6 +188,7 @@ export function ActivityFilters({
           />
         </div>
         <AdjacentMonth
+          path={path}
           scope={scope}
           direction={1}
           rememberFocus={rememberFocus}
@@ -185,7 +197,7 @@ export function ActivityFilters({
       <div className="flex min-w-0 flex-1 items-end gap-2 sm:flex-initial">
         <div className="min-w-0 flex-1 sm:w-44">
           <Select
-            id="activity-clinic"
+            id={`${prefix}-clinic`}
             name="clinic"
             label="Clínica"
             value={draft.fields.clinic}
@@ -200,7 +212,12 @@ export function ActivityFilters({
             showRequirement={false}
           />
         </div>
-        <Button id="activity-apply" type="submit" size="sm" variant="secondary">
+        <Button
+          id={`${prefix}-apply`}
+          type="submit"
+          size="sm"
+          variant="secondary"
+        >
           Aplicar
         </Button>
       </div>

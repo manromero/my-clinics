@@ -1,9 +1,5 @@
-import { ActivityNavigationFocusProvider } from "./_components/activity-navigation-focus";
+import { MonthlyScopeFocusProvider } from "@/lib/components/monthly-scope-filters/monthly-scope-focus";
 
 export default function ActivityLayout({ children }: LayoutProps<"/activity">) {
-  return (
-    <ActivityNavigationFocusProvider>
-      {children}
-    </ActivityNavigationFocusProvider>
-  );
+  return <MonthlyScopeFocusProvider>{children}</MonthlyScopeFocusProvider>;
 }

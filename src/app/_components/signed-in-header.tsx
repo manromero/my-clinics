@@ -15,7 +15,7 @@ export function SignedInHeader({
 }: {
   displayName: string;
   email?: string;
-  currentHref?: "/clinics" | "/activity";
+  currentHref?: "/clinics" | "/activity" | "/summary";
 }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string>();
@@ -25,7 +25,7 @@ export function SignedInHeader({
     <AppHeader
       variant="signed-in"
       currentHref={currentHref}
-      availableDestinations={["/activity", "/clinics"]}
+      availableDestinations={["/activity", "/summary", "/clinics"]}
       account={{
         identity: { displayName, email },
         signOutPending: pending,

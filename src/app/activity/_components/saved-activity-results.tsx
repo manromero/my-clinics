@@ -7,12 +7,10 @@ import { Button } from "@/lib/components/button/button";
 import { ConfirmDialog } from "@/lib/components/confirm-dialog/confirm-dialog";
 import { ConcealSignedInContent } from "../../_components/signed-in-history-guard";
 import type { ActivityDraft } from "../_lib/activity-entry";
-import { formatActivityDate, formatEuroCents } from "../_lib/activity-format";
-import {
-  activityMonthKey,
-  type ActivityRow,
-  type ActivityViewData,
-} from "../_lib/activity-view";
+import { formatEuroCents } from "@/lib/format/amounts";
+import { formatActivityDate } from "../_lib/activity-format";
+import { monthKey } from "@/lib/monthly-scope/monthly-scope";
+import type { ActivityRow, ActivityViewData } from "../_lib/activity-view";
 import type { ActivityWriteResult } from "../_lib/write-activity";
 import { ActivityForm } from "./activity-form";
 import type { ActivityRowAction } from "./activity-list";
@@ -35,7 +33,7 @@ const writeErrors = {
 };
 
 function savedNotice(scope: ActivityViewData["scope"], draft: ActivityDraft) {
-  const changedMonth = !draft.date.startsWith(`${activityMonthKey(scope)}-`);
+  const changedMonth = !draft.date.startsWith(`${monthKey(scope)}-`);
   const changedClinic =
     scope.clinicId !== null && scope.clinicId !== draft.clinicId;
   if (changedMonth && changedClinic) {

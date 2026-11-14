@@ -1,7 +1,7 @@
 import type { ReactNode, Ref } from "react";
 import { EmptyState } from "@/lib/components/empty-state/empty-state";
 import { Surface } from "@/lib/components/surface/surface";
-import { activityCount, formatEuroCents } from "../_lib/activity-format";
+import { recordCount, formatEuroCents } from "@/lib/format/amounts";
 import type { ActivityViewData } from "../_lib/activity-view";
 import { ActivityList, type ActivityRowAction } from "./activity-list";
 
@@ -23,7 +23,7 @@ export function ActivityResults({
   const cards = [
     { label: "Facturación total", value: formatEuroCents(totals.priceCents) },
     { label: "Ganancia bruta", value: formatEuroCents(totals.grossCents) },
-    { label: "Registros", value: activityCount.format(totals.rowCount) },
+    { label: "Registros", value: recordCount.format(totals.rowCount) },
     {
       label: "Ganancia tras IRPF",
       value: formatEuroCents(totals.netCents),

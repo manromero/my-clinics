@@ -29,7 +29,7 @@ export function notifySignedOut() {
 
 function verifySignedInHistory(event: PopStateEvent) {
   const { pathname } = window.location;
-  if (pathname !== "/activity" && pathname !== "/clinics") return;
+  if (!["/activity", "/clinics", "/summary"].includes(pathname)) return;
 
   // The router can restore a cached signed-in payload without a server request.
   // Intercept before its popstate handler runs and verify the current session.
