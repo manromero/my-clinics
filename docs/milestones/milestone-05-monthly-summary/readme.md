@@ -59,6 +59,8 @@ no new schema or migration is planned.
   no recalculation at current clinic or IRPF rates and no fallback to fixtures.
 - Loading, no activity, no included clinics, and read failure are distinct.
   A failed read can be retried without losing the selected filters.
-- The work is reviewed by the user in the current session, directly on
-  `develop`, without subagents or a feature branch. Commit and push follow
-  user review.
+- Each implementation task follows the standard
+  [development workflow](../../development-workflow.md) and
+  [Git workflow](../../git-workflow.md), including a feature branch, separate
+  implementer and reviewer roles, and a pull request targeting `develop` for
+  human approval and manual merge.
