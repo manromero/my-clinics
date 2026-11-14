@@ -1,6 +1,6 @@
 # Task 00 — Build the summary with fixtures
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -45,7 +45,7 @@ Inspect and capture desktop and mobile views against the S04 reference.
 
 The user approved the milestone plan and assigned Task 00 for implementation.
 
-[Draft PR #59](https://github.com/manromero/my-clinics/pull/59) contains
+[PR #59](https://github.com/manromero/my-clinics/pull/59) contains
 the protected Summary route, shared filters, and fixture-only results.
 Implementation and independent review verified application commit
 `5e1b97d445d76483403359ae72230367a243dd90` against the base below.
@@ -57,10 +57,10 @@ No correction rounds were used. The reviewer noted that the native select can
 truncate a long name on mobile; the selected name remains visible in full
 in the scope heading.
 
-Delivery remains in progress. Automatic approval review rejected publishing
-the three redacted synthetic screenshots to the public PR without explicit
-authorization. The PR is a draft pending verified inline evidence. Human
-approval and manual merge have not started.
+The user authorized publishing the three redacted synthetic screenshots.
+The PR displays the desktop, mobile, and empty-state captures inline, and all
+three downloads matched the original PNGs. Human approval and manual merge
+are pending.
 
 ## Execution context
 
