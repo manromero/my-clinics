@@ -1,6 +1,6 @@
 # Task 00 — Build the summary with fixtures
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -71,8 +71,9 @@ S04 on desktop and narrow mobile and verified filters, focus, reload, and
 zero and empty states on application commit
 `e707d154e19b34126f07a9b230d72a6ec1ccf7e3`. Lint, type checking,
 formatting, production build, and all 284 tests passed. No application
-blockers remain. The two replacement captures await authorization for
-publication in the public PR.
+blockers remain. The user authorized publishing the two replacement
+captures. Both are inline in the PR, and the downloaded PNGs matched the
+originals. Human approval and manual merge remain pending.
 
 ## Execution context
 
