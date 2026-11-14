@@ -1,6 +1,6 @@
 # Task 06 — Connect edits and deletion and enable Activity
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -53,4 +53,25 @@ and Data API. Capture desktop and mobile evidence and record hosted results.
 
 ## Progress notes
 
-Proposed; implementation has not started.
+Assigned for implementation. Hosted acceptance and independent review are pending.
+
+## Execution context
+
+- Readiness verified against the approved task, delivered Tasks 02–05 and 05a,
+  and the project's requirements and screen references. The generated client
+  exposes `update_activity` and `delete_activity`.
+- Branch `feature/edit-delete-activity` from `develop` at
+  `cb694feb635564ccaf13f51b314d8ca1572a39bf`.
+- Primary integration points are the Activity route and its shared form, the
+  sign-in page and auth callback, and the signed-in navigation. Check the
+  Activity history guard and route caching against sign-out and account changes.
+- Sources: [requirements](../../requirements.md#activity),
+  [S03](../../screens.md#s03--monthly-activity),
+  [visual references](../../screens.md#visual-design-references), and the
+  [local signed-in procedure](../../supabase.md#local-signed-in-validation).
+- Preflight verified two distinct ordinary accounts and active fixture clinics
+  on the approved synthetic project, plus controllable isolated Chrome sessions.
+  On this workstation, Node requests required the Windows system trust store.
+  Each role establishes its own fresh sessions and verifies hosted results
+  without retaining credentials or modifying unrelated fixtures.
+- Open questions: none at intake. Correction rounds used: 0.
