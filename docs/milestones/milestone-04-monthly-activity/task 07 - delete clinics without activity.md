@@ -1,6 +1,6 @@
 # Task 07 — Delete clinics without activity
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -85,10 +85,23 @@ roles exercised confirmation and cancellation in Chrome at 1440 × 900 and
 390 × 844. Independent review also verified pending and retry behavior by
 intercepting the request before it reached the server.
 
-Review found no code or visual defects. Validation blocker RV07-01 remains
-open. The preview on synthetic project `lvqbrjybwstvdhaxyxyn` lists only
-`20261114120000_allow_owner_clinic_deletion.sql`. Applying it and provisioning
-temporary accounts for the last-clinic scenario await user authorization.
-Real deletion, stale activity rejection and deactivation, successful retry,
-Activity filter refresh, and anonymous and other-account Data API checks
-remain pending. Correction rounds used: 0 of 2.
+The initial review found no code or visual defects and recorded validation
+blocker RV07-01 for the remaining live checks. The user authorized deployment
+of `20261114120000_allow_owner_clinic_deletion.sql` to synthetic project
+`lvqbrjybwstvdhaxyxyn` and two temporary accounts. Only that migration was
+applied. Migration history and a second dry run confirmed the target was
+current.
+
+Both roles verified live deletion of active and inactive clinics, the
+last-clinic empty state, prior-month activity added after confirmation opened,
+deactivation with history preserved, retry after an intercepted failure, and
+Activity clinic options and URL refresh. Direct Data API probes confirmed
+anonymous and other-account isolation and denied direct table deletion. Both
+temporary accounts and their test data were removed and verified absent.
+Independent review at `58f84e3aec22dc54ff8cd4f71541845df3d94f66` closed
+RV07-01. No blocking or optional findings remain. Correction rounds used:
+0 of 2.
+
+[PR #58](https://github.com/manromero/my-clinics/pull/58) contains the check
+results and desktop and mobile evidence. Human approval and manual merge
+into `develop` are pending.
