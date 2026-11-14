@@ -81,16 +81,12 @@ export function buildSummaryView(
     requestedClinic,
   );
   const scope = resolveMonthlyScope(period, requestedClinic, clinicOptions);
-  const clinics = clinicOptions
-    .filter(
-      ({ active, id }) =>
-        (active || totalsByClinic.has(id)) &&
-        (scope.clinicId === null || id === scope.clinicId),
-    )
-    .map((clinic) => ({
-      clinic,
-      totals: totalsByClinic.get(clinic.id) ?? zeroTotals,
-    }));
+  const clinics = clinicOptions.flatMap((clinic) => {
+    if (scope.clinicId !== null && clinic.id !== scope.clinicId) return [];
+
+    const totals = totalsByClinic.get(clinic.id);
+    return totals ? [{ clinic, totals }] : [];
+  });
   const totals = clinics.reduce(
     (sum, { totals }) => ({
       priceCents: sum.priceCents + totals.priceCents,

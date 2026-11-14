@@ -42,7 +42,7 @@ export function SummaryResults({ data }: { data: SummaryViewData }) {
         <SummaryComparison clinics={clinics} scope={scope} totals={totals} />
       ) : (
         <EmptyState
-          title="No hay clínicas en este resumen"
+          title="No hay actividad en este periodo"
           explanation="Selecciona otra clínica o cambia el periodo."
           action={{ label: "Ir a Clínicas", href: "/clinics" }}
         />

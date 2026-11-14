@@ -34,8 +34,12 @@ describe("saved summary", () => {
       summary.clinics.map(({ clinic, totals }) => [clinic.id, totals.rowCount]),
     ).toEqual([
       ["1", 50],
-      ["2", 0],
       [historicalId, 2],
+    ]);
+    expect(summary.clinicOptions.map(({ id }) => id)).toEqual([
+      "1",
+      "2",
+      historicalId,
     ]);
     expect(summary.totals).toEqual({
       priceCents: BigInt("9007199254740892"),
@@ -43,6 +47,22 @@ describe("saved summary", () => {
       netCents: BigInt(3074),
       rowCount: 52,
     });
+  });
+
+  it("includes clinics with zero earnings only when they have saved rows", () => {
+    const summary = buildSummaryView(period, undefined, clinics, [
+      { clinic_id: "2", price: "0", gross: "0", net: "0", row_count: "1" },
+    ]);
+    expect(summary.clinics.map(({ clinic }) => clinic.id)).toEqual(["2"]);
+    expect(summary.totals.netCents).toBe(BigInt(0));
+    expect(summary.totals.rowCount).toBe(1);
+
+    const empty = buildSummaryView(period, "1", clinics, [
+      { clinic_id: "2", price: "0", gross: "0", net: "0", row_count: "1" },
+    ]);
+    expect(empty.scope.clinicId).toBe("1");
+    expect(empty.clinics).toEqual([]);
+    expect(empty.totals.rowCount).toBe(0);
   });
 
   it("limits the figures to a selected historical clinic", () => {
