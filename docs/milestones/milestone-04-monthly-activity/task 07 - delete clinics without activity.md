@@ -72,3 +72,23 @@ failure, and the empty clinic list on desktop and mobile; capture evidence.
   and the Windows system trust store for local Node requests. Hosted migration
   validation follows the [Supabase guide](../../supabase.md).
 - No open product questions. Correction rounds used: 0 of 2.
+
+## Progress notes
+
+[Draft PR #58](https://github.com/manromero/my-clinics/pull/58) targets
+`develop`. Implementation and initial independent review of
+`62d822e994c61b799df330106267cc217c97bfd3` passed lint, type checking,
+formatting, the production build, 282 application tests and five database
+tooling tests. Hosted disposable validation passed replay, parity, upgrade,
+type freshness, access tests and both concurrent create/delete orders. Both
+roles exercised confirmation and cancellation in Chrome at 1440 × 900 and
+390 × 844. Independent review also verified pending and retry behavior by
+intercepting the request before it reached the server.
+
+Review found no code or visual defects. Validation blocker RV07-01 remains
+open. The preview on synthetic project `lvqbrjybwstvdhaxyxyn` lists only
+`20261114120000_allow_owner_clinic_deletion.sql`. Applying it and provisioning
+temporary accounts for the last-clinic scenario await user authorization.
+Real deletion, stale activity rejection and deactivation, successful retry,
+Activity filter refresh, and anonymous and other-account Data API checks
+remain pending. Correction rounds used: 0 of 2.
