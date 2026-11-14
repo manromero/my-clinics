@@ -72,13 +72,12 @@ export function SignedInHistoryGuard({
       root.style.setProperty("display", "none");
     }
 
-    function protectConcealedDialog(event: Event) {
-      if (root.style.display !== "none") return;
+    function protectConcealedDialog(event: KeyboardEvent) {
+      if (event.key !== "Escape" || root.style.display !== "none") return;
 
       // Escape can target a concealed native modal behind the retry dialog.
-      // Keep the browser and the dialog's own handler from dismissing it.
+      // Stop the key before the browser requests dismissal of that modal.
       event.preventDefault();
-      event.stopImmediatePropagation();
     }
 
     function suspend() {
@@ -150,7 +149,7 @@ export function SignedInHistoryGuard({
     window.addEventListener("blur", suspend);
     window.addEventListener("focus", verifyOnReturn);
     document.addEventListener("visibilitychange", visibilityChanged);
-    root.addEventListener("cancel", protectConcealedDialog, true);
+    window.addEventListener("keydown", protectConcealedDialog, true);
     if (document.hidden) suspend();
     // Keep this listener for the document's lifetime, including after client
     // navigation to Login. Registering the same function again is a no-op.
@@ -163,7 +162,7 @@ export function SignedInHistoryGuard({
       window.removeEventListener("blur", suspend);
       window.removeEventListener("focus", verifyOnReturn);
       document.removeEventListener("visibilitychange", visibilityChanged);
-      root.removeEventListener("cancel", protectConcealedDialog, true);
+      window.removeEventListener("keydown", protectConcealedDialog, true);
     };
   }, [ownerId]);
 
