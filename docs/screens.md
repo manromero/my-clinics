@@ -223,6 +223,10 @@ the row. A failed deletion leaves the row in place and shows the failure.
 - Use the same year/month and clinic controls as Monthly activity.
 - Show the selected period and clinic scope prominently.
 - Provide a link back to Monthly activity preserving both selections.
+- Compare each clinic's earnings after IRPF with the signed total on the
+  `Ganancia tras IRPF` card. Show zero and positive amounts in blue and losses
+  in red with a minus sign. Leave bars unfilled when the clinic amount or the
+  total is zero or negative. Cap the bar fill at 100%.
 - Show one row per included clinic and a total row for the selected scope.
 
 | Measure            | Meaning                                                           |
@@ -232,9 +236,9 @@ the row. A failed deletion leaves the row in place and shows the failure.
 | Ganancia tras IRPF | Sum of rounded row earnings after applying each row's stored IRPF |
 | Nº de registros    | Count of all saved rows, including negative and zero rows         |
 
-Include active clinics with no activity as zero rows. Include inactive clinics
-when they have activity in the selected month. When filtering to one clinic,
-both the clinic figures and the total describe only that clinic.
+Include a clinic in the chart and breakdown if it has any saved activity in
+the selected scope, regardless of its status or earnings. When filtering to
+one clinic, both the clinic figures and the total describe only that clinic.
 
 All amounts include negative entries according to the requirements. Calculate
 totals from rounded row values, preserving their signs. Display monetary amounts
@@ -244,7 +248,8 @@ changes, deletions, or date changes affecting the month.
 ### States
 
 - Loading summary.
-- Month with no activity: zero amounts/counts for included active clinics.
+- Month or clinic selection with no activity: no clinic rows; preserve the
+  selected filters.
 - No included clinics: clear empty state with navigation to Clinics or a different
   period/filter.
 - Load failure with retry.

@@ -68,8 +68,7 @@ build, and 286 tests on application commit
 Activity pagination and verified month boundaries, clinic eligibility, updates
 through browser history, retry, and account isolation. Both inspected desktop
 and narrow layouts; the PR includes four verified inline screenshots.
-No blocking findings or correction rounds. Human approval and manual merge
-are pending.
+No blocking findings or correction rounds. PR #60 was merged into `develop`.
 
 ## Execution context
 

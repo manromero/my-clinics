@@ -1,9 +1,9 @@
 # Milestone 05 — Monthly summary
 
-Task 00 was merged in [PR #59](https://github.com/manromero/my-clinics/pull/59).
-Task 01 passed implementation checks and independent review. Human approval
-and manual merge of [PR #60](https://github.com/manromero/my-clinics/pull/60)
-are pending.
+Tasks 00 and 01 were merged into `develop` in
+[PR #59](https://github.com/manromero/my-clinics/pull/59) and
+[PR #60](https://github.com/manromero/my-clinics/pull/60), respectively.
+Task 02 is the remaining work before closing the milestone.
 
 ## Objective
 
@@ -21,7 +21,7 @@ same period and clinic filter.
   Keep Activity as the post-sign-in destination.
 - Follow the [S04 Stitch design](../../screens.md#visual-design-references) and
   [Alexandria](../../screens/alexandria/DESIGN.md): a period and scope header,
-  key figures, a comparison of clinic prices and net earnings, and a clinic
+  key figures, a comparison of earnings after IRPF by clinic, and a clinic
   breakdown with consolidated totals. Use Spanish labels, two decimal places
   for euros, and integer record counts. Keep the numeric values readable
   without the chart, including on mobile.
@@ -30,21 +30,23 @@ same period and clinic filter.
   `net − gross` if presented as a deduction, without labeling it with a fixed
   rate. Do not carry over sample-only fiscal annotations or average percentages
   from the mockup.
-- Display active clinics with no activity as zero rows. Include inactive
-  clinics in the breakdown only when they have activity in the selected month.
+- Include only clinics with saved activity in the comparison and monthly
+  breakdown, whether active or inactive. The comparison shows each clinic's
+  earnings after IRPF against the total on the `Ganancia tras IRPF` card.
+  Zero amounts appear in blue and losses in red, both beside unfilled bars.
   A single-clinic filter scopes the headline figures, comparison, breakdown,
-  and consolidated totals together. If a selected inactive clinic loses its
-  last entry, preserve the owned selection and show an empty scope instead of
-  broadening to all clinics.
+  and consolidated totals together. Preserve an owned selection with no
+  records and show the no-activity state for that scope.
 - Exclude the PDF download and Liquidaciones link. This is a read-only summary:
   no settlement workflow or IRPF settings.
 
 ## Delivery sequence
 
-| Task                                                                                   | Status | Direct dependencies                                         |
-| -------------------------------------------------------------------------------------- | ------ | ----------------------------------------------------------- |
-| [00 — Build the summary with fixtures](<task 00 - summary with fixtures.md>)           | `done` | [Milestone 04](../milestone-04-monthly-activity/readme.md)  |
-| [01 — Connect the summary to Supabase](<task 01 - connect the summary to supabase.md>) | `done` | 00 and the hosted Milestone 04 activity data and totals RPC |
+| Task                                                                                             | Status    | Direct dependencies                                         |
+| ------------------------------------------------------------------------------------------------ | --------- | ----------------------------------------------------------- |
+| [00 — Build the summary with fixtures](<task 00 - summary with fixtures.md>)                     | `done`    | [Milestone 04](../milestone-04-monthly-activity/readme.md)  |
+| [01 — Connect the summary to Supabase](<task 01 - connect the summary to supabase.md>)           | `done`    | 00 and the hosted Milestone 04 activity data and totals RPC |
+| [02 — Refine the clinic earnings breakdown](<task 02 - refine the clinic earnings breakdown.md>) | `pending` | 01                                                          |
 
 Task 00 can be reviewed with clearly labeled synthetic figures on development.
 Task 01 replaces the temporary data source and enables the context-preserving

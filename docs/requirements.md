@@ -112,8 +112,11 @@ amounts. Calculations must preserve decimal monetary precision.
 - Open the current month by default and allow selecting a year and month.
 - Allow filtering by clinic. The filter applies to both the activity list and
   its summary. Show activity in date order.
-- Include active clinics with no activity as zero rows in the summary, and
-  inactive clinics when they have activity in the selected month.
+- Include clinics in the chart and monthly breakdown only when they have saved
+  activity in the selected scope, regardless of clinic status or earnings.
+- Compare each clinic's earnings after IRPF with the signed total shown in
+  `Ganancia tras IRPF`. Show positive and zero amounts in blue and losses in
+  red. Leave bars unfilled for zero or negative earnings after IRPF.
 - Sum signed prices, including negative prices. Count every saved activity row,
   including negative rows and rows with zero amounts.
 - Gross earnings include both percentage-based earnings and directly entered

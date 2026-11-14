@@ -13,7 +13,7 @@ before implementation begins.
 | [02 — Clinic management](milestone-02-clinic-management/readme.md)                        | Clinic management, Supabase persistence and dedicated database validation credentials            | All tasks done. Human approval and manual merge of [PR #45](https://github.com/manromero/my-clinics/pull/45) pending. |
 | [03 — Authentication](milestone-03-authentication/readme.md)                              | Google sign-in with Supabase Auth and owner-only access to clinics                               | Complete. [PR #49](https://github.com/manromero/my-clinics/pull/49) is merged into `develop`.                         |
 | [04 — Monthly activity](milestone-04-monthly-activity/readme.md)                          | Filter, record, edit, and delete monthly activity with private persistence and accurate earnings | Complete. [PR #58](https://github.com/manromero/my-clinics/pull/58) is merged into `develop`.                         |
-| [05 — Monthly summary](milestone-05-monthly-summary/readme.md)                            | Review monthly totals and a per-clinic breakdown of saved activity                               | Plan approved. Implementation pending.                                                                                |
+| [05 — Monthly summary](milestone-05-monthly-summary/readme.md)                            | Review monthly totals and a per-clinic breakdown of saved activity                               | Tasks 00 and 01 merged into `develop`. Task 02 pending.                                                               |
 
 Draft milestones remain subject to user approval of their scope and order.
 
