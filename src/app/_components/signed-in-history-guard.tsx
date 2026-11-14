@@ -59,17 +59,26 @@ export function SignedInHistoryGuard({
   }
 
   useLayoutEffect(() => {
+    const root = content.current!;
     let check: AbortController | undefined;
     let needsCheck = false;
     let focusedControl: HTMLElement | undefined;
 
     function hide() {
-      const root = content.current;
       const focused = document.activeElement;
-      if (focused instanceof HTMLElement && root?.contains(focused)) {
+      if (focused instanceof HTMLElement && root.contains(focused)) {
         focusedControl = focused;
       }
-      root?.style.setProperty("display", "none");
+      root.style.setProperty("display", "none");
+    }
+
+    function protectConcealedDialog(event: Event) {
+      if (root.style.display !== "none") return;
+
+      // Escape can target a concealed native modal behind the retry dialog.
+      // Keep the browser and the dialog's own handler from dismissing it.
+      event.preventDefault();
+      event.stopImmediatePropagation();
     }
 
     function suspend() {
@@ -99,7 +108,7 @@ export function SignedInHistoryGuard({
         }
         if (response.status !== 204) throw new Error("Session unavailable");
         needsCheck = false;
-        content.current?.style.removeProperty("display");
+        root.style.removeProperty("display");
         setState("visible");
         // Restore focus after a possible retry dialog closes.
         const restoreFocus = focusedControl;
@@ -141,6 +150,7 @@ export function SignedInHistoryGuard({
     window.addEventListener("blur", suspend);
     window.addEventListener("focus", verifyOnReturn);
     document.addEventListener("visibilitychange", visibilityChanged);
+    root.addEventListener("cancel", protectConcealedDialog, true);
     if (document.hidden) suspend();
     // Keep this listener for the document's lifetime, including after client
     // navigation to Login. Registering the same function again is a no-op.
@@ -153,6 +163,7 @@ export function SignedInHistoryGuard({
       window.removeEventListener("blur", suspend);
       window.removeEventListener("focus", verifyOnReturn);
       document.removeEventListener("visibilitychange", visibilityChanged);
+      root.removeEventListener("cancel", protectConcealedDialog, true);
     };
   }, [ownerId]);
 
