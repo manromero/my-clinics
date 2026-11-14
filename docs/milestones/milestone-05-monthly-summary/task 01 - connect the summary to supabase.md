@@ -1,6 +1,6 @@
 # Task 01 — Connect the summary to Supabase
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -59,6 +59,17 @@ capture desktop and mobile with saved data.
 ## Progress notes
 
 The user assigned implementation under the project workflow.
+
+[PR #60](https://github.com/manromero/my-clinics/pull/60) connects Summary to
+saved activity and links both screens with the same scope. The implementer
+and independent reviewer passed lint, type checking, formatting, the production
+build, and 286 tests on application commit
+`b4aadf8cc83df4727197ff14d31e212ca4b633b1`. Both reconciled saved amounts across
+Activity pagination and verified month boundaries, clinic eligibility, updates
+through browser history, retry, and account isolation. Both inspected desktop
+and narrow layouts; the PR includes four verified inline screenshots.
+No blocking findings or correction rounds. Human approval and manual merge
+are pending.
 
 ## Execution context
 
