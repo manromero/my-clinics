@@ -54,7 +54,7 @@ export function SummaryBreakdown({
                 <th
                   key={label}
                   scope="col"
-                  className="px-3 py-4 text-right last:pr-5"
+                  className="px-3 py-4 text-right [overflow-wrap:normal]"
                 >
                   {label}
                 </th>
@@ -141,7 +141,7 @@ function ClinicActivityLink({
   clinicName: string;
 }) {
   return (
-    <ActionLink href={href}>
+    <ActionLink href={href} className="lg:whitespace-nowrap">
       Ver actividad<span className="sr-only"> de {clinicName}</span>
     </ActionLink>
   );
