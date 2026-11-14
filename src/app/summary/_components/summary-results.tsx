@@ -5,7 +5,7 @@ import { SummaryBreakdown } from "./summary-breakdown";
 import { SummaryComparison } from "./summary-comparison";
 
 export function SummaryResults({ data }: { data: SummaryViewData }) {
-  const { clinics, totals } = data;
+  const { clinics, scope, totals } = data;
 
   return (
     <>
@@ -39,7 +39,7 @@ export function SummaryResults({ data }: { data: SummaryViewData }) {
         </div>
       </section>
       {clinics.length > 0 ? (
-        <SummaryComparison clinics={clinics} />
+        <SummaryComparison clinics={clinics} scope={scope} totals={totals} />
       ) : (
         <EmptyState
           title="No hay clínicas en este resumen"

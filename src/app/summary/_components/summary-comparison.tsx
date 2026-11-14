@@ -1,143 +1,131 @@
 import { Surface } from "@/lib/components/surface/surface";
 import { formatEuroCents } from "@/lib/format/amounts";
+import {
+  monthName,
+  monthlyPeriodParams,
+} from "@/lib/monthly-scope/monthly-scope";
 import type { SummaryViewData } from "../_lib/summary-view";
 
-function magnitude(amount: bigint) {
-  return amount < BigInt(0) ? -amount : amount;
-}
+const zero = BigInt(0);
 
-function ComparisonBar({
-  amount,
-  scale,
-  centered,
-  color,
-}: {
-  amount: bigint;
-  scale: bigint;
-  centered: boolean;
-  color: string;
-}) {
-  const width = Number((magnitude(amount) * BigInt(10_000)) / scale) / 100;
-  return (
-    <div className="relative h-2 rounded-full bg-surface-container-low">
-      {centered && (
-        <span className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-on-surface-variant/50" />
-      )}
-      {amount !== BigInt(0) && (
-        <span
-          className={`absolute inset-y-0 min-w-0.5 rounded-full ${color}`}
-          style={{
-            width: `${centered ? width / 2 : width}%`,
-            ...(amount < BigInt(0)
-              ? { right: "50%" }
-              : { left: centered ? "50%" : 0 }),
-          }}
-        />
-      )}
-    </div>
-  );
+function magnitude(amount: bigint) {
+  return amount < zero ? -amount : amount;
 }
 
 export function SummaryComparison({
   clinics,
-}: Pick<SummaryViewData, "clinics">) {
-  const amounts = clinics.flatMap(({ totals }) => [
-    totals.priceCents,
-    totals.netCents,
-  ]);
-  const centered = amounts.some((amount) => amount < BigInt(0));
-  const scale = amounts.reduce(
-    (largest, amount) =>
-      magnitude(amount) > largest ? magnitude(amount) : largest,
-    BigInt(1),
+  scope,
+  totals,
+}: Pick<SummaryViewData, "clinics" | "scope" | "totals">) {
+  const scale = clinics.reduce(
+    (sum, { totals }) => sum + magnitude(totals.priceCents),
+    zero,
   );
 
   return (
     <Surface
       as="section"
       aria-labelledby="summary-comparison"
-      className="sm:p-7"
+      className="sm:p-6"
     >
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2
-          id="summary-comparison"
-          className="font-headline text-title font-semibold"
-        >
-          Importes y ganancias por clínica
-        </h2>
-        <div
-          className="flex flex-wrap gap-x-4 gap-y-1 text-caption font-medium text-on-surface-variant"
-          aria-hidden="true"
-        >
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <div>
+          <h2
+            id="summary-comparison"
+            className="font-headline text-lg font-semibold"
+          >
+            Importes y ganancias por clínica
+          </h2>
+          <p className="font-label text-caption text-on-surface-variant">
+            <span className="inline-block first-letter:uppercase">
+              {monthName(scope.month)} de {monthlyPeriodParams(scope).year}
+            </span>
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-x-4 gap-y-1 font-label text-caption text-on-surface-variant">
           <span className="flex items-center gap-1.5">
-            <span className="size-2.5 rounded-full bg-on-surface-variant/60" />{" "}
-            Importe total
+            <span
+              aria-hidden="true"
+              className="size-2.5 shrink-0 rounded-full bg-primary"
+            />
+            Importe positivo
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="size-2.5 rounded-full bg-primary" /> Ganancia tras
-            IRPF
+            <span
+              aria-hidden="true"
+              className="size-2.5 shrink-0 rounded-full bg-error"
+            />
+            Importe negativo
           </span>
         </div>
       </div>
-      <ul className="mt-5 space-y-2">
-        {clinics.map(({ clinic, totals }) => (
-          <li
-            key={clinic.id}
-            className="space-y-2.5 rounded-xl bg-surface/80 px-3.5 py-3 sm:px-4"
-          >
-            <div className="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1">
-              <p className="text-label font-semibold">
-                {clinic.name}
-                {!clinic.active && (
-                  <span className="ml-2 text-caption font-normal text-on-surface-variant">
-                    Inactiva
-                  </span>
+      <ul className="mt-7 space-y-4">
+        {clinics.map(({ clinic, totals }) => {
+          const price = magnitude(totals.priceCents);
+          const negativePrice = totals.priceCents < zero;
+          const width =
+            scale === zero ? 0 : Number((price * BigInt(10_000)) / scale) / 100;
+
+          return (
+            <li key={clinic.id} className="space-y-1.5">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 font-label text-caption">
+                <p className="font-medium">
+                  {clinic.name}
+                  {!clinic.active && (
+                    <span className="ml-1.5 font-normal text-on-surface-variant">
+                      (Inactiva)
+                    </span>
+                  )}
+                </p>
+                <dl className="flex flex-wrap items-baseline gap-x-1.5 tabular-nums">
+                  <div>
+                    <dt className="sr-only">Importe total</dt>
+                    <dd
+                      className={
+                        negativePrice
+                          ? "font-semibold text-error"
+                          : "text-on-surface-variant"
+                      }
+                    >
+                      {formatEuroCents(`${totals.priceCents}`)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="sr-only">Ganancia tras IRPF</dt>
+                    <dd
+                      className={`font-semibold ${totals.netCents < zero ? "text-error" : "text-primary"}`}
+                    >
+                      <span aria-hidden="true">→ </span>
+                      {formatEuroCents(`${totals.netCents}`)}
+                      <span aria-hidden="true"> neto</span>
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+              <div
+                aria-hidden="true"
+                className="h-3 overflow-hidden rounded-full bg-surface-container"
+              >
+                {width > 0 && (
+                  <div
+                    className={`h-full rounded-full ${negativePrice ? "bg-error" : "bg-primary"}`}
+                    style={{ width: `${width}%` }}
+                  />
                 )}
-              </p>
-              <dl className="flex flex-wrap gap-x-4 gap-y-1 text-label tabular-nums">
-                <div>
-                  <dt className="sr-only">Importe total</dt>
-                  <dd
-                    className={`flex items-center gap-1.5 ${totals.priceCents < BigInt(0) ? "font-semibold text-error" : "text-on-surface-variant"}`}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="size-2 shrink-0 rounded-full bg-on-surface-variant/60"
-                    />
-                    {formatEuroCents(`${totals.priceCents}`)}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="sr-only">Ganancia tras IRPF</dt>
-                  <dd
-                    className={`flex items-center gap-1.5 font-semibold ${totals.netCents < BigInt(0) ? "text-error" : "text-on-surface"}`}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="size-2 shrink-0 rounded-full bg-primary"
-                    />
-                    {formatEuroCents(`${totals.netCents}`)}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-            <div className="space-y-1" aria-hidden="true">
-              <ComparisonBar
-                amount={totals.priceCents}
-                scale={scale}
-                centered={centered}
-                color="bg-on-surface-variant/60"
-              />
-              <ComparisonBar
-                amount={totals.netCents}
-                scale={scale}
-                centered={centered}
-                color="bg-primary"
-              />
-            </div>
-          </li>
-        ))}
+              </div>
+            </li>
+          );
+        })}
       </ul>
+      <div className="mt-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 rounded-lg bg-surface-container-low px-4 py-3 font-label text-caption">
+        <p className="text-on-surface-variant">
+          Cada barra representa la proporción del importe de la clínica sobre la
+          suma de los importes sin signo.
+        </p>
+        <p className="font-semibold text-primary tabular-nums">
+          Importe total con signo: {formatEuroCents(`${totals.priceCents}`)}
+        </p>
+      </div>
     </Surface>
   );
 }
