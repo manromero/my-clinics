@@ -53,7 +53,20 @@ and Data API. Capture desktop and mobile evidence and record hosted results.
 
 ## Progress notes
 
-Assigned for implementation. Hosted acceptance and independent review are pending.
+[Draft PR #57](https://github.com/manromero/my-clinics/pull/57) contains the
+implementation and desktop and mobile evidence. Lint, type checking,
+formatting, 274 tests, and the production build passed at `b03ef50`. Hosted
+checks covered owner writes, saved rates, month and clinic moves, deletion and
+retry, and isolation through the app and Data API. The Google handoff passed
+live, and the successful callback passed with a controlled PKCE exchange.
+Interactive Google provider return was unavailable.
+
+Independent review of `b03ef50` against `cb694fe` found blocker R06-01:
+an existing tab still showed the former account's Activity draft, rows, totals
+and identity after a rejected stale write, and Clinics showed the former
+account's records on returning to the tab after a same-origin account switch.
+The reviewer independently passed application checks and verified the remaining
+hosted and visual cases. Correction round 1 is in progress.
 
 ## Execution context
 
@@ -74,4 +87,4 @@ Assigned for implementation. Hosted acceptance and independent review are pendin
   On this workstation, Node requests required the Windows system trust store.
   Each role establishes its own fresh sessions and verifies hosted results
   without retaining credentials or modifying unrelated fixtures.
-- Open questions: none at intake. Correction rounds used: 0.
+- Open blocker: R06-01. Correction rounds started: 1 of 2.
