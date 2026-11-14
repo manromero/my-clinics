@@ -20,7 +20,7 @@ export default async function ClinicsPage() {
     (typeof name === "string" && name.trim()) || user.email || "Usuario";
 
   return (
-    <SignedInHistoryGuard key={user.id}>
+    <SignedInHistoryGuard key={user.id} ownerId={user.id}>
       <SignedInHeader displayName={displayName} email={user.email} />
       <PageContainer as="main" className="flex-1 space-y-8">
         <ClinicCreation />

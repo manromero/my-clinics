@@ -1,8 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useContext, useState, useTransition } from "react";
 import { AppHeader } from "@/lib/components/app-header/app-header";
 import { signOut } from "../clinics/sign-out";
+import {
+  ConcealSignedInContent,
+  notifySignedOut,
+} from "./signed-in-history-guard";
 
 export function SignedInHeader({
   displayName,
@@ -15,6 +19,7 @@ export function SignedInHeader({
 }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string>();
+  const conceal = useContext(ConcealSignedInContent);
 
   return (
     <AppHeader
@@ -28,7 +33,13 @@ export function SignedInHeader({
         onSignOut: () => {
           startTransition(async () => {
             const error = await signOut();
-            setError(error);
+            if (error) {
+              setError(error);
+              return;
+            }
+            conceal();
+            notifySignedOut();
+            window.location.replace("/login");
           });
         },
       }}

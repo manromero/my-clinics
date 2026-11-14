@@ -8,6 +8,7 @@ import {
   saveActivity,
 } from "@/app/activity/_lib/write-activity";
 import { GET as authCallback } from "@/app/auth/callback/route";
+import { GET as checkSession } from "@/app/auth/session/route";
 import { createClinic } from "@/app/clinics/create-clinic";
 import { listClinics } from "@/app/clinics/list-clinics";
 import { signOut } from "@/app/clinics/sign-out";
@@ -253,11 +254,11 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
   });
 
   it.each([204, 503])(
-    "clears the local session and opens login when remote logout returns %i",
+    "reports a cleared local session when remote logout returns %i",
     async (status) => {
       const { fetch } = setupSignOut(status);
 
-      await expect(signOut()).rejects.toThrow("redirect: /login");
+      await expect(signOut()).resolves.toBeNull();
 
       expect(fetch).toHaveBeenCalledOnce();
       expect(cookies.has(sessionCookie)).toBe(false);
@@ -731,9 +732,44 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
     expect(fetch).toHaveBeenCalledOnce();
 
     failSessionCookieRemoval = false;
-    await expect(signOut()).rejects.toThrow("redirect: /login");
+    await expect(signOut()).resolves.toBeNull();
     expect(cookies.has(sessionCookie)).toBe(false);
     expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it("checks the rendered owner against the current verified session without returning an identity", async () => {
+    const session = fixtureSession(3600, "returning-tab");
+    const check = (owner: string) =>
+      checkSession(
+        new Request(`${origin}/auth/session`, {
+          headers: { "X-MyClinics-Owner": owner },
+        }),
+      );
+    expect((await check(session.user.id)).status).toBe(409);
+
+    storeSession(session);
+    const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
+      expect(new URL(String(input)).pathname).toBe("/auth/v1/user");
+      expect(new Headers(init?.headers).get("authorization")).toBe(
+        `Bearer ${session.access_token}`,
+      );
+      return Response.json(session.user);
+    });
+    vi.stubGlobal("fetch", fetch);
+
+    const sameOwner = await check(session.user.id);
+    expect(sameOwner.status).toBe(204);
+    expect(sameOwner.headers.get("cache-control")).toBe("private, no-store");
+    expect(await sameOwner.text()).toBe("");
+    const switchedOwner = await check("previous-owner");
+    expect(switchedOwner.status).toBe(409);
+    expect(await switchedOwner.text()).toBe("");
+
+    fetch.mockResolvedValueOnce(new Response(null, { status: 503 }));
+    fetch.mockResolvedValueOnce(new Response(null, { status: 503 }));
+    fetch.mockResolvedValueOnce(new Response(null, { status: 503 }));
+    fetch.mockResolvedValueOnce(new Response(null, { status: 503 }));
+    expect((await check(session.user.id)).status).toBe(503);
   });
 
   it.each([

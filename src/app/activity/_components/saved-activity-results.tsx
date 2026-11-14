@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { ActionLink } from "@/lib/components/action-link/action-link";
 import { Alert } from "@/lib/components/alert/alert";
 import { Button } from "@/lib/components/button/button";
 import { ConfirmDialog } from "@/lib/components/confirm-dialog/confirm-dialog";
+import { ConcealSignedInContent } from "../../_components/signed-in-history-guard";
 import type { ActivityDraft } from "../_lib/activity-entry";
 import { formatActivityDate, formatEuroCents } from "../_lib/activity-format";
 import {
@@ -29,8 +30,6 @@ const writeErrors = {
     "El registro ya no está disponible. Recarga la actividad para actualizar la lista.",
   "edit-unavailable":
     "El registro o la clínica ya no están disponibles para este cambio. Revisa la clínica o cancela y recarga la actividad.",
-  "session-changed":
-    "La sesión ha cambiado. Recarga la página para consultar tu actividad.",
   failed:
     "Vuelve a intentarlo. Los datos introducidos siguen en el formulario.",
 };
@@ -68,6 +67,7 @@ export function SavedActivityResults({
   pagination?: ReactNode;
 }) {
   const { scope, clinicOptions, canCreate } = data;
+  const conceal = useContext(ConcealSignedInContent);
   const [operation, setOperation] = useState<Operation | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string>();
@@ -115,6 +115,11 @@ export function SavedActivityResults({
     setError(undefined);
     try {
       const result = await action();
+      if (result === "session-changed") {
+        conceal();
+        window.location.reload();
+        return;
+      }
       if (result !== "saved") {
         setError(
           result === "failed" || (deleting && result === "invalid")

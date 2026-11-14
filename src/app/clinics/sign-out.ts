@@ -1,9 +1,8 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { createWritableSupabaseAuthClient } from "@/lib/supabase/auth-actions-client";
 
-export async function signOut(): Promise<string> {
+export async function signOut(): Promise<string | null> {
   const supabase = await createWritableSupabaseAuthClient();
   const retry = "Vuelve a intentarlo en unos instantes.";
   if (!supabase) return retry;
@@ -19,5 +18,5 @@ export async function signOut(): Promise<string> {
     if (!remaining || remaining.error || remaining.data.session) return retry;
   }
 
-  redirect("/login");
+  return null;
 }

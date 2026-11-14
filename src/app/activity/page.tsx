@@ -138,7 +138,7 @@ export default async function ActivityPage({
   ]);
 
   return (
-    <SignedInHistoryGuard key={user.id}>
+    <SignedInHistoryGuard key={user.id} ownerId={user.id}>
       <SignedInHeader
         currentHref="/activity"
         displayName={displayName}
