@@ -42,11 +42,11 @@ same period and clinic filter.
 
 ## Delivery sequence
 
-| Task                                                                                             | Status    | Direct dependencies                                         |
-| ------------------------------------------------------------------------------------------------ | --------- | ----------------------------------------------------------- |
-| [00 — Build the summary with fixtures](<task 00 - summary with fixtures.md>)                     | `done`    | [Milestone 04](../milestone-04-monthly-activity/readme.md)  |
-| [01 — Connect the summary to Supabase](<task 01 - connect the summary to supabase.md>)           | `done`    | 00 and the hosted Milestone 04 activity data and totals RPC |
-| [02 — Refine the clinic earnings breakdown](<task 02 - refine the clinic earnings breakdown.md>) | `pending` | 01                                                          |
+| Task                                                                                             | Status        | Direct dependencies                                         |
+| ------------------------------------------------------------------------------------------------ | ------------- | ----------------------------------------------------------- |
+| [00 — Build the summary with fixtures](<task 00 - summary with fixtures.md>)                     | `done`        | [Milestone 04](../milestone-04-monthly-activity/readme.md)  |
+| [01 — Connect the summary to Supabase](<task 01 - connect the summary to supabase.md>)           | `done`        | 00 and the hosted Milestone 04 activity data and totals RPC |
+| [02 — Refine the clinic earnings breakdown](<task 02 - refine the clinic earnings breakdown.md>) | `in_progress` | 01                                                          |
 
 Task 00 can be reviewed with clearly labeled synthetic figures on development.
 Task 01 replaces the temporary data source and enables the context-preserving

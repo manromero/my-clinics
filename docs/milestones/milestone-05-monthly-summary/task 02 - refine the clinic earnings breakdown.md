@@ -1,6 +1,6 @@
 # Task 02 — Refine the clinic earnings breakdown
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -73,3 +73,22 @@ Inspect desktop and mobile and collect visual evidence under the
 The user approved publishing this definition on `develop`. Implementation
 will be assigned separately through the
 [standard workflow](../../development-workflow.md).
+
+## Execution context
+
+- Assignment branch: `feature/summary-net-earnings-comparison`, from updated
+  `develop` at `a0a799f8c0616f576520aaaeef1e3c3faa2b0741`.
+- Readiness: task 01 is merged, the requirements and S04 references are in
+  place, and both ordinary synthetic fixture accounts authenticated and read
+  their respective active clinic through the local validation launcher.
+- `src/app/summary/_lib/summary-view.ts` resolves the scope and assembles the
+  saved groups from the existing monthly totals RPC. Its displayed clinic list
+  currently also includes active clinics without a group; the filter options
+  and displayed rows serve different purposes. Both presentation sections use
+  this list. `summary-comparison.tsx` currently scales by absolute prices, and
+  `summary-results.tsx` selects the empty states.
+- Use the [local signed-in procedure](../../supabase.md#local-signed-in-validation)
+  with the separate role sessions and temporary owner-scoped synthetic rows as
+  needed. Compare the same scope in Activity and Summary. Capture desktop and
+  mobile evidence against Alexandria and S04. No database or Activity changes.
+- No open product decisions or outstanding hypotheses. Correction rounds used: 0.
