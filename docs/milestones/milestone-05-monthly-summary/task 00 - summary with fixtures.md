@@ -1,6 +1,6 @@
 # Task 00 — Build the summary with fixtures
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -62,6 +62,18 @@ The PR displays the desktop, mobile, and empty-state captures inline, and all
 three downloads matched the original PNGs. Human approval and manual merge
 are pending.
 
+Human review reopened the task because the clinic comparison diverged from
+S04. Correction round 1 restored one rounded track per clinic on a shared
+surface, with the price and net amount above it. Negative prices use a red
+bar from the same left edge and keep their minus sign. Zero prices leave
+the track empty. Independent review compared the running application with
+S04 on desktop and narrow mobile and verified filters, focus, reload, and
+zero and empty states on application commit
+`e707d154e19b34126f07a9b230d72a6ec1ccf7e3`. Lint, type checking,
+formatting, production build, and all 284 tests passed. No application
+blockers remain. The two replacement captures await authorization for
+publication in the public PR.
+
 ## Execution context
 
 - Ready for implementation and independent review. The assignment branch is
@@ -81,4 +93,4 @@ are pending.
   on the approved synthetic project. Use fresh role sessions for their checks.
   Node's system CA option can resolve local certificate-chain errors without
   disabling TLS verification.
-- No open product decisions. Correction rounds used: 0.
+- No open product decisions. Correction rounds used: 1.
