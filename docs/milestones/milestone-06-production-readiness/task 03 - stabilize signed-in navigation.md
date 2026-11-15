@@ -62,7 +62,7 @@ Collect [visual evidence](../../development-workflow.md#visual-pr-evidence).
   Keep tab-return policy and prefetch changes in Tasks 04 and 05, respectively.
 - Open investigation: whether navigation replaces the document, remounts the
   shared interface, or hides it while waiting for session or route work.
-  Correction rounds used: 1 (in progress).
+  Correction rounds used: 1. Independent re-review is blocked.
 
 ## Progress notes
 
@@ -78,3 +78,15 @@ Initial independent review confirmed the navigation improvement and found one
 blocking history race: a session response issued before an account change can
 arrive after it and restore the old account's cached route. Correction round 1
 must prevent that restoration while preserving navigation and scroll behavior.
+
+Correction head `c70d486a0c11bf1cd6f7580a7985ea38bb84f694` keeps the
+destination content hidden until a fresh, authorized server render arrives.
+Implementation checks passed: lint, typecheck, formatting, production build,
+287 tests, and the synthetic account change, throttled navigation, history
+scroll, and region retry checks in Chrome. Updated screenshots are in the PR.
+
+The assigned reviewer could not complete re-review of the correction: its
+session was stopped by an automatic content filter, including on a retry limited
+to ordinary application checks. The initial review does not cover the correction.
+The task remains in progress and the PR remains a draft pending independent
+verification.
