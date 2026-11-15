@@ -98,7 +98,7 @@ export default async function SummaryPage({
   const loadKey = JSON.stringify([period.year, period.month, query.clinic]);
 
   return (
-    <SignedInPage ownerId={user.id}>
+    <SignedInPage ownerId={user.id} renderId={crypto.randomUUID()}>
       <PageContainer as="main" className="flex-1 space-y-8 sm:space-y-10">
         <Suspense
           key={loadKey}

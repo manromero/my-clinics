@@ -62,8 +62,19 @@ Collect [visual evidence](../../development-workflow.md#visual-pr-evidence).
   Keep tab-return policy and prefetch changes in Tasks 04 and 05, respectively.
 - Open investigation: whether navigation replaces the document, remounts the
   shared interface, or hides it while waiting for session or route work.
-  Correction rounds used: 0.
+  Correction rounds used: 1 (in progress).
 
 ## Progress notes
 
 Scope approved. Implementation assigned.
+
+[Draft PR #65](https://github.com/manromero/my-clinics/pull/65) addresses a
+production flash during monthly URL redirects by keeping the shared shell in an
+App Router layout. Initial head `60dbc4312e71ad85adb8580d607c579dd9fcf344`
+passed lint, typecheck, formatting, production build, 287 tests, and throttled
+desktop and mobile navigation.
+
+Initial independent review confirmed the navigation improvement and found one
+blocking history race: a session response issued before an account change can
+arrive after it and restore the old account's cached route. Correction round 1
+must prevent that restoration while preserving navigation and scroll behavior.

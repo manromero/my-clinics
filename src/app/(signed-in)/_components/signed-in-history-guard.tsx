@@ -1,14 +1,17 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   createContext,
+  useCallback,
   useContext,
   useLayoutEffect,
   useRef,
   useState,
+  useTransition,
   type ReactNode,
 } from "react";
+import { flushSync } from "react-dom";
 import { Button } from "@/lib/components/button/button";
 import { Dialog } from "@/lib/components/dialog/dialog";
 import { LoadingState } from "@/lib/components/loading-state/loading-state";
@@ -18,29 +21,55 @@ import { createHistoryScroll } from "./history-scroll";
 const accountChannelName = "myclinics-account";
 export const ConcealSignedInContent = createContext<() => void>(() => {});
 const SignedInOwner = createContext<string | null>(null);
+const HistoryRestore = createContext<{
+  attempt: symbol | null;
+  pageRendered: (href: string, renderId: string) => void;
+} | null>(null);
 
-let checkHistory: ((event: PopStateEvent) => void) | undefined;
+let beginHistoryRestore: (() => void) | undefined;
+
+function routeHref(pathname: string, search: string) {
+  return search ? `${pathname}?${search}` : pathname;
+}
+
+function currentHistoryHref() {
+  const { pathname, searchParams } = new URL(window.location.href);
+  return routeHref(pathname, searchParams.toString());
+}
 
 export function SignedInPage({
   ownerId,
+  renderId,
   children,
 }: {
   ownerId: string;
+  renderId: string;
   children: ReactNode;
 }) {
   const layoutOwner = useContext(SignedInOwner);
   const conceal = useContext(ConcealSignedInContent);
   const sameOwner = layoutOwner === ownerId;
+  const history = useContext(HistoryRestore);
+  const pathname = usePathname();
+  const search = useSearchParams().toString();
 
   useLayoutEffect(() => {
     // A fresh page can arrive under a layout retained from a previous account.
     if (!sameOwner) {
       conceal();
       window.location.reload();
+    } else if (history?.attempt) {
+      history.pageRendered(routeHref(pathname, search), renderId);
     }
-  }, [sameOwner, conceal]);
+  }, [sameOwner, conceal, history, pathname, search, renderId]);
 
-  return sameOwner ? children : null;
+  if (!sameOwner) return null;
+  if (!history?.attempt) return children;
+  return (
+    <PageContainer as="main" className="flex-1">
+      <LoadingState label="Cargando página…" variant="region" />
+    </PageContainer>
+  );
 }
 
 function openAccountChannel() {
@@ -62,11 +91,11 @@ function isSignedInLocation() {
 }
 
 function verifySignedInHistory(event: PopStateEvent) {
-  if (checkHistory) {
-    checkHistory(event);
+  if (!isSignedInLocation()) return;
+  if (beginHistoryRestore) {
+    beginHistoryRestore();
     return;
   }
-  if (!isSignedInLocation()) return;
 
   // A transition to Login can unmount the guard while router history survives.
   // Reload protected entries in that document to authorize them from scratch.
@@ -85,18 +114,60 @@ export function SignedInHistoryGuard({
   const concealed = useRef(false);
   const retry = useRef<() => void>(null);
   const historyScroll = useRef<ReturnType<typeof createHistoryScroll>>(null);
+  const { refresh } = useRouter();
   const pathname = usePathname();
   const search = useSearchParams().toString();
-  const committedRoute = useRef({ pathname, search });
+  const traversal = useRef<{
+    href: string;
+    firstRender?: { id: string; refreshStarted: boolean };
+    timeout: number;
+  } | null>(null);
+  const [attempt, setAttempt] = useState<symbol | null>(null);
+  const [refreshing, startRefresh] = useTransition();
   const [state, setState] = useState<
     "visible" | "checking" | "failed" | "concealed"
   >("visible");
 
-  function concealContent() {
+  const concealContent = useCallback(() => {
     concealed.current = true;
     content.current?.style.setProperty("display", "none");
     setState("concealed");
-  }
+  }, []);
+
+  const pageRendered = useCallback(
+    (href: string, renderId: string) => {
+      const pending = traversal.current;
+      if (!pending || href !== currentHistoryHref() || concealed.current)
+        return;
+
+      if (href !== pending.href || !pending.firstRender) {
+        const firstRender = { id: renderId, refreshStarted: false };
+        pending.href = href;
+        pending.firstRender = firstRender;
+        // The first commit may come from the router cache. Its data stays
+        // behind the gate while the destination authorizes a fresh render.
+        queueMicrotask(() => {
+          if (
+            traversal.current !== pending ||
+            pending.firstRender !== firstRender ||
+            concealed.current
+          )
+            return;
+          firstRender.refreshStarted = true;
+          startRefresh(refresh);
+        });
+      } else if (
+        pending.firstRender.refreshStarted &&
+        !refreshing &&
+        renderId !== pending.firstRender.id
+      ) {
+        window.clearTimeout(pending.timeout);
+        traversal.current = null;
+        setAttempt(null);
+      }
+    },
+    [refresh, refreshing],
+  );
 
   useLayoutEffect(() => {
     const root = content.current!;
@@ -105,8 +176,6 @@ export function SignedInHistoryGuard({
     let check: AbortController | undefined;
     let needsCheck = false;
     let focusedControl: HTMLElement | undefined;
-    let historyEntry: { href: string; state: unknown } | undefined;
-    let confirmedEvent: PopStateEvent | undefined;
 
     function hide() {
       const focused = document.activeElement;
@@ -133,12 +202,8 @@ export function SignedInHistoryGuard({
 
     async function verify() {
       if (check || concealed.current || document.hidden) return;
-      // Keep the currently committed screen visible while verifying a
-      // traversal. The router has not received the destination entry yet.
-      if (needsCheck) {
-        hide();
-        setState("checking");
-      }
+      hide();
+      setState("checking");
       const request = new AbortController();
       check = request;
       try {
@@ -157,21 +222,6 @@ export function SignedInHistoryGuard({
         needsCheck = false;
         root.style.removeProperty("display");
         setState("visible");
-        const entry = historyEntry;
-        historyEntry = undefined;
-        if (entry?.href === window.location.href) {
-          confirmedEvent = new PopStateEvent("popstate", {
-            state: entry.state,
-          });
-          window.dispatchEvent(confirmedEvent);
-          confirmedEvent = undefined;
-          scroll.restore(
-            committedRoute.current.pathname,
-            committedRoute.current.search,
-          );
-        } else {
-          scroll.cancel();
-        }
         // Restore focus after a possible retry dialog closes.
         const restoreFocus = focusedControl;
         window.requestAnimationFrame(() => {
@@ -190,7 +240,7 @@ export function SignedInHistoryGuard({
     }
 
     function verifyOnReturn() {
-      if (needsCheck || historyEntry) void verify();
+      if (needsCheck) void verify();
     }
 
     function visibilityChanged() {
@@ -220,25 +270,26 @@ export function SignedInHistoryGuard({
     if (document.hidden) suspend();
     // Keep this listener for the document's lifetime, including after client
     // navigation to Login. Registering the same function again is a no-op.
-    const onHistory = (event: PopStateEvent) => {
-      if (event === confirmedEvent) return;
-      if (!isSignedInLocation()) {
-        historyEntry = undefined;
-        scroll.cancel();
-        return;
-      }
-
-      event.stopImmediatePropagation();
+    const onHistory = () => {
+      window.clearTimeout(traversal.current?.timeout);
       scroll.begin();
-      historyEntry = { href: window.location.href, state: event.state };
-      check?.abort();
-      check = undefined;
-      void verify();
+      const pending = {
+        href: currentHistoryHref(),
+        timeout: window.setTimeout(() => {
+          concealContent();
+          window.location.reload();
+        }, 8000),
+      };
+      traversal.current = pending;
+      // Close the gate before Next receives this native history event.
+      flushSync(() => setAttempt(Symbol()));
     };
-    checkHistory = onHistory;
+    beginHistoryRestore = onHistory;
     window.addEventListener("popstate", verifySignedInHistory, true);
     return () => {
-      if (checkHistory === onHistory) checkHistory = undefined;
+      if (beginHistoryRestore === onHistory) beginHistoryRestore = undefined;
+      window.clearTimeout(traversal.current?.timeout);
+      traversal.current = null;
       historyScroll.current = null;
       scroll.dispose();
       check?.abort();
@@ -250,12 +301,11 @@ export function SignedInHistoryGuard({
       document.removeEventListener("visibilitychange", visibilityChanged);
       window.removeEventListener("keydown", protectConcealedDialog, true);
     };
-  }, [ownerId]);
+  }, [concealContent, ownerId]);
 
   useLayoutEffect(() => {
-    committedRoute.current = { pathname, search };
-    historyScroll.current?.restore(pathname, search);
-  }, [pathname, search]);
+    if (!attempt) historyScroll.current?.restore(pathname, search);
+  }, [attempt, pathname, search]);
 
   return (
     <ConcealSignedInContent value={concealContent}>
@@ -280,7 +330,9 @@ export function SignedInHistoryGuard({
       )}
       <div ref={content} className="flex min-h-dvh flex-col">
         <SignedInOwner value={ownerId}>
-          {state !== "concealed" && children}
+          <HistoryRestore value={{ attempt, pageRendered }}>
+            {state !== "concealed" && children}
+          </HistoryRestore>
         </SignedInOwner>
       </div>
     </ConcealSignedInContent>

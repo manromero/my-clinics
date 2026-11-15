@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function ClinicsPage() {
   const { user } = await requireSupabaseSession();
   return (
-    <SignedInPage ownerId={user.id}>
+    <SignedInPage ownerId={user.id} renderId={crypto.randomUUID()}>
       <PageContainer as="main" className="flex-1 space-y-8">
         <ClinicCreation />
         <Suspense

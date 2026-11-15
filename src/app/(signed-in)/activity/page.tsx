@@ -154,7 +154,7 @@ export default async function ActivityPage({
   ]);
 
   return (
-    <SignedInPage ownerId={user.id}>
+    <SignedInPage ownerId={user.id} renderId={crypto.randomUUID()}>
       <PageContainer as="main" className="flex-1 space-y-8">
         <Suspense
           key={loadKey}
