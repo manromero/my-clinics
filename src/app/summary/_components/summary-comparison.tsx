@@ -8,68 +8,44 @@ import type { SummaryViewData } from "../_lib/summary-view";
 
 const zero = BigInt(0);
 
-function magnitude(amount: bigint) {
-  return amount < zero ? -amount : amount;
+function barWidth(netCents: bigint, totalNetCents: bigint) {
+  if (netCents <= zero || totalNetCents <= zero) return 0;
+  if (netCents >= totalNetCents) return 100;
+
+  // Scale before converting to a number so large saved amounts stay finite.
+  return Number((netCents * BigInt(1_000_000)) / totalNetCents) / 10_000;
 }
 
 export function SummaryComparison({
   clinics,
   scope,
-  totals,
+  totals: { netCents: totalNetCents },
 }: Pick<SummaryViewData, "clinics" | "scope" | "totals">) {
-  const scale = clinics.reduce(
-    (sum, { totals }) => sum + magnitude(totals.priceCents),
-    zero,
-  );
-
   return (
     <Surface
       as="section"
       aria-labelledby="summary-comparison"
       className="sm:p-6"
     >
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        <div>
-          <h2
-            id="summary-comparison"
-            className="font-headline text-lg font-semibold"
-          >
-            Importes y ganancias por clínica
-          </h2>
-          <p className="font-label text-caption text-on-surface-variant">
-            <span className="inline-block first-letter:uppercase">
-              {monthName(scope.month)} de {monthlyPeriodParams(scope).year}
-            </span>
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-x-4 gap-y-1 font-label text-caption text-on-surface-variant">
-          <span className="flex items-center gap-1.5">
-            <span
-              aria-hidden="true"
-              className="size-2.5 shrink-0 rounded-full bg-primary"
-            />
-            Importe positivo
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span
-              aria-hidden="true"
-              className="size-2.5 shrink-0 rounded-full bg-error"
-            />
-            Importe negativo
-          </span>
-        </div>
-      </div>
+      <h2
+        id="summary-comparison"
+        className="font-headline text-lg font-semibold"
+      >
+        Ganancias tras IRPF por clínica
+      </h2>
+      <p className="font-label text-caption text-on-surface-variant">
+        <span className="inline-block first-letter:uppercase">
+          {monthName(scope.month)} de {monthlyPeriodParams(scope).year}
+        </span>
+      </p>
       <ul className="mt-7 space-y-4">
-        {clinics.map(({ clinic, totals }) => {
-          const price = magnitude(totals.priceCents);
-          const negativePrice = totals.priceCents < zero;
-          const width =
-            scale === zero ? 0 : Number((price * BigInt(10_000)) / scale) / 100;
+        {clinics.map(({ clinic, totals: { netCents } }) => {
+          const width = barWidth(netCents, totalNetCents);
 
           return (
             <li key={clinic.id} className="space-y-1.5">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 font-label text-caption">
-                <p className="font-medium">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 font-label text-label">
+                <p className="font-medium [overflow-wrap:anywhere]">
                   {clinic.name}
                   {!clinic.active && (
                     <span className="ml-1.5 font-normal text-on-surface-variant">
@@ -77,30 +53,11 @@ export function SummaryComparison({
                     </span>
                   )}
                 </p>
-                <dl className="flex flex-wrap items-baseline gap-x-1.5 tabular-nums">
-                  <div>
-                    <dt className="sr-only">Importe total</dt>
-                    <dd
-                      className={
-                        negativePrice
-                          ? "font-semibold text-error"
-                          : "text-on-surface-variant"
-                      }
-                    >
-                      {formatEuroCents(`${totals.priceCents}`)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="sr-only">Ganancia tras IRPF</dt>
-                    <dd
-                      className={`font-semibold ${totals.netCents < zero ? "text-error" : "text-primary"}`}
-                    >
-                      <span aria-hidden="true">→ </span>
-                      {formatEuroCents(`${totals.netCents}`)}
-                      <span aria-hidden="true"> neto</span>
-                    </dd>
-                  </div>
-                </dl>
+                <p
+                  className={`ml-auto text-right font-semibold tabular-nums [overflow-wrap:anywhere] ${netCents < zero ? "text-error" : "text-primary"}`}
+                >
+                  {formatEuroCents(`${netCents}`)}
+                </p>
               </div>
               <div
                 aria-hidden="true"
@@ -108,7 +65,7 @@ export function SummaryComparison({
               >
                 {width > 0 && (
                   <div
-                    className={`h-full rounded-full ${negativePrice ? "bg-error" : "bg-primary"}`}
+                    className="h-full rounded-full bg-primary"
                     style={{ width: `${width}%` }}
                   />
                 )}
@@ -117,15 +74,11 @@ export function SummaryComparison({
           );
         })}
       </ul>
-      <div className="mt-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 rounded-lg bg-surface-container-low px-4 py-3 font-label text-caption">
-        <p className="text-on-surface-variant">
-          Cada barra representa la proporción del importe de la clínica sobre la
-          suma de los importes sin signo.
-        </p>
-        <p className="font-semibold text-primary tabular-nums">
-          Importe total con signo: {formatEuroCents(`${totals.priceCents}`)}
-        </p>
-      </div>
+      <p className="mt-6 rounded-lg bg-surface-container-low px-4 py-3 font-label text-caption text-on-surface-variant">
+        Cada barra muestra la ganancia de la clínica como porcentaje del total
+        que figura en “Ganancia tras IRPF”. Las pérdidas se muestran en rojo,
+        con la barra vacía.
+      </p>
     </Surface>
   );
 }

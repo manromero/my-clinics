@@ -13,14 +13,8 @@ export function SummaryBreakdown({
     ...clinics.map(({ clinic, totals }) => ({
       id: clinic.id,
       title: clinic.name,
-      href: totals.rowCount
-        ? `/activity?${monthlyScopeParams({ ...scope, clinicId: clinic.id })}`
-        : null,
-      status: !clinic.active
-        ? "Inactiva"
-        : totals.rowCount === 0
-          ? "Sin actividad"
-          : null,
+      href: `/activity?${monthlyScopeParams({ ...scope, clinicId: clinic.id })}`,
+      status: clinic.active ? null : "Inactiva",
       measures: summaryMeasures(totals),
     })),
     {

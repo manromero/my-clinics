@@ -1,6 +1,6 @@
 # Task 02 — Refine the clinic earnings breakdown
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -70,6 +70,37 @@ Inspect desktop and mobile and collect visual evidence under the
 
 ## Progress notes
 
-The user approved publishing this definition on `develop`. Implementation
-will be assigned separately through the
+The user assigned implementation through the
 [standard workflow](../../development-workflow.md).
+
+[PR #61](https://github.com/manromero/my-clinics/pull/61) compares signed net
+earnings with the headline total and shows only clinics with saved records in
+the chart and breakdown. The implementer and independent reviewer passed lint,
+type checking, formatting, the production build, and all 287 tests on application
+commit `66a166863fa99d8721f48367c01688113bd5a250`.
+
+Both used separate signed-in synthetic fixtures to verify signed and capped
+bars, zero and negative totals, clinic inclusion, empty and filtered states,
+month changes, and matching amounts and counts in Activity. Both inspected
+desktop and narrow layouts and verified fixture cleanup. The PR contains the
+verified inline captures and the independent review results. No blockers or
+correction rounds. Human approval and manual merge are pending.
+
+## Execution context
+
+- Assignment branch: `feature/summary-net-earnings-comparison`, from updated
+  `develop` at `a0a799f8c0616f576520aaaeef1e3c3faa2b0741`.
+- Readiness: task 01 is merged, the requirements and S04 references are in
+  place, and both ordinary synthetic fixture accounts authenticated and read
+  their respective active clinic through the local validation launcher.
+- `src/app/summary/_lib/summary-view.ts` resolves the scope and assembles the
+  saved groups from the existing monthly totals RPC. Its displayed clinic list
+  currently also includes active clinics without a group; the filter options
+  and displayed rows serve different purposes. Both presentation sections use
+  this list. `summary-comparison.tsx` currently scales by absolute prices, and
+  `summary-results.tsx` selects the empty states.
+- Use the [local signed-in procedure](../../supabase.md#local-signed-in-validation)
+  with the separate role sessions and temporary owner-scoped synthetic rows as
+  needed. Compare the same scope in Activity and Summary. Capture desktop and
+  mobile evidence against Alexandria and S04. No database or Activity changes.
+- No open product decisions or outstanding hypotheses. Correction rounds used: 0.
