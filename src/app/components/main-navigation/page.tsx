@@ -13,7 +13,7 @@ export default function Page() {
   return (
     <Catalogue
       title="MainNavigation"
-      description="Actividad, resumen, clínicas y ajustes con una página actual accesible y todos los destinos disponibles en pantallas estrechas."
+      description="Clínicas, actividad, resumen y ajustes con una página actual accesible y todos los destinos disponibles en pantallas estrechas."
       sections={[
         {
           id: "interactivo",
@@ -35,6 +35,16 @@ export default function Page() {
             "Cada destino conserva su enlace y solo la página actual recibe aria-current.",
           examples: [
             {
+              id: "clinics",
+              title: "Clínicas",
+              content: (
+                <MainNavigation
+                  currentHref="/clinics"
+                  aria-label="Ejemplo Clínicas"
+                />
+              ),
+            },
+            {
               id: "activity",
               title: "Actividad",
               content: (
@@ -51,16 +61,6 @@ export default function Page() {
                 <MainNavigation
                   currentHref="/summary"
                   aria-label="Ejemplo Resumen"
-                />
-              ),
-            },
-            {
-              id: "clinics",
-              title: "Clínicas",
-              content: (
-                <MainNavigation
-                  currentHref="/clinics"
-                  aria-label="Ejemplo Clínicas"
                 />
               ),
             },

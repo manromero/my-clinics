@@ -25,7 +25,7 @@ export function SignedInHeader({
     <AppHeader
       variant="signed-in"
       currentHref={currentHref}
-      availableDestinations={["/activity", "/summary", "/clinics"]}
+      availableDestinations={["/clinics", "/activity", "/summary"]}
       account={{
         identity: { displayName, email },
         signOutPending: pending,

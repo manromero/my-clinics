@@ -60,7 +60,7 @@ export function MainNavigationSpecimen() {
         Destino seleccionado: {currentHref}
       </p>
       <p className="text-sm leading-6 text-on-surface-variant">
-        API: currentHref acepta /activity, /summary, /clinics o /settings. Sin
+        API: currentHref acepta /clinics, /activity, /summary o /settings. Sin
         currentHref no se marca ninguna página. El consumidor determina la
         sección actual, también para rutas anidadas. labels permite ampliar
         etiquetas sin cambiar los destinos. Se admiten atributos nativos de nav,

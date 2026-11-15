@@ -64,10 +64,10 @@ description below.
 | S04 | Monthly summary  | Resumen                  | `/summary`     | Review monthly amounts and row counts by clinic    |
 | S05 | Settings         | Ajustes                  | `/settings`    | Change Ana's default IRPF rate and access sign-out |
 
-After successful sign-in in Milestone 03, open Clinics. When Monthly activity
-is available, open it for the current month in Europe/Madrid. Protected screens
-share navigation to Clinics, Activity, Summary, and Settings. Keep the signed-in
-identity and sign-out action accessible.
+After successful sign-in, open Activity for the current month in Europe/Madrid.
+On desktop and mobile, the signed-in navigation displays Clínicas, Actividad,
+and Resumen in that order. Keep the signed-in identity and sign-out action
+accessible.
 
 Use a shared year/month and clinic selection for Activity and Summary. Moving
 between those screens preserves that context. Initial entry defaults to the

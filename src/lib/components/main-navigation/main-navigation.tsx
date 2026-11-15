@@ -2,9 +2,9 @@ import Link from "next/link";
 import type { ComponentPropsWithRef } from "react";
 
 const destinations = [
+  { href: "/clinics", label: "Clínicas" },
   { href: "/activity", label: "Actividad" },
   { href: "/summary", label: "Resumen" },
-  { href: "/clinics", label: "Clínicas" },
   { href: "/settings", label: "Ajustes" },
 ] as const;
 

@@ -72,7 +72,7 @@ describe("AppHeader", () => {
     const trigger = screen.getByRole("button", {
       name: "Menú de cuenta de Ana Hurtado",
     });
-    for (const name of ["Actividad", "Resumen", "Clínicas", "Ajustes"]) {
+    for (const name of ["Clínicas", "Actividad", "Resumen", "Ajustes"]) {
       await user.tab();
       expect(screen.getByRole("link", { name })).toHaveFocus();
     }
