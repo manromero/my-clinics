@@ -66,4 +66,19 @@ Check the create and edit forms and capture
 
 ## Progress notes
 
-Implementation started.
+[Draft PR #64](https://github.com/manromero/my-clinics/pull/64) remembers the
+last successfully created activity's eligible clinic during the current signed-in
+Activity visit. Lint, type checking, formatting, the production build, and all
+287 tests passed on the implementation commit.
+
+Independent review of `a0ef5ecc0575a8e50d851bc5e4969fcca67eb68d` against the
+recorded base repeated those checks and verified the create/edit behavior, date
+defaults, failed save, cancel, inactive clinic fallback, filter redirect, and
+visit reset with a separate synthetic account. The reviewer inspected desktop
+and mobile captures; no technical blockers remained. No correction rounds were
+required.
+
+Delivery is blocked on inline visual evidence: automatic approval rejected
+uploading the four local synthetic screenshots to the public PR without
+explicit permission. The task stays `in_progress`; human approval and manual
+merge remain pending.
