@@ -27,7 +27,7 @@ saved financial calculations.
 
 | Task                                                                                                                 | Status    | Direct dependencies                             |
 | -------------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------- |
-| [00 — Set up entry routing and a development-only catalogue](<task 00 - entry routing and development catalogue.md>) | `pending` | Existing sign-in flow and catalogue             |
+| [00 — Set up entry routing and a development-only catalogue](<task 00 - entry routing and development catalogue.md>) | `done`    | Existing sign-in flow and catalogue             |
 | [01 — Reorder the signed-in navigation](<task 01 - reorder signed-in navigation.md>)                                 | `pending` | Existing Activity, Clinics, and Summary screens |
 | [02 — Reuse the last clinic in new activities](<task 02 - reuse the last clinic.md>)                                 | `pending` | Existing activity creation and date default     |
 | [03 — Keep the interface visible during navigation](<task 03 - stabilize signed-in navigation.md>)                   | `pending` | 01                                              |
