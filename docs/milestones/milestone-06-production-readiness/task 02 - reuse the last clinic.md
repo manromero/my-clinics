@@ -1,6 +1,6 @@
 # Task 02 — Reuse the last clinic in new activities
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -43,6 +43,41 @@ editing an existing record. Confirm that the date default still works.
 Check the create and edit forms and capture
 [desktop and mobile evidence](../../development-workflow.md#visual-pr-evidence).
 
+## Execution context
+
+- Readiness: approved scope and criteria are actionable. The activity form and
+  existing save result are on `develop`. Both dedicated synthetic accounts
+  signed in and opened the Activity page in isolated Chrome sessions.
+- Branch: `feature/reuse-last-activity-clinic`, based on
+  `90d7682ba5a937c575617d498c6b317f368d663a` from `origin/develop`.
+- Sources: see the requirements and S03 links above, the
+  [architecture](../../architecture.md), and the
+  [signed-in validation procedure](../../supabase.md#local-signed-in-validation).
+  The relevant code is under `src/app/activity/`.
+- Verified: `SavedActivityResults` handles the save result, and `ActivityForm`
+  initializes the clinic and date from the existing route data or edit record.
+  The results sit beneath a scope-keyed boundary. Check that visit state
+  survives changes within Activity and resets on leaving or changing account.
+- Hypothesis: route-local client state above the scope-keyed results can keep
+  the preference for the intended visit. Confirm the lifecycle in the browser.
+- Keep the existing date behavior, edit defaults, and persistence. Use each
+  role's own fixture account and clean up only the temporary records it creates.
+- Open product questions: none. Correction rounds used: 0.
+
 ## Progress notes
 
-Scope approved. Awaiting implementation assignment.
+[PR #64](https://github.com/manromero/my-clinics/pull/64) remembers the
+last successfully created activity's eligible clinic during the current signed-in
+Activity visit. Lint, type checking, formatting, the production build, and all
+287 tests passed on the implementation commit.
+
+Independent review of `a0ef5ecc0575a8e50d851bc5e4969fcca67eb68d` against the
+recorded base repeated those checks and verified the create/edit behavior, date
+defaults, failed save, cancel, inactive clinic fallback, filter redirect, and
+visit reset with a separate synthetic account. The reviewer inspected desktop
+and mobile captures; no technical blockers remained. No correction rounds were
+required.
+
+The user authorized publication of the four synthetic screenshots. The PR
+contains verified inline captures of create and edit at desktop and mobile
+sizes. Human approval and manual merge remain pending.

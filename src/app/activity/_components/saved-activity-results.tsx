@@ -15,6 +15,7 @@ import type { ActivityWriteResult } from "../_lib/write-activity";
 import { ActivityForm } from "./activity-form";
 import type { ActivityRowAction } from "./activity-list";
 import { ActivityResults } from "./activity-results";
+import { LastCreatedClinic } from "./activity-visit";
 
 type Operation =
   { kind: "create" } | { kind: "edit" | "delete"; row: ActivityRow };
@@ -50,12 +51,14 @@ function savedNotice(scope: ActivityViewData["scope"], draft: ActivityDraft) {
 
 export function SavedActivityResults({
   data,
+  ownerId,
   lastEntered,
   saveActivityAction,
   deleteActivityAction,
   pagination,
 }: {
   data: ActivityViewData;
+  ownerId: string;
   lastEntered?: ActivityRow["date"];
   saveActivityAction: (
     draft: ActivityDraft,
@@ -66,6 +69,7 @@ export function SavedActivityResults({
 }) {
   const { scope, clinicOptions, canCreate } = data;
   const conceal = useContext(ConcealSignedInContent);
+  const { lastCreatedClinic, rememberClinic } = useContext(LastCreatedClinic);
   const [operation, setOperation] = useState<Operation | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string>();
@@ -106,6 +110,7 @@ export function SavedActivityResults({
     action: () => Promise<ActivityWriteResult>,
     success: string,
     failure: string,
+    onSaved?: () => void,
   ) {
     if (inFlight.current) return;
     inFlight.current = true;
@@ -127,6 +132,7 @@ export function SavedActivityResults({
         return;
       }
 
+      onSaved?.();
       setNotice(success);
       setOperation(null);
     } catch {
@@ -213,6 +219,11 @@ export function SavedActivityResults({
           row={row}
           scope={scope}
           clinics={clinicOptions}
+          lastCreatedClinicId={
+            lastCreatedClinic?.ownerId === ownerId
+              ? lastCreatedClinic.clinicId
+              : undefined
+          }
           lastEntered={lastEntered}
           pending={pending}
           error={error}
@@ -221,6 +232,9 @@ export function SavedActivityResults({
               () => saveActivityAction(draft, row?.id),
               savedNotice(scope, draft),
               "Vuelve a intentarlo. Los datos introducidos siguen en el formulario.",
+              operation.kind === "create"
+                ? () => rememberClinic({ ownerId, clinicId: draft.clinicId })
+                : undefined,
             )
           }
           onCancel={closeOperation}

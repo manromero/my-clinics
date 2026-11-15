@@ -38,6 +38,7 @@ export function ActivityForm({
   row,
   scope,
   clinics,
+  lastCreatedClinicId,
   lastEntered,
   pending,
   error,
@@ -47,6 +48,7 @@ export function ActivityForm({
   row?: ActivityRow;
   scope: MonthlyScope;
   clinics: readonly ActivityClinicOption[];
+  lastCreatedClinicId?: string;
   lastEntered?: ActivityRow["date"];
   pending: boolean;
   error?: string;
@@ -59,6 +61,8 @@ export function ActivityForm({
   const [clinicId, setClinicId] = useState(
     () =>
       row?.clinicId ??
+      clinics.find(({ id, active }) => active && id === lastCreatedClinicId)
+        ?.id ??
       clinics.find(({ id, active }) => active && id === scope.clinicId)?.id ??
       "",
   );

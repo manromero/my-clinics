@@ -124,6 +124,7 @@ async function SavedActivity({
       </div>
       <SavedActivityResults
         data={data}
+        ownerId={ownerId}
         lastEntered={lastEntered}
         saveActivityAction={saveActivityAction}
         deleteActivityAction={deleteActivityAction}
