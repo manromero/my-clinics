@@ -14,6 +14,7 @@ before implementation begins.
 | [03 — Authentication](milestone-03-authentication/readme.md)                              | Google sign-in with Supabase Auth and owner-only access to clinics                               | Complete. [PR #49](https://github.com/manromero/my-clinics/pull/49) is merged into `develop`.                         |
 | [04 — Monthly activity](milestone-04-monthly-activity/readme.md)                          | Filter, record, edit, and delete monthly activity with private persistence and accurate earnings | Complete. [PR #58](https://github.com/manromero/my-clinics/pull/58) is merged into `develop`.                         |
 | [05 — Monthly summary](milestone-05-monthly-summary/readme.md)                            | Review monthly totals and a per-clinic breakdown of saved activity                               | Tasks 00 and 01 merged into `develop`. Task 02 pending.                                                               |
+| [06 — Production readiness](milestone-06-production-readiness/readme.md)                  | Prepare routing, activity entry, and signed-in navigation for production                         | Scope approved. All six tasks await implementation.                                                                   |
 
 Draft milestones remain subject to user approval of their scope and order.
 
