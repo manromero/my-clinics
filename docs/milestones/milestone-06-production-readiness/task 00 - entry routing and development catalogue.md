@@ -44,7 +44,14 @@ responses and the signed-in and signed-out flows in a browser.
 
 ## Progress notes
 
-Scope approved. Awaiting implementation assignment.
+The user assigned implementation through the
+[standard workflow](../../development-workflow.md).
+
+[PR #62](https://github.com/manromero/my-clinics/pull/62) implements the
+entry redirect and development-only catalogue. Initial review at
+`57f4395298c82463d02f5e1e99d2eb47598cdc94` found R-01: the production
+404 still serialized catalogue and specimen content in its HTML and
+React Server Component responses. Correction round 1 addresses this finding.
 
 ## Execution context
 
@@ -59,4 +66,4 @@ Scope approved. Awaiting implementation assignment.
 - Confirm the HTTP results in both server modes and exercise the existing login
   and protected route behavior with the dedicated role sessions. Use the
   [local signed-in validation procedure](../../supabase.md#local-signed-in-validation).
-- No open product decisions. Correction rounds used: 0.
+- No open product decisions. Correction rounds started: 1.
