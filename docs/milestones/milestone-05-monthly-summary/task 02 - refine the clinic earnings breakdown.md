@@ -1,6 +1,6 @@
 # Task 02 — Refine the clinic earnings breakdown
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -70,9 +70,21 @@ Inspect desktop and mobile and collect visual evidence under the
 
 ## Progress notes
 
-The user approved publishing this definition on `develop`. Implementation
-will be assigned separately through the
+The user assigned implementation through the
 [standard workflow](../../development-workflow.md).
+
+[PR #61](https://github.com/manromero/my-clinics/pull/61) compares signed net
+earnings with the headline total and shows only clinics with saved records in
+the chart and breakdown. The implementer and independent reviewer passed lint,
+type checking, formatting, the production build, and all 287 tests on application
+commit `66a166863fa99d8721f48367c01688113bd5a250`.
+
+Both used separate signed-in synthetic fixtures to verify signed and capped
+bars, zero and negative totals, clinic inclusion, empty and filtered states,
+month changes, and matching amounts and counts in Activity. Both inspected
+desktop and narrow layouts and verified fixture cleanup. The PR contains the
+verified inline captures and the independent review results. No blockers or
+correction rounds. Human approval and manual merge are pending.
 
 ## Execution context
 
