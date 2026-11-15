@@ -15,6 +15,7 @@ import type { ActivityWriteResult } from "../_lib/write-activity";
 import { ActivityForm } from "./activity-form";
 import type { ActivityRowAction } from "./activity-list";
 import { ActivityResults } from "./activity-results";
+import { LastCreatedClinic } from "./activity-visit";
 
 type Operation =
   { kind: "create" } | { kind: "edit" | "delete"; row: ActivityRow };
@@ -66,6 +67,8 @@ export function SavedActivityResults({
 }) {
   const { scope, clinicOptions, canCreate } = data;
   const conceal = useContext(ConcealSignedInContent);
+  const { clinicId: lastCreatedClinicId, rememberClinic } =
+    useContext(LastCreatedClinic);
   const [operation, setOperation] = useState<Operation | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string>();
@@ -106,6 +109,7 @@ export function SavedActivityResults({
     action: () => Promise<ActivityWriteResult>,
     success: string,
     failure: string,
+    onSaved?: () => void,
   ) {
     if (inFlight.current) return;
     inFlight.current = true;
@@ -127,6 +131,7 @@ export function SavedActivityResults({
         return;
       }
 
+      onSaved?.();
       setNotice(success);
       setOperation(null);
     } catch {
@@ -213,6 +218,7 @@ export function SavedActivityResults({
           row={row}
           scope={scope}
           clinics={clinicOptions}
+          lastCreatedClinicId={lastCreatedClinicId}
           lastEntered={lastEntered}
           pending={pending}
           error={error}
@@ -221,6 +227,9 @@ export function SavedActivityResults({
               () => saveActivityAction(draft, row?.id),
               savedNotice(scope, draft),
               "Vuelve a intentarlo. Los datos introducidos siguen en el formulario.",
+              operation.kind === "create"
+                ? () => rememberClinic(draft.clinicId)
+                : undefined,
             )
           }
           onCancel={closeOperation}

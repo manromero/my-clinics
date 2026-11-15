@@ -13,6 +13,7 @@ import { SignedInHistoryGuard } from "../_components/signed-in-history-guard";
 import { MonthlyScopeFilters } from "@/lib/components/monthly-scope-filters/monthly-scope-filters";
 import { ActivityLoadError } from "./_components/activity-load-error";
 import { ActivityPageLinks } from "./_components/activity-page-links";
+import { ActivityVisit } from "./_components/activity-visit";
 import { SavedActivityResults } from "./_components/saved-activity-results";
 import type { ActivityDraft } from "./_lib/activity-entry";
 import {
@@ -165,18 +166,20 @@ export default async function ActivityPage({
         email={user.email}
       />
       <PageContainer as="main" className="flex-1 space-y-8">
-        <Suspense
-          key={loadKey}
-          fallback={
-            <LoadingState
-              label="Cargando actividad…"
-              variant="region"
-              indicator="skeleton"
-            />
-          }
-        >
-          <SavedActivity query={query} period={period} ownerId={user.id} />
-        </Suspense>
+        <ActivityVisit>
+          <Suspense
+            key={loadKey}
+            fallback={
+              <LoadingState
+                label="Cargando actividad…"
+                variant="region"
+                indicator="skeleton"
+              />
+            }
+          >
+            <SavedActivity query={query} period={period} ownerId={user.id} />
+          </Suspense>
+        </ActivityVisit>
       </PageContainer>
       <AppFooter
         identity="MyClinics"
