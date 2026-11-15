@@ -51,12 +51,14 @@ function savedNotice(scope: ActivityViewData["scope"], draft: ActivityDraft) {
 
 export function SavedActivityResults({
   data,
+  ownerId,
   lastEntered,
   saveActivityAction,
   deleteActivityAction,
   pagination,
 }: {
   data: ActivityViewData;
+  ownerId: string;
   lastEntered?: ActivityRow["date"];
   saveActivityAction: (
     draft: ActivityDraft,
@@ -67,8 +69,7 @@ export function SavedActivityResults({
 }) {
   const { scope, clinicOptions, canCreate } = data;
   const conceal = useContext(ConcealSignedInContent);
-  const { clinicId: lastCreatedClinicId, rememberClinic } =
-    useContext(LastCreatedClinic);
+  const { lastCreatedClinic, rememberClinic } = useContext(LastCreatedClinic);
   const [operation, setOperation] = useState<Operation | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string>();
@@ -218,7 +219,11 @@ export function SavedActivityResults({
           row={row}
           scope={scope}
           clinics={clinicOptions}
-          lastCreatedClinicId={lastCreatedClinicId}
+          lastCreatedClinicId={
+            lastCreatedClinic?.ownerId === ownerId
+              ? lastCreatedClinic.clinicId
+              : undefined
+          }
           lastEntered={lastEntered}
           pending={pending}
           error={error}
@@ -228,7 +233,7 @@ export function SavedActivityResults({
               savedNotice(scope, draft),
               "Vuelve a intentarlo. Los datos introducidos siguen en el formulario.",
               operation.kind === "create"
-                ? () => rememberClinic(draft.clinicId)
+                ? () => rememberClinic({ ownerId, clinicId: draft.clinicId })
                 : undefined,
             )
           }

@@ -2,16 +2,18 @@
 
 import { createContext, useState, type ReactNode } from "react";
 
+type CreatedClinic = { ownerId: string; clinicId: string };
+
 export const LastCreatedClinic = createContext<{
-  clinicId?: string;
-  rememberClinic: (clinicId: string) => void;
+  lastCreatedClinic?: CreatedClinic;
+  rememberClinic: (clinic: CreatedClinic) => void;
 }>({ rememberClinic: () => {} });
 
 export function ActivityVisit({ children }: { children: ReactNode }) {
-  const [clinicId, rememberClinic] = useState<string>();
+  const [lastCreatedClinic, rememberClinic] = useState<CreatedClinic>();
 
   return (
-    <LastCreatedClinic value={{ clinicId, rememberClinic }}>
+    <LastCreatedClinic value={{ lastCreatedClinic, rememberClinic }}>
       {children}
     </LastCreatedClinic>
   );
