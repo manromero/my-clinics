@@ -1,6 +1,6 @@
 # Task 01 — Reorder the signed-in navigation
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -54,4 +54,14 @@ on desktop and mobile. Collect
 
 ## Progress notes
 
-Scope approved. Implementation assigned under the standard development workflow.
+[PR #63](https://github.com/manromero/my-clinics/pull/63) implements the approved
+navigation order. Lint, type checking, formatting, the production build, and all
+287 tests passed. The PR contains verified desktop and mobile captures.
+
+Independent review at `e80c99d2d8a3ca3e35a5d66a3409c4a24c44c1fb` verified the
+three destinations, visible keyboard focus and order, the active link on each
+screen, signed-in entry to the current Activity month, and direct and contextual
+Summary URLs. The existing authentication tests covered the successful callback.
+The review closed its initial evidence gap after rerunning the browser check
+with a dedicated fixture. No code corrections or open findings remain.
+Human approval and manual merge are pending.
