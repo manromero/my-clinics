@@ -3,8 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { MainNavigation } from "./main-navigation";
 
-const routes = ["/activity", "/summary", "/clinics", "/settings"] as const;
-const labels = ["Actividad", "Resumen", "Clínicas", "Ajustes"];
+const routes = ["/clinics", "/activity", "/summary", "/settings"] as const;
+const labels = ["Clínicas", "Actividad", "Resumen", "Ajustes"];
 
 describe("MainNavigation", () => {
   it("provides all four Spanish destinations in a named navigation landmark", () => {
@@ -63,7 +63,7 @@ describe("MainNavigation", () => {
     }
     expect(activate).toHaveBeenCalledTimes(4);
     await user.tab({ shift: true });
-    expect(screen.getByRole("link", { name: "Clínicas" })).toHaveFocus();
+    expect(screen.getByRole("link", { name: "Resumen" })).toHaveFocus();
   });
 
   it("keeps full long labels accessible without changing destinations", () => {
