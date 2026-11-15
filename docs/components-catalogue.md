@@ -1,6 +1,8 @@
 # Components catalogue
 
-Run `pnpm dev` and open `/components`. The index links to dedicated foundations
+Run `pnpm dev` and open `/components`. The index and its specimens are only
+available on the Next.js development server. Production builds, including
+previews, return HTTP 404 for these URLs. The index links to dedicated foundations
 and component pages, using synthetic content without authentication or services.
 Group each shared component with its unit tests in `src/lib/components/<component>`.
 Keep page-specific specimens within `src/app/components/<slug>`; only scaffolding

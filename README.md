@@ -24,7 +24,7 @@ saved clinics at `/clinics`. See [Persistent clinic listing](docs/supabase.md#pe
 
 ## Styling
 
-Tailwind CSS runs through `@tailwindcss/postcss` in `postcss.config.mjs` and is imported in `src/app/globals.css`. Add utility classes directly to components; source detection is automatic, so no `tailwind.config.js` is needed for the current setup. The home page includes a responsive example card.
+Tailwind CSS runs through `@tailwindcss/postcss` in `postcss.config.mjs` and is imported in `src/app/globals.css`. Add utility classes directly to components; source detection is automatic, so no `tailwind.config.js` is needed for the current setup.
 
 See the [Tailwind CSS guide for Next.js](https://tailwindcss.com/docs/installation/framework-guides/nextjs) and [project styling conventions](docs/architecture.md#nextjs-and-styling).
 
