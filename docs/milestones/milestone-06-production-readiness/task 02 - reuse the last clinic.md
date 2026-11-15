@@ -1,6 +1,6 @@
 # Task 02 — Reuse the last clinic in new activities
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -66,7 +66,7 @@ Check the create and edit forms and capture
 
 ## Progress notes
 
-[Draft PR #64](https://github.com/manromero/my-clinics/pull/64) remembers the
+[PR #64](https://github.com/manromero/my-clinics/pull/64) remembers the
 last successfully created activity's eligible clinic during the current signed-in
 Activity visit. Lint, type checking, formatting, the production build, and all
 287 tests passed on the implementation commit.
@@ -78,7 +78,6 @@ visit reset with a separate synthetic account. The reviewer inspected desktop
 and mobile captures; no technical blockers remained. No correction rounds were
 required.
 
-Delivery is blocked on inline visual evidence: automatic approval rejected
-uploading the four local synthetic screenshots to the public PR without
-explicit permission. The task stays `in_progress`; human approval and manual
-merge remain pending.
+The user authorized publication of the four synthetic screenshots. The PR
+contains verified inline captures of create and edit at desktop and mobile
+sizes. Human approval and manual merge remain pending.

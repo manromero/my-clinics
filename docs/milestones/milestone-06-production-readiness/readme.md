@@ -25,14 +25,14 @@ saved financial calculations.
 
 ## Delivery sequence
 
-| Task                                                                                                                 | Status        | Direct dependencies                             |
-| -------------------------------------------------------------------------------------------------------------------- | ------------- | ----------------------------------------------- |
-| [00 — Set up entry routing and a development-only catalogue](<task 00 - entry routing and development catalogue.md>) | `done`        | Existing sign-in flow and catalogue             |
-| [01 — Reorder the signed-in navigation](<task 01 - reorder signed-in navigation.md>)                                 | `done`        | Existing Activity, Clinics, and Summary screens |
-| [02 — Reuse the last clinic in new activities](<task 02 - reuse the last clinic.md>)                                 | `in_progress` | Existing activity creation and date default     |
-| [03 — Keep the interface visible during navigation](<task 03 - stabilize signed-in navigation.md>)                   | `pending`     | 01                                              |
-| [04 — Make session checks less disruptive on tab return](<task 04 - improve session checks on tab return.md>)        | `pending`     | 03                                              |
-| [05 — Improve destination loading with prefetch](<task 05 - improve destination loading.md>)                         | `pending`     | 03 and 04                                       |
+| Task                                                                                                                 | Status    | Direct dependencies                             |
+| -------------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------- |
+| [00 — Set up entry routing and a development-only catalogue](<task 00 - entry routing and development catalogue.md>) | `done`    | Existing sign-in flow and catalogue             |
+| [01 — Reorder the signed-in navigation](<task 01 - reorder signed-in navigation.md>)                                 | `done`    | Existing Activity, Clinics, and Summary screens |
+| [02 — Reuse the last clinic in new activities](<task 02 - reuse the last clinic.md>)                                 | `done`    | Existing activity creation and date default     |
+| [03 — Keep the interface visible during navigation](<task 03 - stabilize signed-in navigation.md>)                   | `pending` | 01                                              |
+| [04 — Make session checks less disruptive on tab return](<task 04 - improve session checks on tab return.md>)        | `pending` | 03                                              |
+| [05 — Improve destination loading with prefetch](<task 05 - improve destination loading.md>)                         | `pending` | 03 and 04                                       |
 
 Tasks 00–02 can be assigned independently once their existing dependencies are
 available on `develop`. Tasks 03–05 build on one another so each can measure and
