@@ -86,8 +86,8 @@ props, defaults or behavior already evident in code.
 Do not use component comments as usage manuals or add a Markdown guide per
 component by default.
 
-The `/components` catalogue is available only under `pnpm dev`. Its shared route
-layout returns not found for the index and specimens in production builds. Keep
+The `/components` catalogue is available only under `pnpm dev`. Next.js Proxy
+returns HTTP 404 before rendering the index or specimens in production builds. Keep
 demonstration instructions there. Reusable components must not reference its
 routes, specimens or tests, including in comments. Keep lasting cross-cutting
 guidance in project documentation.

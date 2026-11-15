@@ -2,6 +2,16 @@ import { type NextRequest, NextResponse } from "next/server";
 import { createSupabaseAuthClient } from "@/lib/supabase/auth-client";
 
 export async function proxy(request: NextRequest) {
+  if (/^\/components(?:\/|$)/i.test(request.nextUrl.pathname)) {
+    if (process.env.NODE_ENV === "development") return NextResponse.next();
+
+    // Stop the request before Next.js generates HTML or a Flight payload.
+    return new NextResponse("404 — Página no encontrada.", {
+      status: 404,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
+  }
+
   let response = NextResponse.next({ request });
   const supabase = createSupabaseAuthClient({
     getAll: () => request.cookies.getAll(),
@@ -25,5 +35,11 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/clinics", "/activity", "/summary", "/login"],
+  matcher: [
+    "/clinics",
+    "/activity",
+    "/summary",
+    "/login",
+    "/components/:path*",
+  ],
 };
