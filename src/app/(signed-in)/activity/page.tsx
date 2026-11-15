@@ -3,13 +3,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { ActionLink } from "@/lib/components/action-link/action-link";
-import { AppFooter } from "@/lib/components/app-footer/app-footer";
 import { LoadingState } from "@/lib/components/loading-state/loading-state";
 import { PageContainer } from "@/lib/components/page-container/page-container";
 import { PageHeader } from "@/lib/components/page-header/page-header";
 import { requireSupabaseSession } from "@/lib/supabase/session";
-import { SignedInHeader } from "../_components/signed-in-header";
-import { SignedInHistoryGuard } from "../_components/signed-in-history-guard";
+import { SignedInPage } from "../_components/signed-in-history-guard";
 import { MonthlyScopeFilters } from "@/lib/components/monthly-scope-filters/monthly-scope-filters";
 import { ActivityLoadError } from "./_components/activity-load-error";
 import { ActivityPageLinks } from "./_components/activity-page-links";
@@ -148,9 +146,6 @@ export default async function ActivityPage({
   const { user } = await requireSupabaseSession();
   const query = await searchParams;
   const period = monthlyPeriodFromQuery(query);
-  const name = user.user_metadata?.full_name;
-  const displayName =
-    (typeof name === "string" && name.trim()) || user.email || "Usuario";
   const loadKey = JSON.stringify([
     period.year,
     period.month,
@@ -159,12 +154,7 @@ export default async function ActivityPage({
   ]);
 
   return (
-    <SignedInHistoryGuard key={user.id} ownerId={user.id}>
-      <SignedInHeader
-        currentHref="/activity"
-        displayName={displayName}
-        email={user.email}
-      />
+    <SignedInPage ownerId={user.id}>
       <PageContainer as="main" className="flex-1 space-y-8">
         <Suspense
           key={loadKey}
@@ -179,10 +169,6 @@ export default async function ActivityPage({
           <SavedActivity query={query} period={period} ownerId={user.id} />
         </Suspense>
       </PageContainer>
-      <AppFooter
-        identity="MyClinics"
-        metadata="Entorno de desarrollo · Datos sintéticos"
-      />
-    </SignedInHistoryGuard>
+    </SignedInPage>
   );
 }

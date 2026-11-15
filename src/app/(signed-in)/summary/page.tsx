@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { ActionLink } from "@/lib/components/action-link/action-link";
-import { AppFooter } from "@/lib/components/app-footer/app-footer";
 import { LoadingState } from "@/lib/components/loading-state/loading-state";
 import { MonthlyScopeFilters } from "@/lib/components/monthly-scope-filters/monthly-scope-filters";
 import { PageContainer } from "@/lib/components/page-container/page-container";
@@ -16,8 +15,7 @@ import {
   type MonthlyQuery,
 } from "@/lib/monthly-scope/monthly-scope";
 import { requireSupabaseSession } from "@/lib/supabase/session";
-import { SignedInHeader } from "../_components/signed-in-header";
-import { SignedInHistoryGuard } from "../_components/signed-in-history-guard";
+import { SignedInPage } from "../_components/signed-in-history-guard";
 import { SummaryLoadError } from "./_components/summary-load-error";
 import { SummaryResults } from "./_components/summary-results";
 import { readSummary } from "./_lib/read-summary";
@@ -97,18 +95,10 @@ export default async function SummaryPage({
   const { user } = await requireSupabaseSession();
   const query = await searchParams;
   const period = monthlyPeriodFromQuery(query);
-  const name = user.user_metadata?.full_name;
-  const displayName =
-    (typeof name === "string" && name.trim()) || user.email || "Usuario";
   const loadKey = JSON.stringify([period.year, period.month, query.clinic]);
 
   return (
-    <SignedInHistoryGuard key={user.id} ownerId={user.id}>
-      <SignedInHeader
-        currentHref="/summary"
-        displayName={displayName}
-        email={user.email}
-      />
+    <SignedInPage ownerId={user.id}>
       <PageContainer as="main" className="flex-1 space-y-8 sm:space-y-10">
         <Suspense
           key={loadKey}
@@ -123,7 +113,6 @@ export default async function SummaryPage({
           <SavedSummary query={query} period={period} />
         </Suspense>
       </PageContainer>
-      <AppFooter identity="MyClinics" />
-    </SignedInHistoryGuard>
+    </SignedInPage>
   );
 }

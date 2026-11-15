@@ -2,17 +2,17 @@
 
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { readActivity } from "@/app/activity/_lib/read-activity";
+import { readActivity } from "@/app/(signed-in)/activity/_lib/read-activity";
 import {
   deleteActivity,
   saveActivity,
-} from "@/app/activity/_lib/write-activity";
+} from "@/app/(signed-in)/activity/_lib/write-activity";
 import { GET as authCallback } from "@/app/auth/callback/route";
 import { GET as checkSession } from "@/app/auth/session/route";
-import { createClinic } from "@/app/clinics/create-clinic";
-import { listClinics } from "@/app/clinics/list-clinics";
-import { signOut } from "@/app/clinics/sign-out";
-import { updateClinic } from "@/app/clinics/update-clinic";
+import { createClinic } from "@/app/(signed-in)/clinics/create-clinic";
+import { listClinics } from "@/app/(signed-in)/clinics/list-clinics";
+import { signOut } from "@/app/(signed-in)/clinics/sign-out";
+import { updateClinic } from "@/app/(signed-in)/clinics/update-clinic";
 import { startGoogleSignIn } from "@/app/login/actions";
 import { proxy } from "@/proxy";
 import { createSupabaseAuthClient } from "./auth-client";

@@ -1,6 +1,6 @@
 # Task 03 — Keep the interface visible during navigation
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -46,6 +46,24 @@ or frame traces on desktop and mobile, including throttled navigation.
 Check cold URLs, back and forward, and history after sign-out.
 Collect [visual evidence](../../development-workflow.md#visual-pr-evidence).
 
+## Execution context
+
+- Task 01 is merged. The assignment branch is
+  `feature/stabilize-signed-in-navigation`, based on updated `develop` at
+  `8f2e293ff6e925fdb002c447fc6f8bf3d28f45d9`.
+- Inspect the three route pages under `src/app`, the shared header and navigation
+  under `src/lib/components`, and the session safeguards in `src/proxy.ts`,
+  `src/lib/supabase`, and `src/app/auth`. See [screens](../../screens.md)
+  for the existing navigation and visual references.
+- Both dedicated synthetic fixtures passed the launcher and opened isolated
+  Chrome DevTools sessions. Use the
+  [local signed-in validation procedure](../../supabase.md#local-signed-in-validation).
+- Identify the cause from the production baseline before changing behavior.
+  Keep tab-return policy and prefetch changes in Tasks 04 and 05, respectively.
+- Open investigation: whether navigation replaces the document, remounts the
+  shared interface, or hides it while waiting for session or route work.
+  Correction rounds used: 0.
+
 ## Progress notes
 
-Scope approved. Awaiting implementation assignment.
+Scope approved. Implementation assigned.
