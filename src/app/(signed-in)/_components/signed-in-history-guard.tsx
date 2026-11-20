@@ -166,7 +166,11 @@ export function SignedInHistoryGuard({
   const traversal = useRef<HistoryTraversal | null>(null);
   const [attempt, setAttempt] = useState<symbol | null>(null);
   const [historyStatus, setHistoryStatus] = useState<HistoryStatus>("loading");
-  const [, startRefresh] = useTransition();
+  const [refreshing, startRefresh] = useTransition();
+  const dataRefreshActive = useRef(false);
+  useLayoutEffect(() => {
+    dataRefreshActive.current = refreshing;
+  }, [refreshing]);
   const [state, setState] = useState<
     "visible" | "checking" | "failed" | "concealed" | "context-failed"
   >("visible");
@@ -223,6 +227,18 @@ export function SignedInHistoryGuard({
           return;
         }
         if (pending.firstRender === renderId) return;
+        if (cached && renderedAt < pending.startedAt) {
+          queueMicrotask(() => {
+            if (
+              !concealed.current &&
+              href === currentHistoryHref() &&
+              !dataRefreshActive.current
+            ) {
+              dataRefreshActive.current = true;
+              startRefresh(refresh);
+            }
+          });
+        }
         window.clearTimeout(pending.timeout);
         traversal.current = null;
         setAttempt(null);
@@ -248,7 +264,10 @@ export function SignedInHistoryGuard({
     let permanentlyBlocked = false;
     let revision = dataRevision();
     let focusedControl: HTMLElement | undefined;
+    let suspendedScroll: { left: number; top: number } | undefined;
     function hide() {
+      if (root.style.display !== "none")
+        suspendedScroll = { left: window.scrollX, top: window.scrollY };
       const active = document.activeElement;
       if (active instanceof HTMLElement && root.contains(active))
         focusedControl = active;
@@ -256,6 +275,10 @@ export function SignedInHistoryGuard({
     }
     function reveal() {
       root.style.removeProperty("display");
+      if (suspendedScroll) {
+        window.scrollTo({ ...suspendedScroll, behavior: "instant" });
+        suspendedScroll = undefined;
+      }
       setState("visible");
       const focus = focusedControl;
       focusedControl = undefined;
@@ -329,6 +352,11 @@ export function SignedInHistoryGuard({
         if (revision !== dataRevision()) {
           revision = dataRevision();
           entries.current.clear();
+        }
+        // Continuity restores presentation immediately; foreground/reconnect
+        // separately refreshes business data, including other-device writes.
+        if (!dataRefreshActive.current) {
+          dataRefreshActive.current = true;
           startRefresh(refresh);
         }
         reveal();

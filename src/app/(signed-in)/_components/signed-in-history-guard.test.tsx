@@ -104,9 +104,9 @@ describe("signed-in session continuity", () => {
     expect(screen.getByLabelText("Draft")).toHaveValue("unsaved");
     expect(fetch).toHaveBeenCalledTimes(1);
     await act(async () => finish(response()));
-    expect(router.refresh).not.toHaveBeenCalled();
+    expect(router.refresh).toHaveBeenCalledTimes(1);
   });
-  it("reuses a known history payload without refreshing the route", () => {
+  it("preserves a known same-URL history draft without unmounting", async () => {
     vi.stubGlobal("fetch", vi.fn());
     mount();
     const draft = screen.getByLabelText("Draft") as HTMLInputElement;
@@ -115,6 +115,7 @@ describe("signed-in session continuity", () => {
     expect(screen.getByLabelText("Draft")).toBe(draft);
     expect(draft).toHaveValue("edited unsaved value");
     expect(screen.getByRole("heading")).toBeVisible();
+    await act(async () => {});
     expect(router.refresh).not.toHaveBeenCalled();
   });
   it("does not reveal a held old verification after same-user re-login and cookie rollback", async () => {
