@@ -92,13 +92,18 @@ async function SavedSummary({
 export default async function SummaryPage({
   searchParams,
 }: PageProps<"/summary">) {
-  const { user } = await requireSupabaseSession();
+  const { user, context } = await requireSupabaseSession();
   const query = await searchParams;
   const period = monthlyPeriodFromQuery(query);
   const loadKey = JSON.stringify([period.year, period.month, query.clinic]);
 
   return (
-    <SignedInPage ownerId={user.id} renderId={crypto.randomUUID()}>
+    <SignedInPage
+      ownerId={user.id}
+      context={context}
+      renderedAt={context.verifiedAt}
+      renderId={crypto.randomUUID()}
+    >
       <PageContainer as="main" className="flex-1 space-y-8 sm:space-y-10">
         <Suspense
           key={loadKey}

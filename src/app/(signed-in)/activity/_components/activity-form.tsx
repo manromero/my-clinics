@@ -1,3 +1,7 @@
+import {
+  useDraftState,
+  useDraftFocus,
+} from "../../_components/continuity-drafts";
 import { useLayoutEffect, useRef, useState, type FormEvent } from "react";
 import { DateInput } from "@/lib/components/date-input/date-input";
 import { DecimalInput } from "@/lib/components/decimal-input/decimal-input";
@@ -55,10 +59,13 @@ export function ActivityForm({
   onSave: (entry: ActivityDraft) => void;
   onCancel: () => void;
 }) {
-  const [date, setDate] = useState(
+  const draftKey = `activity-form:${row?.id ?? "new"}`;
+  const [date, setDate] = useDraftState(
+    `${draftKey}:date`,
     () => row?.date ?? newActivityDate(scope, lastEntered),
   );
-  const [clinicId, setClinicId] = useState(
+  const [clinicId, setClinicId] = useDraftState(
+    `${draftKey}:clinicId`,
     () =>
       row?.clinicId ??
       clinics.find(({ id, active }) => active && id === lastCreatedClinicId)
@@ -66,12 +73,20 @@ export function ActivityForm({
       clinics.find(({ id, active }) => active && id === scope.clinicId)?.id ??
       "",
   );
-  const [description, setDescription] = useState(row?.description ?? "");
-  const [price, setPrice] = useState(
+  const [description, setDescription] = useDraftState(
+    `${draftKey}:description`,
+    row?.description ?? "",
+  );
+  const [price, setPrice] = useDraftState(
+    `${draftKey}:price`,
     row ? activityAmountInput(row.priceCents) : "",
   );
-  const [mode, setMode] = useState(row?.calculationMode ?? "percentage");
-  const [direct, setDirect] = useState(
+  const [mode, setMode] = useDraftState(
+    `${draftKey}:mode`,
+    row?.calculationMode ?? "percentage",
+  );
+  const [direct, setDirect] = useDraftState(
+    `${draftKey}:direct`,
     row?.calculationMode === "direct"
       ? activityAmountInput(row.grossCents)
       : "",
@@ -79,6 +94,8 @@ export function ActivityForm({
   const [submissions, setSubmissions] = useState(0);
   const focusError = useRef<HTMLElement | null>(null);
   const dateInput = useRef<HTMLInputElement>(null);
+
+  useDraftFocus(dateInput, draftKey);
 
   useLayoutEffect(() => {
     focusError.current?.focus();

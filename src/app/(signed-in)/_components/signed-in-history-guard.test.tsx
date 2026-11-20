@@ -1,0 +1,160 @@
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  sessionMarker,
+  sessionMarkerName,
+} from "@/lib/supabase/session-context";
+import {
+  acceptContext,
+  invalidateContext,
+  sessionFenceKey,
+} from "./session-fence";
+import { SignedInHistoryGuard, SignedInPage } from "./signed-in-history-guard";
+const router = vi.hoisted(() => ({ refresh: vi.fn(), replace: vi.fn() }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => router,
+  usePathname: () => "/activity",
+  useSearchParams: () => new URLSearchParams(),
+}));
+const context = {
+  generation: "a".repeat(64),
+  expiresAt: Math.floor(Date.now() / 1000) + 3600,
+  verifiedAt: 100,
+};
+function response() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "X-MyClinics-Expires": String(context.expiresAt),
+      "X-MyClinics-Verified": "200",
+    },
+  });
+}
+function mount() {
+  return render(
+    <SignedInHistoryGuard ownerId="owner" context={context}>
+      <SignedInPage
+        ownerId="owner"
+        context={context}
+        renderId="original"
+        renderedAt={1}
+      >
+        <main>
+          <h1>Private activity</h1>
+          <input aria-label="Draft" defaultValue="unsaved" />
+        </main>
+      </SignedInPage>
+    </SignedInHistoryGuard>,
+  );
+}
+beforeEach(() => {
+  Object.defineProperty(HTMLDialogElement.prototype, "showModal", {
+    configurable: true,
+    value: function (this: HTMLDialogElement) {
+      this.setAttribute("open", "");
+    },
+  });
+  Object.defineProperty(HTMLDialogElement.prototype, "close", {
+    configurable: true,
+    value: function (this: HTMLDialogElement) {
+      this.removeAttribute("open");
+    },
+  });
+  vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+  localStorage.clear();
+  document.cookie = `${sessionMarkerName}=${sessionMarker(context)}; path=/`;
+  Object.defineProperty(document, "hidden", {
+    configurable: true,
+    value: false,
+  });
+  window.history.replaceState({}, "", "/activity");
+  vi.stubGlobal(
+    "ResizeObserver",
+    class {
+      observe() {}
+      disconnect() {}
+    },
+  );
+  router.refresh.mockReset();
+  router.replace.mockReset();
+});
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
+describe("signed-in session continuity", () => {
+  it("shows the same draft immediately during a slow return check and deduplicates event bursts", async () => {
+    let finish!: (value: Response) => void;
+    const fetch = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    vi.stubGlobal("fetch", fetch);
+    mount();
+    act(() => {
+      window.dispatchEvent(new Event("blur"));
+      window.dispatchEvent(new Event("focus"));
+      window.dispatchEvent(new Event("focus"));
+      window.dispatchEvent(new Event("online"));
+    });
+    expect(screen.getByRole("heading")).toBeVisible();
+    expect(screen.getByLabelText("Draft")).toHaveValue("unsaved");
+    expect(fetch).toHaveBeenCalledTimes(1);
+    await act(async () => finish(response()));
+    expect(router.refresh).not.toHaveBeenCalled();
+  });
+  it("reuses a known history payload without refreshing the route", () => {
+    vi.stubGlobal("fetch", vi.fn());
+    mount();
+    const draft = screen.getByLabelText("Draft") as HTMLInputElement;
+    draft.value = "edited unsaved value";
+    act(() => window.dispatchEvent(new PopStateEvent("popstate")));
+    expect(screen.getByLabelText("Draft")).toBe(draft);
+    expect(draft).toHaveValue("edited unsaved value");
+    expect(screen.getByRole("heading")).toBeVisible();
+    expect(router.refresh).not.toHaveBeenCalled();
+  });
+  it("does not reveal a held old verification after same-user re-login and cookie rollback", async () => {
+    let finish!: (value: Response) => void;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        () =>
+          new Promise<Response>((resolve) => {
+            finish = resolve;
+          }),
+      ),
+    );
+    mount();
+    act(() => {
+      window.dispatchEvent(new Event("blur"));
+      window.dispatchEvent(new Event("focus"));
+    });
+    act(() => {
+      invalidateContext(context.generation);
+      acceptContext({
+        ...context,
+        generation: "b".repeat(64),
+        verifiedAt: 300,
+      });
+      // The browser can apply old Set-Cookie headers even after JS aborts.
+      document.cookie = `${sessionMarkerName}=${sessionMarker(context)}; path=/`;
+      window.dispatchEvent(
+        new StorageEvent("storage", { key: sessionFenceKey }),
+      );
+    });
+    await act(async () => finish(response()));
+    expect(screen.queryByText("Private activity")).not.toBeInTheDocument();
+  });
+  it("blocks expired context and keeps failed verification behind accessible recovery", async () => {
+    document.cookie = `${sessionMarkerName}=${sessionMarker({ ...context, expiresAt: 1 })}; path=/`;
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+    mount();
+    await waitFor(() => expect(screen.getByRole("dialog")).toBeVisible());
+    expect(screen.getByText("Private activity")).not.toBeVisible();
+    expect(screen.getByRole("button", { name: "Reintentar" })).toBeVisible();
+  });
+});

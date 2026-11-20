@@ -1,3 +1,8 @@
+import { createHash } from "node:crypto";
+import {
+  sessionMarkerName,
+  sessionMarker,
+} from "@/lib/supabase/session-context";
 import { type NextRequest, NextResponse } from "next/server";
 import { createSupabaseAuthClient } from "@/lib/supabase/auth-client";
 
@@ -29,7 +34,31 @@ export async function proxy(request: NextRequest) {
       response = refreshed;
     },
   });
-  await supabase?.auth.getClaims();
+  const verifiedAt = Date.now();
+  const result = await supabase?.auth.getClaims();
+  const claims = result?.data?.claims;
+  if (
+    !result?.error &&
+    typeof claims?.session_id === "string" &&
+    typeof claims.exp === "number"
+  ) {
+    response.cookies.set(
+      sessionMarkerName,
+      sessionMarker({
+        generation: createHash("sha256")
+          .update(claims.session_id)
+          .digest("hex"),
+        expiresAt: claims.exp,
+        verifiedAt,
+      }),
+      {
+        path: "/",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: false,
+      },
+    );
+  } else response.cookies.delete(sessionMarkerName);
   response.headers.set("Cache-Control", "private, no-store");
   return response;
 }

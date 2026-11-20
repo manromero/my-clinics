@@ -17,62 +17,88 @@ import { Button } from "@/lib/components/button/button";
 import { Dialog } from "@/lib/components/dialog/dialog";
 import { LoadingState } from "@/lib/components/loading-state/loading-state";
 import { PageContainer } from "@/lib/components/page-container/page-container";
+import {
+  parseSessionMarker,
+  sameSession,
+  sessionMarkerName,
+  type SessionContext,
+} from "@/lib/supabase/session-context";
+import {
+  acceptContext,
+  contextIsCurrent,
+  invalidateContext,
+  sessionFenceKey,
+  readFence,
+} from "./session-fence";
+import { dataRevision, dataRevisionKey } from "./data-invalidation";
+import { ContinuityDrafts, type DraftStore } from "./continuity-drafts";
 import { createHistoryScroll } from "./history-scroll";
 
 const accountChannelName = "myclinics-account";
 export const ConcealSignedInContent = createContext<() => void>(() => {});
-const SignedInOwner = createContext<string | null>(null);
+const SignedInOwner = createContext<{
+  ownerId: string;
+  context: SessionContext;
+} | null>(null);
 type HistoryStatus = "loading" | "slow" | "retrying";
 type HistoryTraversal = {
   href: string;
-  firstRender?: { id: string; refreshStarted: boolean };
+  startedAt: number;
+  firstRender?: string;
   timeout?: number;
-  restoreFocus?: boolean;
 };
 const HistoryRestore = createContext<{
   attempt: symbol | null;
   status: HistoryStatus;
-  pageRendered: (href: string, renderId: string) => void;
+  pageRendered: (href: string, renderId: string, renderedAt: number) => void;
   retry: () => void;
 } | null>(null);
-
 let beginHistoryRestore: (() => void) | undefined;
 
 function routeHref(pathname: string, search: string) {
   return search ? `${pathname}?${search}` : pathname;
 }
-
 function currentHistoryHref() {
   const { pathname, searchParams } = new URL(window.location.href);
   return routeHref(pathname, searchParams.toString());
 }
+function marker() {
+  return parseSessionMarker(
+    document.cookie
+      .split("; ")
+      .find((value) => value.startsWith(`${sessionMarkerName}=`))
+      ?.slice(sessionMarkerName.length + 1),
+  );
+}
 
 export function SignedInPage({
   ownerId,
+  context,
   renderId,
+  renderedAt,
   children,
 }: {
   ownerId: string;
+  context: SessionContext;
   renderId: string;
+  renderedAt: number;
   children: ReactNode;
 }) {
-  const layoutOwner = useContext(SignedInOwner);
+  const layout = useContext(SignedInOwner);
   const conceal = useContext(ConcealSignedInContent);
-  const sameOwner = layoutOwner === ownerId;
+  const sameOwner =
+    layout?.ownerId === ownerId &&
+    layout.context.generation === context.generation;
   const history = useContext(HistoryRestore);
   const pathname = usePathname();
   const search = useSearchParams().toString();
-
   useLayoutEffect(() => {
-    // A fresh page can arrive under a layout retained from a previous account.
     if (!sameOwner) {
       conceal();
       window.location.reload();
-    } else if (history?.attempt) {
-      history.pageRendered(routeHref(pathname, search), renderId);
-    }
-  }, [sameOwner, conceal, history, pathname, search, renderId]);
-
+    } else
+      history?.pageRendered(routeHref(pathname, search), renderId, renderedAt);
+  }, [sameOwner, conceal, history, pathname, search, renderId, renderedAt]);
   if (!sameOwner) return null;
   if (!history?.attempt) return children;
   return (
@@ -97,66 +123,70 @@ export function SignedInPage({
     </PageContainer>
   );
 }
-
 function openAccountChannel() {
-  if (typeof BroadcastChannel !== "undefined") {
+  if (typeof BroadcastChannel !== "undefined")
     return new BroadcastChannel(accountChannelName);
-  }
 }
-
 export function notifySignedOut() {
+  invalidateContext();
   const channel = openAccountChannel();
   channel?.postMessage("signed-out");
   channel?.close();
 }
-
 function isSignedInLocation() {
   return ["/activity", "/clinics", "/summary"].includes(
     window.location.pathname,
   );
 }
-
 function verifySignedInHistory(event: PopStateEvent) {
   if (!isSignedInLocation()) return;
-  if (beginHistoryRestore) {
-    beginHistoryRestore();
-    return;
-  }
-
-  // A transition to Login can unmount the guard while router history survives.
-  // Reload protected entries in that document to authorize them from scratch.
+  if (beginHistoryRestore) return beginHistoryRestore();
   event.stopImmediatePropagation();
   window.location.reload();
 }
 
 export function SignedInHistoryGuard({
   ownerId,
+  context,
   children,
 }: {
   ownerId: string;
+  context: SessionContext;
   children: ReactNode;
 }) {
+  const [drafts] = useState<DraftStore>(() => new Map());
   const content = useRef<HTMLDivElement>(null);
   const concealed = useRef(false);
   const retry = useRef<() => void>(null);
   const historyScroll = useRef<ReturnType<typeof createHistoryScroll>>(null);
+  const entries = useRef(new Map<string, string>());
+  const session = useRef(context);
   const { refresh, replace } = useRouter();
   const pathname = usePathname();
   const search = useSearchParams().toString();
   const traversal = useRef<HistoryTraversal | null>(null);
   const [attempt, setAttempt] = useState<symbol | null>(null);
   const [historyStatus, setHistoryStatus] = useState<HistoryStatus>("loading");
-  const [refreshing, startRefresh] = useTransition();
+  const [, startRefresh] = useTransition();
   const [state, setState] = useState<
     "visible" | "checking" | "failed" | "concealed"
   >("visible");
 
   const concealContent = useCallback(() => {
     concealed.current = true;
+    invalidateContext(context.generation);
+    entries.current.clear();
+    drafts.clear();
     content.current?.style.setProperty("display", "none");
     setState("concealed");
-  }, []);
-
+  }, [context.generation, drafts]);
+  const eligible = useCallback(
+    () =>
+      !concealed.current &&
+      contextIsCurrent(session.current) &&
+      sameSession(session.current, marker()),
+    [],
+  );
   const watchHistory = useCallback((pending: HistoryTraversal) => {
     window.clearTimeout(pending.timeout);
     pending.timeout = window.setTimeout(() => {
@@ -164,75 +194,48 @@ export function SignedInHistoryGuard({
         setHistoryStatus("slow");
     }, 8000);
   }, []);
-
   const retryHistory = useCallback(() => {
     const pending = traversal.current;
     if (!pending || concealed.current || pending.href !== currentHistoryHref())
       return;
-
-    pending.restoreFocus ||= Boolean(
-      document.activeElement?.closest("[data-history-recovery]"),
-    );
     setHistoryStatus("retrying");
     watchHistory(pending);
-    if (pending.firstRender) {
-      startRefresh(refresh);
-    } else {
-      const { pathname, search, hash } = window.location;
-      replace(`${pathname}${search}${hash}`, { scroll: false });
-    }
+    if (pending.firstRender) startRefresh(refresh);
+    else
+      replace(
+        `${window.location.pathname}${window.location.search}${window.location.hash}`,
+        { scroll: false },
+      );
   }, [refresh, replace, watchHistory]);
-
   const pageRendered = useCallback(
-    (href: string, renderId: string) => {
+    (href: string, renderId: string, renderedAt: number) => {
+      if (href !== currentHistoryHref() || concealed.current) return;
       const pending = traversal.current;
-      if (!pending || href !== currentHistoryHref() || concealed.current)
-        return;
-
-      if (href !== pending.href || !pending.firstRender) {
-        const firstRender = { id: renderId, refreshStarted: false };
-        pending.href = href;
-        pending.firstRender = firstRender;
-        // The first commit may come from the router cache. Its data stays
-        // behind the gate while the destination authorizes a fresh render.
-        queueMicrotask(() => {
-          if (
-            traversal.current !== pending ||
-            pending.firstRender !== firstRender ||
-            concealed.current
-          )
-            return;
-          firstRender.refreshStarted = true;
-          startRefresh(refresh);
-        });
-      } else if (
-        pending.firstRender.refreshStarted &&
-        !refreshing &&
-        renderId !== pending.firstRender.id
-      ) {
-        const restoreFocus =
-          pending.restoreFocus ||
-          document.activeElement?.closest("[data-history-recovery]");
+      const cached = entries.current.get(href) === renderId;
+      if (pending) {
+        // Reuse a known native Router Cache entry. A newly authorized server
+        // commit also needs no second render. Unknown old entries refresh once.
+        if (!cached && renderedAt < pending.startedAt && !pending.firstRender) {
+          pending.firstRender = renderId;
+          queueMicrotask(() => {
+            if (traversal.current === pending && !concealed.current)
+              startRefresh(refresh);
+          });
+          return;
+        }
+        if (pending.firstRender === renderId) return;
         window.clearTimeout(pending.timeout);
         traversal.current = null;
         setAttempt(null);
-        if (restoreFocus) {
-          window.requestAnimationFrame(() => {
-            if (
-              !traversal.current &&
-              document.activeElement === document.body
-            ) {
-              content.current
-                ?.querySelector<HTMLElement>(
-                  'header nav a[aria-current="page"]',
-                )
-                ?.focus({ preventScroll: true });
-            }
-          });
-        }
       }
+      entries.current.delete(href);
+      entries.current.set(href, renderId);
+      // This bounds eligibility metadata; private RSC payloads remain managed
+      // by Next's native in-memory cache. Entries expire with the session.
+      if (entries.current.size > 32)
+        entries.current.delete(entries.current.keys().next().value!);
     },
-    [refresh, refreshing],
+    [refresh],
   );
 
   useLayoutEffect(() => {
@@ -240,63 +243,97 @@ export function SignedInHistoryGuard({
     const scroll = createHistoryScroll(root);
     historyScroll.current = scroll;
     let check: AbortController | undefined;
-    let needsCheck = false;
+    let expiry: number | undefined;
+    let uncertainDocument = false;
+    let redirecting = false;
+    let revision = dataRevision();
     let focusedControl: HTMLElement | undefined;
-
     function hide() {
-      const focused = document.activeElement;
-      if (focused instanceof HTMLElement && root.contains(focused)) {
-        focusedControl = focused;
-      }
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && root.contains(active))
+        focusedControl = active;
       root.style.setProperty("display", "none");
     }
-
-    function protectConcealedDialog(event: KeyboardEvent) {
-      if (event.key !== "Escape" || root.style.display !== "none") return;
-
-      // Escape can target a concealed native modal behind the retry dialog.
-      // Stop the key before the browser requests dismissal of that modal.
-      event.preventDefault();
+    function reveal() {
+      root.style.removeProperty("display");
+      setState("visible");
+      const focus = focusedControl;
+      focusedControl = undefined;
+      window.requestAnimationFrame(() => {
+        if (document.activeElement === document.body)
+          focus?.focus({ preventScroll: true });
+      });
     }
-
-    function suspend() {
-      needsCheck = true;
-      check?.abort();
-      check = undefined;
-      hide();
+    function expire() {
+      window.clearTimeout(expiry);
+      expiry = window.setTimeout(
+        () => {
+          if (concealed.current) return;
+          hide();
+          entries.current.clear();
+          setState("checking");
+          void verify(true);
+        },
+        Math.max(
+          0,
+          Math.min(session.current.expiresAt * 1000 - Date.now(), 2147483647),
+        ),
+      );
     }
-
-    async function verify() {
+    async function verify(block = false) {
       if (check || concealed.current || document.hidden) return;
-      hide();
-      setState("checking");
+      if (block) {
+        hide();
+        setState("checking");
+      }
       const request = new AbortController();
       check = request;
+      const snapshot = session.current;
       try {
         const response = await fetch("/auth/session", {
           cache: "no-store",
-          headers: { "X-MyClinics-Owner": ownerId },
+          headers: {
+            "X-MyClinics-Owner": ownerId,
+            "X-MyClinics-Session": snapshot.generation,
+          },
           signal: AbortSignal.any([request.signal, AbortSignal.timeout(8000)]),
         });
-        if (request.signal.aborted || concealed.current) return;
+        if (
+          request.signal.aborted ||
+          concealed.current ||
+          !contextIsCurrent(snapshot)
+        )
+          return;
         if (response.status === 409) {
           concealContent();
           window.location.reload();
           return;
         }
         if (response.status !== 204) throw new Error("Session unavailable");
-        needsCheck = false;
-        root.style.removeProperty("display");
-        setState("visible");
-        // Restore focus after a possible retry dialog closes.
-        const restoreFocus = focusedControl;
-        window.requestAnimationFrame(() => {
-          restoreFocus?.focus({ preventScroll: true });
-        });
-        focusedControl = undefined;
+        const renewed = {
+          ...snapshot,
+          expiresAt: Number(response.headers.get("X-MyClinics-Expires")),
+          verifiedAt: Number(response.headers.get("X-MyClinics-Verified")),
+        };
+        if (
+          !sameSession(renewed, marker()) ||
+          !Number.isFinite(renewed.verifiedAt) ||
+          !acceptContext(renewed)
+        ) {
+          concealContent();
+          return;
+        }
+        session.current = renewed;
+        uncertainDocument = false;
+        expire();
+        if (revision !== dataRevision()) {
+          revision = dataRevision();
+          entries.current.clear();
+          startRefresh(refresh);
+        }
+        reveal();
       } catch {
         if (!request.signal.aborted && !concealed.current) {
-          needsCheck = true;
           hide();
           setState("failed");
         }
@@ -304,73 +341,134 @@ export function SignedInHistoryGuard({
         if (check === request) check = undefined;
       }
     }
-
-    function verifyOnReturn() {
-      if (needsCheck) void verify();
+    function returned() {
+      if (document.hidden) return;
+      if (concealed.current) {
+        if (!redirecting) {
+          redirecting = true;
+          window.location.reload();
+        }
+        return;
+      }
+      const current = eligible() && !uncertainDocument;
+      if (current) reveal();
+      else {
+        hide();
+        setState("checking");
+      }
+      void verify(!current);
     }
-
-    function visibilityChanged() {
-      if (document.hidden) suspend();
-      else verifyOnReturn();
+    function protectConcealedDialog(event: KeyboardEvent) {
+      if (event.key === "Escape" && root.style.display === "none")
+        event.preventDefault();
     }
-
-    const channel = openAccountChannel();
-    channel?.addEventListener("message", (event) => {
-      if (event.data !== "signed-out") return;
-      suspend();
-      void verify();
-    });
-    retry.current = () => void verify();
-
-    // Hide the saved document before the browser stores it in its history
-    // cache. A restored document must verify the current account again.
-    const verifyRestoredSession = (event: PageTransitionEvent) => {
-      if (event.persisted) window.location.reload();
-    };
-    window.addEventListener("pagehide", suspend);
-    window.addEventListener("pageshow", verifyRestoredSession);
-    window.addEventListener("blur", suspend);
-    window.addEventListener("focus", verifyOnReturn);
-    document.addEventListener("visibilitychange", visibilityChanged);
     window.addEventListener("keydown", protectConcealedDialog, true);
-    if (document.hidden) suspend();
-    // Keep this listener for the document's lifetime, including after client
-    // navigation to Login. Registering the same function again is a no-op.
-    const onHistory = () => {
+    function suspend() {
+      hide();
+    }
+    function documentSuspended() {
+      uncertainDocument = true;
+      check?.abort();
+      check = undefined;
+      hide();
+    }
+    function visible() {
+      if (document.hidden) suspend();
+      else returned();
+    }
+    function storageChanged(event: StorageEvent) {
+      if (event.key === dataRevisionKey) {
+        if (!document.hidden) returned();
+        return;
+      }
+      if (event.key !== sessionFenceKey) return;
+      if (!contextIsCurrent(session.current)) {
+        concealContent();
+        if (!document.hidden) window.location.reload();
+      }
+    }
+    function accountChanged(event: MessageEvent) {
+      if (event.data === "signed-out") {
+        concealContent();
+        if (!document.hidden) window.location.reload();
+      }
+    }
+    function restored(event: PageTransitionEvent) {
+      if (event.persisted) {
+        uncertainDocument = true;
+        returned();
+      }
+    }
+    function onHistory() {
       window.clearTimeout(traversal.current?.timeout);
       scroll.begin();
-      const pending = { href: currentHistoryHref() };
+      const pending = { href: currentHistoryHref(), startedAt: Date.now() };
       traversal.current = pending;
       watchHistory(pending);
-      // Close the gate before Next receives this native history event.
-      flushSync(() => {
-        setHistoryStatus("loading");
-        setAttempt(Symbol());
-      });
+      // Keep native Activity/cache boundaries intact for an eligible visited
+      // entry, including unsaved input. A temporary loader would unmount it.
+      if (!entries.current.has(pending.href) || !eligible()) {
+        flushSync(() => {
+          setHistoryStatus("loading");
+          setAttempt(Symbol());
+        });
+      }
+      if (!eligible()) returned();
+    }
+    const dataChanged = () => {
+      revision = dataRevision();
+      entries.current.clear();
     };
+    window.addEventListener(dataRevisionKey, dataChanged);
+    const channel = openAccountChannel();
+    channel?.addEventListener("message", accountChanged);
+    retry.current = () => void verify(true);
+    if (!acceptContext(context)) {
+      hide();
+      queueMicrotask(() => {
+        if (readFence()) {
+          concealContent();
+          window.location.reload();
+        } else setState("failed");
+      });
+    } else if (!eligible()) returned();
+    else expire();
     beginHistoryRestore = onHistory;
     window.addEventListener("popstate", verifySignedInHistory, true);
+    window.addEventListener("pagehide", documentSuspended);
+    window.addEventListener("pageshow", restored);
+    window.addEventListener("blur", suspend);
+    window.addEventListener("focus", returned);
+    document.addEventListener("visibilitychange", visible);
+    document.addEventListener("freeze", documentSuspended);
+    document.addEventListener("resume", returned);
+    window.addEventListener("online", returned);
+    window.addEventListener("storage", storageChanged);
     return () => {
       if (beginHistoryRestore === onHistory) beginHistoryRestore = undefined;
       window.clearTimeout(traversal.current?.timeout);
+      window.clearTimeout(expiry);
       traversal.current = null;
       historyScroll.current = null;
+      window.removeEventListener("keydown", protectConcealedDialog, true);
       scroll.dispose();
       check?.abort();
       channel?.close();
-      window.removeEventListener("pagehide", suspend);
-      window.removeEventListener("pageshow", verifyRestoredSession);
+      window.removeEventListener(dataRevisionKey, dataChanged);
+      window.removeEventListener("pagehide", documentSuspended);
+      window.removeEventListener("pageshow", restored);
       window.removeEventListener("blur", suspend);
-      window.removeEventListener("focus", verifyOnReturn);
-      document.removeEventListener("visibilitychange", visibilityChanged);
-      window.removeEventListener("keydown", protectConcealedDialog, true);
+      window.removeEventListener("focus", returned);
+      document.removeEventListener("visibilitychange", visible);
+      document.removeEventListener("freeze", documentSuspended);
+      document.removeEventListener("resume", returned);
+      window.removeEventListener("online", returned);
+      window.removeEventListener("storage", storageChanged);
     };
-  }, [concealContent, ownerId, watchHistory]);
-
+  }, [context, ownerId, concealContent, eligible, watchHistory, refresh]);
   useLayoutEffect(() => {
     if (!attempt) historyScroll.current?.restore(pathname, search);
   }, [attempt, pathname, search]);
-
   return (
     <ConcealSignedInContent value={concealContent}>
       {(state === "checking" || state === "concealed") && (
@@ -393,7 +491,7 @@ export function SignedInHistoryGuard({
         </Dialog>
       )}
       <div ref={content} className="flex min-h-dvh flex-col">
-        <SignedInOwner value={ownerId}>
+        <SignedInOwner value={{ ownerId, context }}>
           <HistoryRestore
             value={{
               attempt,
@@ -402,7 +500,14 @@ export function SignedInHistoryGuard({
               retry: retryHistory,
             }}
           >
-            {state !== "concealed" && children}
+            <ContinuityDrafts
+              value={{
+                store: drafts,
+                scope: routeHref(pathname, search),
+              }}
+            >
+              {state !== "concealed" && children}
+            </ContinuityDrafts>
           </HistoryRestore>
         </SignedInOwner>
       </div>

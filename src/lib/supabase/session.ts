@@ -1,5 +1,6 @@
 import "server-only";
 
+import { readSessionContext } from "./read-session-context";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
@@ -9,10 +10,13 @@ import { createSupabaseAuthClient } from "./auth-client";
 async function readSession(
   client: ReturnType<typeof createSupabaseAuthClient>,
 ) {
+  const verifiedAt = Date.now();
   const result = await client?.auth.getUser().catch(() => null);
   const user = result?.data.user;
   if (!client || result?.error || !user?.id) return null;
-  return { client, user };
+  const context = await readSessionContext(client, user.id, verifiedAt);
+  if (!context) return null;
+  return { client, user, context };
 }
 
 // Proxy refreshes the cookies before rendering. Cache only within the render.

@@ -1,5 +1,7 @@
 "use server";
 
+import { cookies } from "next/headers";
+import { sessionMarkerName } from "@/lib/supabase/session-context";
 import { createWritableSupabaseAuthClient } from "@/lib/supabase/auth-actions-client";
 
 export async function signOut(): Promise<string | null> {
@@ -18,5 +20,6 @@ export async function signOut(): Promise<string | null> {
     if (!remaining || remaining.error || remaining.data.session) return retry;
   }
 
+  (await cookies()).set(sessionMarkerName, "", { path: "/", maxAge: 0 });
   return null;
 }

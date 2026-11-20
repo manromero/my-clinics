@@ -18,6 +18,7 @@ export function createHistoryScroll(root: HTMLElement) {
   function remember() {
     if (!pending && root.style.display !== "none") {
       positions.set(entryKey(), { left: window.scrollX, top: window.scrollY });
+      if (positions.size > 32) positions.delete(positions.keys().next().value!);
     }
   }
 
