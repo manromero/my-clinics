@@ -62,7 +62,7 @@ Collect [visual evidence](../../development-workflow.md#visual-pr-evidence).
   Keep tab-return policy and prefetch changes in Tasks 04 and 05, respectively.
 - Open investigation: whether navigation replaces the document, remounts the
   shared interface, or hides it while waiting for session or route work.
-  Correction rounds used: 1. Independent re-review is blocked.
+  Correction rounds used: 2 (round 2 in progress).
 
 ## Progress notes
 
@@ -90,3 +90,11 @@ session was stopped by an automatic content filter, including on a retry limited
 to ordinary application checks. The initial review does not cover the correction.
 The task remains in progress and the PR remains a draft pending independent
 verification.
+
+The user authorized an independent replacement reviewer. The replacement
+reviewed `2af0cddbd5345553f662ade15c53ba16ca87ded0`, verified the normal
+throttled flows and confirmed that held responses keep cached destination
+content hidden. The exact account-change timing has implementer evidence only.
+The reviewer found a second blocker (HISTORY-02): after eight seconds, a valid
+but delayed history response causes a full document reload and replaces the
+header. Round 2 must keep waiting and recovery inside the route region.

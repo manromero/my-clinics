@@ -12,6 +12,7 @@ import {
   type ReactNode,
 } from "react";
 import { flushSync } from "react-dom";
+import { Alert } from "@/lib/components/alert/alert";
 import { Button } from "@/lib/components/button/button";
 import { Dialog } from "@/lib/components/dialog/dialog";
 import { LoadingState } from "@/lib/components/loading-state/loading-state";
@@ -21,9 +22,18 @@ import { createHistoryScroll } from "./history-scroll";
 const accountChannelName = "myclinics-account";
 export const ConcealSignedInContent = createContext<() => void>(() => {});
 const SignedInOwner = createContext<string | null>(null);
+type HistoryStatus = "loading" | "slow" | "retrying";
+type HistoryTraversal = {
+  href: string;
+  firstRender?: { id: string; refreshStarted: boolean };
+  timeout?: number;
+  restoreFocus?: boolean;
+};
 const HistoryRestore = createContext<{
   attempt: symbol | null;
+  status: HistoryStatus;
   pageRendered: (href: string, renderId: string) => void;
+  retry: () => void;
 } | null>(null);
 
 let beginHistoryRestore: (() => void) | undefined;
@@ -67,7 +77,23 @@ export function SignedInPage({
   if (!history?.attempt) return children;
   return (
     <PageContainer as="main" className="flex-1">
-      <LoadingState label="Cargando página…" variant="region" />
+      {history.status === "loading" ? (
+        <LoadingState label="Cargando página…" variant="region" />
+      ) : (
+        <Alert
+          data-history-recovery
+          title="La página está tardando en cargar"
+          announcement="polite"
+          action={{
+            label:
+              history.status === "retrying" ? "Cargando página…" : "Reintentar",
+            onClick: history.retry,
+            pending: history.status === "retrying",
+          }}
+        >
+          Puedes esperar o volver a intentarlo.
+        </Alert>
+      )}
     </PageContainer>
   );
 }
@@ -114,15 +140,12 @@ export function SignedInHistoryGuard({
   const concealed = useRef(false);
   const retry = useRef<() => void>(null);
   const historyScroll = useRef<ReturnType<typeof createHistoryScroll>>(null);
-  const { refresh } = useRouter();
+  const { refresh, replace } = useRouter();
   const pathname = usePathname();
   const search = useSearchParams().toString();
-  const traversal = useRef<{
-    href: string;
-    firstRender?: { id: string; refreshStarted: boolean };
-    timeout: number;
-  } | null>(null);
+  const traversal = useRef<HistoryTraversal | null>(null);
   const [attempt, setAttempt] = useState<symbol | null>(null);
+  const [historyStatus, setHistoryStatus] = useState<HistoryStatus>("loading");
   const [refreshing, startRefresh] = useTransition();
   const [state, setState] = useState<
     "visible" | "checking" | "failed" | "concealed"
@@ -133,6 +156,32 @@ export function SignedInHistoryGuard({
     content.current?.style.setProperty("display", "none");
     setState("concealed");
   }, []);
+
+  const watchHistory = useCallback((pending: HistoryTraversal) => {
+    window.clearTimeout(pending.timeout);
+    pending.timeout = window.setTimeout(() => {
+      if (traversal.current === pending && !concealed.current)
+        setHistoryStatus("slow");
+    }, 8000);
+  }, []);
+
+  const retryHistory = useCallback(() => {
+    const pending = traversal.current;
+    if (!pending || concealed.current || pending.href !== currentHistoryHref())
+      return;
+
+    pending.restoreFocus ||= Boolean(
+      document.activeElement?.closest("[data-history-recovery]"),
+    );
+    setHistoryStatus("retrying");
+    watchHistory(pending);
+    if (pending.firstRender) {
+      startRefresh(refresh);
+    } else {
+      const { pathname, search, hash } = window.location;
+      replace(`${pathname}${search}${hash}`, { scroll: false });
+    }
+  }, [refresh, replace, watchHistory]);
 
   const pageRendered = useCallback(
     (href: string, renderId: string) => {
@@ -161,9 +210,26 @@ export function SignedInHistoryGuard({
         !refreshing &&
         renderId !== pending.firstRender.id
       ) {
+        const restoreFocus =
+          pending.restoreFocus ||
+          document.activeElement?.closest("[data-history-recovery]");
         window.clearTimeout(pending.timeout);
         traversal.current = null;
         setAttempt(null);
+        if (restoreFocus) {
+          window.requestAnimationFrame(() => {
+            if (
+              !traversal.current &&
+              document.activeElement === document.body
+            ) {
+              content.current
+                ?.querySelector<HTMLElement>(
+                  'header nav a[aria-current="page"]',
+                )
+                ?.focus({ preventScroll: true });
+            }
+          });
+        }
       }
     },
     [refresh, refreshing],
@@ -273,16 +339,14 @@ export function SignedInHistoryGuard({
     const onHistory = () => {
       window.clearTimeout(traversal.current?.timeout);
       scroll.begin();
-      const pending = {
-        href: currentHistoryHref(),
-        timeout: window.setTimeout(() => {
-          concealContent();
-          window.location.reload();
-        }, 8000),
-      };
+      const pending = { href: currentHistoryHref() };
       traversal.current = pending;
+      watchHistory(pending);
       // Close the gate before Next receives this native history event.
-      flushSync(() => setAttempt(Symbol()));
+      flushSync(() => {
+        setHistoryStatus("loading");
+        setAttempt(Symbol());
+      });
     };
     beginHistoryRestore = onHistory;
     window.addEventListener("popstate", verifySignedInHistory, true);
@@ -301,7 +365,7 @@ export function SignedInHistoryGuard({
       document.removeEventListener("visibilitychange", visibilityChanged);
       window.removeEventListener("keydown", protectConcealedDialog, true);
     };
-  }, [concealContent, ownerId]);
+  }, [concealContent, ownerId, watchHistory]);
 
   useLayoutEffect(() => {
     if (!attempt) historyScroll.current?.restore(pathname, search);
@@ -330,7 +394,14 @@ export function SignedInHistoryGuard({
       )}
       <div ref={content} className="flex min-h-dvh flex-col">
         <SignedInOwner value={ownerId}>
-          <HistoryRestore value={{ attempt, pageRendered }}>
+          <HistoryRestore
+            value={{
+              attempt,
+              status: historyStatus,
+              pageRendered,
+              retry: retryHistory,
+            }}
+          >
             {state !== "concealed" && children}
           </HistoryRestore>
         </SignedInOwner>
