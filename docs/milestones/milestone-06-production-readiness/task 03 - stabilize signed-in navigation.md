@@ -1,6 +1,6 @@
 # Task 03 — Keep the interface visible during navigation
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -62,7 +62,7 @@ Collect [visual evidence](../../development-workflow.md#visual-pr-evidence).
   Keep tab-return policy and prefetch changes in Tasks 04 and 05, respectively.
 - Open investigation: whether navigation replaces the document, remounts the
   shared interface, or hides it while waiting for session or route work.
-  Correction rounds used: 2 (round 2 in progress).
+  Correction rounds used: 2. Final independent product review passed.
 
 ## Progress notes
 
@@ -98,3 +98,18 @@ content hidden. The exact account-change timing has implementer evidence only.
 The reviewer found a second blocker (HISTORY-02): after eight seconds, a valid
 but delayed history response causes a full document reload and replaces the
 header. Round 2 must keep waiting and recovery inside the route region.
+
+Round 2 product head `7b548e924151cb876fb24ff9e19e7db872c5674f` passed
+independent code, functional and visual review. The slow-history notice and retry
+remain inside the content region. Desktop and touch-mobile responses held beyond
+9.6 seconds, late responses, keyboard retry, scroll, filters, and normal sign-out
+during a pending response followed by history traversal passed. Both findings
+were verified as corrected. The exact two-account timing was exercised by the
+implementer; independent verification used code inspection and the held-response
+sign-out scenario.
+
+Lint, typecheck, formatting, production build, diff checks, and all 287 tests
+passed. The build passed on retry after the installed Next.js version reported a
+security advisory; dependency updating remains a separate follow-up. Browser
+verification used Chrome. The PR preserves before/after evidence and the review
+history. Human approval and manual merge remain pending.
