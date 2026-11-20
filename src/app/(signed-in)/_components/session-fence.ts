@@ -3,29 +3,59 @@
 import type { SessionContext } from "@/lib/supabase/session-context";
 
 const key = "myclinics-session-context";
-type Fence = SessionContext & { invalidated?: boolean };
+const retiredLimit = 256;
+type Fence = SessionContext & {
+  invalidated?: boolean;
+  retired: string[];
+  blocked?: boolean;
+};
+const generationPattern = /^[a-f0-9]{64}$/;
 
-export function readFence(): Fence | null {
+// undefined means unavailable/corrupt storage, distinct from a first visit.
+function storedFence(): Fence | null | undefined {
   try {
-    const value = JSON.parse(
-      localStorage.getItem(key) ?? "null",
-    ) as Fence | null;
-    return value &&
-      typeof value.generation === "string" &&
-      typeof value.verifiedAt === "number"
-      ? value
-      : null;
+    const raw = localStorage.getItem(key);
+    if (raw === null) return null;
+    const value = JSON.parse(raw) as Partial<Fence>;
+    if (
+      !value ||
+      typeof value.generation !== "string" ||
+      !generationPattern.test(value.generation) ||
+      !Number.isSafeInteger(value.verifiedAt) ||
+      !Number.isSafeInteger(value.expiresAt)
+    )
+      return undefined;
+    const retired = value.retired ?? [];
+    if (
+      !Array.isArray(retired) ||
+      retired.length > retiredLimit ||
+      retired.some(
+        (id) => typeof id !== "string" || !generationPattern.test(id),
+      )
+    )
+      return undefined;
+    return { ...value, retired } as Fence;
   } catch {
-    return null;
+    return undefined;
   }
 }
 
+export function readFence(): Fence | null {
+  return storedFence() ?? null;
+}
+
 export function acceptContext(context: SessionContext) {
-  const previous = readFence();
+  const previous = storedFence();
+  if (
+    previous === undefined ||
+    previous?.blocked ||
+    previous?.retired.includes(context.generation)
+  )
+    return false;
   if (previous?.generation === context.generation && previous.invalidated)
     return false;
-  // A delayed old render must not replace a context established by a newer
-  // server verification. Equal-time conflicting generations fail closed.
+  // Ordering only rejects stale bootstrap snapshots. A newer timestamp never
+  // revives a generation that was signed out or superseded.
   if (
     previous &&
     previous.generation !== context.generation &&
@@ -37,8 +67,20 @@ export function acceptContext(context: SessionContext) {
     previous.verifiedAt > context.verifiedAt
   )
     return true;
+  const retired = previous ? [...previous.retired] : [];
+  if (
+    previous &&
+    previous.generation !== context.generation &&
+    !retired.includes(previous.generation)
+  )
+    retired.push(previous.generation);
   try {
-    localStorage.setItem(key, JSON.stringify(context));
+    if (retired.length > retiredLimit) {
+      // Keep the already-established context usable; never evict a spent ID
+      // to admit another one. The caller presents explicit storage recovery.
+      return false;
+    }
+    localStorage.setItem(key, JSON.stringify({ ...context, retired }));
     return true;
   } catch {
     return false;
@@ -46,7 +88,7 @@ export function acceptContext(context: SessionContext) {
 }
 
 export function invalidateContext(generation?: string) {
-  const previous = readFence();
+  const previous = storedFence();
   if (!previous || (generation && previous.generation !== generation)) return;
   try {
     localStorage.setItem(
@@ -59,8 +101,13 @@ export function invalidateContext(generation?: string) {
 }
 
 export function contextIsCurrent(context: SessionContext) {
-  const value = readFence();
-  return value?.generation === context.generation && !value.invalidated;
+  const value = storedFence();
+  return (
+    value?.generation === context.generation &&
+    !value.invalidated &&
+    !value.blocked &&
+    !value.retired.includes(context.generation)
+  );
 }
 
 export const sessionFenceKey = key;

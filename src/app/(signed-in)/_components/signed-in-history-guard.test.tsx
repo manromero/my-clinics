@@ -30,12 +30,12 @@ function response() {
     },
   });
 }
-function mount() {
+function mount(renderContext = context) {
   return render(
-    <SignedInHistoryGuard ownerId="owner" context={context}>
+    <SignedInHistoryGuard ownerId="owner" context={renderContext}>
       <SignedInPage
         ownerId="owner"
-        context={context}
+        context={renderContext}
         renderId="original"
         renderedAt={1}
       >
@@ -157,4 +157,40 @@ describe("signed-in session continuity", () => {
     expect(screen.getByText("Private activity")).not.toBeVisible();
     expect(screen.getByRole("button", { name: "Reintentar" })).toBeVisible();
   });
+});
+it("shows exceptional storage recovery without verification/reload loops", async () => {
+  localStorage.setItem(sessionFenceKey, "corrupt");
+  const fetch = vi.fn();
+  vi.stubGlobal("fetch", fetch);
+  mount();
+  await waitFor(() =>
+    expect(screen.getByText(/No se puede recuperar/)).toBeVisible(),
+  );
+  act(() => {
+    window.dispatchEvent(new Event("focus"));
+    window.dispatchEvent(new Event("online"));
+  });
+  expect(fetch).not.toHaveBeenCalled();
+  expect(screen.getByText(/Cierra todas las/)).toBeVisible();
+  expect(
+    screen.queryByRole("heading", { name: "Private activity" }),
+  ).toBeNull();
+});
+
+it("does not bootstrap a spent generation after a later account established continuity", async () => {
+  acceptContext(context);
+  invalidateContext(context.generation);
+  acceptContext({ ...context, generation: "b".repeat(64), verifiedAt: 200 });
+  // The actual fixed fence must reject even if this old render carries a
+  // timestamp later than the newer account's initial verification.
+  const newer = { ...context, generation: "b".repeat(64), verifiedAt: 300 };
+  acceptContext(newer);
+  vi.stubGlobal("fetch", vi.fn());
+  mount({ ...context, verifiedAt: 400 });
+  await waitFor(() =>
+    expect(screen.getByText(/No se puede recuperar/)).toBeVisible(),
+  );
+  expect(
+    screen.queryByRole("heading", { name: "Private activity" }),
+  ).toBeNull();
 });

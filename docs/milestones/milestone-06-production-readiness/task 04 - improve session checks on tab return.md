@@ -278,3 +278,35 @@ permission to weaken cross-account isolation because fixtures are synthetic.
   Handoffs include the local signed-in procedure and measured baseline. Full
   implementation checks and independent acceptance review remain outstanding.
   Correction rounds used: 0 of 2.
+
+### Initial implementation review and correction round 1
+
+[Draft PR 66](https://github.com/manromero/my-clinics/pull/66) contains initial
+implementation `1c336e998a2602b3adac47e10ac34abba3d7723d`, independently
+reviewed against `f8ccff523befef138295369cdd5bd47f19928d20`. Task and index
+remain `in_progress`. Initial review is blocked; correction round 1 of 2 is
+assigned, with no optional findings.
+
+- R03 (open): accepting another generation overwrites the earlier invalidation.
+  Actual module reproduction accepts A at 100, invalidates A, accepts B at 200,
+  then incorrectly accepts A at 300. Terminally superseded contexts must remain
+  rejected across subsequent context changes, regardless of a newer timestamp.
+  Correct the fence and cover delayed old work/account-transition behavior.
+- R04 (open): complete comparable cold and throttled production measurements on
+  desktop and touch mobile, refreshed/restored timing, blocking, request classes,
+  layout movement, cross-tab business-data invalidation and keyboard/focus/scroll
+  preservation. Marker expiry is not evidence of actual token expiry; clearly
+  identify real, simulated and unverified scenarios.
+- Independent lint, typecheck, formatting and 297 tests passed. Reviewer verified
+  actual Activity create/edit/delete and restored Summary (123.45 to 200 to 0),
+  exact synthetic-row cleanup, eight-second timeout/retry, expired-marker blocking
+  and HttpOnly credential-cookie flags. Desktop/mobile visual inspection of all
+  three screens found no new visual blocker. This does not waive R03/R04.
+- Coordinator independently retrieved all three saved inline PR images as PNG,
+  checked their expected dimensions and byte equality, and visually inspected
+  the retrieved files. GitHub tooling CI passed; hosted database checks skipped
+  because no schema changed. Human acceptance and manual merge remain pending.
+- Managed baseline-worktree preparation did not return and was stopped. A
+  read-only Git worktree inventory found no new baseline checkout. A static
+  tracked-source export at the exact base may be used for isolated production
+  measurement without disturbing the assignment checkout or other worktrees.

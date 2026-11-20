@@ -28,7 +28,6 @@ import {
   contextIsCurrent,
   invalidateContext,
   sessionFenceKey,
-  readFence,
 } from "./session-fence";
 import { dataRevision, dataRevisionKey } from "./data-invalidation";
 import { ContinuityDrafts, type DraftStore } from "./continuity-drafts";
@@ -169,7 +168,7 @@ export function SignedInHistoryGuard({
   const [historyStatus, setHistoryStatus] = useState<HistoryStatus>("loading");
   const [, startRefresh] = useTransition();
   const [state, setState] = useState<
-    "visible" | "checking" | "failed" | "concealed"
+    "visible" | "checking" | "failed" | "concealed" | "context-failed"
   >("visible");
 
   const concealContent = useCallback(() => {
@@ -246,6 +245,7 @@ export function SignedInHistoryGuard({
     let expiry: number | undefined;
     let uncertainDocument = false;
     let redirecting = false;
+    let permanentlyBlocked = false;
     let revision = dataRevision();
     let focusedControl: HTMLElement | undefined;
     function hide() {
@@ -342,7 +342,7 @@ export function SignedInHistoryGuard({
       }
     }
     function returned() {
-      if (document.hidden) return;
+      if (document.hidden || permanentlyBlocked) return;
       if (concealed.current) {
         if (!redirecting) {
           redirecting = true;
@@ -424,13 +424,11 @@ export function SignedInHistoryGuard({
     channel?.addEventListener("message", accountChanged);
     retry.current = () => void verify(true);
     if (!acceptContext(context)) {
+      permanentlyBlocked = true;
       hide();
-      queueMicrotask(() => {
-        if (readFence()) {
-          concealContent();
-          window.location.reload();
-        } else setState("failed");
-      });
+      entries.current.clear();
+      drafts.clear();
+      queueMicrotask(() => setState("context-failed"));
     } else if (!eligible()) returned();
     else expire();
     beginHistoryRestore = onHistory;
@@ -465,7 +463,15 @@ export function SignedInHistoryGuard({
       window.removeEventListener("online", returned);
       window.removeEventListener("storage", storageChanged);
     };
-  }, [context, ownerId, concealContent, eligible, watchHistory, refresh]);
+  }, [
+    context,
+    ownerId,
+    concealContent,
+    eligible,
+    watchHistory,
+    refresh,
+    drafts,
+  ]);
   useLayoutEffect(() => {
     if (!attempt) historyScroll.current?.restore(pathname, search);
   }, [attempt, pathname, search]);
@@ -474,6 +480,19 @@ export function SignedInHistoryGuard({
       {(state === "checking" || state === "concealed") && (
         <PageContainer className="py-8">
           <LoadingState label="Comprobando sesión…" variant="region" />
+        </PageContainer>
+      )}
+      {state === "context-failed" && (
+        <PageContainer className="py-8">
+          <Alert
+            title="No se puede recuperar esta sesión"
+            variant="error"
+            announcement="assertive"
+          >
+            Cierra todas las pestañas de MyClinics. Si el problema continúa,
+            borra los datos de este sitio en la configuración del navegador y
+            vuelve a iniciar sesión. No se han restaurado datos privados.
+          </Alert>
         </PageContainer>
       )}
       {state === "failed" && (
