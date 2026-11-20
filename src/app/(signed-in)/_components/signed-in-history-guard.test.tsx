@@ -214,9 +214,13 @@ it("conceals server-rendered private markup before hydration can accept its gene
   );
   const container = document.createElement("div");
   container.innerHTML = html;
-  expect(
-    container.querySelector("main")?.closest('[style="display:none"]'),
-  ).not.toBeNull();
+  const protectedRoot = container
+    .querySelector("main")
+    ?.closest<HTMLElement>("[inert]");
+  expect(protectedRoot).not.toBeNull();
+  expect(protectedRoot?.getAttribute("aria-hidden")).toBe("true");
+  expect(protectedRoot?.style.opacity).toBe("0");
+  expect(protectedRoot?.style.display).not.toBe("none");
   expect(container.textContent).toContain("Comprobando");
 });
 

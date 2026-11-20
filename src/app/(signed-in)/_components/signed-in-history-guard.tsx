@@ -522,7 +522,7 @@ export function SignedInHistoryGuard({
   return (
     <ConcealSignedInContent value={concealContent}>
       {(state === "checking" || state === "concealed") && (
-        <PageContainer className="min-h-dvh py-8">
+        <PageContainer className="fixed inset-0 z-50 py-8">
           <LoadingState label="Comprobando sesión…" variant="region" />
         </PageContainer>
       )}
@@ -556,7 +556,13 @@ export function SignedInHistoryGuard({
       <div
         ref={content}
         className="flex min-h-dvh flex-col"
-        style={{ display: state === "visible" ? undefined : "none" }}
+        aria-hidden={state !== "visible"}
+        inert={state !== "visible"}
+        style={
+          state === "visible"
+            ? undefined
+            : { opacity: 0, pointerEvents: "none" }
+        }
       >
         <SignedInOwner value={{ ownerId, context }}>
           <HistoryRestore
