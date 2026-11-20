@@ -1,4 +1,52 @@
-type ScrollPosition = { left: number; top: number };
+type FocusPosition = {
+  name?: string;
+  radioValue?: string;
+  href?: string;
+  label?: string;
+  tag: string;
+  text?: string;
+};
+type ScrollPosition = { left: number; top: number; focus?: FocusPosition };
+function focusPosition(root: HTMLElement): FocusPosition | undefined {
+  const node = document.activeElement;
+  if (
+    !(node instanceof HTMLElement) ||
+    !root.contains(node) ||
+    node === document.body
+  )
+    return;
+  return {
+    tag: node.tagName,
+    name: node.getAttribute("name") ?? undefined,
+    radioValue:
+      node instanceof HTMLInputElement && node.type === "radio"
+        ? node.value
+        : undefined,
+    href: node.getAttribute("href") ?? undefined,
+    label: node.getAttribute("aria-label") ?? undefined,
+    text: node.textContent?.trim(),
+  };
+}
+function findFocus(root: HTMLElement, saved: FocusPosition) {
+  return [
+    ...root.querySelectorAll<HTMLElement>(
+      "input,select,textarea,button,a,[tabindex]",
+    ),
+  ].find((node) => {
+    if (saved.radioValue)
+      return (
+        node instanceof HTMLInputElement &&
+        node.type === "radio" &&
+        node.value === saved.radioValue
+      );
+    if (saved.name) return node.getAttribute("name") === saved.name;
+    if (saved.href) return node.getAttribute("href") === saved.href;
+    if (saved.label) return node.getAttribute("aria-label") === saved.label;
+    return (
+      node.tagName === saved.tag && node.textContent?.trim() === saved.text
+    );
+  });
+}
 type HistoryWindow = Window & {
   navigation?: { currentEntry: Pick<NavigationHistoryEntry, "key"> | null };
 };
@@ -17,7 +65,11 @@ export function createHistoryScroll(root: HTMLElement) {
 
   function remember() {
     if (!pending && root.style.display !== "none") {
-      positions.set(entryKey(), { left: window.scrollX, top: window.scrollY });
+      positions.set(entryKey(), {
+        left: window.scrollX,
+        top: window.scrollY,
+        focus: focusPosition(root) ?? positions.get(entryKey())?.focus,
+      });
       if (positions.size > 32) positions.delete(positions.keys().next().value!);
     }
   }
@@ -54,7 +106,18 @@ export function createHistoryScroll(root: HTMLElement) {
       ) {
         return;
       }
-      window.scrollTo({ ...target, behavior: "instant" });
+      const focus = target.focus ? findFocus(root, target.focus) : undefined;
+      if (target.focus && !focus && !allowClamp) return;
+      window.scrollTo({
+        left: target.left,
+        top: target.top,
+        behavior: "instant",
+      });
+      if (focus)
+        window.requestAnimationFrame(() => {
+          if (focus.isConnected && href === location.href)
+            focus.focus({ preventScroll: true });
+        });
       cancel();
     }
 
@@ -71,6 +134,7 @@ export function createHistoryScroll(root: HTMLElement) {
 
   remember();
   window.addEventListener("scroll", remember, { passive: true });
+  root.addEventListener("focusin", remember);
   root.addEventListener("wheel", cancel, { passive: true });
   root.addEventListener("touchmove", cancel, { passive: true });
   return {
@@ -80,6 +144,7 @@ export function createHistoryScroll(root: HTMLElement) {
     dispose() {
       cancel();
       window.removeEventListener("scroll", remember);
+      root.removeEventListener("focusin", remember);
       root.removeEventListener("wheel", cancel);
       root.removeEventListener("touchmove", cancel);
     },

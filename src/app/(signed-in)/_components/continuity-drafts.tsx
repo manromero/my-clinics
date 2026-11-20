@@ -88,9 +88,19 @@ export function useDraftFocus(
     const values = entry(drafts.store, drafts.scope);
     const field = values.get(`${prefix}:focus`);
     const frame = window.requestAnimationFrame(() => {
-      const control =
+      const saved =
         typeof field === "string"
-          ? input.current?.form?.elements.namedItem(field)
+          ? { name: field }
+          : (field as { name?: string; radioValue?: string } | undefined);
+      const form = input.current?.form;
+      const control = saved?.radioValue
+        ? [
+            ...(form?.querySelectorAll<HTMLInputElement>(
+              'input[type="radio"]',
+            ) ?? []),
+          ].find((node) => node.value === saved.radioValue)
+        : saved?.name
+          ? form?.elements.namedItem(saved.name)
           : null;
       if (control instanceof HTMLElement)
         control.focus({ preventScroll: true });
@@ -103,7 +113,13 @@ export function useDraftFocus(
         target instanceof HTMLTextAreaElement
       ) {
         if (target.form && target.form === input.current?.form)
-          values.set(`${prefix}:focus`, target.name);
+          values.set(`${prefix}:focus`, {
+            name: target.name,
+            radioValue:
+              target instanceof HTMLInputElement && target.type === "radio"
+                ? target.value
+                : undefined,
+          });
       }
     };
     document.addEventListener("focusin", remember);

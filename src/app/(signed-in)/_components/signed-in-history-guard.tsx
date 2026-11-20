@@ -28,6 +28,7 @@ import {
   contextIsCurrent,
   invalidateContext,
   sessionFenceKey,
+  readFence,
 } from "./session-fence";
 import { dataRevision, dataRevisionKey } from "./data-invalidation";
 import { ContinuityDrafts, type DraftStore } from "./continuity-drafts";
@@ -321,12 +322,21 @@ export function SignedInHistoryGuard({
           },
           signal: AbortSignal.any([request.signal, AbortSignal.timeout(8000)]),
         });
-        if (
-          request.signal.aborted ||
-          concealed.current ||
-          !contextIsCurrent(snapshot)
-        )
+        if (request.signal.aborted || concealed.current) return;
+        if (!contextIsCurrent(snapshot)) {
+          hide();
+          if (!readFence()) {
+            permanentlyBlocked = true;
+            setState("context-failed");
+          } else {
+            concealContent();
+            if (!document.hidden && !redirecting) {
+              redirecting = true;
+              window.location.reload();
+            }
+          }
           return;
+        }
         if (response.status === 409) {
           concealContent();
           window.location.reload();
@@ -371,6 +381,14 @@ export function SignedInHistoryGuard({
     }
     function returned() {
       if (document.hidden || permanentlyBlocked) return;
+      if (!readFence()) {
+        permanentlyBlocked = true;
+        hide();
+        entries.current.clear();
+        drafts.clear();
+        setState("context-failed");
+        return;
+      }
       if (concealed.current) {
         if (!redirecting) {
           redirecting = true;
@@ -451,7 +469,7 @@ export function SignedInHistoryGuard({
     const channel = openAccountChannel();
     channel?.addEventListener("message", accountChanged);
     retry.current = () => void verify(true);
-    if (!acceptContext(context)) {
+    if (!acceptContext(session.current)) {
       permanentlyBlocked = true;
       hide();
       entries.current.clear();
@@ -491,15 +509,7 @@ export function SignedInHistoryGuard({
       window.removeEventListener("online", returned);
       window.removeEventListener("storage", storageChanged);
     };
-  }, [
-    context,
-    ownerId,
-    concealContent,
-    eligible,
-    watchHistory,
-    refresh,
-    drafts,
-  ]);
+  }, [ownerId, concealContent, eligible, watchHistory, refresh, drafts]);
   useLayoutEffect(() => {
     if (!attempt) historyScroll.current?.restore(pathname, search);
   }, [attempt, pathname, search]);
