@@ -19,6 +19,11 @@ sections, and avoid a jump when its content loads.
 - Keep prefetch limited to useful destinations and URL scopes. Preserve
   authentication, account isolation, and freshness after writes. Broad
   caching changes or speculative loading of every filter value are out of scope.
+- Apply Task 04's session-continuity, cache identity, and invalidation contract
+  when reusing prefetched results. Verify that eligible prefetched content avoids
+  redundant blocking refreshes and is discarded when its session context changes.
+  Task 04 owns that policy and any supporting bounded cache; this task owns
+  destination selection, prefetch scheduling, and integration with loading states.
 
 ## Dependencies
 

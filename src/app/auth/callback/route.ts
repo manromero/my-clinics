@@ -1,5 +1,5 @@
 import { createWritableSupabaseAuthClient } from "@/lib/supabase/auth-actions-client";
-import { currentActivityHref } from "../../activity/_lib/activity-view";
+import { currentActivityHref } from "../../(signed-in)/activity/_lib/activity-view";
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;

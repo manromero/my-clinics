@@ -16,8 +16,9 @@ moving between screens or returning to the browser tab.
   existing date behavior.
 - **Performance:** investigate and fix each reported issue within its own
   implementation task. Keep the shared interface stable on navigation, make
-  session checks on tab return less disruptive, and improve how destination
-  content loads.
+  session checks and history restoration less disruptive, and improve how
+  destination content loads. Define session continuity, bounded cache reuse,
+  background revalidation, and invalidation before adding destination prefetch.
 
 This milestone prepares the application for production. It does not include
 production deployment, release tagging, new business features, or changes to
@@ -30,8 +31,8 @@ saved financial calculations.
 | [00 — Set up entry routing and a development-only catalogue](<task 00 - entry routing and development catalogue.md>) | `done`    | Existing sign-in flow and catalogue             |
 | [01 — Reorder the signed-in navigation](<task 01 - reorder signed-in navigation.md>)                                 | `done`    | Existing Activity, Clinics, and Summary screens |
 | [02 — Reuse the last clinic in new activities](<task 02 - reuse the last clinic.md>)                                 | `done`    | Existing activity creation and date default     |
-| [03 — Keep the interface visible during navigation](<task 03 - stabilize signed-in navigation.md>)                   | `pending` | 01                                              |
-| [04 — Make session checks less disruptive on tab return](<task 04 - improve session checks on tab return.md>)        | `pending` | 03                                              |
+| [03 — Keep the interface visible during navigation](<task 03 - stabilize signed-in navigation.md>)                   | `done`    | 01                                              |
+| [04 — Improve session continuity and history restoration](<task 04 - improve session checks on tab return.md>)       | `pending` | 03                                              |
 | [05 — Improve destination loading with prefetch](<task 05 - improve destination loading.md>)                         | `pending` | 03 and 04                                       |
 
 Tasks 00–02 can be assigned independently once their existing dependencies are
@@ -55,3 +56,7 @@ verify its own change against the latest signed-in navigation behavior.
 
 The user approved this scope and delivery sequence on 2026-11-15.
 Implementation will be assigned separately.
+
+On 2026-11-20, the user expanded Task 04 to cover session continuity, conditional
+history restoration, bounded caching, background revalidation, and invalidation.
+Task 05 will consume that policy when implementing destination prefetch.

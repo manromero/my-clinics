@@ -6,7 +6,7 @@ import { Badge } from "@/lib/components/badge/badge";
 import { PageContainer } from "@/lib/components/page-container/page-container";
 import { Surface } from "@/lib/components/surface/surface";
 import { readSupabaseSession } from "@/lib/supabase/session";
-import { currentActivityHref } from "../activity/_lib/activity-view";
+import { currentActivityHref } from "../(signed-in)/activity/_lib/activity-view";
 import { GoogleSignInForm } from "./google-sign-in-form";
 
 export const metadata: Metadata = {
