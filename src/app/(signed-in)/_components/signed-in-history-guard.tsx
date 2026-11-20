@@ -172,9 +172,11 @@ export function SignedInHistoryGuard({
   useLayoutEffect(() => {
     dataRefreshActive.current = refreshing;
   }, [refreshing]);
+  // Server authorization cannot inspect the browser's retired-generation fence.
+  // Keep its entire private subtree unpainted until client activation accepts it.
   const [state, setState] = useState<
     "visible" | "checking" | "failed" | "concealed" | "context-failed"
-  >("visible");
+  >("checking");
 
   const concealContent = useCallback(() => {
     concealed.current = true;
@@ -275,6 +277,7 @@ export function SignedInHistoryGuard({
       root.style.setProperty("display", "none");
     }
     function reveal() {
+      if (concealed.current || permanentlyBlocked || document.hidden) return;
       root.style.removeProperty("display");
       if (suspendedScroll) {
         window.scrollTo({ ...suspendedScroll, behavior: "instant" });
@@ -476,7 +479,10 @@ export function SignedInHistoryGuard({
       drafts.clear();
       queueMicrotask(() => setState("context-failed"));
     } else if (!eligible()) returned();
-    else expire();
+    else {
+      expire();
+      if (!document.hidden) queueMicrotask(reveal);
+    }
     beginHistoryRestore = onHistory;
     window.addEventListener("popstate", verifySignedInHistory, true);
     window.addEventListener("pagehide", documentSuspended);
@@ -516,7 +522,7 @@ export function SignedInHistoryGuard({
   return (
     <ConcealSignedInContent value={concealContent}>
       {(state === "checking" || state === "concealed") && (
-        <PageContainer className="py-8">
+        <PageContainer className="min-h-dvh py-8">
           <LoadingState label="Comprobando sesión…" variant="region" />
         </PageContainer>
       )}
@@ -547,7 +553,11 @@ export function SignedInHistoryGuard({
           <p>Vuelve a intentarlo para acceder a tus datos.</p>
         </Dialog>
       )}
-      <div ref={content} className="flex min-h-dvh flex-col">
+      <div
+        ref={content}
+        className="flex min-h-dvh flex-col"
+        style={{ display: state === "visible" ? undefined : "none" }}
+      >
         <SignedInOwner value={{ ownerId, context }}>
           <HistoryRestore
             value={{

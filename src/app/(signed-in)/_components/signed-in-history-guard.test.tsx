@@ -1,3 +1,4 @@
+import { renderToString } from "react-dom/server";
 import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -114,9 +115,9 @@ describe("signed-in session continuity", () => {
     act(() => window.dispatchEvent(new PopStateEvent("popstate")));
     expect(screen.getByLabelText("Draft")).toBe(draft);
     expect(draft).toHaveValue("edited unsaved value");
-    expect(screen.getByRole("heading")).toBeVisible();
     await act(async () => {});
-    expect(router.refresh).not.toHaveBeenCalled();
+    expect(screen.getByRole("heading")).toBeVisible();
+    expect(router.refresh).toHaveBeenCalledTimes(1);
   });
   it("does not reveal a held old verification after same-user re-login and cookie rollback", async () => {
     let finish!: (value: Response) => void;
@@ -194,4 +195,39 @@ it("does not bootstrap a spent generation after a later account established cont
   expect(
     screen.queryByRole("heading", { name: "Private activity" }),
   ).toBeNull();
+});
+
+it("conceals server-rendered private markup before hydration can accept its generation", () => {
+  const html = renderToString(
+    <SignedInHistoryGuard ownerId="owner" context={context}>
+      <SignedInPage
+        ownerId="owner"
+        context={context}
+        renderId="ssr"
+        renderedAt={1}
+      >
+        <main>
+          <h1>Private activity</h1>
+        </main>
+      </SignedInPage>
+    </SignedInHistoryGuard>,
+  );
+  const container = document.createElement("div");
+  container.innerHTML = html;
+  expect(
+    container.querySelector("main")?.closest('[style="display:none"]'),
+  ).not.toBeNull();
+  expect(container.textContent).toContain("Comprobando");
+});
+
+it("reveals a legitimate cold server-verified context after the client fence accepts it", async () => {
+  const fetch = vi.fn();
+  vi.stubGlobal("fetch", fetch);
+  mount();
+  await waitFor(() =>
+    expect(
+      screen.getByRole("heading", { name: "Private activity" }),
+    ).toBeVisible(),
+  );
+  expect(fetch).not.toHaveBeenCalled();
 });
