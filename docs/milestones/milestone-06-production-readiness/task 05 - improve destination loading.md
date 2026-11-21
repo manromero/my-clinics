@@ -62,6 +62,13 @@ sign-out, and account switching. Collect
 Implementation assigned on 2026-11-21 under the coordinator, implementer, and
 independent reviewer workflow.
 
+[PR 67](https://github.com/manromero/my-clinics/pull/67) contains the implementation
+and detailed measurements. Independent product review passed; the PR remains a
+draft and this task remains `in_progress` because required inline screenshot
+publication awaits specific user authorization following an automatic approval
+review rejection. No screenshots have been uploaded. Human acceptance and manual
+merge remain pending.
+
 ## Execution context
 
 - Readiness: approved scope and criteria are actionable; Tasks 03 and 04 are
@@ -97,3 +104,54 @@ independent reviewer workflow.
 - No database/schema, OAuth provider, dependency upgrade, broad caching policy,
   persistent private storage or production deployment changes are authorized.
 - Correction rounds used: 0 of 2. Human acceptance and manual merge are pending.
+
+## Implementation and validation
+
+- Product head: `ebf42ca793a3eafc257186b3ec0e5b6f9a7dd799`. Native full prefetch
+  targets only the two alternate canonical main-navigation destinations after
+  Task 04 accepts session presentation. Next.js owns scheduling and in-memory
+  caching; existing session generation fences and write invalidation are retained.
+- Added a route loading boundary and shared content-region skeleton. Cold or
+  unfinished requests retain the shell and show pending feedback in the main area.
+- Comparable production traces cover all six directed transitions, cold and
+  repeat, on desktop and touch emulation. With equal 3.5-second pre-click dwell,
+  baseline readiness was 405–725 ms desktop and 186–540 ms touch; final readiness
+  was 9–21 ms and 14–24 ms. All 24 final cases had zero post-click destination RSC
+  requests. Cold here means an unvisited destination with prefetch opportunity,
+  not immediate navigation before speculative work can finish.
+- Recorded movement including recent-input shifts decreased from about 0.109 on
+  desktop Summary to at most 0.0185 desktop, and from up to 0.1492 touch to zero.
+  These observations are not Web Vitals CLS or latency guarantees.
+- Implementer checks passed: `pnpm lint`, `pnpm typecheck`,
+  `pnpm format:check`, `pnpm test` (41 files, 312 tests), `pnpm build` on an
+  unchanged retry, and `git diff --check`. Initial build invocations stopped on
+  the installed Next.js security advisory. No security check was disabled or
+  dependency changed. GitHub tooling and Vercel passed; hosted migration checks
+  were appropriately skipped because no schema or generated types changed.
+- Independent native reviewer verified the product head against base
+  `22782ee745b882ddd2320ae9d98fc979b59bde2f`, repeated required checks and tests,
+  and saved its fresh build failure/success logs. Its own 24 navigation cases
+  measured 12–24 ms desktop and 15–27 ms touch, with no post-click destination
+  requests or loader frames.
+- Independent live checks covered held-response early navigation, failed prefetch
+  recovery, monthly clinic scope, blocked-session scheduling, slow streamed
+  loading, create/edit/delete totals and cleanup, late-response sign-out, and
+  account switching. All eight intended implementer captures and independent
+  captures were inspected against Alexandria and the relevant Stitch references.
+- Product review found no blocking defects or optional UI/code findings.
+  Correction rounds used: 0 of 2. The existing Next.js security upgrade is a
+  separate dependency follow-up.
+
+## Remaining blocker and limitations
+
+- Automatic approval review rejected uploading the eight authenticated-session
+  screenshots to GitHub because their external publication requires specific user
+  authorization, even though fixture content is synthetic. Local captures remain
+  available and independently inspected. Specific approval was requested; no
+  upload retry or workaround has been attempted. PR 67 records the inventory,
+  source commits, viewport metadata, results and publication limitation.
+- The task and milestone remain `in_progress` until this evidence requirement is
+  resolved. No product correction round was consumed by the publication blocker.
+- Chrome 157 desktop and touch emulation were tested; physical devices, Safari
+  and Firefox were not. Browser throttling does not throttle server-side Supabase
+  calls. Google OAuth changes and production deployment are outside scope.

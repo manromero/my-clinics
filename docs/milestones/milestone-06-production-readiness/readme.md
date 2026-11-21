@@ -60,3 +60,9 @@ Implementation will be assigned separately.
 On 2026-11-20, the user expanded Task 04 to cover session continuity, conditional
 history restoration, bounded caching, background revalidation, and invalidation.
 Task 05 will consume that policy when implementing destination prefetch.
+
+Task 05 is implemented in [PR 67](https://github.com/manromero/my-clinics/pull/67)
+and independently reviewed without product blockers. It remains `in_progress`
+pending specific authorization to publish the required synthetic signed-in
+screenshots after automatic approval review rejected their external upload.
+Human acceptance and manual merge remain pending.
