@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { ActionLink } from "@/lib/components/action-link/action-link";
-import { LoadingState } from "@/lib/components/loading-state/loading-state";
+import { DestinationLoading } from "../_components/destination-loading";
 import { PageContainer } from "@/lib/components/page-container/page-container";
 import { PageHeader } from "@/lib/components/page-header/page-header";
 import { requireSupabaseSession } from "@/lib/supabase/session";
@@ -163,13 +163,7 @@ export default async function ActivityPage({
       <PageContainer as="main" className="flex-1 space-y-8">
         <Suspense
           key={loadKey}
-          fallback={
-            <LoadingState
-              label="Cargando actividad…"
-              variant="region"
-              indicator="skeleton"
-            />
-          }
+          fallback={<DestinationLoading label="Cargando actividad…" />}
         >
           <SavedActivity query={query} period={period} ownerId={user.id} />
         </Suspense>

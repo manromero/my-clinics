@@ -2,11 +2,50 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { MainNavigation } from "./main-navigation";
+import type { ComponentProps } from "react";
+
+vi.mock("next/link", () => ({
+  default: ({
+    prefetch,
+    ...props
+  }: ComponentProps<"a"> & { prefetch?: boolean }) => (
+    <a {...props} data-prefetch={String(prefetch)} />
+  ),
+}));
 
 const routes = ["/clinics", "/activity", "/summary", "/settings"] as const;
 const labels = ["Clínicas", "Actividad", "Resumen", "Ajustes"];
 
 describe("MainNavigation", () => {
+  it("prefetches only the available alternate destinations at their supplied scope", () => {
+    render(
+      <MainNavigation
+        currentHref="/activity"
+        availableDestinations={["/clinics", "/activity", "/summary"]}
+        hrefs={{ "/summary": "/summary?year=2026&month=10&clinic=7" }}
+        prefetch
+      />,
+    );
+    expect(screen.getByRole("link", { name: "Actividad" })).toHaveAttribute(
+      "data-prefetch",
+      "false",
+    );
+    expect(screen.getByRole("link", { name: "Clínicas" })).toHaveAttribute(
+      "data-prefetch",
+      "true",
+    );
+    expect(screen.getByRole("link", { name: "Resumen" })).toHaveAttribute(
+      "data-prefetch",
+      "true",
+    );
+    expect(screen.getByRole("link", { name: "Resumen" })).toHaveAttribute(
+      "href",
+      "/summary?year=2026&month=10&clinic=7",
+    );
+    expect(
+      screen.queryByRole("link", { name: "Ajustes" }),
+    ).not.toBeInTheDocument();
+  });
   it("provides all four Spanish destinations in a named navigation landmark", () => {
     render(<MainNavigation />);
     const links = within(

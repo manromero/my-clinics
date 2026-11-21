@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { LoadingState } from "@/lib/components/loading-state/loading-state";
+import { DestinationLoading } from "../_components/destination-loading";
 import { PageContainer } from "@/lib/components/page-container/page-container";
 import { requireSupabaseSession } from "@/lib/supabase/session";
 import { ClinicCreation } from "./clinic-creation";
@@ -22,11 +22,7 @@ export default async function ClinicsPage() {
     >
       <PageContainer as="main" className="flex-1 space-y-8">
         <ClinicCreation />
-        <Suspense
-          fallback={
-            <LoadingState label="Cargando clínicas…" variant="region" />
-          }
-        >
+        <Suspense fallback={<DestinationLoading label="Cargando clínicas…" />}>
           <SavedClinics ownerId={user.id} />
         </Suspense>
       </PageContainer>

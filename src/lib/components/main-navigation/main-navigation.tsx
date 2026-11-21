@@ -18,6 +18,7 @@ export type MainNavigationProps = Omit<
   availableDestinations?: readonly MainDestination[];
   labels?: Partial<Record<MainDestination, string>>;
   hrefs?: Partial<Record<MainDestination, string>>;
+  prefetch?: boolean;
 };
 
 export function MainNavigation({
@@ -25,6 +26,7 @@ export function MainNavigation({
   availableDestinations,
   labels,
   hrefs,
+  prefetch,
   "aria-label": ariaLabel = "Navegación principal",
   className = "",
   ...props
@@ -45,6 +47,7 @@ export function MainNavigation({
             <li key={href} className="min-w-0 max-w-full flex-auto">
               <Link
                 href={hrefs?.[href] ?? href}
+                prefetch={currentHref === href ? false : prefetch}
                 aria-current={currentHref === href ? "page" : undefined}
                 className={`flex min-h-11 items-center justify-center rounded-lg px-3.5 py-2 font-label text-label transition-colors duration-(--duration-fast) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [overflow-wrap:anywhere] ${currentHref === href ? "bg-surface-container font-semibold text-primary" : "font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"}`}
               >

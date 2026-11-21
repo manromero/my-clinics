@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { ActionLink } from "@/lib/components/action-link/action-link";
-import { LoadingState } from "@/lib/components/loading-state/loading-state";
+import { DestinationLoading } from "../_components/destination-loading";
 import { MonthlyScopeFilters } from "@/lib/components/monthly-scope-filters/monthly-scope-filters";
 import { PageContainer } from "@/lib/components/page-container/page-container";
 import { PageHeader } from "@/lib/components/page-header/page-header";
@@ -107,13 +107,7 @@ export default async function SummaryPage({
       <PageContainer as="main" className="flex-1 space-y-8 sm:space-y-10">
         <Suspense
           key={loadKey}
-          fallback={
-            <LoadingState
-              label="Cargando resumen…"
-              variant="region"
-              indicator="skeleton"
-            />
-          }
+          fallback={<DestinationLoading label="Cargando resumen…" />}
         >
           <SavedSummary query={query} period={period} />
         </Suspense>

@@ -51,6 +51,7 @@ export function SignedInShell({
     <>
       <AppHeader
         variant="signed-in"
+        prefetch
         currentHref={currentHref}
         hrefs={{
           "/activity": `/activity?${scope}`,

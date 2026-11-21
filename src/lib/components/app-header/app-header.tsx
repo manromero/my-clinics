@@ -13,6 +13,7 @@ export type AppHeaderProps = { brandHref?: string } & (
       currentHref?: MainDestination;
       availableDestinations?: readonly MainDestination[];
       hrefs?: Partial<Record<MainDestination, string>>;
+      prefetch?: boolean;
       account: Omit<UserMenuProps, "variant">;
     }
 );
@@ -44,6 +45,7 @@ export function AppHeader(props: AppHeaderProps) {
             <MainNavigation
               currentHref={props.currentHref}
               hrefs={props.hrefs}
+              prefetch={props.prefetch}
               availableDestinations={props.availableDestinations}
               className="col-start-1 row-start-2 justify-self-center max-sm:[&_a]:px-2.5 lg:col-start-2 lg:row-start-1"
             />
