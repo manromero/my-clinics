@@ -1,6 +1,6 @@
 # Task 04 — Improve session continuity and history restoration
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -140,9 +140,10 @@ restoration, bounded caching, invalidation and the contract for Task 05. The use
 then selected conventional established-session reuse with background verification
 and data revalidation; the proposed custom 30-second lease was withdrawn.
 
-[PR 66](https://github.com/manromero/my-clinics/pull/66) is ready for human
-acceptance and manual merge after one correction round. Agent completion does
-not represent human approval or a merge.
+[PR 66](https://github.com/manromero/my-clinics/pull/66) is reopened for a
+user-reported double loading state during ordinary screen navigation. The previous
+delivery passed review after one correction round; correction round 2 is now
+active. Human acceptance and manual merge remain pending.
 
 ## Execution context
 
@@ -229,3 +230,27 @@ are preserved in [PR 66](https://github.com/manromero/my-clinics/pull/66).
   again. Retired generations are not silently forgotten to recover.
 - The installed Next.js 16.4.3 security advisory remains a separate dependency
   follow-up; this task did not upgrade dependencies or claim that it resolved it.
+
+## Post-delivery correction round 2
+
+The user reports that switching between screens (for example Activity to Summary)
+shows the destination loading label, briefly flashes, then shows the same loading
+label again before the data. Investigate and correct this visible repeated load
+for ordinary header navigation among all three screens, including cold/warm and
+slow navigation. Do not treat a generic visible heading as proof that the intended
+destination/scope is ready. Preserve session isolation, server authorization,
+background freshness, URL/filter scope, drafts, focus and scroll.
+
+- Reopened branch: `feature/session-continuity`, current head
+  `c598a8f2a7d82f52b936d89da1fd3bf52b65a0e6`; PR 66 is open and unmerged.
+  Updated remote `develop` still points to the original assignment base.
+- Both synthetic role launchers succeeded on the production baseline. Use the
+  existing local signed-in validation procedure and approved fixture project.
+- Static hypotheses, not reproduced conclusions: unscoped header links can enter
+  a monthly route that redirects after reading data; foreground or history refresh
+  may overlap a navigation; Suspense boundaries can reset between partial commits.
+  Classify actual non-prefetch destination requests, redirects, background checks
+  and visible loader intervals before selecting a fix.
+- This is the second and final automatic correction round, not a new task or
+  reset review budget. Preserve earlier R03/R04 findings and evidence. No Task 05
+  prefetch scheduler or authentication-policy change is authorized by this report.

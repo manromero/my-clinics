@@ -161,6 +161,11 @@ export function SignedInHistoryGuard({
   const historyScroll = useRef<ReturnType<typeof createHistoryScroll>>(null);
   const entries = useRef(new Map<string, string>());
   const session = useRef(context);
+  const latestPage = useRef<{
+    href: string;
+    renderId: string;
+    renderedAt: number;
+  } | null>(null);
   const { refresh, replace } = useRouter();
   const pathname = usePathname();
   const search = useSearchParams().toString();
@@ -216,6 +221,7 @@ export function SignedInHistoryGuard({
   const pageRendered = useCallback(
     (href: string, renderId: string, renderedAt: number) => {
       if (href !== currentHistoryHref() || concealed.current) return;
+      latestPage.current = { href, renderId, renderedAt };
       const pending = traversal.current;
       const cached = entries.current.get(href) === renderId;
       if (pending) {
@@ -316,6 +322,8 @@ export function SignedInHistoryGuard({
       const request = new AbortController();
       check = request;
       const snapshot = session.current;
+      const startedAt = Date.now();
+      const initialPage = latestPage.current;
       try {
         const response = await fetch("/auth/session", {
           cache: "no-store",
@@ -362,13 +370,21 @@ export function SignedInHistoryGuard({
         session.current = renewed;
         uncertainDocument = false;
         expire();
-        if (revision !== dataRevision()) {
+        const changedData = revision !== dataRevision();
+        if (changedData) {
           revision = dataRevision();
           entries.current.clear();
         }
         // Continuity restores presentation immediately; foreground/reconnect
         // separately refreshes business data, including other-device writes.
-        if (!dataRefreshActive.current) {
+        // A navigation completed while Auth was pending: its new server render
+        // already reads current data. Cached/older commits still revalidate.
+        const page = latestPage.current;
+        const freshNavigation =
+          page !== initialPage &&
+          page?.href === currentHistoryHref() &&
+          page.renderedAt >= startedAt;
+        if (!dataRefreshActive.current && (!freshNavigation || changedData)) {
           dataRefreshActive.current = true;
           startRefresh(refresh);
         }

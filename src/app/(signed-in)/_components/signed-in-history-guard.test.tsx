@@ -11,10 +11,14 @@ import {
   sessionFenceKey,
 } from "./session-fence";
 import { SignedInHistoryGuard, SignedInPage } from "./signed-in-history-guard";
-const router = vi.hoisted(() => ({ refresh: vi.fn(), replace: vi.fn() }));
+const router = vi.hoisted(() => ({
+  refresh: vi.fn(),
+  replace: vi.fn(),
+  pathname: "/activity",
+}));
 vi.mock("next/navigation", () => ({
   useRouter: () => router,
-  usePathname: () => "/activity",
+  usePathname: () => router.pathname,
   useSearchParams: () => new URLSearchParams(),
 }));
 const context = {
@@ -76,6 +80,7 @@ beforeEach(() => {
       disconnect() {}
     },
   );
+  router.pathname = "/activity";
   router.refresh.mockReset();
   router.replace.mockReset();
 });
@@ -107,6 +112,60 @@ describe("signed-in session continuity", () => {
     await act(async () => finish(response()));
     expect(router.refresh).toHaveBeenCalledTimes(1);
   });
+  it.each([
+    { fresh: true, changedData: false, refreshes: 0 },
+    { fresh: false, changedData: false, refreshes: 1 },
+    { fresh: true, changedData: true, refreshes: 1 },
+  ])(
+    "deduplicates only fresh destinations without a later data revision ($fresh/$changedData)",
+    async ({ fresh, changedData, refreshes }) => {
+      let finish!: (value: Response) => void;
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(
+          () =>
+            new Promise<Response>((resolve) => {
+              finish = resolve;
+            }),
+        ),
+      );
+      const view = mount();
+      act(() => {
+        window.dispatchEvent(new Event("blur"));
+        window.dispatchEvent(new Event("focus"));
+      });
+      act(() => {
+        window.history.pushState({}, "", "/summary");
+        router.pathname = "/summary";
+      });
+      view.rerender(
+        <SignedInHistoryGuard ownerId="owner" context={context}>
+          <SignedInPage
+            ownerId="owner"
+            context={context}
+            renderId="destination"
+            renderedAt={fresh ? Date.now() : 1}
+          >
+            <main>
+              <h1>Private summary</h1>
+            </main>
+          </SignedInPage>
+        </SignedInHistoryGuard>,
+      );
+      if (changedData)
+        localStorage.setItem(
+          "myclinics-data-revision",
+          JSON.stringify({
+            generation: context.generation,
+            revision: "changed-during-navigation",
+          }),
+        );
+      await act(async () => finish(response()));
+      expect(screen.getByText("Private summary")).toBeVisible();
+      expect(router.refresh).toHaveBeenCalledTimes(refreshes);
+    },
+  );
+
   it("preserves a known same-URL history draft without unmounting", async () => {
     vi.stubGlobal("fetch", vi.fn());
     mount();

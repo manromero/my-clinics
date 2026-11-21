@@ -12,6 +12,7 @@ export type AppHeaderProps = { brandHref?: string } & (
       variant: "signed-in";
       currentHref?: MainDestination;
       availableDestinations?: readonly MainDestination[];
+      hrefs?: Partial<Record<MainDestination, string>>;
       account: Omit<UserMenuProps, "variant">;
     }
 );
@@ -42,6 +43,7 @@ export function AppHeader(props: AppHeaderProps) {
           <>
             <MainNavigation
               currentHref={props.currentHref}
+              hrefs={props.hrefs}
               availableDestinations={props.availableDestinations}
               className="col-start-1 row-start-2 justify-self-center max-sm:[&_a]:px-2.5 lg:col-start-2 lg:row-start-1"
             />
