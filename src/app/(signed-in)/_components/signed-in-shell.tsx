@@ -13,6 +13,7 @@ import { signOut } from "../clinics/sign-out";
 import {
   ConcealSignedInContent,
   notifySignedOut,
+  PrefetchSignedInDestinations,
 } from "./signed-in-history-guard";
 
 export function SignedInShell({
@@ -46,12 +47,13 @@ export function SignedInShell({
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string>();
   const conceal = useContext(ConcealSignedInContent);
+  const prefetch = useContext(PrefetchSignedInDestinations);
 
   return (
     <>
       <AppHeader
         variant="signed-in"
-        prefetch
+        prefetch={prefetch}
         currentHref={currentHref}
         hrefs={{
           "/activity": `/activity?${scope}`,

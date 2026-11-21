@@ -36,6 +36,7 @@ import { createHistoryScroll } from "./history-scroll";
 
 const accountChannelName = "myclinics-account";
 export const ConcealSignedInContent = createContext<() => void>(() => {});
+export const PrefetchSignedInDestinations = createContext(false);
 const SignedInOwner = createContext<{
   ownerId: string;
   context: SessionContext;
@@ -595,7 +596,9 @@ export function SignedInHistoryGuard({
                 scope: routeHref(pathname, search),
               }}
             >
-              {state !== "concealed" && children}
+              <PrefetchSignedInDestinations value={state === "visible"}>
+                {state !== "concealed" && children}
+              </PrefetchSignedInDestinations>
             </ContinuityDrafts>
           </HistoryRestore>
         </SignedInOwner>
