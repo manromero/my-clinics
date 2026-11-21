@@ -1,6 +1,6 @@
 # Task 05 — Improve destination loading with prefetch
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -59,4 +59,41 @@ sign-out, and account switching. Collect
 
 ## Progress notes
 
-Scope approved. Awaiting implementation assignment.
+Implementation assigned on 2026-11-21 under the coordinator, implementer, and
+independent reviewer workflow.
+
+## Execution context
+
+- Readiness: approved scope and criteria are actionable; Tasks 03 and 04 are
+  merged into `develop` (Task 04 in PR 66). No open product decisions.
+- Branch: `feature/destination-prefetch`; updated `develop` base:
+  `22782ee745b882ddd2320ae9d98fc979b59bde2f`. Checkout was clean at intake.
+- Native `implementer` and `reviewer` roles are exposed in this session and will
+  be selected sequentially, with one writer at a time.
+- Verified synthetic target: `lvqbrjybwstvdhaxyxyn`. Both configured ordinary
+  fixture accounts can sign in and read their active owned clinic. Chrome is
+  available. Follow [local signed-in validation](../../supabase.md#local-signed-in-validation)
+  independently for each role; keep credentials and raw traces private.
+- Relevant sources: [requirements](../../requirements.md),
+  [architecture](../../architecture.md), [screens](../../screens.md), Alexandria
+  and S02/S03/S04 Stitch references, Task 04's policy and PR 66, and installed
+  Next.js 16.4.3 documentation (`prefetching.md`, `loading.md`, `use-router.md`).
+- Relevant code: signed-in shell, history guard, session fence and data
+  invalidation helpers; main navigation and header; Activity/Summary scoped links;
+  the three destination pages and their Suspense fallbacks.
+- Verified finding: header monthly links already use canonical year/month/clinic
+  URLs. Task 04 uses generation-fenced native Router Cache payloads and server
+  authorization, with background verification and write invalidation. Preserve
+  these guarantees and avoid redundant blocking refreshes.
+- Investigation hypothesis: default prefetch for dynamic authenticated routes
+  may not prepare complete destination data. Compare native full link prefetch,
+  loading boundaries and targeted scheduling against a production baseline before
+  choosing the smallest supported improvement. This is not a prescribed design.
+- Validation: all four required checks, useful regression tests, comparable
+  before/after desktop and touch production measurements (cold and repeat),
+  early-click and failed-request recovery, monthly scope, writes, sign-out and
+  account switching. Preserve sanitized timing/request/layout evidence and
+  source-attributed screenshots in the PR using the required skills.
+- No database/schema, OAuth provider, dependency upgrade, broad caching policy,
+  persistent private storage or production deployment changes are authorized.
+- Correction rounds used: 0 of 2. Human acceptance and manual merge are pending.
