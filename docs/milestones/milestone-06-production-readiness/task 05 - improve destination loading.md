@@ -1,6 +1,6 @@
 # Task 05 — Improve destination loading with prefetch
 
-Status: `pending`
+Status: `done`
 
 ## Objective
 
@@ -59,4 +59,103 @@ sign-out, and account switching. Collect
 
 ## Progress notes
 
-Scope approved. Awaiting implementation assignment.
+Implementation assigned on 2026-11-21 under the coordinator, implementer, and
+independent reviewer workflow.
+
+[PR 67](https://github.com/manromero/my-clinics/pull/67) contains the implementation
+and detailed measurements. Independent product and evidence review passed. The
+user explicitly authorized publication of the eight synthetic signed-in captures
+on 2026-11-21; all eight are attached and independently verified. The task is
+ready for human acceptance and manual merge, which remain pending.
+
+## Execution context
+
+- Readiness: approved scope and criteria are actionable; Tasks 03 and 04 are
+  merged into `develop` (Task 04 in PR 66). No open product decisions.
+- Branch: `feature/destination-prefetch`; updated `develop` base:
+  `22782ee745b882ddd2320ae9d98fc979b59bde2f`. Checkout was clean at intake.
+- Native `implementer` and `reviewer` roles are exposed in this session and will
+  be selected sequentially, with one writer at a time.
+- Verified synthetic target: `lvqbrjybwstvdhaxyxyn`. Both configured ordinary
+  fixture accounts can sign in and read their active owned clinic. Chrome is
+  available. Follow [local signed-in validation](../../supabase.md#local-signed-in-validation)
+  independently for each role; keep credentials and raw traces private.
+- Relevant sources: [requirements](../../requirements.md),
+  [architecture](../../architecture.md), [screens](../../screens.md), Alexandria
+  and S02/S03/S04 Stitch references, Task 04's policy and PR 66, and installed
+  Next.js 16.4.3 documentation (`prefetching.md`, `loading.md`, `use-router.md`).
+- Relevant code: signed-in shell, history guard, session fence and data
+  invalidation helpers; main navigation and header; Activity/Summary scoped links;
+  the three destination pages and their Suspense fallbacks.
+- Verified finding: header monthly links already use canonical year/month/clinic
+  URLs. Task 04 uses generation-fenced native Router Cache payloads and server
+  authorization, with background verification and write invalidation. Preserve
+  these guarantees and avoid redundant blocking refreshes.
+- Investigation hypothesis: default prefetch for dynamic authenticated routes
+  may not prepare complete destination data. Compare native full link prefetch,
+  loading boundaries and targeted scheduling against a production baseline before
+  choosing the smallest supported improvement. This is not a prescribed design.
+- Validation: all four required checks, useful regression tests, comparable
+  before/after desktop and touch production measurements (cold and repeat),
+  early-click and failed-request recovery, monthly scope, writes, sign-out and
+  account switching. Preserve sanitized timing/request/layout evidence and
+  source-attributed screenshots in the PR using the required skills.
+- No database/schema, OAuth provider, dependency upgrade, broad caching policy,
+  persistent private storage or production deployment changes are authorized.
+- Correction rounds used: 0 of 2. Human acceptance and manual merge are pending.
+
+## Implementation and validation
+
+- Product head: `ebf42ca793a3eafc257186b3ec0e5b6f9a7dd799`. Native full prefetch
+  targets only the two alternate canonical main-navigation destinations after
+  Task 04 accepts session presentation. Next.js owns scheduling and in-memory
+  caching; existing session generation fences and write invalidation are retained.
+- Added a route loading boundary and shared content-region skeleton. Cold or
+  unfinished requests retain the shell and show pending feedback in the main area.
+- Comparable production traces cover all six directed transitions, cold and
+  repeat, on desktop and touch emulation. With equal 3.5-second pre-click dwell,
+  baseline readiness was 405–725 ms desktop and 186–540 ms touch; final readiness
+  was 9–21 ms and 14–24 ms. All 24 final cases had zero post-click destination RSC
+  requests. Cold here means an unvisited destination with prefetch opportunity,
+  not immediate navigation before speculative work can finish.
+- Recorded movement including recent-input shifts decreased from about 0.109 on
+  desktop Summary to at most 0.0185 desktop, and from up to 0.1492 touch to zero.
+  These observations are not Web Vitals CLS or latency guarantees.
+- Implementer checks passed: `pnpm lint`, `pnpm typecheck`,
+  `pnpm format:check`, `pnpm test` (41 files, 312 tests), `pnpm build` on an
+  unchanged retry, and `git diff --check`. Initial build invocations stopped on
+  the installed Next.js security advisory. No security check was disabled or
+  dependency changed. GitHub tooling and Vercel passed; hosted migration checks
+  were appropriately skipped because no schema or generated types changed.
+- Independent native reviewer verified the product head against base
+  `22782ee745b882ddd2320ae9d98fc979b59bde2f`, repeated required checks and tests,
+  and saved its fresh build failure/success logs. Its own 24 navigation cases
+  measured 12–24 ms desktop and 15–27 ms touch, with no post-click destination
+  requests or loader frames.
+- Independent live checks covered held-response early navigation, failed prefetch
+  recovery, monthly clinic scope, blocked-session scheduling, slow streamed
+  loading, create/edit/delete totals and cleanup, late-response sign-out, and
+  account switching. All eight intended implementer captures and independent
+  captures were inspected against Alexandria and the relevant Stitch references.
+- Product review found no blocking defects or optional UI/code findings.
+  Correction rounds used: 0 of 2. The existing Next.js security upgrade is a
+  separate dependency follow-up.
+
+## Evidence resolution and limitations
+
+- R01 is fixed and independently verified. Automatic approval review initially
+  rejected external screenshot publication; the user subsequently authorized
+  exactly eight captures in PR 67 on 2026-11-21. The implementer published them
+  through `github-pr`, preserving prior history and source attribution. Both
+  implementer and reviewer retrieved all eight saved inline assets: HTTP 200 PNG,
+  matching dimensions, complete bytes and SHA-256 hashes against the originals.
+  Both inspected the retrieved images visually. PR 67 preserves capture metadata,
+  verification results and the authorization record. No review blockers remain.
+- The task and indexes are `done`; correction rounds remain 0 of 2. Human
+  acceptance and manual merge remain pending. This evidence resolution required
+  no product changes or correction round.
+- Saved Markdown and retrieved assets were verified; the rendered GitHub PR page
+  was not separately inspected in a browser.
+- Chrome 157 desktop and touch emulation were tested; physical devices, Safari
+  and Firefox were not. Browser throttling does not throttle server-side Supabase
+  calls. Google OAuth changes and production deployment are outside scope.
