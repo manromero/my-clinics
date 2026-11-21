@@ -1,6 +1,6 @@
 # Task 05 — Improve destination loading with prefetch
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -63,11 +63,10 @@ Implementation assigned on 2026-11-21 under the coordinator, implementer, and
 independent reviewer workflow.
 
 [PR 67](https://github.com/manromero/my-clinics/pull/67) contains the implementation
-and detailed measurements. Independent product review passed; the PR remains a
-draft and this task remains `in_progress` because required inline screenshot
-publication awaits specific user authorization following an automatic approval
-review rejection. No screenshots have been uploaded. Human acceptance and manual
-merge remain pending.
+and detailed measurements. Independent product and evidence review passed. The
+user explicitly authorized publication of the eight synthetic signed-in captures
+on 2026-11-21; all eight are attached and independently verified. The task is
+ready for human acceptance and manual merge, which remain pending.
 
 ## Execution context
 
@@ -142,16 +141,21 @@ merge remain pending.
   Correction rounds used: 0 of 2. The existing Next.js security upgrade is a
   separate dependency follow-up.
 
-## Remaining blocker and limitations
+## Evidence resolution and limitations
 
-- Automatic approval review rejected uploading the eight authenticated-session
-  screenshots to GitHub because their external publication requires specific user
-  authorization, even though fixture content is synthetic. Local captures remain
-  available and independently inspected. Specific approval was requested; no
-  upload retry or workaround has been attempted. PR 67 records the inventory,
-  source commits, viewport metadata, results and publication limitation.
-- The task and milestone remain `in_progress` until this evidence requirement is
-  resolved. No product correction round was consumed by the publication blocker.
+- R01 is fixed and independently verified. Automatic approval review initially
+  rejected external screenshot publication; the user subsequently authorized
+  exactly eight captures in PR 67 on 2026-11-21. The implementer published them
+  through `github-pr`, preserving prior history and source attribution. Both
+  implementer and reviewer retrieved all eight saved inline assets: HTTP 200 PNG,
+  matching dimensions, complete bytes and SHA-256 hashes against the originals.
+  Both inspected the retrieved images visually. PR 67 preserves capture metadata,
+  verification results and the authorization record. No review blockers remain.
+- The task and indexes are `done`; correction rounds remain 0 of 2. Human
+  acceptance and manual merge remain pending. This evidence resolution required
+  no product changes or correction round.
+- Saved Markdown and retrieved assets were verified; the rendered GitHub PR page
+  was not separately inspected in a browser.
 - Chrome 157 desktop and touch emulation were tested; physical devices, Safari
   and Firefox were not. Browser throttling does not throttle server-side Supabase
   calls. Google OAuth changes and production deployment are outside scope.
