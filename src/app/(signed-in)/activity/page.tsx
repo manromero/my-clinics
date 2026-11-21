@@ -143,7 +143,7 @@ async function SavedActivity({
 export default async function ActivityPage({
   searchParams,
 }: PageProps<"/activity">) {
-  const { user } = await requireSupabaseSession();
+  const { user, context } = await requireSupabaseSession();
   const query = await searchParams;
   const period = monthlyPeriodFromQuery(query);
   const loadKey = JSON.stringify([
@@ -154,7 +154,12 @@ export default async function ActivityPage({
   ]);
 
   return (
-    <SignedInPage ownerId={user.id} renderId={crypto.randomUUID()}>
+    <SignedInPage
+      ownerId={user.id}
+      context={context}
+      renderedAt={context.verifiedAt}
+      renderId={crypto.randomUUID()}
+    >
       <PageContainer as="main" className="flex-1 space-y-8">
         <Suspense
           key={loadKey}

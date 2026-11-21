@@ -39,6 +39,34 @@ describe("MainNavigation", () => {
     );
   });
 
+  it("uses supplied scoped URLs while identifying the destination by its route", () => {
+    render(
+      <MainNavigation
+        currentHref="/activity"
+        hrefs={{
+          "/activity": "/activity?year=2026&month=10",
+          "/summary": "/summary?year=2026&month=10&clinic=7",
+        }}
+      />,
+    );
+    expect(screen.getByRole("link", { name: "Actividad" })).toHaveAttribute(
+      "href",
+      "/activity?year=2026&month=10",
+    );
+    expect(screen.getByRole("link", { name: "Actividad" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByRole("link", { name: "Resumen" })).toHaveAttribute(
+      "href",
+      "/summary?year=2026&month=10&clinic=7",
+    );
+    expect(screen.getByRole("link", { name: labels[0] })).toHaveAttribute(
+      "href",
+      "/clinics",
+    );
+  });
+
   it("links only to available destinations when given a subset", () => {
     render(
       <MainNavigation
@@ -86,6 +114,6 @@ describe("MainNavigation", () => {
       "aria-current",
       "page",
     );
-    expect(screen.getByRole("link", { name: "Clínicas" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: labels[0] })).toBeInTheDocument();
   });
 });

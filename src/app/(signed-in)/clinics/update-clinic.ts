@@ -42,5 +42,7 @@ export async function updateClinic(
   }
 
   revalidatePath("/clinics");
+  revalidatePath("/summary");
+  revalidatePath("/activity");
   return { status: "saved" };
 }

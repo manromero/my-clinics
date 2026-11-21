@@ -23,5 +23,7 @@ export async function createClinic(formData: FormData) {
   }
 
   revalidatePath("/clinics");
+  revalidatePath("/summary");
+  revalidatePath("/activity");
   return { status: "saved" } as const;
 }

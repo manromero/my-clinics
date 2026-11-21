@@ -60,13 +60,17 @@ function callback(query: string) {
   return authCallback(new Request(`${origin}/auth/callback?${query}`));
 }
 
-function fixtureSession(expiresIn: number, refreshToken: string) {
+function fixtureSession(
+  expiresIn: number,
+  refreshToken: string,
+  owner = "fixture-user",
+) {
   const exp = Math.floor(Date.now() / 1000) + expiresIn;
   const header = Buffer.from('{"alg":"HS256","typ":"JWT"}').toString(
     "base64url",
   );
   const payload = Buffer.from(
-    JSON.stringify({ sub: "fixture-user", exp }),
+    JSON.stringify({ sub: owner, exp, session_id: `session-${refreshToken}` }),
   ).toString("base64url");
   return {
     access_token: `${header}.${payload}.Zml4dHVyZQ`,
@@ -409,7 +413,7 @@ describe("Supabase SSR authentication with a controlled Auth transport", () => {
     ]);
     expect(first?.totals.priceCents).toBe("900719925474099327");
     expect(first?.lastEntered).toBe("9999-12-02");
-    const laterSession = fixtureSession(7200, "second-account");
+    const laterSession = fixtureSession(7200, "second-account", "second-owner");
     session = {
       ...laterSession,
       user: { id: "second-owner", email: "second@example.test" },

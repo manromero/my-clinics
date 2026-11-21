@@ -18,6 +18,11 @@ const row: ClinicRow = {
 
 function testClient(fetch: typeof globalThis.fetch) {
   vi.mocked(requireSupabaseSession).mockResolvedValue({
+    context: {
+      generation: "a".repeat(64),
+      expiresAt: 9999999999,
+      verifiedAt: 1,
+    },
     client: createClient<Database>(
       "https://myclinics.example",
       "sb_publishable_fixture",

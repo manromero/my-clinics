@@ -1,5 +1,6 @@
 "use client";
 
+import { useDraftState } from "../_components/continuity-drafts";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Clinic } from "@/lib/clinics/clinic";
@@ -44,7 +45,10 @@ export function ClinicList({
   ownerId: string;
 }) {
   const router = useRouter();
-  const [editing, setEditing] = useState<Clinic | null>(null);
+  const [editing, setEditing] = useDraftState<Clinic | null>(
+    "clinic-editing",
+    null,
+  );
   const [notice, setNotice] = useState<"saved" | "deleted" | null>(null);
   const hasClinics = clinics !== null && clinics.length > 0;
 

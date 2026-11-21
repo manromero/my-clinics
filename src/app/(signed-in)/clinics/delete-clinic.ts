@@ -32,6 +32,7 @@ export async function deleteClinic(
   }
 
   revalidatePath("/clinics");
+  revalidatePath("/summary");
   revalidatePath("/activity");
   return "deleted";
 }

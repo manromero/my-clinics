@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  useDraftState,
+  useClearDraft,
+} from "../../_components/continuity-drafts";
+import { notifyDataChanged } from "../../_components/data-invalidation";
+
 import { useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { ActionLink } from "@/lib/components/action-link/action-link";
 import { Alert } from "@/lib/components/alert/alert";
@@ -70,7 +76,11 @@ export function SavedActivityResults({
   const { scope, clinicOptions, canCreate } = data;
   const conceal = useContext(ConcealSignedInContent);
   const { lastCreatedClinic, rememberClinic } = useContext(LastCreatedClinic);
-  const [operation, setOperation] = useState<Operation | null>(null);
+  const [operation, setOperation] = useDraftState<Operation | null>(
+    "activity-operation",
+    null,
+  );
+  const clearDraft = useClearDraft();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string>();
   const [notice, setNotice] = useState("");
@@ -103,7 +113,10 @@ export function SavedActivityResults({
   };
 
   function closeOperation() {
-    if (!inFlight.current) setOperation(null);
+    if (!inFlight.current) {
+      clearDraft("activity-form:");
+      setOperation(null);
+    }
   }
 
   async function write(
@@ -132,6 +145,8 @@ export function SavedActivityResults({
         return;
       }
 
+      clearDraft("activity-form:");
+      notifyDataChanged();
       onSaved?.();
       setNotice(success);
       setOperation(null);

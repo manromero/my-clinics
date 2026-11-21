@@ -1,3 +1,9 @@
+import { cookies } from "next/headers";
+import { readSessionContext } from "@/lib/supabase/read-session-context";
+import {
+  sessionMarkerName,
+  sessionMarker,
+} from "@/lib/supabase/session-context";
 import { isAuthSessionMissingError } from "@supabase/supabase-js";
 import { createWritableSupabaseAuthClient } from "@/lib/supabase/auth-actions-client";
 
@@ -7,6 +13,7 @@ export async function GET(request: Request) {
   if (!owner) return new Response(null, { status: 400, headers });
 
   const client = await createWritableSupabaseAuthClient();
+  const verifiedAt = Date.now();
   const result = await client?.auth.getUser().catch(() => null);
   if (!result) return new Response(null, { status: 503, headers });
 
@@ -20,8 +27,28 @@ export async function GET(request: Request) {
   ) {
     return new Response(null, { status: 503, headers });
   }
+  const context =
+    !error && client && data.user?.id === owner
+      ? await readSessionContext(client, owner, verifiedAt)
+      : null;
+  const expectedGeneration = request.headers.get("X-MyClinics-Session");
+  if (
+    !context ||
+    (expectedGeneration && expectedGeneration !== context.generation)
+  )
+    return new Response(null, { status: 409, headers });
+  (await cookies()).set(sessionMarkerName, sessionMarker(context), {
+    path: "/",
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: false,
+  });
   return new Response(null, {
-    status: !error && data.user?.id === owner ? 204 : 409,
-    headers,
+    status: 204,
+    headers: {
+      ...headers,
+      "X-MyClinics-Expires": String(context.expiresAt),
+      "X-MyClinics-Verified": String(context.verifiedAt),
+    },
   });
 }

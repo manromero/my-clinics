@@ -1,5 +1,6 @@
 "use client";
 
+import { useDraftState } from "../_components/continuity-drafts";
 import { useState } from "react";
 import { Alert } from "@/lib/components/alert/alert";
 import { Button } from "@/lib/components/button/button";
@@ -8,7 +9,7 @@ import { ClinicForm } from "./clinic-form";
 import { createClinic } from "./create-clinic";
 
 export function ClinicCreation() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useDraftState("clinic-creation-open", false);
   const [saved, setSaved] = useState(false);
 
   return (

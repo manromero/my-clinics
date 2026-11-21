@@ -1,3 +1,7 @@
+import {
+  ContinuityDrafts,
+  type DraftStore,
+} from "../_components/continuity-drafts";
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -79,4 +83,41 @@ describe("Clinic creation form", () => {
     expect(percentage).not.toHaveAttribute("aria-invalid");
     expect(percentage).toHaveFocus();
   });
+});
+
+it("restores an unmounted creation draft in its scope and clears it on cancel or new session", async () => {
+  const user = userEvent.setup();
+  const store: DraftStore = new Map();
+  const view = (shown: boolean, drafts = store, scope = "/clinics") => (
+    <ContinuityDrafts value={{ store: drafts, scope }}>
+      {shown ? <ClinicCreation /> : null}
+    </ContinuityDrafts>
+  );
+  const { rerender } = render(view(true));
+  await user.click(screen.getByRole("button", { name: "Nueva clínica" }));
+  await user.type(
+    screen.getByRole("textbox", { name: "Nombre de la clínica" }),
+    "Unsaved clinic",
+  );
+  await user.type(
+    screen.getByRole("textbox", { name: "Porcentaje por defecto" }),
+    "37,5",
+  );
+  rerender(view(false));
+  rerender(view(true));
+  expect(screen.getByRole("dialog")).toBeVisible();
+  expect(
+    screen.getByRole("textbox", { name: "Nombre de la clínica" }),
+  ).toHaveValue("Unsaved clinic");
+  expect(
+    screen.getByRole("textbox", { name: "Porcentaje por defecto" }),
+  ).toHaveValue("37,5");
+  await user.click(screen.getByRole("button", { name: "Cancelar" }));
+  await user.click(screen.getByRole("button", { name: "Nueva clínica" }));
+  expect(
+    screen.getByRole("textbox", { name: "Nombre de la clínica" }),
+  ).toHaveValue("");
+  rerender(view(false));
+  rerender(view(true, new Map()));
+  expect(screen.queryByRole("dialog")).toBeNull();
 });

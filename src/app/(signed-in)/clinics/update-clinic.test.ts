@@ -28,6 +28,11 @@ function clinicForm(name = "  Clínica Sintética  ", percentage = "27,50") {
 beforeEach(() => {
   vi.resetAllMocks();
   requireSession.mockResolvedValue({
+    context: {
+      generation: "a".repeat(64),
+      expiresAt: 9999999999,
+      verifiedAt: 1,
+    },
     user,
     client: createClient<Database>(
       "https://myclinics.example",
@@ -74,7 +79,7 @@ describe("update clinic server action", () => {
           }),
         }),
       );
-      expect(revalidatePath).toHaveBeenCalledExactlyOnceWith("/clinics");
+      expect(revalidatePath).toHaveBeenCalledWith("/clinics");
     },
   );
 
@@ -150,6 +155,6 @@ describe("update clinic server action", () => {
     expect(await updateClinic(clinicId, form)).toEqual({ status: "failed" });
     expect(revalidatePath).not.toHaveBeenCalled();
     expect(await updateClinic(clinicId, form)).toEqual({ status: "saved" });
-    expect(revalidatePath).toHaveBeenCalledExactlyOnceWith("/clinics");
+    expect(revalidatePath).toHaveBeenCalledWith("/clinics");
   });
 });

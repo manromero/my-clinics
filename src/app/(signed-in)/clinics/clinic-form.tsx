@@ -1,4 +1,10 @@
 import {
+  useClearDraft,
+  useDraftState,
+  useDraftFocus,
+} from "../_components/continuity-drafts";
+import { notifyDataChanged } from "../_components/data-invalidation";
+import {
   useContext,
   useEffect,
   useRef,
@@ -44,8 +50,15 @@ export function ClinicForm({
   onSaved: () => void;
 }) {
   const conceal = useContext(ConcealSignedInContent);
-  const [name, setName] = useState(clinic?.name ?? "");
-  const [percentage, setPercentage] = useState(
+  const draftKey = `clinic-form:${clinic?.id ?? "new"}`;
+  const clearDraft = useClearDraft();
+  const [active, setActive] = useDraftState(
+    `${draftKey}:active`,
+    clinic?.active ? "active" : "inactive",
+  );
+  const [name, setName] = useDraftState(`${draftKey}:name`, clinic?.name ?? "");
+  const [percentage, setPercentage] = useDraftState(
+    `${draftKey}:percentage`,
     clinic ? clinic.percentage.toFixed(2).replace(".", ",") : "",
   );
   const [result, setResult] = useState<ClinicSaveResult | null>(null);
@@ -61,6 +74,7 @@ export function ClinicForm({
   const nameInput = useRef<HTMLInputElement>(null);
   const percentageInput = useRef<HTMLInputElement>(null);
   const focusError = useRef<"name" | "percentage" | null>(null);
+  useDraftFocus(nameInput, draftKey);
   const fieldErrors = result?.status === "invalid" ? result : undefined;
 
   useEffect(() => {
@@ -107,6 +121,8 @@ export function ClinicForm({
     try {
       const response = await save(formData);
       if (response.status === "saved") {
+        clearDraft(draftKey);
+        notifyDataChanged();
         onSaved();
       } else {
         if (response.status === "invalid") {
@@ -128,6 +144,8 @@ export function ClinicForm({
     const response = await deletion.remove().catch(() => "failed" as const);
     switch (response) {
       case "deleted":
+        clearDraft(draftKey);
+        notifyDataChanged();
         deletion.onDeleted();
         break;
       case "linked-activity":
@@ -168,7 +186,10 @@ export function ClinicForm({
         }
         noValidate
         onSubmit={handleSubmit}
-        onCancel={() => onCancel(result)}
+        onCancel={() => {
+          clearDraft(draftKey);
+          onCancel(result);
+        }}
         pending={pending}
         error={
           result?.status === "failed"
@@ -214,7 +235,8 @@ export function ClinicForm({
               label="Estado del centro"
               name="active"
               options={stateOptions}
-              defaultValue={clinic.active ? "active" : "inactive"}
+              value={active}
+              onValueChange={setActive}
             />
             <p className="text-sm leading-6 text-on-surface-variant">
               Las clínicas inactivas conservan su actividad existente y no

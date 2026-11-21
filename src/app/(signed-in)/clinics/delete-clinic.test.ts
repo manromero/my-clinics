@@ -20,6 +20,11 @@ const clinicId = "9223372036854775807";
 beforeEach(() => {
   vi.resetAllMocks();
   requireSession.mockResolvedValue({
+    context: {
+      generation: "a".repeat(64),
+      expiresAt: 9999999999,
+      verifiedAt: 1,
+    },
     user,
     client: createClient<Database>(
       "https://myclinics.example",
@@ -48,7 +53,7 @@ it("calls the scoped RPC with the exact ID and invalidates both routes after del
       body: JSON.stringify({ p_id: clinicId }),
     }),
   );
-  expect(revalidatePath).toHaveBeenCalledTimes(2);
+  expect(revalidatePath).toHaveBeenCalledTimes(3);
   expect(revalidatePath).toHaveBeenCalledWith("/clinics");
   expect(revalidatePath).toHaveBeenCalledWith("/activity");
 });
