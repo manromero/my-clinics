@@ -1,0 +1,2 @@
+-- Supabase-managed schemas are not owned here. Application definitions follow
+-- in lexical order; the previous application baseline contained no objects.

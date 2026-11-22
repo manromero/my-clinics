@@ -1,0 +1,19 @@
+# Repository tooling configuration, not a hosted project identifier.
+# Hosted API settings must be changed and verified in the Dashboard separately.
+project_id = "my-clinics"
+
+[api]
+enabled = false
+auto_expose_new_tables = false
+
+[db.migrations]
+enabled = true
+schema_paths = ["./schemas/*.sql"]
+
+[db.seed]
+enabled = false
+sql_paths = ["./seed.sql"]
+
+[experimental.pgdelta]
+enabled = true
+declarative_schema_path = "./schemas"

@@ -1,0 +1,90 @@
+# Task 16 — Implement Dialog
+
+Status: `done`
+
+## Objective
+
+Implement Dialog for the shared MyClinics visual system.
+
+## Scope
+
+Provide an accessible modal primitive with title/description, open/close lifecycle, backdrop, responsive sizing, overflow handling and reachable actions. Manage initial focus, focus containment, Escape, background interaction and focus return. Document dismissal policy and any focused headless dependency choice.
+
+## Exclusions
+
+No production business-screen implementation, persistence, authentication integration, domain calculations, domain-specific selectors, indicators, tables or reporting charts. Do not implement dependent tasks early.
+
+## Dependencies
+
+- [Task 02 — Implement Button](<task 02 - button.md>) must be complete.
+- [Task 05 — Implement Surface / Card](<task 05 - surface.md>) must be complete.
+
+The [milestone acceptance contract](readme.md#completion-contract-for-every-task) also applies.
+
+## Acceptance criteria
+
+- Deliver the scope above with a documented, focused public API and examples of supported variants.
+- Test opening/closing, accessible dialog name, keyboard focus containment and restoration, Escape and dismissal policy. Demonstrate short and scrollable content at both sizes.
+- Add or update the component's interactive examples in [/components](<task 00 - components showcase.md>), covering the variants and states in this task. Foundations must appear as specimens; the showcase task provides the initial screen itself.
+- Include meaningful unit tests for the delivered public contract, semantics and interactions. No task is complete with screenshots alone, implementation-mirroring assertions or snapshots alone.
+- Use `chrome-screenshots` for running catalogue evidence and `github-pr` for inline PR attachments. Inspect desktop (for example 1440 × 900) and mobile (for example 390 × 844); include a mobile capture whenever layout, wrapping, controls or interaction presentation differs, or explain why one image suffices. Include relevant focus/error/pending states and compare reference similarity, not just presence.
+- Group each reusable component with its unit tests in src/lib/components/<component>. Keep page-specific specimens under src/app/components/<slug> and validate catalogue pages live rather than with unit tests; shared non-UI helpers belong in src/lib.
+- Support Spanish labels, keyboard access, visible focus, readable contrast and narrow viewports. Keep generic UI free of authentication, persistence and clinic/calculation rules.
+
+## Validation
+
+Run the unit-test command established by Task 00 (once available), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, and `pnpm build` for route, theme, font, dependency or production-build changes. Validate interactions in the running showcase as well as unit tests. Independently review code, behavior and visual evidence against [Alexandria](../../screens/alexandria/DESIGN.md), the [screen references](../../screens.md#visual-design-references), and applicable S01-S04 HTML/PNG files. Record command results and limitations, not assumed passes.
+
+## Progress notes
+
+Implemented a controlled native Dialog and interactive catalogue covering both sizes, short/scrollable content, initial focus and dismissal policy. Component tests and live Chrome focus, keyboard, background interaction and responsive checks are complete; detailed results and screenshots accompany the implementation PR. Independent code, functional and desktop/mobile visual review passed without blockers or optional findings. Agent work is complete; human acceptance and manual merge remain pending under the [tracking rules](../readme.md#task-structure-and-status).
+
+## Execution context
+
+- Readiness: ready. Tasks 02 and 05 are done and available on the baseline.
+- Workspace: isolated task16-dialog worktree to protect parallel assignments.
+- Branch: `feature/shared-dialog`.
+- Base: `origin/develop` at `01921946da4fd419e9e5d0016ce08cc360d82b48`, fetched before branch creation.
+- References: architecture, requirements, screens/shared interaction rules, Alexandria, and S02/S03 HTML and PNG references. The exports guide appearance without extending this generic primitive into FormPanel or ConfirmDialog.
+- Verified existing building blocks: Button, IconButton, Surface, semantic theme tokens, dedicated catalogue routes and Vitest/Testing Library. Package manager is pnpm 11.25.0; installed framework baseline is Next 16.4.3 and React 19.3.0.
+- Implementation must read relevant installed Next.js guides before code changes. Select native modal behavior or a focused accessible headless dependency based on browser behavior and compatibility; document dismissal and focus policy in catalogue examples. Unit tests alone cannot establish native browser focus/inert behavior.
+- Required validation: meaningful component unit tests, lint, typecheck, formatting, build; live desktop/mobile opening, closing, initial focus, containment, restoration, Escape, backdrop policy, scrollable content and reachable actions. Use chrome-screenshots and github-pr skills for evidence and verified inline PR attachments.
+- Open product questions: none. Routine API and dismissal defaults remain scoped implementation choices.
+- Hypotheses: none relied upon for readiness.
+- Correction rounds used: 0 of 2.
+- Human acceptance and manual merge remain pending after agent delivery.
+
+## Delivery and independent review
+
+- Implementation PR: [#24](https://github.com/manromero/my-clinics/pull/24), targeting `develop`.
+- Implementation head independently reviewed: `21dde5e83d22edb6ff142e6575f8df27616fa215`; base recorded above.
+- Implementer and reviewer each passed `pnpm test` (18 files / 120 tests), `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build` and diff checks.
+- Independent live Chrome review verified controlled lifecycle, accessible name/description, initial focus, background focus rejection, keyboard boundaries, Escape/restoration, backdrop versus drag policy, explicit exit and all eight size/content/viewport combinations. Desktop 1440 × 900 and narrow CSS 390 × 844 showed readable wrapping, internal scrolling and reachable actions.
+- Nine permanent inline PR screenshots were independently retrieved as valid PNGs with expected dimensions; representative downloads were visually inspected against Alexandria and applicable S02/S03 direction. Detailed capture and attachment metadata are in the PR.
+- Review conclusion: no blockers and no optional findings. Correction rounds used: 0 of 2.
+- Limitations: Chrome-only validation, narrow CSS viewport without touch emulation, no physical phone or assistive-technology announcement testing. Native browser/document keyboard stops do not permit focus on background controls. GitHub-page rendering was unavailable; image downloads were verified.
+- This final documentation/status update is submitted for corresponding independent review. Human approval and manual merge remain pending in GitHub; no merge was performed.
+
+## Post-merge initial-focus correction
+
+- User feedback after merging PR #24: initial focus must move to the first focusable control; the title must not be focusable. This supersedes the original title-focus default.
+- Readiness: ready; focused correction to the existing initial-focus contract, without business scope changes or new dependencies.
+- Branch: `feature/dialog-initial-focus`; base `origin/develop` at `e70d7da30632b80329f09ed1bef25b62805aa89b`. Reuse the clean isolated Dialog worktree.
+- Scope: remove the heading focus target, use the first available interactive control by default, preserve valid explicit initial-focus overrides, modal containment, dismissal and focus restoration. Ensure safe behavior without focusable controls without making the heading focusable.
+- Relevant files: shared Dialog/tests and route-local Dialog catalogue specimens. Update documentation and tests currently asserting title focus.
+- Validation: component tests, lint, typecheck, formatting, build; independent live Chrome desktop/mobile keyboard/focus review and refreshed screenshots using chrome-screenshots/github-pr.
+- Resumed on 2026-11-04 after PR #25 (FormPanel) merged. Include the new modal FormPanel consumer in regression validation; preserve its separate task status and implementation.
+- Open questions: none. No hypotheses required for readiness.
+- Correction budget retained: 0 of 2 automatic review correction rounds used; this user-requested post-merge change does not reset the budget.
+- Previous implementation/review records above remain historical. Task/index reopened while this correction is validated. Human acceptance/manual merge of the correction remain pending.
+
+### Correction delivery
+
+- Correction PR: [#26](https://github.com/manromero/my-clinics/pull/26), targeting `develop` after merged PR #25.
+- Implementation head independently reviewed: `4d24d905df9de3c2f841c045c749ae96b3e10911`; correction base recorded above.
+- Result: title is not focusable. Default initial focus reaches the first available interactive control, including long non-dismissible dialogs with unavailable leading controls. Without available controls the native dialog container holds focus; valid explicit initial-focus overrides remain supported.
+- Implementer and reviewer each passed 19 test files / 130 tests, lint, typecheck, formatting, production build and diff checks. Independent desktop 1440 × 900 and narrow CSS 390 × 844 Chrome review verified the corrected focus contract, modal safety/restoration, scroll handling and FormPanel pending/error regressions.
+- Eight inline PR PNG attachments were independently retrieved with correct type/dimensions and representative visual inspection. Capture metadata and detailed validation remain in the PR.
+- Independent review conclusion: no blockers or optional findings; correction rounds retained at 0 of 2. Final tracking changes require corresponding documentation review.
+- Limitations: Chrome-only, narrow CSS without touch/device testing, no physical phone or assistive-technology announcements; GitHub inline rendering unavailable, downloaded image evidence verified.
+- Task/index are done for this correction. Human acceptance and manual merge of PR #26 remain pending; no merge performed by agents. Prior delivery notes remain historical.

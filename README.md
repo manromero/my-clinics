@@ -15,9 +15,16 @@ pnpm dev
 
 Open [localhost:3000](http://localhost:3000).
 
+## Hosted database development
+
+Follow the [Supabase setup guide](docs/supabase.md). Database development uses
+hosted development projects with synthetic data; Docker and a local Supabase
+runtime are not required. Configure the root environment variables to display
+saved clinics at `/clinics`. See [Persistent clinic listing](docs/supabase.md#persistent-clinic-listing).
+
 ## Styling
 
-Tailwind CSS runs through `@tailwindcss/postcss` in `postcss.config.mjs` and is imported in `src/app/globals.css`. Add utility classes directly to components; source detection is automatic, so no `tailwind.config.js` is needed for the current setup. The home page includes a responsive example card.
+Tailwind CSS runs through `@tailwindcss/postcss` in `postcss.config.mjs` and is imported in `src/app/globals.css`. Add utility classes directly to components; source detection is automatic, so no `tailwind.config.js` is needed for the current setup.
 
 See the [Tailwind CSS guide for Next.js](https://tailwindcss.com/docs/installation/framework-guides/nextjs) and [project styling conventions](docs/architecture.md#nextjs-and-styling).
 
@@ -37,6 +44,7 @@ See the [Tailwind CSS guide for Next.js](https://tailwindcss.com/docs/installati
 
 - [Agent instructions](AGENTS.md)
 - [Git workflow](docs/git-workflow.md): `develop` → feature branch → `develop` → `main`, followed by a release tag on `main`.
+- [Development workflow contract](docs/development-workflow.md): coordinator intake and delivery, separate implementer and reviewer, two correction rounds, evidence, and manual user merge. Native [implementer](.codex/agents/implementer.toml) and [reviewer](.codex/agents/reviewer.toml) configuration is validated; the [workflow history](docs/milestones/milestone-00-development-workflow/workflow-history.md) links setup evidence and accepted decisions. Start fresh agents with selected context per task and reuse them for that task's correction/review rounds. Task 03 execution evidence is recorded in its [validation report](docs/milestones/milestone-00-development-workflow/workflow-validation.md).
 - [Architecture and shared components](docs/architecture.md): application organization and shared component conventions.
 - [Requirements](docs/requirements.md): confirmed scope, business rules, and acceptance criteria.
 - [Milestones and tasks](docs/milestones/readme.md): validated milestones, task definitions, and progress tracking.

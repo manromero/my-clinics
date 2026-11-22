@@ -1,0 +1,260 @@
+"use client";
+
+import {
+  useDraftState,
+  useClearDraft,
+} from "../../_components/continuity-drafts";
+import { notifyDataChanged } from "../../_components/data-invalidation";
+
+import { useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { ActionLink } from "@/lib/components/action-link/action-link";
+import { Alert } from "@/lib/components/alert/alert";
+import { Button } from "@/lib/components/button/button";
+import { ConfirmDialog } from "@/lib/components/confirm-dialog/confirm-dialog";
+import { ConcealSignedInContent } from "../../_components/signed-in-history-guard";
+import type { ActivityDraft } from "../_lib/activity-entry";
+import { formatEuroCents } from "@/lib/format/amounts";
+import { formatActivityDate } from "../_lib/activity-format";
+import { monthKey } from "@/lib/monthly-scope/monthly-scope";
+import type { ActivityRow, ActivityViewData } from "../_lib/activity-view";
+import type { ActivityWriteResult } from "../_lib/write-activity";
+import { ActivityForm } from "./activity-form";
+import type { ActivityRowAction } from "./activity-list";
+import { ActivityResults } from "./activity-results";
+import { LastCreatedClinic } from "./activity-visit";
+
+type Operation =
+  { kind: "create" } | { kind: "edit" | "delete"; row: ActivityRow };
+
+const writeErrors = {
+  invalid:
+    "Revisa la fecha, la clínica y los importes antes de volver a guardar.",
+  "clinic-unavailable":
+    "Esta clínica ya no está disponible. Selecciona otra clínica o vuelve a intentarlo si se reactiva.",
+  "activity-unavailable":
+    "El registro ya no está disponible. Recarga la actividad para actualizar la lista.",
+  "edit-unavailable":
+    "El registro o la clínica ya no están disponibles para este cambio. Revisa la clínica o cancela y recarga la actividad.",
+  failed:
+    "Vuelve a intentarlo. Los datos introducidos siguen en el formulario.",
+};
+
+function savedNotice(scope: ActivityViewData["scope"], draft: ActivityDraft) {
+  const changedMonth = !draft.date.startsWith(`${monthKey(scope)}-`);
+  const changedClinic =
+    scope.clinicId !== null && scope.clinicId !== draft.clinicId;
+  if (changedMonth && changedClinic) {
+    return `Actividad guardada con fecha ${formatActivityDate(draft.date)} en otra clínica. Cambia el periodo y el filtro para verla.`;
+  }
+  if (changedMonth) {
+    return `Actividad guardada con fecha ${formatActivityDate(draft.date)}. Cambia el periodo para verla.`;
+  }
+  if (changedClinic) {
+    return "Actividad guardada en otra clínica. Cambia el filtro para verla.";
+  }
+  return "Actividad guardada.";
+}
+
+export function SavedActivityResults({
+  data,
+  ownerId,
+  lastEntered,
+  saveActivityAction,
+  deleteActivityAction,
+  pagination,
+}: {
+  data: ActivityViewData;
+  ownerId: string;
+  lastEntered?: ActivityRow["date"];
+  saveActivityAction: (
+    draft: ActivityDraft,
+    id?: string,
+  ) => Promise<ActivityWriteResult>;
+  deleteActivityAction: (id: string) => Promise<ActivityWriteResult>;
+  pagination?: ReactNode;
+}) {
+  const { scope, clinicOptions, canCreate } = data;
+  const conceal = useContext(ConcealSignedInContent);
+  const { lastCreatedClinic, rememberClinic } = useContext(LastCreatedClinic);
+  const [operation, setOperation] = useDraftState<Operation | null>(
+    "activity-operation",
+    null,
+  );
+  const clearDraft = useClearDraft();
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string>();
+  const [notice, setNotice] = useState("");
+  const inFlight = useRef(false);
+  const opener = useRef<HTMLButtonElement>(null);
+  const listHeading = useRef<HTMLHeadingElement>(null);
+  const row = operation && "row" in operation ? operation.row : undefined;
+  const deleting = operation?.kind === "delete";
+
+  useEffect(() => {
+    if (operation || !opener.current) return;
+    const trigger = opener.current;
+    opener.current = null;
+    if (trigger.isConnected && trigger.getClientRects().length) {
+      trigger.focus();
+    } else {
+      listHeading.current?.focus();
+    }
+  }, [operation]);
+
+  function openOperation(next: Operation, trigger: HTMLButtonElement) {
+    opener.current = trigger;
+    setNotice("");
+    setError(undefined);
+    setOperation(next);
+  }
+
+  const openRowAction: ActivityRowAction = (kind, row, trigger) => {
+    openOperation({ kind, row }, trigger);
+  };
+
+  function closeOperation() {
+    if (!inFlight.current) {
+      clearDraft("activity-form:");
+      setOperation(null);
+    }
+  }
+
+  async function write(
+    action: () => Promise<ActivityWriteResult>,
+    success: string,
+    failure: string,
+    onSaved?: () => void,
+  ) {
+    if (inFlight.current) return;
+    inFlight.current = true;
+    setPending(true);
+    setError(undefined);
+    try {
+      const result = await action();
+      if (result === "session-changed") {
+        conceal();
+        window.location.reload();
+        return;
+      }
+      if (result !== "saved") {
+        setError(
+          result === "failed" || (deleting && result === "invalid")
+            ? failure
+            : writeErrors[result],
+        );
+        return;
+      }
+
+      clearDraft("activity-form:");
+      notifyDataChanged();
+      onSaved?.();
+      setNotice(success);
+      setOperation(null);
+    } catch {
+      setError(failure);
+    } finally {
+      inFlight.current = false;
+      setPending(false);
+    }
+  }
+
+  return (
+    <>
+      {!canCreate && (
+        <Alert title="No hay clínicas activas" variant="warning">
+          <p>
+            Crea una clínica o reactiva una existente para registrar actividad.
+          </p>
+          <ActionLink href="/clinics">Ir a Clínicas</ActionLink>
+        </Alert>
+      )}
+      <ActivityResults
+        data={data}
+        listHeading={listHeading}
+        onAction={openRowAction}
+        pagination={pagination}
+        toolbar={
+          <Button
+            aria-haspopup="dialog"
+            disabled={!canCreate}
+            onClick={(event) =>
+              openOperation({ kind: "create" }, event.currentTarget)
+            }
+          >
+            Nueva actividad
+          </Button>
+        }
+        notice={
+          <div
+            role="status"
+            aria-atomic="true"
+            className={
+              notice
+                ? "mb-4 rounded-lg bg-success-container px-4 py-3 text-label text-success xl:mx-6"
+                : "sr-only"
+            }
+          >
+            {notice}
+          </div>
+        }
+      />
+      {deleting && row && (
+        <ConfirmDialog
+          open
+          onOpenChange={(open) => {
+            if (!open) closeOperation();
+          }}
+          title="Eliminar actividad"
+          description="Se eliminará este registro y se actualizarán los totales del periodo."
+          confirmLabel="Eliminar"
+          pendingLabel="Eliminando…"
+          destructive
+          pending={pending}
+          error={error}
+          onConfirm={() =>
+            write(
+              () => deleteActivityAction(row.id),
+              "Actividad eliminada.",
+              "Vuelve a intentarlo para eliminar el registro.",
+            )
+          }
+        >
+          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-lg bg-surface-container-low p-4 text-sm [&>dt]:font-semibold">
+            <dt>Fecha</dt>
+            <dd>{formatActivityDate(row.date)}</dd>
+            <dt>Clínica</dt>
+            <dd>{clinicOptions.find(({ id }) => id === row.clinicId)?.name}</dd>
+            <dt>Importe</dt>
+            <dd>{formatEuroCents(row.priceCents)}</dd>
+          </dl>
+        </ConfirmDialog>
+      )}
+      {operation && !deleting && (
+        <ActivityForm
+          row={row}
+          scope={scope}
+          clinics={clinicOptions}
+          lastCreatedClinicId={
+            lastCreatedClinic?.ownerId === ownerId
+              ? lastCreatedClinic.clinicId
+              : undefined
+          }
+          lastEntered={lastEntered}
+          pending={pending}
+          error={error}
+          onSave={(draft) =>
+            write(
+              () => saveActivityAction(draft, row?.id),
+              savedNotice(scope, draft),
+              "Vuelve a intentarlo. Los datos introducidos siguen en el formulario.",
+              operation.kind === "create"
+                ? () => rememberClinic({ ownerId, clinicId: draft.clinicId })
+                : undefined,
+            )
+          }
+          onCancel={closeOperation}
+        />
+      )}
+    </>
+  );
+}

@@ -6,11 +6,17 @@ before implementation begins.
 
 ## Milestone index
 
-| Milestone                                                                | Description                                                      | Planning status                |
-| ------------------------------------------------------------------------ | ---------------------------------------------------------------- | ------------------------------ |
-| [00 — Development workflow](milestone-00-development-workflow/readme.md) | Implementer and reviewer workflow with human PR review and merge | Scope validated; tasks pending |
+| Milestone                                                                                 | Description                                                                                      | Status                                                                                                                        |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| [00 — Development workflow](milestone-00-development-workflow/readme.md)                  | Coordinator, implementer, and reviewer workflow with human PR review and merge                   | All agent tasks done; human acceptance tracked in GitHub PR #4                                                                |
+| [01 — Visual foundations and shared components](milestone-01-shared-components/readme.md) | Components catalogue, visual foundations, basic controls and shared screen structure             | Complete. All 28 tasks are done and merged into `develop`.                                                                    |
+| [02 — Clinic management](milestone-02-clinic-management/readme.md)                        | Clinic management, Supabase persistence and dedicated database validation credentials            | All tasks done. Human approval and manual merge of [PR #45](https://github.com/manromero/my-clinics/pull/45) pending.         |
+| [03 — Authentication](milestone-03-authentication/readme.md)                              | Google sign-in with Supabase Auth and owner-only access to clinics                               | Complete. [PR #49](https://github.com/manromero/my-clinics/pull/49) is merged into `develop`.                                 |
+| [04 — Monthly activity](milestone-04-monthly-activity/readme.md)                          | Filter, record, edit, and delete monthly activity with private persistence and accurate earnings | Complete. [PR #58](https://github.com/manromero/my-clinics/pull/58) is merged into `develop`.                                 |
+| [05 — Monthly summary](milestone-05-monthly-summary/readme.md)                            | Review monthly totals and a per-clinic breakdown of saved activity                               | Tasks 00 and 01 merged into `develop`. Task 02 pending.                                                                       |
+| [06 — Production readiness](milestone-06-production-readiness/readme.md)                  | Prepare routing, activity entry, and signed-in navigation for production                         | All tasks are done; [PR #67](https://github.com/manromero/my-clinics/pull/67) is ready for human acceptance and manual merge. |
 
-Further milestones will be added after the user validates their scope and order.
+Draft milestones remain subject to user approval of their scope and order.
 
 ## Task structure and status
 
@@ -21,21 +27,29 @@ dependencies, acceptance criteria, validation, and progress notes.
 
 Every task has exactly one current status:
 
-| Status        | Meaning                                                                                        |
-| ------------- | ---------------------------------------------------------------------------------------------- |
-| `pending`     | Work has not started                                                                           |
-| `in_progress` | Work has started; implementation, review, or human approval remains open                       |
-| `done`        | Acceptance criteria and required validation are satisfied and the user has accepted the result |
+| Status        | Meaning                                                                                                |
+| ------------- | ------------------------------------------------------------------------------------------------------ |
+| `pending`     | Work has not started                                                                                   |
+| `in_progress` | Work has started; implementation, checks, review, or blocking decisions remain open                    |
+| `done`        | Implementation, required checks, and independent agent review are complete; ready for human acceptance |
 
 The task file is the source of truth for its status. Update its status and the
 milestone's task-index row together whenever work starts or changes state.
 Record relevant progress, validation results, open issues, and PR links in the
 task file. Planning a task does not start its implementation.
 
-For a task delivered through a PR, keep `in_progress` throughout implementation,
-review, and the wait for the user's manual merge into `develop`. Mark it `done`
-after that merge and update its progress notes. For a documentation-only task
-accepted directly by the user, record that acceptance instead.
+For a task delivered through a PR, the coordinator marks the task and milestone
+index `done` in the feature branch before final delivery, after implementation,
+required checks, and independent review are complete with no blocking findings.
+Include the tracking update in final review and commit it in the same PR. State
+explicitly that human approval and manual merge remain pending; GitHub is the
+source of truth for those steps. `done` does not mean human acceptance or merge.
+No post-merge tracking commit or automatic merge monitor is required.
+
+Keep blocked or incompletely validated work `in_progress`. If new blockers or
+requested changes reopen a delivered task, return it and its index row to
+`in_progress` until revalidated and reviewed. For a documentation-only task
+accepted directly by the user, record that acceptance as the completion evidence.
 
 If work cannot proceed, keep the applicable current status and describe the
 blocker and required user decision in progress notes. Status changes must reflect

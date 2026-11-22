@@ -1,0 +1,607 @@
+import assert from "node:assert/strict";
+import { randomBytes } from "node:crypto";
+import { execFileSync } from "node:child_process";
+import { readFile, readdir, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { format } from "prettier";
+import { activityConcurrencyTests } from "./activity-database-validation.mjs";
+import { catalogRegressions } from "./database-catalog-regressions.mjs";
+import {
+  clinicConcurrencyTests,
+  clinicNegativeControls,
+  clinicSeedTests,
+} from "./clinic-database-validation.mjs";
+
+export const organization = "njnmfutclorywskqrftd";
+const protectedRef = "lvqbrjybwstvdhaxyxyn";
+const organizationPath = `/organizations/${organization}`;
+const root = fileURLToPath(new URL("../", import.meta.url));
+const typesPath = new URL(
+  "../src/lib/supabase/database.types.ts",
+  import.meta.url,
+);
+const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const literal = (value) => `'${value.replaceAll("'", "''")}'`;
+
+export function checkTypes(actual, expected) {
+  assert.equal(
+    actual,
+    expected,
+    "Generated Database types are stale; run pnpm db:types on a fresh replay",
+  );
+}
+
+export function checkParity(actual, expected) {
+  assert.deepEqual(
+    actual,
+    expected,
+    "Declarative schema and migration history differ",
+  );
+}
+
+async function sqlFiles(folder) {
+  return (await readdir(new URL(`../${folder}/`, import.meta.url)))
+    .filter((name) => name.endsWith(".sql"))
+    .sort();
+}
+
+async function api(path, method = "GET", body) {
+  const response = await fetch(`https://api.supabase.com/v1${path}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${process.env.SUPABASE_ACCESS_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+    redirect: "error",
+    signal: AbortSignal.timeout(120_000),
+  });
+  // Never emit response bodies: management responses can contain credentials.
+  if (!response.ok) {
+    const credentialHint = {
+      401: ". Supabase rejected the validation token (invalid, expired or revoked)",
+      403: ". Check the validation token's organization scope, permissions and owner's role",
+    }[response.status];
+    const sqlState = path.endsWith("/database/query")
+      ? (await response.text()).match(/ERROR:\s+([A-Z0-9]{5}):/)?.[1]
+      : undefined;
+    const error = new Error(
+      `Management API ${method} ${path}: HTTP ${response.status}${sqlState ? ` SQLSTATE ${sqlState}` : ""}${credentialHint ?? ""}`,
+    );
+    error.status = response.status;
+    error.sqlState = sqlState;
+    throw error;
+  }
+  return response.status === 204 ? undefined : response.json();
+}
+
+async function organizationProjects() {
+  const projects = [];
+  let offset = 0;
+  while (true) {
+    const page = await api(
+      `${organizationPath}/projects?limit=50&offset=${offset}`,
+    );
+    assert.ok(
+      Number.isSafeInteger(page.pagination?.count) &&
+        Array.isArray(page.projects) &&
+        page.projects.every(
+          (item) =>
+            typeof item.ref === "string" &&
+            /^[a-z]{20}$/.test(item.ref) &&
+            typeof item.status === "string",
+        ),
+      "Could not verify the organization project inventory",
+    );
+    projects.push(...page.projects);
+    offset += page.projects.length;
+    if (offset >= page.pagination.count) return projects;
+    assert.ok(
+      page.projects.length,
+      "Organization project inventory was incomplete",
+    );
+  }
+}
+
+export function verifyTarget(project, name) {
+  assert.match(project.id, /^[a-z]{20}$/);
+  assert.notEqual(
+    project.id,
+    protectedRef,
+    "Shared development target is prohibited",
+  );
+  assert.equal(project.name, name);
+  assert.equal(project.organization_id, organization);
+  assert.ok(name.startsWith("myclinics-validation-"));
+}
+
+const owned = new Map();
+async function query(ref, sql) {
+  assert.ok(owned.has(ref), "SQL requires a target created by this process");
+  const config = await api(`/projects/${ref}/postgrest`);
+  assert.ok(
+    ["", "pg_pgrst_no_exposed_schemas"].includes(config.db_schema),
+    "Data API must be disabled before SQL",
+  );
+  return api(`/projects/${ref}/database/query`, "POST", { query: sql });
+}
+
+async function disposable(label, run) {
+  const name = `myclinics-validation-${label}-${randomBytes(5).toString("hex")}`;
+  const password = randomBytes(32).toString("base64url");
+  const project = await api("/projects", "POST", {
+    name,
+    organization_slug: organization,
+    region: "eu-central-1",
+    db_pass: password,
+  });
+  const ref = project.id ?? project.ref;
+  // Register immediately so provisioning/configuration failures still clean up.
+  assert.match(ref, /^[a-z]{20}$/);
+  assert.notEqual(ref, protectedRef);
+  owned.set(ref, name);
+  console.log(`Created ${name} (${ref})`);
+  try {
+    let healthy = false;
+    for (let attempt = 0; attempt < 120; attempt++) {
+      const current = await api(`/projects/${ref}`);
+      verifyTarget(current, name);
+      if (current.status === "ACTIVE_HEALTHY") {
+        healthy = true;
+        break;
+      }
+      await pause(5000);
+    }
+    assert.ok(healthy, `Provisioning timed out: ${ref}`);
+    await api(`/projects/${ref}/postgrest`, "PATCH", { db_schema: "" });
+    console.log(`Verified disposable identity; disabling Data API: ${ref}`);
+    return await run(ref);
+  } finally {
+    const current = await api(`/projects/${ref}`);
+    verifyTarget(current, name);
+    await api(`/projects/${ref}`, "DELETE");
+    const projects = await organizationProjects();
+    assert.ok(
+      !projects.some((item) => item.ref === ref),
+      `Cleanup not confirmed: ${ref}`,
+    );
+    owned.delete(ref);
+    console.log(`Deleted and verified absent: ${ref}`);
+  }
+}
+
+async function snapshot(ref) {
+  const sql = await readFile(
+    new URL("../supabase/validation/catalog.sql", import.meta.url),
+    "utf8",
+  );
+  const rows = await query(ref, sql);
+  assert.equal(rows.length, 1);
+  return rows[0].catalog;
+}
+
+async function replay(ref, files = undefined) {
+  await query(
+    ref,
+    `create schema if not exists supabase_migrations;
+    create table if not exists supabase_migrations.schema_migrations
+    (version text primary key, statements text[], name text);`,
+  );
+  for (const name of files ?? (await sqlFiles("supabase/migrations"))) {
+    assert.match(name, /^\d{14}_[a-z0-9_]+\.sql$/, "Invalid migration name");
+    const sql = await readFile(
+      new URL(`../supabase/migrations/${name}`, import.meta.url),
+      "utf8",
+    );
+    const [version] = name.split("_");
+    await query(
+      ref,
+      `begin;\n${sql}\n;
+      insert into supabase_migrations.schema_migrations(version, name, statements)
+      values (${literal(version)}, ${literal(name.slice(15, -4))}, array[${literal(sql)}]); commit;`,
+    );
+    console.log(`Replayed ${name}`);
+  }
+  console.log("Clean migration replay passed");
+}
+
+async function clinicUpgrade(ref) {
+  const files = await sqlFiles("supabase/migrations");
+  const clinicMigration = "20261108090000_create_clinics.sql";
+  const position = files.indexOf(clinicMigration);
+  assert.ok(position >= 0, "Clinic migration must exist");
+  const securityPosition = files.indexOf(
+    "20261109220000_allow_synthetic_clinic_access.sql",
+  );
+  assert.ok(
+    securityPosition > position,
+    "Clinic development access must follow the clinic migration",
+  );
+  const lengthMigration = "20261110190000_limit_clinic_name_length.sql";
+  const lengthPosition = files.indexOf(lengthMigration);
+  assert.ok(
+    lengthPosition > securityPosition,
+    "Missing clinic name limit migration",
+  );
+  const ownerMigration = "20261111120000_restrict_clinics_to_owners.sql";
+  const ownerPosition = files.indexOf(ownerMigration);
+  assert.ok(
+    ownerPosition > lengthPosition,
+    "Missing clinic ownership migration",
+  );
+  const activityPosition = files.indexOf("20261112120000_create_activity.sql");
+  assert.ok(
+    activityPosition > ownerPosition,
+    "Missing activity migration after clinic ownership",
+  );
+  await replay(ref, files.slice(0, position));
+  // The previous public baseline was empty: no pre-existing clinics are possible.
+  // Commit synthetic data in a separate schema before applying the real migration.
+  await query(
+    ref,
+    `create schema validation_preclinic;
+    create table validation_preclinic.existing_data(id uuid primary key,payload text not null);
+    insert into validation_preclinic.existing_data values
+      ('00000000-0000-4000-8000-000000000099','synthetic-before-clinic-migration');`,
+  );
+  const before = await query(
+    ref,
+    "select * from validation_preclinic.existing_data",
+  );
+  await replay(ref, files.slice(position, securityPosition));
+  assert.deepEqual(
+    await query(ref, "select * from validation_preclinic.existing_data"),
+    before,
+  );
+  assert.deepEqual(
+    await query(ref, "select count(*)::integer as count from public.clinics"),
+    [{ count: 0 }],
+  );
+  await query(
+    ref,
+    await readFile(new URL("../supabase/seed.sql", import.meta.url), "utf8"),
+  );
+  const list =
+    "select id::text as id,name,percentage,active from public.clinics order by id";
+  const clinicsBefore = await query(ref, list);
+  assert.equal(
+    clinicsBefore.length,
+    3,
+    "Synthetic pre-security rows must exist",
+  );
+  await replay(ref, files.slice(securityPosition, lengthPosition));
+  assert.deepEqual(
+    await query(ref, list),
+    clinicsBefore,
+    "Development access upgrade must preserve clinic rows",
+  );
+  await query(
+    ref,
+    `insert into public.clinics(name,percentage,active)
+    values (repeat(U&'\\+01F9B7',200), 12.34, false)`,
+  );
+  const validRows = await query(ref, list);
+  assert.equal(validRows.length, clinicsBefore.length + 1);
+  const [legacy] = await query(
+    ref,
+    `insert into public.clinics(name,percentage)
+    values (repeat('x',201), 50) returning id::text as id`,
+  );
+  const legacyRows = await query(ref, list);
+  const beforeLengthMigration = await snapshot(ref);
+  const history =
+    "select version from supabase_migrations.schema_migrations order by version";
+  const beforeHistory = await query(ref, history);
+
+  await assert.rejects(replay(ref, [lengthMigration]), { sqlState: "23514" });
+  assert.deepEqual(await query(ref, list), legacyRows);
+  checkParity(await snapshot(ref), beforeLengthMigration);
+  assert.deepEqual(await query(ref, history), beforeHistory);
+  console.log(
+    "Clinic name limit upgrade rejected a legacy overlong name without changing rows, schema or history",
+  );
+
+  await query(
+    ref,
+    `delete from public.clinics where id = ${literal(legacy.id)}`,
+  );
+  await replay(ref, [lengthMigration]);
+  assert.deepEqual(await query(ref, list), validRows);
+  console.log(
+    "Clinic name limit upgrade preserved the valid existing rows, including the 200-code-point name",
+  );
+  await replay(ref, files.slice(lengthPosition + 1, ownerPosition + 1));
+  assert.deepEqual(await query(ref, list), validRows);
+  assert.deepEqual(
+    await query(
+      ref,
+      "select count(owner_id)::integer as count from public.clinics",
+    ),
+    [{ count: 0 }],
+    "The owner migration must not assign any legacy rows implicitly",
+  );
+  await databaseTests(ref, ["20-clinic-owner-access.sql"]);
+  console.log(
+    "Actual ownership upgrade preserved every clinic and isolated legacy rows under real SQL roles",
+  );
+  await replay(ref, files.slice(ownerPosition + 1, activityPosition));
+  await activityUpgrade(ref, files[activityPosition]);
+  const clinicDeletionPosition = files.indexOf(
+    "20261114120000_allow_owner_clinic_deletion.sql",
+  );
+  assert.ok(clinicDeletionPosition > activityPosition);
+  await replay(ref, files.slice(activityPosition + 1, clinicDeletionPosition));
+  await clinicDeletionUpgrade(ref, files[clinicDeletionPosition]);
+  await replay(ref, files.slice(clinicDeletionPosition + 1));
+  await query(ref, "drop schema validation_preclinic cascade");
+  console.log(
+    "Actual clinic migration upgrade from previous empty baseline preserved committed synthetic data",
+  );
+  console.log(
+    "Actual development access upgrade preserved three existing synthetic clinics",
+  );
+  return snapshot(ref);
+}
+
+async function activityUpgrade(ref, migration) {
+  await query(
+    ref,
+    `insert into auth.users(id) values
+      ('00000000-0000-4000-8000-000000000041'),
+      ('00000000-0000-4000-8000-000000000042');
+    insert into public.clinics(owner_id,name,percentage,active) values
+      ('00000000-0000-4000-8000-000000000041','Pre-activity clinic A',34.25,true),
+      ('00000000-0000-4000-8000-000000000042','Pre-activity clinic B',60.50,false);`,
+  );
+  const listClinics = `select id::text,owner_id,name,percentage::text,active
+    from public.clinics order by id`;
+  const listOwners = `select id from auth.users where id in
+    ('00000000-0000-4000-8000-000000000041','00000000-0000-4000-8000-000000000042')
+    order by id`;
+  const clinics = await query(ref, listClinics);
+  const owners = await query(ref, listOwners);
+  const catalog = await snapshot(ref);
+  const existingObjects = new Set(
+    catalog.map(({ kind, name }) => `${kind}:${name}`),
+  );
+  await replay(ref, [migration]);
+  assert.deepEqual(
+    await query(ref, listClinics),
+    clinics,
+    "Activity migration changed existing clinics",
+  );
+  assert.deepEqual(
+    await query(ref, listOwners),
+    owners,
+    "Activity migration changed existing owners",
+  );
+  checkParity(
+    (await snapshot(ref)).filter(({ kind, name }) =>
+      existingObjects.has(`${kind}:${name}`),
+    ),
+    catalog,
+  );
+  await databaseTests(ref, ["20-clinic-owner-access.sql", "30-activity.sql"]);
+  console.log(
+    "Activity upgrade preserved existing clinic rows, owners, grants and policies",
+  );
+}
+
+async function clinicDeletionUpgrade(ref, migration) {
+  await query(
+    ref,
+    `begin; set local role authenticated;
+    set local request.jwt.claims = '{"sub":"00000000-0000-4000-8000-000000000041","role":"authenticated"}';
+    select public.create_activity(
+      (select id::text from public.clinics where name='Pre-activity clinic A'),
+      '2026-01-01', 'Before clinic deletion migration', '0', 'percentage', null
+    ); commit;`,
+  );
+  const clinicsQuery = "select * from public.clinics order by id";
+  const activityQuery = "select * from public.activity order by id";
+  const clinics = await query(ref, clinicsQuery);
+  const activity = await query(ref, activityQuery);
+  await replay(ref, [migration]);
+  assert.deepEqual(await query(ref, clinicsQuery), clinics);
+  assert.deepEqual(await query(ref, activityQuery), activity);
+  await databaseTests(ref, ["40-clinic-deletion.sql"]);
+  console.log(
+    "Clinic deletion upgrade preserved existing clinics and activity",
+  );
+}
+
+async function generateTypes(ref, accessToken) {
+  assert.ok(
+    owned.has(ref),
+    "Type generation requires a target created by this process",
+  );
+  const raw = execFileSync(
+    process.execPath,
+    [
+      `${root}node_modules/supabase/dist/supabase.js`,
+      "gen",
+      "types",
+      "--profile=supabase",
+      "--lang=typescript",
+      "--schema=public",
+      `--remote=${ref}`,
+    ],
+    {
+      cwd: root,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        SUPABASE_ACCESS_TOKEN: accessToken,
+        SUPABASE_CLI_BINARY_OVERRIDE: "",
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  assert.ok(
+    raw.includes("export type Database"),
+    "CLI did not return Database types",
+  );
+  return format(raw, { parser: "typescript" });
+}
+
+async function databaseTests(ref, selectedFiles) {
+  const files = selectedFiles ?? (await sqlFiles("supabase/tests"));
+  assert.ok(files.length, "At least one database test is required");
+  for (const name of files) {
+    await query(
+      ref,
+      `begin;\n${await readFile(new URL(`../supabase/tests/${name}`, import.meta.url), "utf8")}\n; rollback;`,
+    );
+    console.log(`Database test passed: ${name}`);
+  }
+}
+
+async function upgrade(ref) {
+  for (const name of [
+    "01-baseline.sql",
+    "02-seed.sql",
+    "03-upgrade.sql",
+    "04-assert.sql",
+  ]) {
+    await query(
+      ref,
+      await readFile(
+        new URL(`../supabase/validation/upgrade/${name}`, import.meta.url),
+        "utf8",
+      ),
+    );
+  }
+  await query(ref, "drop schema validation_fixture cascade");
+  console.log(
+    "Upgrade preserved pre-existing synthetic rows without reset; fixture removed",
+  );
+}
+
+async function negativeControls(ref, baseline, generated) {
+  await assert.rejects(
+    query(ref, "create table public.invalid_migration ("),
+    (error) => error.status === 400,
+  );
+  console.log("Negative migration control rejected invalid SQL");
+  await query(ref, "create table public.validation_schema_drift (id integer)");
+  try {
+    const drift = await snapshot(ref);
+    assert.throws(() => checkParity(drift, baseline));
+  } finally {
+    await query(ref, "drop table public.validation_schema_drift");
+  }
+  checkParity(await snapshot(ref), baseline);
+  assert.throws(() =>
+    checkTypes(generated, `${generated}// deliberate stale types\n`),
+  );
+  console.log("Negative schema/type controls rejected drift; recovery passed");
+}
+
+export async function main(mode = process.argv[2]) {
+  assert.ok(["validate", "types"].includes(mode), "Use validate or types");
+  const accessToken = process.env.SUPABASE_ACCESS_TOKEN;
+  assert.ok(
+    accessToken,
+    "Set SUPABASE_ACCESS_TOKEN to a dedicated scoped PAT in the validation environment or .env.database-validation",
+  );
+  assert.ok(
+    /^sbp_fc[a-f0-9]{38}$/.test(accessToken),
+    "SUPABASE_ACCESS_TOKEN must be a dedicated scoped Supabase PAT (sbp_fc prefix and valid CLI token format)",
+  );
+  assert.equal(
+    process.env.MYCLINICS_DISPOSABLE_AUTHORIZATION,
+    organization,
+    "Explicit disposable-target authorization is required",
+  );
+  const org = await api(organizationPath);
+  assert.equal(
+    org.plan,
+    "free",
+    "Only the verified Free plan is authorized; no paid upgrades",
+  );
+  const projects = await organizationProjects();
+  assert.ok(
+    projects.filter((item) => item.status !== "INACTIVE").length < 2,
+    "No free project capacity in the validation organization; never delete an existing project",
+  );
+  console.log(
+    "Verified Free plan and checked project count in the validation organization",
+  );
+  const result = await disposable("replay", async (ref) => {
+    await replay(ref);
+    const catalog = await snapshot(ref);
+    const generated = await generateTypes(ref, accessToken);
+    checkTypes(await generateTypes(ref, accessToken), generated);
+    if (mode === "validate") {
+      checkTypes(generated, await readFile(typesPath, "utf8"));
+      await clinicSeedTests(
+        (sql) => query(ref, sql),
+        await readFile(
+          new URL("../supabase/seed.sql", import.meta.url),
+          "utf8",
+        ),
+      );
+      await databaseTests(ref);
+      console.log(
+        "Clinic owner grants and RLS verified with two authenticated subjects and the anon role while the Data API was disabled.",
+      );
+      await clinicConcurrencyTests((sql) => query(ref, sql));
+      await activityConcurrencyTests((sql) => query(ref, sql));
+      await clinicNegativeControls(
+        (sql) => query(ref, sql),
+        await readFile(
+          new URL("../supabase/tests/10-clinics.sql", import.meta.url),
+          "utf8",
+        ),
+      );
+      checkParity(await snapshot(ref), catalog);
+      await upgrade(ref);
+      await negativeControls(ref, catalog, generated);
+      await catalogRegressions({
+        query: (sql) => query(ref, sql),
+        snapshot: () => snapshot(ref),
+        checkParity,
+      });
+    }
+    return { catalog, generated };
+  });
+  if (mode === "validate") {
+    await disposable("upgrade", async (ref) => {
+      checkParity(result.catalog, await clinicUpgrade(ref));
+      console.log("Actual upgrade catalog matches clean replay");
+    });
+  }
+  await disposable("desired", async (ref) => {
+    for (const name of await sqlFiles("supabase/schemas")) {
+      await query(
+        ref,
+        await readFile(
+          new URL(`../supabase/schemas/${name}`, import.meta.url),
+          "utf8",
+        ),
+      );
+    }
+    checkParity(result.catalog, await snapshot(ref));
+    console.log("Remote declarative/history catalog parity passed");
+  });
+  if (mode === "types") {
+    await writeFile(typesPath, result.generated);
+    console.log(
+      "Updated generated Database types after clean replay and parity",
+    );
+  }
+  console.log(`Database ${mode} passed; all disposable targets cleaned up`);
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    // SQL/CLI error messages may contain environment values. Keep logs redacted.
+    console.error(
+      error instanceof assert.AssertionError ||
+        error.message.startsWith("Management API ")
+        ? error.message.split("\n")[0]
+        : `Database validation failed (${error.name}); inspect stage logs and disposable cleanup`,
+    );
+    process.exitCode = 1;
+  });
+}

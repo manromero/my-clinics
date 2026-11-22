@@ -58,15 +58,16 @@ description below.
 
 | ID  | Screen           | Spanish navigation label | Proposed route | Purpose                                            |
 | --- | ---------------- | ------------------------ | -------------- | -------------------------------------------------- |
-| S01 | Sign-in          | Acceder                  | `/login`       | Sign in with Ana's authorized Google account       |
+| S01 | Sign-in          | Acceder                  | `/login`       | Sign in with a Google account                      |
 | S02 | Clinics          | Clínicas                 | `/clinics`     | Manage clinic names, percentages, and active state |
 | S03 | Monthly activity | Actividad                | `/activity`    | Enter and correct activity for a selected month    |
 | S04 | Monthly summary  | Resumen                  | `/summary`     | Review monthly amounts and row counts by clinic    |
 | S05 | Settings         | Ajustes                  | `/settings`    | Change Ana's default IRPF rate and access sign-out |
 
-After successful sign-in, open Monthly activity for the current month in
-Europe/Madrid. Protected screens share navigation to Clinics, Activity, Summary,
-and Settings. Keep the signed-in identity and sign-out action accessible.
+After successful sign-in, open Activity for the current month in Europe/Madrid.
+On desktop and mobile, the signed-in navigation displays Clínicas, Actividad,
+and Resumen in that order. Keep the signed-in identity and sign-out action
+accessible.
 
 Use a shared year/month and clinic selection for Activity and Summary. Moving
 between those screens preserves that context. Initial entry defaults to the
@@ -75,22 +76,19 @@ with recorded activity for the selected period.
 
 ## S01 — Sign-in
 
-**Purpose:** grant Ana access to her saved data.
+**Purpose:** give users access to their own clinics through Google sign-in.
 
 ### Content and actions
 
 - Application name and a `Continuar con Google` button.
-- Start Google sign-in and validate that the account is authorized.
-- On success, open Monthly activity.
-- For a different Google account, show an access-denied state with an option to
-  try another account. Do not display application records.
+- Start Google sign-in through Supabase Auth.
+- On success, open Clinics in Milestone 03. Each account sees its own clinics.
 
 ### States
 
 - Ready to sign in.
 - Sign-in in progress, with repeated submission prevented.
 - Sign-in canceled or failed, with a retry action.
-- Account authenticated but not authorized.
 - Session expired: require sign-in before showing protected data again.
 
 ## S02 — Clinics
@@ -112,15 +110,16 @@ with recorded activity for the selected period.
 
 Use a dialog or panel opened from the list, adapting its size to mobile.
 
-| Field      | Behavior                                                                          |
-| ---------- | --------------------------------------------------------------------------------- |
-| Nombre     | Required; reject blank or duplicate names after trimming spaces and ignoring case |
-| Porcentaje | Required; 0–100%, with up to two decimal places                                   |
-| Estado     | Active/inactive; new clinics default to active                                    |
+| Field      | Behavior                                                                                                                                   |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Nombre     | Required; cap input at 200 Unicode code points and show the count. Reject blank or duplicate names after trimming spaces and ignoring case |
+| Porcentaje | Required; 0–100%, with up to two decimal places                                                                                            |
+| Estado     | Active/inactive; new clinics default to active                                                                                             |
 
 Provide `Guardar` and `Cancelar`. A changed percentage affects new activity;
 existing rows retain their applied percentage. Display validation beside the
-affected field. After a successful save, refresh the list and show confirmation.
+affected field. Clear that field's error as the user edits it. After a successful
+save, refresh the list and show confirmation.
 On failure, keep the form values available for retry.
 
 ### States
@@ -224,6 +223,10 @@ the row. A failed deletion leaves the row in place and shows the failure.
 - Use the same year/month and clinic controls as Monthly activity.
 - Show the selected period and clinic scope prominently.
 - Provide a link back to Monthly activity preserving both selections.
+- Compare each clinic's earnings after IRPF with the signed total on the
+  `Ganancia tras IRPF` card. Show zero and positive amounts in blue and losses
+  in red with a minus sign. Leave bars unfilled when the clinic amount or the
+  total is zero or negative. Cap the bar fill at 100%.
 - Show one row per included clinic and a total row for the selected scope.
 
 | Measure            | Meaning                                                           |
@@ -233,9 +236,9 @@ the row. A failed deletion leaves the row in place and shows the failure.
 | Ganancia tras IRPF | Sum of rounded row earnings after applying each row's stored IRPF |
 | Nº de registros    | Count of all saved rows, including negative and zero rows         |
 
-Include active clinics with no activity as zero rows. Include inactive clinics
-when they have activity in the selected month. When filtering to one clinic,
-both the clinic figures and the total describe only that clinic.
+Include a clinic in the chart and breakdown if it has any saved activity in
+the selected scope, regardless of its status or earnings. When filtering to
+one clinic, both the clinic figures and the total describe only that clinic.
 
 All amounts include negative entries according to the requirements. Calculate
 totals from rounded row values, preserving their signs. Display monetary amounts
@@ -245,7 +248,8 @@ changes, deletions, or date changes affecting the month.
 ### States
 
 - Loading summary.
-- Month with no activity: zero amounts/counts for included active clinics.
+- Month or clinic selection with no activity: no clinic rows; preserve the
+  selected filters.
 - No included clinics: clear empty state with navigation to Clinics or a different
   period/filter.
 - Load failure with retry.
@@ -290,8 +294,8 @@ changes, deletions, or date changes affecting the month.
 
 ## Main user flows
 
-1. **Start working:** Sign-in → Google authorization → Monthly activity for the
-   current month.
+1. **Start working:** Sign-in → Google → Clinics in Milestone 03. Once
+   Monthly activity is available, sign-in opens it for the current month.
 2. **Prepare a clinic:** Clinics → New clinic → Save → Monthly activity.
 3. **Record work or an expense:** Monthly activity → New activity → Select a
    calculation mode → Review earnings → Save → Updated list and summary.
