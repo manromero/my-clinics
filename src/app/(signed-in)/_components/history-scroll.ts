@@ -64,7 +64,7 @@ export function createHistoryScroll(root: HTMLElement) {
   }
 
   function remember() {
-    if (!pending && root.style.display !== "none") {
+    if (!pending && !root.inert) {
       positions.set(entryKey(), {
         left: window.scrollX,
         top: window.scrollY,

@@ -158,6 +158,8 @@ export function SignedInHistoryGuard({
   const [drafts] = useState<DraftStore>(() => new Map());
   const content = useRef<HTMLDivElement>(null);
   const concealed = useRef(false);
+  const presentationBlocked = useRef(true);
+  const [sessionNotice, setSessionNotice] = useState(false);
   const retry = useRef<() => void>(null);
   const historyScroll = useRef<ReturnType<typeof createHistoryScroll>>(null);
   const entries = useRef(new Map<string, string>());
@@ -179,7 +181,7 @@ export function SignedInHistoryGuard({
     dataRefreshActive.current = refreshing;
   }, [refreshing]);
   // Server authorization cannot inspect the browser's retired-generation fence.
-  // Keep its entire private subtree unpainted until client activation accepts it.
+  // Keep its private subtree unpainted until client activation accepts it.
   const [state, setState] = useState<
     "visible" | "checking" | "failed" | "concealed" | "context-failed"
   >("checking");
@@ -189,7 +191,7 @@ export function SignedInHistoryGuard({
     invalidateContext(context.generation);
     entries.current.clear();
     drafts.clear();
-    content.current?.style.setProperty("display", "none");
+    presentationBlocked.current = true;
     setState("concealed");
   }, [context.generation, drafts]);
   const eligible = useCallback(
@@ -274,22 +276,16 @@ export function SignedInHistoryGuard({
     let permanentlyBlocked = false;
     let revision = dataRevision();
     let focusedControl: HTMLElement | undefined;
-    let suspendedScroll: { left: number; top: number } | undefined;
     function hide() {
-      if (root.style.display !== "none")
-        suspendedScroll = { left: window.scrollX, top: window.scrollY };
       const active = document.activeElement;
       if (active instanceof HTMLElement && root.contains(active))
         focusedControl = active;
-      root.style.setProperty("display", "none");
+      presentationBlocked.current = true;
+      setState("checking");
     }
     function reveal() {
       if (concealed.current || permanentlyBlocked || document.hidden) return;
-      root.style.removeProperty("display");
-      if (suspendedScroll) {
-        window.scrollTo({ ...suspendedScroll, behavior: "instant" });
-        suspendedScroll = undefined;
-      }
+      presentationBlocked.current = false;
       setState("visible");
       const focus = focusedControl;
       focusedControl = undefined;
@@ -370,6 +366,7 @@ export function SignedInHistoryGuard({
         }
         session.current = renewed;
         uncertainDocument = false;
+        setSessionNotice(false);
         expire();
         const changedData = revision !== dataRevision();
         if (changedData) {
@@ -392,8 +389,12 @@ export function SignedInHistoryGuard({
         reveal();
       } catch {
         if (!request.signal.aborted && !concealed.current) {
-          hide();
-          setState("failed");
+          if (eligible() && !uncertainDocument) {
+            setSessionNotice(true);
+          } else {
+            hide();
+            setState("failed");
+          }
         }
       } finally {
         if (check === request) check = undefined;
@@ -425,13 +426,10 @@ export function SignedInHistoryGuard({
       void verify(!current);
     }
     function protectConcealedDialog(event: KeyboardEvent) {
-      if (event.key === "Escape" && root.style.display === "none")
+      if (event.key === "Escape" && presentationBlocked.current)
         event.preventDefault();
     }
     window.addEventListener("keydown", protectConcealedDialog, true);
-    function suspend() {
-      hide();
-    }
     function documentSuspended() {
       uncertainDocument = true;
       check?.abort();
@@ -439,8 +437,7 @@ export function SignedInHistoryGuard({
       hide();
     }
     function visible() {
-      if (document.hidden) suspend();
-      else returned();
+      if (!document.hidden) returned();
     }
     function storageChanged(event: StorageEvent) {
       if (event.key === dataRevisionKey) {
@@ -488,7 +485,7 @@ export function SignedInHistoryGuard({
     window.addEventListener(dataRevisionKey, dataChanged);
     const channel = openAccountChannel();
     channel?.addEventListener("message", accountChanged);
-    retry.current = () => void verify(true);
+    retry.current = () => void verify(!eligible() || uncertainDocument);
     if (!acceptContext(session.current)) {
       permanentlyBlocked = true;
       hide();
@@ -504,7 +501,8 @@ export function SignedInHistoryGuard({
     window.addEventListener("popstate", verifySignedInHistory, true);
     window.addEventListener("pagehide", documentSuspended);
     window.addEventListener("pageshow", restored);
-    window.addEventListener("blur", suspend);
+    // Window blur also occurs while this page remains visible in split screen.
+    // Conceal only on document lifecycle changes; focus still revalidates.
     window.addEventListener("focus", returned);
     document.addEventListener("visibilitychange", visible);
     document.addEventListener("freeze", documentSuspended);
@@ -524,7 +522,6 @@ export function SignedInHistoryGuard({
       window.removeEventListener(dataRevisionKey, dataChanged);
       window.removeEventListener("pagehide", documentSuspended);
       window.removeEventListener("pageshow", restored);
-      window.removeEventListener("blur", suspend);
       window.removeEventListener("focus", returned);
       document.removeEventListener("visibilitychange", visible);
       document.removeEventListener("freeze", documentSuspended);
@@ -572,15 +569,27 @@ export function SignedInHistoryGuard({
       )}
       <div
         ref={content}
-        className="flex min-h-dvh flex-col"
+        className={`flex min-h-dvh flex-col ${state !== "visible" ? "[&_dialog]:invisible [&_dialog::backdrop]:invisible" : ""}`}
         aria-hidden={state !== "visible"}
         inert={state !== "visible"}
         style={
           state === "visible"
             ? undefined
-            : { opacity: 0, pointerEvents: "none" }
+            : { visibility: "hidden", pointerEvents: "none" }
         }
       >
+        {sessionNotice && state === "visible" && (
+          <PageContainer className="py-4">
+            <Alert
+              title="No se pudo comprobar la sesión"
+              announcement="polite"
+              action={{ label: "Reintentar", onClick: () => retry.current?.() }}
+            >
+              Puedes seguir trabajando. Vuelve a intentarlo cuando tengas
+              conexión.
+            </Alert>
+          </PageContainer>
+        )}
         <SignedInOwner value={{ ownerId, context }}>
           <HistoryRestore
             value={{

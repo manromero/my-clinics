@@ -90,6 +90,27 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 describe("signed-in session continuity", () => {
+  it("keeps a visible document and its edited draft rendered between blur and focus", async () => {
+    const fetch = vi.fn().mockResolvedValue(response());
+    vi.stubGlobal("fetch", fetch);
+    mount();
+    await waitFor(() => expect(screen.getByRole("heading")).toBeVisible());
+    const draft = screen.getByLabelText("Draft") as HTMLInputElement;
+    draft.value = "edited while working side by side";
+    draft.focus();
+    vi.mocked(window.scrollTo).mockClear();
+    act(() => window.dispatchEvent(new Event("blur")));
+    expect(document.hidden).toBe(false);
+    expect(screen.getByRole("heading")).toBeVisible();
+    expect(draft).toBeVisible();
+    expect(draft).toHaveValue("edited while working side by side");
+    expect(fetch).not.toHaveBeenCalled();
+    expect(window.scrollTo).not.toHaveBeenCalled();
+    await act(async () => window.dispatchEvent(new Event("focus")));
+    expect(screen.getByLabelText("Draft")).toBe(draft);
+    expect(draft).toBeVisible();
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
   it("shows the same draft immediately during a slow return check and deduplicates event bursts", async () => {
     let finish!: (value: Response) => void;
     const fetch = vi.fn(
@@ -111,6 +132,123 @@ describe("signed-in session continuity", () => {
     expect(fetch).toHaveBeenCalledTimes(1);
     await act(async () => finish(response()));
     expect(router.refresh).toHaveBeenCalledTimes(1);
+  });
+  it("keeps an established session rendered across ordinary visibility changes", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response()));
+    mount();
+    await waitFor(() => expect(screen.getByRole("heading")).toBeVisible());
+    act(() => {
+      Object.defineProperty(document, "hidden", { value: true });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    expect(screen.getByRole("heading")).toBeVisible();
+    await act(async () => {
+      Object.defineProperty(document, "hidden", { value: false });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    expect(screen.getByRole("heading")).toBeVisible();
+  });
+  it.each(["pagehide", "freeze"])(
+    "still conceals private content on %s and verifies its return",
+    async (event) => {
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response()));
+      mount();
+      await waitFor(() => expect(screen.getByRole("heading")).toBeVisible());
+      const draft = screen.getByLabelText("Draft");
+      act(() => {
+        (event === "pagehide" ? window : document).dispatchEvent(
+          new Event(event),
+        );
+      });
+      expect(draft).not.toBeVisible();
+      await act(async () => {
+        Object.defineProperty(document, "hidden", { value: false });
+        window.dispatchEvent(new Event("focus"));
+      });
+      expect(draft).toBeVisible();
+      expect(screen.getByLabelText("Draft")).toBe(draft);
+    },
+  );
+  it("keeps eligible drafts usable after background network failure and retries without blocking", async () => {
+    const fetch = vi.fn().mockRejectedValueOnce(new Error("offline"));
+    vi.stubGlobal("fetch", fetch);
+    mount();
+    await waitFor(() => expect(screen.getByRole("heading")).toBeVisible());
+    const draft = screen.getByLabelText("Draft");
+    await act(async () => window.dispatchEvent(new Event("focus")));
+    expect(screen.getByRole("heading")).toBeVisible();
+    expect(draft).toBeVisible();
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.getByText(/Puedes seguir trabajando/)).toBeVisible();
+    fetch.mockResolvedValueOnce(response());
+    await act(async () =>
+      screen.getByRole("button", { name: "Reintentar" }).click(),
+    );
+    expect(screen.queryByText(/Puedes seguir trabajando/)).toBeNull();
+    expect(screen.getByLabelText("Draft")).toBe(draft);
+  });
+  it("blocks a failed background request if its session expired while pending", async () => {
+    let fail!: (error: Error) => void;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        () =>
+          new Promise<Response>((_, reject) => {
+            fail = reject;
+          }),
+      ),
+    );
+    mount();
+    await waitFor(() => expect(screen.getByRole("heading")).toBeVisible());
+    act(() => window.dispatchEvent(new Event("focus")));
+    document.cookie = `${sessionMarkerName}=${sessionMarker({ ...context, expiresAt: 1 })}; path=/`;
+    await act(async () => fail(new Error("offline")));
+    expect(screen.getByText("Private activity")).not.toBeVisible();
+    expect(screen.getByRole("dialog")).toBeVisible();
+  });
+  it("removes private content on cross-tab sign-out while the window is unfocused", async () => {
+    const channels: EventTarget[] = [];
+    vi.stubGlobal(
+      "BroadcastChannel",
+      class extends EventTarget {
+        constructor() {
+          super();
+          channels.push(this);
+        }
+        close() {}
+      },
+    );
+    mount();
+    await waitFor(() => expect(screen.getByRole("heading")).toBeVisible());
+    act(() => window.dispatchEvent(new Event("blur")));
+    act(() =>
+      channels[0].dispatchEvent(
+        new MessageEvent("message", { data: "signed-out" }),
+      ),
+    );
+    expect(screen.queryByText("Private activity")).toBeNull();
+    expect(screen.queryByLabelText("Draft")).toBeNull();
+  });
+  it("still conceals an unfocused visible document when its session expires", async () => {
+    const expiring = {
+      ...context,
+      expiresAt: Math.floor(Date.now() / 1000) + 10,
+    };
+    document.cookie = `${sessionMarkerName}=${sessionMarker(expiring)}; path=/`;
+    const fetch = vi.fn(() => new Promise<Response>(() => {}));
+    vi.stubGlobal("fetch", fetch);
+    vi.useFakeTimers();
+    try {
+      mount(expiring);
+      await act(async () => {});
+      act(() => window.dispatchEvent(new Event("blur")));
+      expect(screen.getByRole("heading")).toBeVisible();
+      await act(async () => vi.advanceTimersByTime(10_000));
+      expect(screen.getByText("Private activity")).not.toBeVisible();
+      expect(fetch).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
   });
   it.each([
     { fresh: true, changedData: false, refreshes: 0 },
@@ -278,7 +416,7 @@ it("conceals server-rendered private markup before hydration can accept its gene
     ?.closest<HTMLElement>("[inert]");
   expect(protectedRoot).not.toBeNull();
   expect(protectedRoot?.getAttribute("aria-hidden")).toBe("true");
-  expect(protectedRoot?.style.opacity).toBe("0");
+  expect(protectedRoot?.style.visibility).toBe("hidden");
   expect(protectedRoot?.style.display).not.toBe("none");
   expect(container.textContent).toContain("Comprobando");
 });
