@@ -11,6 +11,7 @@ import {
   sessionFenceKey,
 } from "./session-fence";
 import { SignedInHistoryGuard, SignedInPage } from "./signed-in-history-guard";
+import { dataRevisionKey, notifyDataChanged } from "./data-invalidation";
 const router = vi.hoisted(() => ({
   refresh: vi.fn(),
   replace: vi.fn(),
@@ -34,6 +35,13 @@ function response() {
       "X-MyClinics-Verified": "200",
     },
   });
+}
+function changeData(revision: string, generation = context.generation) {
+  localStorage.setItem(
+    dataRevisionKey,
+    JSON.stringify({ generation, revision }),
+  );
+  window.dispatchEvent(new StorageEvent("storage", { key: dataRevisionKey }));
 }
 function mount(renderContext = context) {
   return render(
@@ -90,6 +98,124 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 describe("signed-in session continuity", () => {
+  it("checks repeated focus, visibility and reconnect without querying route data", async () => {
+    const fetch = vi.fn().mockResolvedValue(response());
+    vi.stubGlobal("fetch", fetch);
+    mount();
+    await waitFor(() => expect(screen.getByRole("heading")).toBeVisible());
+    for (const event of ["focus", "focus", "visibilitychange", "online"]) {
+      await act(async () =>
+        (event === "visibilitychange" ? document : window).dispatchEvent(
+          new Event(event),
+        ),
+      );
+    }
+    expect(fetch).toHaveBeenCalledTimes(4);
+    expect(router.refresh).not.toHaveBeenCalled();
+  });
+  it("refreshes a concrete cross-tab change once without checking the session", async () => {
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+    mount();
+    await waitFor(() => expect(screen.getByRole("heading")).toBeVisible());
+    await act(async () => {
+      changeData("remote-1");
+      changeData("remote-1");
+    });
+    expect(router.refresh).toHaveBeenCalledTimes(1);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+  it.each([true, false])(
+    "defers hidden changes until return, including missed events (%s)",
+    async (dispatch) => {
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response()));
+      mount();
+      await waitFor(() => expect(screen.getByRole("heading")).toBeVisible());
+      act(() => {
+        Object.defineProperty(document, "hidden", { value: true });
+        if (dispatch) {
+          changeData("remote-1");
+          changeData("remote-2");
+        } else
+          localStorage.setItem(
+            dataRevisionKey,
+            JSON.stringify({
+              generation: context.generation,
+              revision: "missed",
+            }),
+          );
+      });
+      expect(router.refresh).not.toHaveBeenCalled();
+      await act(async () => {
+        Object.defineProperty(document, "hidden", { value: false });
+        document.dispatchEvent(new Event("visibilitychange"));
+        window.dispatchEvent(new Event("focus"));
+      });
+      expect(router.refresh).toHaveBeenCalledTimes(1);
+    },
+  );
+  it("keeps newer concrete changes queued while an earlier refresh is pending", async () => {
+    let finish!: () => void;
+    router.refresh.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    vi.stubGlobal("fetch", vi.fn());
+    mount();
+    await waitFor(() => expect(screen.getByRole("heading")).toBeVisible());
+    await act(async () => changeData("remote-1"));
+    expect(router.refresh).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      changeData("remote-2");
+      changeData("remote-3");
+      changeData("remote-3");
+    });
+    expect(router.refresh).toHaveBeenCalledTimes(1);
+    await act(async () => finish());
+    expect(router.refresh).toHaveBeenCalledTimes(2);
+  });
+  it("leaves same-tab writes to Server Action invalidation", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response()));
+    mount();
+    await waitFor(() => expect(screen.getByRole("heading")).toBeVisible());
+    act(() => notifyDataChanged());
+    await act(async () => window.dispatchEvent(new Event("focus")));
+    expect(router.refresh).not.toHaveBeenCalled();
+  });
+  it("ignores data notices from another session generation", async () => {
+    vi.stubGlobal("fetch", vi.fn());
+    mount();
+    await waitFor(() => expect(screen.getByRole("heading")).toBeVisible());
+    await act(async () => changeData("other-account", "b".repeat(64)));
+    expect(router.refresh).not.toHaveBeenCalled();
+    expect(screen.getByRole("heading")).toBeVisible();
+  });
+  it("waits for uncertain lifecycle verification before refreshing a known change", async () => {
+    let finish!: (value: Response) => void;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        () =>
+          new Promise<Response>((resolve) => {
+            finish = resolve;
+          }),
+      ),
+    );
+    mount();
+    await waitFor(() => expect(screen.getByRole("heading")).toBeVisible());
+    act(() => window.dispatchEvent(new Event("pagehide")));
+    await act(async () => {
+      changeData("remote-1");
+      window.dispatchEvent(new Event("focus"));
+    });
+    expect(router.refresh).not.toHaveBeenCalled();
+    expect(screen.getByText("Private activity")).not.toBeVisible();
+    await act(async () => finish(response()));
+    expect(router.refresh).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("heading")).toBeVisible();
+  });
   it("keeps a visible document and its edited draft rendered between blur and focus", async () => {
     const fetch = vi.fn().mockResolvedValue(response());
     vi.stubGlobal("fetch", fetch);
@@ -131,7 +257,7 @@ describe("signed-in session continuity", () => {
     expect(screen.getByLabelText("Draft")).toHaveValue("unsaved");
     expect(fetch).toHaveBeenCalledTimes(1);
     await act(async () => finish(response()));
-    expect(router.refresh).toHaveBeenCalledTimes(1);
+    expect(router.refresh).not.toHaveBeenCalled();
   });
   it("keeps an established session rendered across ordinary visibility changes", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response()));
@@ -251,12 +377,13 @@ describe("signed-in session continuity", () => {
     }
   });
   it.each([
-    { fresh: true, changedData: false, refreshes: 0 },
-    { fresh: false, changedData: false, refreshes: 1 },
-    { fresh: true, changedData: true, refreshes: 1 },
+    { fresh: true, knownChange: false },
+    { fresh: false, knownChange: false },
+    { fresh: true, knownChange: true },
+    { fresh: false, knownChange: true },
   ])(
-    "deduplicates only fresh destinations without a later data revision ($fresh/$changedData)",
-    async ({ fresh, changedData, refreshes }) => {
+    "refreshes a destination only for a known change while auth is pending ($fresh/$knownChange)",
+    async ({ fresh, knownChange }) => {
       let finish!: (value: Response) => void;
       vi.stubGlobal(
         "fetch",
@@ -290,17 +417,10 @@ describe("signed-in session continuity", () => {
           </SignedInPage>
         </SignedInHistoryGuard>,
       );
-      if (changedData)
-        localStorage.setItem(
-          "myclinics-data-revision",
-          JSON.stringify({
-            generation: context.generation,
-            revision: "changed-during-navigation",
-          }),
-        );
+      if (knownChange) await act(async () => changeData("during-navigation"));
       await act(async () => finish(response()));
       expect(screen.getByText("Private summary")).toBeVisible();
-      expect(router.refresh).toHaveBeenCalledTimes(refreshes);
+      expect(router.refresh).toHaveBeenCalledTimes(knownChange ? 1 : 0);
     },
   );
 

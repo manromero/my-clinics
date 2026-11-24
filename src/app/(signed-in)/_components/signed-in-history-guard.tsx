@@ -164,11 +164,6 @@ export function SignedInHistoryGuard({
   const historyScroll = useRef<ReturnType<typeof createHistoryScroll>>(null);
   const entries = useRef(new Map<string, string>());
   const session = useRef(context);
-  const latestPage = useRef<{
-    href: string;
-    renderId: string;
-    renderedAt: number;
-  } | null>(null);
   const { refresh, replace } = useRouter();
   const pathname = usePathname();
   const search = useSearchParams().toString();
@@ -177,9 +172,11 @@ export function SignedInHistoryGuard({
   const [historyStatus, setHistoryStatus] = useState<HistoryStatus>("loading");
   const [refreshing, startRefresh] = useTransition();
   const dataRefreshActive = useRef(false);
+  const refreshKnownChanges = useRef<() => void>(null);
   useLayoutEffect(() => {
     dataRefreshActive.current = refreshing;
-  }, [refreshing]);
+    if (!refreshing) refreshKnownChanges.current?.();
+  });
   // Server authorization cannot inspect the browser's retired-generation fence.
   // Keep its private subtree unpainted until client activation accepts it.
   const [state, setState] = useState<
@@ -224,7 +221,6 @@ export function SignedInHistoryGuard({
   const pageRendered = useCallback(
     (href: string, renderId: string, renderedAt: number) => {
       if (href !== currentHistoryHref() || concealed.current) return;
-      latestPage.current = { href, renderId, renderedAt };
       const pending = traversal.current;
       const cached = entries.current.get(href) === renderId;
       if (pending) {
@@ -275,7 +271,32 @@ export function SignedInHistoryGuard({
     let redirecting = false;
     let permanentlyBlocked = false;
     let revision = dataRevision();
+    let pendingDataChange = false;
     let focusedControl: HTMLElement | undefined;
+    function refreshChangedData() {
+      if (
+        !pendingDataChange ||
+        dataRefreshActive.current ||
+        document.hidden ||
+        uncertainDocument ||
+        presentationBlocked.current ||
+        !eligible()
+      )
+        return;
+      pendingDataChange = false;
+      dataRefreshActive.current = true;
+      startRefresh(refresh);
+    }
+    function observeDataChange() {
+      const next = dataRevision();
+      if (next && next !== revision) {
+        revision = next;
+        pendingDataChange = true;
+        entries.current.clear();
+      }
+      refreshChangedData();
+    }
+    refreshKnownChanges.current = refreshChangedData;
     function hide() {
       const active = document.activeElement;
       if (active instanceof HTMLElement && root.contains(active))
@@ -319,8 +340,6 @@ export function SignedInHistoryGuard({
       const request = new AbortController();
       check = request;
       const snapshot = session.current;
-      const startedAt = Date.now();
-      const initialPage = latestPage.current;
       try {
         const response = await fetch("/auth/session", {
           cache: "no-store",
@@ -368,25 +387,8 @@ export function SignedInHistoryGuard({
         uncertainDocument = false;
         setSessionNotice(false);
         expire();
-        const changedData = revision !== dataRevision();
-        if (changedData) {
-          revision = dataRevision();
-          entries.current.clear();
-        }
-        // Continuity restores presentation immediately; foreground/reconnect
-        // separately refreshes business data, including other-device writes.
-        // A navigation completed while Auth was pending: its new server render
-        // already reads current data. Cached/older commits still revalidate.
-        const page = latestPage.current;
-        const freshNavigation =
-          page !== initialPage &&
-          page?.href === currentHistoryHref() &&
-          page.renderedAt >= startedAt;
-        if (!dataRefreshActive.current && (!freshNavigation || changedData)) {
-          dataRefreshActive.current = true;
-          startRefresh(refresh);
-        }
         reveal();
+        observeDataChange();
       } catch {
         if (!request.signal.aborted && !concealed.current) {
           if (eligible() && !uncertainDocument) {
@@ -423,6 +425,7 @@ export function SignedInHistoryGuard({
         hide();
         setState("checking");
       }
+      observeDataChange();
       void verify(!current);
     }
     function protectConcealedDialog(event: KeyboardEvent) {
@@ -441,7 +444,7 @@ export function SignedInHistoryGuard({
     }
     function storageChanged(event: StorageEvent) {
       if (event.key === dataRevisionKey) {
-        if (!document.hidden) returned();
+        observeDataChange();
         return;
       }
       if (event.key !== sessionFenceKey) return;
@@ -515,6 +518,7 @@ export function SignedInHistoryGuard({
       window.clearTimeout(expiry);
       traversal.current = null;
       historyScroll.current = null;
+      refreshKnownChanges.current = null;
       window.removeEventListener("keydown", protectConcealedDialog, true);
       scroll.dispose();
       check?.abort();
