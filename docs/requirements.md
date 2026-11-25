@@ -60,6 +60,9 @@ and over the workbook's structure.
 - A clinic's invoice template is optional. Allow assigning, replacing, or removing
   it in both creation and editing, showing the file name. Apply changes only on
   `Guardar`; canceling or a failed save preserves the previously saved template.
+- The template field supports a native file chooser and drag and drop simultaneously,
+  with identical validation for a single file. Reject multiple files clearly, allow
+  same-file reselection, and retain the current selection when the chooser is canceled.
 - Saved templates are available across sessions and devices and follow the same
   account ownership restrictions as their clinics. Storage technology is an
   implementation choice.

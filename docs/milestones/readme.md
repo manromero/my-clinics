@@ -15,6 +15,7 @@ before implementation begins.
 | [04 — Monthly activity](milestone-04-monthly-activity/readme.md)                          | Filter, record, edit, and delete monthly activity with private persistence and accurate earnings | Complete. [PR #58](https://github.com/manromero/my-clinics/pull/58) is merged into `develop`.                                 |
 | [05 — Monthly summary](milestone-05-monthly-summary/readme.md)                            | Review monthly totals and a per-clinic breakdown of saved activity                               | Tasks 00 and 01 merged into `develop`. Task 02 pending.                                                                       |
 | [06 — Production readiness](milestone-06-production-readiness/readme.md)                  | Prepare routing, activity entry, and signed-in navigation for production                         | All tasks are done; [PR #67](https://github.com/manromero/my-clinics/pull/67) is ready for human acceptance and manual merge. |
+| [07 — Invoices](milestone-07-invoices/readme.md)                                          | Private clinic PDF templates, shared FileInput, live preview and download                        | Proposed seven-task breakdown; all tasks pending; human acceptance pending.                                                   |
 
 Draft milestones remain subject to user approval of their scope and order.
 

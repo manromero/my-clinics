@@ -131,6 +131,12 @@ Use a dialog or panel opened from the list, adapting its size to mobile.
 | Estado                     | Active/inactive; new clinics default to active                                                                                             |
 | Plantilla de factura (PDF) | Optional fillable PDF, maximum 10 MB; show file name and allow assignment, replacement, or removal in both creation and editing            |
 
+Offer a native file chooser and drag and drop simultaneously for the optional
+single-PDF field, with identical validation. Indicate when a file is dragged over
+the drop target and show file errors beside the field, including multiple-file
+rejection. Allow selecting the same file again; canceling the chooser retains
+the current selection.
+
 Validate the PDF before saving: it must be readable, not password-protected, and
 contain the five required fillable fields defined in
 [requirements](requirements.md#invoice-templates-and-generation). Show the reason
