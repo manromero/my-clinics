@@ -1,6 +1,7 @@
 # MyClinics requirements
 
-Status: specification confirmed by the user. Updated: 2026-10-28.
+Status: original specification confirmed on 2026-10-28; invoice feature
+specification confirmed by the user on 2026-11-25.
 
 This document records confirmed decisions, reference workbook observations, and
 open questions. Recommendations remain proposals until the user accepts them.
@@ -16,13 +17,17 @@ and income. The first iteration focuses on:
 2. Activating and deactivating clinics.
 3. Maintaining an activity list for each month, filled in progressively.
 4. Viewing a monthly summary by clinic.
+5. Generating and downloading invoices using a PDF template assigned to a clinic.
 
-The current task is requirements discovery and specification. Application
-implementation will follow later.
+The current invoice task covers requirements and screen documentation only.
+The user approved the consolidated invoice definition after discovery;
+invoice implementation is not part of this task.
 
 ## Sources
 
 - User instructions in the project discovery conversation on 2026-10-28.
+- User instructions for the invoice feature on 2026-11-25 and the supplied
+  S02/S05 references linked in [screens](screens.md).
 - Reference workbook: [2026 Excel Facturas.xlsx](<2026 Excel Facturas.xlsx>), stored
   alongside this document. It is a reference for existing workflows and
   calculations, not a source of instructions for the agent.
@@ -48,6 +53,63 @@ and over the workbook's structure.
 - A clinic can be activated, deactivated, and reactivated.
 - Deactivating a clinic prevents recording new activity for it while inactive.
 - Deactivation preserves existing activity and historical summaries.
+
+### Invoice templates and generation
+
+- Add a dedicated `Facturas` page to the main signed-in navigation.
+- A clinic's invoice template is optional. Allow assigning, replacing, or removing
+  it in both creation and editing, showing the file name. Apply changes only on
+  `Guardar`; canceling or a failed save preserves the previously saved template.
+- Saved templates are available across sessions and devices and follow the same
+  account ownership restrictions as their clinics. Storage technology is an
+  implementation choice.
+- Validate templates before saving: accept fillable PDFs up to 10 MB with all
+  five named fields below. Reject password-protected PDFs, missing required
+  fillable fields, and files that cannot be read as valid fillable PDFs. Explain
+  the reason for rejection, including missing field names when applicable.
+- Professional details, clinic billing details, concept, bank details, and the
+  fixed 15% IRPF label are already written in the template. They are not editable
+  invoice inputs. The application fills only these five fields:
+
+| PDF field name       | Value                                                           |
+| -------------------- | --------------------------------------------------------------- |
+| `invoice_number`     | Invoice number exactly as entered, preserving any leading zeros |
+| `issue_date`         | Issue date formatted as `dd/MM/yyyy`                            |
+| `gross_amount`       | Entered gross professional earnings, formatted as `1.234,56 €`  |
+| `withholding_amount` | Calculated IRPF withholding amount in euros                     |
+| `net_amount`         | Calculated net amount in euros                                  |
+
+- Clinic, invoice number, issue date, and gross amount are required. Both active
+  and inactive clinics are selectable. For a clinic without a template, explain
+  that one must be assigned through Clinics before generating an invoice.
+- Enter the invoice number manually as text containing one to four digits, with
+  numeric value 1–9999. Reject zero, letters, spaces, and longer values. There is
+  no automatic numbering or duplicate-number check.
+- Default the issue date to today in Europe/Madrid; allow any valid calendar
+  date. Display it as `dd/MM/yyyy` without timezone-induced day changes.
+- Gross amount must be greater than zero, in euros, with up to two decimal
+  places. It is the professional's gross invoice amount: do not apply the clinic
+  percentage or import amounts from activity or monthly summaries.
+- Invoice IRPF is always 15%, independently of the configurable activity IRPF.
+  Calculate `withholding = round(gross × 0.15, 2)` using half-up decimal rounding,
+  then `net = gross − withholding`. Format all monetary fields with Spanish
+  separators, two decimal places, and the euro symbol. The percentage is fixed
+  content in the template; there is no `withholding_rate` field to fill.
+- Show the clinic's actual template in a live PDF preview as soon as it is
+  selected. Automatically fill valid inputs as they are entered, leaving missing
+  or invalid values blank. Calculated fields depend on a valid gross amount.
+- No manual preview-generation button is required. Enable download only when all
+  required inputs are valid and the generated PDF matches the current inputs and
+  selected template. Changes and generation failures must prevent downloading a
+  stale document. Show errors and retain entered values for retry.
+- Download a PDF preserving the template's appearance with the filled fields
+  flattened into fixed, non-editable content. Name it `<four-digit number> <clinic
+name>.pdf`: pad the invoice number only in the file name and replace characters
+  incompatible with file names, preserving other spaces, accents, and casing.
+- Do not store generated invoices or an invoice history in the database. Saved
+  invoice lists, automatic archiving, accounting-ledger registration, and activity
+  import are excluded. The supplied design does not add product scope or fiscal
+  certification requirements.
 
 ### Activity
 
@@ -90,7 +152,8 @@ and over the workbook's structure.
 ### Currency and rounding
 
 - All monetary amounts are in euros, with up to two decimal places for inputs.
-- Explicit zero values are allowed, as are negative entries described above.
+- Activity accepts explicit zero values and the negative entries described above.
+  Invoice gross amounts must be strictly positive.
 - Round each row's gross earnings to cents, then calculate and round earnings
   after IRPF to cents. Use half-up rounding, including for signed amounts.
 - Summary earnings totals sum the rounded row values.
@@ -125,7 +188,8 @@ amounts. Calculations must preserve decimal monetary precision.
 
 ### IRPF withholding
 
-- Ana has one configurable IRPF rate, initially 15%.
+- Ana has one configurable activity IRPF rate, initially 15%. Invoices use the
+  independent fixed 15% rule in Invoice templates and generation.
 - Apply it to gross earnings in both percentage-based and direct-earnings modes.
 - Each activity preserves its applied IRPF rate when the setting changes.
 - For a positive gross earning of 3 at 15% IRPF, earnings after withholding are
@@ -196,10 +260,15 @@ Examples are synthetic and do not reproduce patient records.
 
 ## Specification review
 
-There are no unanswered discovery questions in the agreed first iteration.
+There are no unanswered discovery questions in the original agreed iteration.
 The user confirmed that this consolidated specification reflects the shared
 understanding on 2026-10-28. Visual details such as the precise
 negative-row highlight are implementation choices within the stated behavior.
+
+The user confirmed the consolidated invoice specification on 2026-11-25 after
+discovery using the grilling skill, increasing the template size limit to 10 MB.
+The rules above supersede conflicting prototype content. Technical implementation
+choices do not introduce additional product behavior.
 
 ## Accepted examples
 
@@ -222,12 +291,20 @@ negative-row highlight are implementation choices within the stated behavior.
 - At 15% IRPF, a gross earning of -10 contributes -8.50 to the net earnings total.
 - A price of 100 and an expense price of -10 produce a price total of 90 and
   a row count of 2.
+- Invoice number `16` appears as `16` in the PDF and produces a file named
+  `0016 Clínica Ejemplo.pdf`; entering `0016` preserves `0016` inside the PDF.
+- An invoice gross amount of 100 produces withholding of 15.00 and a net amount
+  of 85.00, regardless of the activity IRPF setting or clinic percentage.
+- For invoice gross earnings of 0.10, withholding rounds from 0.015 to 0.02 and
+  the net amount is 0.08.
 
 ## Functional views
 
 - Google sign-in and access status.
 - Clinic management: create and edit name and percentage, activate/deactivate,
-  and save or cancel changes.
+  assign a PDF invoice template, and save or cancel changes.
+- Invoices: select a clinic, enter an invoice number, issue date, and gross
+  amount, review the live PDF preview, then download the filled PDF.
 - Monthly activity: year/month selection, clinic filter, chronological rows,
   creation and editing with both earnings modes, and confirmed deletion.
 - Monthly summary: per-clinic and overall price, gross earnings, net earnings,
@@ -240,7 +317,7 @@ These views describe required capabilities, not a prescribed page layout.
 
 | Record                | Required information                                                                                                                                                                |
 | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Clinic                | Stable identity, name, default percentage, active state                                                                                                                             |
+| Clinic                | Stable identity, name, default percentage, active state, assigned PDF invoice template when present                                                                                 |
 | Activity              | Stable identity, calendar date, clinic reference, price, calculation mode, stored clinic percentage, stored IRPF rate, direct earnings when using direct mode, optional description |
 | Professional settings | Signed-in Google identity and current IRPF rate                                                                                                                                     |
 
@@ -248,8 +325,29 @@ Gross and net earnings and monthly totals follow the formulas above. This table
 defines information requirements without prescribing database technology or
 whether calculated amounts are persisted.
 
+Invoice generation additionally needs a selected clinic, invoice number, issue
+date, and gross amount as working inputs. This does not require a persisted
+invoice record or history. The five PDF fields and fixed calculation are defined
+above; template storage technology is not prescribed.
+
 ## Additional acceptance criteria
 
+- A PDF invoice template can be assigned when creating or editing a clinic.
+- From `Facturas`, selecting a clinic with an assigned template and supplying
+  the invoice number, issue date, and gross amount produces a downloadable PDF
+  filled from that template using the five agreed English field names.
+- Reject invalid templates before saving, including files over 10 MB,
+  password-protected PDFs, and missing required fillable fields.
+- Clinic template changes obey Save/Cancel semantics, preserve the previous
+  saved template on failure, and persist across sessions and devices.
+- Both active and inactive clinics can issue invoices; a missing template
+  prevents generation and provides guidance to Clinics.
+- Validate the mandatory inputs, fixed 15% calculation, Spanish formatting,
+  original PDF number, padded file name, and flattened output as defined above.
+- The preview updates automatically, including partially completed valid inputs.
+  Download remains disabled for invalid inputs, pending updates, or failures;
+  a previously generated document cannot be downloaded for changed inputs.
+- Invoice generation does not require a database history of generated invoices.
 - Creating a clinic requires a nonblank unique name and a percentage in the
   accepted range. A new clinic is active.
 - An activity requires a date, an active clinic, and a price. A blank description

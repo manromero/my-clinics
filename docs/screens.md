@@ -1,6 +1,6 @@
 # MyClinics screens
 
-Updated: 2026-10-28.
+Updated: 2026-11-25. Invoice definition confirmed by the user.
 
 This document maps the confirmed [requirements](requirements.md) to screens and
 interactions for the first version. Requirements remain the source of truth for
@@ -29,10 +29,23 @@ intended appearance:
 | S02 — Clinics          | [code.html](screens/s02_gesti_n_de_cl_nicas/code.html) | [screen.png](screens/s02_gesti_n_de_cl_nicas/screen.png) |
 | S03 — Monthly activity | [code.html](screens/s03_actividad_mensual/code.html)   | [screen.png](screens/s03_actividad_mensual/screen.png)   |
 | S04 — Monthly summary  | [code.html](screens/s04_resumen_mensual/code.html)     | [screen.png](screens/s04_resumen_mensual/screen.png)     |
+| S05 — Invoices         | [code.html](screens/s05_facturas/code.html)            | [screen.png](screens/s05_facturas/screen.png)            |
 
-There is currently no supplied S05 Settings export. Apply the same Alexandria
+There is currently no supplied S06 Settings export. Apply the same Alexandria
 visual language and shared navigation to that screen using its functional
 description below.
+
+The user supplied an updated S02 reference for the template field and a new S05
+invoice reference. At this documentation pass, S02's HTML is identical to S05's
+invoice HTML; a clinic-form HTML reference still needs reconciliation. Preserve
+the supplied files and use the confirmed clinic-form behavior below.
+
+S05 is the supplied invoice screen design, not a requirement to implement every
+element pictured. Use its form-and-preview composition and visual styling with
+the approved scope below. Omit invoice history, annual-history access, automatic
+archiving, accounting registration, activity import, editable concept, automatic
+number suggestions, and tax/certification claims. Keep the live preview, adapted
+to the real assigned PDF and the confirmed fixed 15% calculation.
 
 ### How to use the references
 
@@ -56,17 +69,18 @@ description below.
 
 ## Screen map
 
-| ID  | Screen           | Spanish navigation label | Proposed route | Purpose                                            |
-| --- | ---------------- | ------------------------ | -------------- | -------------------------------------------------- |
-| S01 | Sign-in          | Acceder                  | `/login`       | Sign in with a Google account                      |
-| S02 | Clinics          | Clínicas                 | `/clinics`     | Manage clinic names, percentages, and active state |
-| S03 | Monthly activity | Actividad                | `/activity`    | Enter and correct activity for a selected month    |
-| S04 | Monthly summary  | Resumen                  | `/summary`     | Review monthly amounts and row counts by clinic    |
-| S05 | Settings         | Ajustes                  | `/settings`    | Change Ana's default IRPF rate and access sign-out |
+| ID  | Screen           | Spanish navigation label | Proposed route | Purpose                                                     |
+| --- | ---------------- | ------------------------ | -------------- | ----------------------------------------------------------- |
+| S01 | Sign-in          | Acceder                  | `/login`       | Sign in with a Google account                               |
+| S02 | Clinics          | Clínicas                 | `/clinics`     | Manage clinic names, percentages, and active state          |
+| S03 | Monthly activity | Actividad                | `/activity`    | Enter and correct activity for a selected month             |
+| S04 | Monthly summary  | Resumen                  | `/summary`     | Review monthly amounts and row counts by clinic             |
+| S05 | Invoices         | Facturas                 | `/invoices`    | Generate and download an invoice from a clinic PDF template |
+| S06 | Settings         | Ajustes                  | `/settings`    | Change Ana's default IRPF rate and access sign-out          |
 
 After successful sign-in, open Activity for the current month in Europe/Madrid.
 On desktop and mobile, the signed-in navigation displays Clínicas, Actividad,
-and Resumen in that order. Keep the signed-in identity and sign-out action
+Resumen, and Facturas in that order. Keep the signed-in identity and sign-out action
 accessible.
 
 Use a shared year/month and clinic selection for Activity and Summary. Moving
@@ -110,11 +124,19 @@ with recorded activity for the selected period.
 
 Use a dialog or panel opened from the list, adapting its size to mobile.
 
-| Field      | Behavior                                                                                                                                   |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Nombre     | Required; cap input at 200 Unicode code points and show the count. Reject blank or duplicate names after trimming spaces and ignoring case |
-| Porcentaje | Required; 0–100%, with up to two decimal places                                                                                            |
-| Estado     | Active/inactive; new clinics default to active                                                                                             |
+| Field                      | Behavior                                                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Nombre                     | Required; cap input at 200 Unicode code points and show the count. Reject blank or duplicate names after trimming spaces and ignoring case |
+| Porcentaje                 | Required; 0–100%, with up to two decimal places                                                                                            |
+| Estado                     | Active/inactive; new clinics default to active                                                                                             |
+| Plantilla de factura (PDF) | Optional fillable PDF, maximum 10 MB; show file name and allow assignment, replacement, or removal in both creation and editing            |
+
+Validate the PDF before saving: it must be readable, not password-protected, and
+contain the five required fillable fields defined in
+[requirements](requirements.md#invoice-templates-and-generation). Show the reason
+for rejection, including missing field names. Template changes take effect only
+on `Guardar`; `Cancelar` and failed saves preserve the previously saved template.
+Saved templates remain available across sessions and devices.
 
 Provide `Guardar` and `Cancelar`. A changed percentage affects new activity;
 existing rows retain their applied percentage. Display validation beside the
@@ -254,7 +276,82 @@ changes, deletions, or date changes affecting the month.
   period/filter.
 - Load failure with retry.
 
-## S05 — Settings
+## S05 — Invoices
+
+**Purpose:** generate and download an invoice using the selected clinic's PDF
+template, without requiring a database history of generated invoices.
+
+### Content and actions
+
+- Open from the main signed-in navigation using `Facturas`.
+- Use the supplied [S05 HTML](screens/s05_facturas/code.html) and
+  [S05 image](screens/s05_facturas/screen.png) as the visual reference: form on
+  the left and live PDF preview on the right on desktop, stacked on mobile.
+- Select an active or inactive clinic, identify inactive clinics in the selector,
+  and display the assigned template's file name.
+- Enter the following mandatory values and provide `Descargar factura PDF`.
+
+| Field             | Behavior                                                                                   |
+| ----------------- | ------------------------------------------------------------------------------------------ |
+| Clínica           | Required; select an active or inactive clinic and use its assigned template                |
+| Número de factura | Required text; one to four digits, numeric value 1–9999; preserve entered zeros in the PDF |
+| Fecha de emisión  | Required valid calendar date; default to today in Europe/Madrid; display `dd/MM/yyyy`      |
+| Importe bruto     | Required euro amount greater than zero, up to two decimal places                           |
+
+The gross amount is entered manually without applying the clinic percentage or
+importing activity. Show gross, fixed 15% withholding, and net amounts using the
+invoice formula in [requirements](requirements.md#invoice-templates-and-generation).
+The activity IRPF setting does not affect invoices. Display monetary amounts
+with Spanish separators, two decimals, and the euro symbol.
+
+Professional, clinic billing, concept, bank, and fixed IRPF percentage text comes
+from the template. Do not add editable fields for this content. There is no
+automatic numbering or duplicate-number verification.
+
+### Live preview and download
+
+- Show the actual assigned PDF as soon as a clinic with a template is selected;
+  the illustrative invoice in the export is not a fixed application layout.
+- Update the preview automatically as valid values are entered. Leave missing or
+  invalid fields blank; fill withholding and net when gross is valid. Do not
+  require the reference's `Actualizar vista` button.
+- Enable download only when all mandatory fields are valid and the PDF reflects
+  the current form and template. Disable it while updating or after an error;
+  never download a stale preview for changed inputs or a different clinic.
+- Preserve the template's appearance and flatten filled fields in the downloaded
+  PDF. Use the file name `0016 Nombre de la clínica.pdf` for entered number `16`;
+  the PDF itself retains `16`. Entered `0016` remains `0016` in the PDF. Replace
+  only file-name-incompatible characters in the clinic name.
+- If download actions appear in both the form and preview toolbar, apply the
+  same validity and freshness rules to both.
+
+### Design elements outside scope
+
+Omit `Histórico anual`, `Últimas facturas del mes`, `Ver todas`, archived-copy
+messages, accounting/manager registration, and `Importar de ... actos clínicos`.
+Remove the concept editor, numbering suggestions and verification lock, and
+unsupported fiscal-status or PDF/A certification badges. Static tax or payment
+text already present in a user's template remains template content; it does not
+introduce additional application calculations or compliance claims.
+
+### States
+
+- Clinics/template loading and automatic preview update in progress.
+- No clinics: explain how to create one and link to Clinics.
+- No template: explain that it must be assigned in the clinic form, link to
+  Clinics, and keep invoice generation/download unavailable.
+- Invalid or incomplete inputs: show field errors, preview the valid values,
+  and keep download disabled.
+- Valid inputs and updated PDF: download available.
+- Clinic/template load or generation failure: show an error, retain entered
+  values for retry, and prevent downloading an outdated PDF.
+
+<a id="s05--settings"></a>
+
+## S06 — Settings
+
+Settings was previously identified as S05. The legacy anchor above preserves
+existing milestone links; S05 now identifies the supplied invoice reference.
 
 **Purpose:** manage the default IRPF rate for new activity and the current session.
 
@@ -307,3 +404,8 @@ changes, deletions, or date changes affecting the month.
    activity remains available and new entry for that clinic is blocked.
 7. **Change default withholding:** Settings → Edit IRPF → Save → New entries use
    the new rate, existing entries retain their stored rate.
+8. **Prepare an invoice template:** Clinics → New clinic or Edit → Assign a PDF
+   invoice template → Save.
+9. **Generate an invoice:** Facturas → Select clinic → Enter invoice number,
+   issue date, and gross amount → Review automatically updated PDF → Download
+   when all inputs are valid and the PDF is current. No invoice history is saved.
