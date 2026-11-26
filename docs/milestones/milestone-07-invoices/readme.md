@@ -92,6 +92,13 @@ checks remain blockers rather than inferred passes.
 
 ## Progress notes
 
+2026-11-26: Task 02 implementation and required validation passed, but the initial
+independent phase 2 review of [PR #72](https://github.com/manromero/my-clinics/pull/72)
+found blocking B1 in the browser upload credential scope. Correction round 1 of 2
+is assigned. Other independent checks passed, including the fresh hosted lifecycle
+suite and 383 unit tests. The task remains `in_progress`; deployment authorization
+and human acceptance remain pending.
+
 2026-11-26: Task 02 phase 1 investigation and independent decision review passed
 at `67fd610d804b1f453e385aa7801603c29d250996`, with no blockers and one optional
 research diagnostic suggestion. Actual hosted transfer/access/cache proofs and

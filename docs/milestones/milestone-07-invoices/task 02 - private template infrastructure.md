@@ -147,9 +147,33 @@ role tests do not replace hosted setup and API checks. No UI screenshots require
   This is not a phase 1 blocker and does not extend scope independently.
 - Open items: phase 2 implementation, hosted validation, PR, independent final
   review, and separately scoped development rollout authorization.
-- Correction rounds used: 0 of 2. Phase 1 decision review accepted with no blockers.
+- Phase 2 initial review of `8cf9e8577a22fb551ac401c4b67211878520d6bc`
+  found B1 blocking: `begin.uploadGrant` exports the full ordinary-user account
+  token across the existing HttpOnly boundary. Independent raw REST probes could
+  create/read unrelated owned clinics after cancellation without cookies. Replace
+  this with a narrower transfer capability and independently re-review the
+  affected transport/lifetime contract. Signed standard upload was proven;
+  signed TUS was not proven by reviewer diagnostics and must not be assumed.
+- Other phase 2 checks passed: implementer full replay/types/parity/upgrade and
+  actual Next production proof; reviewer independently passed 383 unit tests,
+  required application checks, fresh SQL and all 14 non-Next hosted lifecycle
+  checks. The reviewer inspected, rather than reran, full type-generation/parity/
+  upgrade and production HTTP evidence. No UI review applies.
+- PR: <https://github.com/manromero/my-clinics/pull/72> (draft). All implementation
+  and reviewer disposable targets were deleted and absence confirmed. Development
+  remains paused to provide capacity for correction validation.
+- Correction rounds used: 1 of 2 dispatched for B1. Phase 1 accepted; phase 2
+  remains blocked pending correction and re-review. O1 is addressed for acceptance.
 
 ## Progress notes
+
+2026-11-26: Phase 2 initial independent review of PR #72 at `8cf9e85` found B1:
+the upload grant exposes the full account token rather than a file-scoped
+capability. All other reviewed checks passed, including a fresh hosted lifecycle
+suite and 383 unit tests. Correction round 1 is assigned to the same implementer;
+the same reviewer will verify the revised transfer and security contract. Signed
+TUS remains unproven; supported alternatives must be evaluated honestly. No
+persistent development rollout is authorized or claimed.
 
 2026-11-26: Phase 1 investigation and independent decision review passed at
 `67fd610d804b1f453e385aa7801603c29d250996`. Actual 10 MB raw/multipart/TUS transfers,
