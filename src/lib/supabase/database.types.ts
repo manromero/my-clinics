@@ -142,7 +142,6 @@ export type Database = {
           outcome: Json | null;
           owner_id: string;
           payload: Json;
-          quarantine_cleaned_at: string | null;
           retired_at: string | null;
           sha256: string | null;
           state: string;
@@ -162,7 +161,6 @@ export type Database = {
           outcome?: Json | null;
           owner_id: string;
           payload: Json;
-          quarantine_cleaned_at?: string | null;
           retired_at?: string | null;
           sha256?: string | null;
           state: string;
@@ -182,7 +180,6 @@ export type Database = {
           outcome?: Json | null;
           owner_id?: string;
           payload?: Json;
-          quarantine_cleaned_at?: string | null;
           retired_at?: string | null;
           sha256?: string | null;
           state?: string;
@@ -229,7 +226,10 @@ export type Database = {
         Args: { p_id: string; p_owner: string };
         Returns: Json;
       };
-      claim_template_cleanup: { Args: { p_id: string }; Returns: Json };
+      claim_template_cleanup: {
+        Args: { p_id: string; p_owner: string };
+        Returns: Json;
+      };
       claim_template_validation: {
         Args: { p_id: string; p_owner: string };
         Returns: Json;
@@ -252,10 +252,6 @@ export type Database = {
       };
       delete_activity: { Args: { p_id: string }; Returns: string };
       delete_clinic: { Args: { p_id: string }; Returns: string };
-      finish_template_cleanup: {
-        Args: { p_id: string; p_lease: string };
-        Returns: undefined;
-      };
       finish_template_validation: {
         Args: {
           p_bytes: number;
@@ -267,23 +263,14 @@ export type Database = {
         };
         Returns: Json;
       };
-      list_template_cleanup: { Args: never; Returns: Json };
       parse_activity_amount: { Args: { amount: string }; Returns: number };
       read_clinic_template: {
         Args: { p_clinic: string; p_owner: string; p_template: string };
         Returns: Json;
       };
-      template_quarantine_cleanup: {
-        Args: { p_finished?: boolean; p_id: string };
-        Returns: Json;
-      };
       template_request: {
         Args: { p_id: string; p_owner: string };
         Returns: Json;
-      };
-      template_upload_allowed: {
-        Args: { object_name: string };
-        Returns: boolean;
       };
       update_activity: {
         Args: {
