@@ -96,9 +96,11 @@ checks remain blockers rather than inferred passes.
 workflow. Its existing scope is approved for execution; other tasks remain pending.
 
 Task 00 implementation is in [draft PR #70](https://github.com/manromero/my-clinics/pull/70).
-Independent review found no product defects, but existing S02/S05 reference
-formatting failures and unavailable actual native-dialog cancellation validation
-prevent readiness. Task 00 remains `in_progress`; correction rounds used: 0 of 2.
+Independent review found no product defects. The user authorized formatting S02/S05
+reference HTML with project Prettier 3.9.10; the global format check now passes,
+pending independent re-review. Actual native-dialog cancellation validation remains
+unavailable and prevents readiness. Task 00 remains `in_progress`; correction round
+1 of 2 addresses formatting only.
 
 2026-11-25: Prepared for direct documentation delivery, human acceptance pending.
 All implementation tasks remain pending. No implementation, hosted operations,

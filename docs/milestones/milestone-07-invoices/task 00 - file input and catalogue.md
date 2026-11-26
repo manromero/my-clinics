@@ -57,9 +57,10 @@ Detailed evidence and review limitations are preserved in the PR.
 
 Delivery remains blocked with status `in_progress`:
 
-- B01: `pnpm format:check` fails only the untouched supplied S02/S05 reference
-  HTML, also reproduced from the base commit. Assignment files pass formatting.
-  User authorization to normalize these reference files is pending.
+- B01: fixed, independent re-review pending. With explicit user authorization,
+  formatted S02/S05 reference HTML using project Prettier 3.9.10 (matching the
+  lockfile). `pnpm format:check` now passes globally. The original failure was
+  independently reproduced from the base commit; its original cause is unknown.
 - B02: actual native chooser cancellation is unverified. Automated chooser
   opening/selection and empty completion retain selection, but empty completion
   does not prove native cancellation. The reviewer's isolated headed Chrome
@@ -68,7 +69,7 @@ Delivery remains blocked with status `in_progress`:
   A working native UI session or an explicit user decision on this validation
   limitation is required before readiness.
 
-No automatic correction rounds used (0 of 2); no application fixes were identified.
+Correction round 1 of 2 addresses B01; no application fixes were identified.
 Human acceptance and manual merge remain pending; do not merge this draft as a
 clean validated delivery.
 
