@@ -125,36 +125,40 @@ export async function templateStorageTests({
   );
   // Explicit exception only after transactional SQL owner/grant checks passed.
   await api(`/projects/${ref}/postgrest`, "PATCH", { db_schema: "public" });
+  async function waitForDataApi() {
+    const deadline = Date.now() + 30000;
+    let ready = false;
+    while (Date.now() < deadline) {
+      const response = await fetch(`${url}/rest/v1/`, {
+        headers: { apikey: secret, Authorization: `Bearer ${secret}` },
+        signal: AbortSignal.timeout(5000),
+      }).catch(() => null);
+      if (response?.ok) {
+        const schema = await response.json();
+        if (schema.paths?.["/rpc/template_request"]) {
+          ready = true;
+          break;
+        }
+      }
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    assert.ok(
+      ready,
+      "Disposable Data API did not become ready after scoped configuration reload",
+    );
+  }
   const sql = async (statement) => {
     await api(`/projects/${ref}/postgrest`, "PATCH", { db_schema: "" });
     try {
       return await query(ref, statement);
     } finally {
       await api(`/projects/${ref}/postgrest`, "PATCH", { db_schema: "public" });
-      const deadline = Date.now() + 30000;
-      let ready = false;
-      while (Date.now() < deadline) {
-        const response = await fetch(`${url}/rest/v1/`, {
-          headers: { apikey: secret, Authorization: `Bearer ${secret}` },
-          signal: AbortSignal.timeout(5000),
-        }).catch(() => null);
-        if (response?.ok) {
-          const schema = await response.json();
-          if (schema.paths?.["/rpc/template_request"]) {
-            ready = true;
-            break;
-          }
-        }
-        await new Promise((resolve) => setTimeout(resolve, 250));
-      }
-      assert.ok(
-        ready,
-        "Disposable Data API did not become ready after scoped configuration reload",
-      );
+      await waitForDataApi();
     }
   };
   let app;
   try {
+    await waitForDataApi();
     const users = [];
     for (let i = 0; i < 2; i++) {
       const email = `template-${randomUUID()}@example.test`,
