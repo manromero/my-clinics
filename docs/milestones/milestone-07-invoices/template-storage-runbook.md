@@ -2,10 +2,12 @@
 
 This implements the independently accepted [decision](template-storage-decision.md).
 It provides infrastructure for tasks 03–06; clinic forms are not wired here.
-Generated invoices are never stored. Persistent development rollout is **not yet
-authorized or executed**. Obtain approval for the exact target, reviewed commit,
-migration, bucket configuration, server secret, and daily cleanup before applying
-the steps below. Disposable validation is separately authorized.
+Generated invoices are never stored. The user explicitly authorized the reviewed
+development rollout at `6b3af7fa68ba0379a70db119e652bfd54b376d3a`, including the
+migration, two private buckets, local server secret, verification and cleanup.
+The migration has **not yet been applied**. The task-specific native CLI consent
+amendment below requires independent procedure review before execution.
+Disposable validation is separately authorized.
 
 ## Runtime contract
 
@@ -116,8 +118,7 @@ each update, protecting later combined saves against stale clinic fields.
 Target for the proposed synthetic development rollout:
 `lvqbrjybwstvdhaxyxyn`, `my-clinics_dev`, organization `njnmfutclorywskqrftd`.
 Production `xihkrkgrhupiwcsfjctp` is prohibited by both disposable and template
-operator mutation paths. The following is a reviewable plan, not an executed
-rollout or a request to widen authorization implicitly.
+operator mutation paths. This authorized plan is not yet an executed rollout.
 
 1. Record reviewed head, current migration history, and a read-only inventory of
    clinics/activity/owners. Verify exact ref/name/org and healthy status. Follow
@@ -148,6 +149,57 @@ rollout or a request to widen authorization implicitly.
    migration commands have **not** been run against development for this task.
    CLI help was checked locally; native transport/authentication may still need
    operator resolution. Stop on unexpected history, drift or connectivity errors.
+
+### Task-specific native CLI consent amendment
+
+The initial native apply attempt stopped before SQL with CLI 3.0.0's hosted
+mutation consent requirement. Fresh read-only inspection still returns only the
+six previous migrations through `20261114120000`; the new migration is absent.
+The Data API was restored to its recorded `public` schema while this procedure
+amendment receives independent review. The preservation baseline is 14 clinics,
+63 activity rows and seven Auth owners, with read-only ordered-record digests.
+
+CLI 3.0.0 [hosted-consent source](https://github.com/supabase/cli/blob/v3.0.0/apps/cli/src/command-internal/hosted-consent/hosted-consent.ts)
+explicitly refuses an agent-driven prompt, even with a terminal, and never
+accepts piped answers. The native command needs its own explicit acknowledgement
+after the user's authorization and independent review. For **this task only**,
+after independent acceptance of this amendment, the following command-specific
+`--yes` acknowledges the already reviewed and authorized migration. It does not
+replace the review, authorize another target or permit a global flag/environment
+setting. The generic manual migration rule remains unchanged. Never set
+`SUPABASE_YES`, hide agent detection, use global `--yes`, reset, seed or repair.
+
+Before that command, fail closed unless all of these conditions hold:
+
+- Live Management API identity is `lvqbrjybwstvdhaxyxyn`, `my-clinics_dev`,
+  organization `njnmfutclorywskqrftd`, status `ACTIVE_HEALTHY`.
+- Read-only history matches the six baseline versions exactly; the new version
+  is absent, and clinic/activity/owner inventory and digests still match.
+- Reviewed migration `20261126160000_private_templates.sql` has SHA-256
+  `dca0e0f0bd9375d0c00991484d383f67bea3b8062249fc7e8a6e595bbb4ca2c4`.
+- Disable and independently read back the Data API configuration, then repeat
+  the exact native dry run with `--skip-vault`. Its target ref must match and
+  its plan must contain only that migration, with empty `seeds` and `roles`.
+- Record the amendment's independently reviewed head. Use the same pinned
+  CLI 3.0.0, explicit target and migration file for apply; stop on any discrepancy.
+
+```powershell
+$env:NODE_USE_SYSTEM_CA='1'
+$templateRef='lvqbrjybwstvdhaxyxyn'
+pnpm supabase db push --remote=$templateRef --dry-run --skip-vault
+# Only after the guarded exact preview and accepted procedure amendment:
+pnpm supabase db push --remote=$templateRef --skip-vault --yes
+```
+
+System CA trust fixes the native transport without disabling TLS verification.
+The CLI labels this linked project's default branch `production` and displays
+the cached name `my-clinics`; these are not the application's production project
+identity. Its [pinned identity renderer](https://github.com/supabase/cli/blob/v3.0.0/apps/cli/src/command-internal/target/target-identity.ts)
+derives those fields from linked-project metadata. Verify the explicit ref and
+live Management API identity, never those cached labels. Production's distinct
+ref remains prohibited. After apply, verify the new migration record, grants,
+RLS and preservation before restoring the original Data API schema. On a blocked
+preview or pre-apply refusal, restore and verify that original schema.
 
 3. Supply the organization-scoped PAT in ignored `.env.database-validation`, with
    existing lifecycle/database/config permissions plus API Keys Read and API Key
