@@ -135,7 +135,7 @@ export function notifySignedOut() {
   channel?.close();
 }
 function isSignedInLocation() {
-  return ["/activity", "/clinics", "/summary"].includes(
+  return ["/activity", "/clinics", "/summary", "/invoices"].includes(
     window.location.pathname,
   );
 }

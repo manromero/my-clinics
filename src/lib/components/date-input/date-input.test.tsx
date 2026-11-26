@@ -5,6 +5,22 @@ import { describe, expect, it, vi } from "vitest";
 import { DateInput } from "./date-input";
 
 describe("DateInput", () => {
+  it("supports an explicit day/month/year text presentation without locale conversion", () => {
+    render(
+      <DateInput
+        label="Emisión"
+        inputFormat="dd/MM/yyyy"
+        value="29/02/2024"
+        readOnly
+      />,
+    );
+    expect(screen.getByLabelText("Emisión")).toHaveAttribute("type", "text");
+    expect(screen.getByLabelText("Emisión")).toHaveValue("29/02/2024");
+    expect(screen.getByLabelText("Emisión")).toHaveAttribute(
+      "placeholder",
+      "dd/MM/yyyy",
+    );
+  });
   it("associates labels, requirements and deduplicated descriptions and removes errors", async () => {
     const user = userEvent.setup();
     const { rerender } = render(

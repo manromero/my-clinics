@@ -1,6 +1,6 @@
 # Task 01 — Invoice route and form contracts
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -49,6 +49,40 @@ and production-safe interim state. Capture S05/Alexandria evidence, disclosing f
 
 ## Progress notes
 
-Planning only; no checks performed. At intake inspect the actual shell and
-Milestone 06 continuity policy rather than assuming tracking proves what is merged.
-Human acceptance of this refined task is pending.
+2026-11-26: The user assigned this task under the project workflow, authorizing
+its existing scope for implementation. Implementation and independent review are
+pending; human acceptance and manual merge remain separate.
+
+## Execution context
+
+- Readiness: approved objective and criteria are actionable. Both dedicated
+  synthetic accounts signed in and displayed Activity in isolated headless Chrome.
+  No database, template infrastructure or PDF-generation work is authorized here.
+- Branch: `feature/invoice-route-form-contracts`, based on updated `origin/develop`
+  at `e2dc1f3f7a6776efdab1f5157accab54ee2c992e`. The initial checkout was clean.
+- Sources: the requirements, S05 and milestone references above, plus
+  [architecture](../../architecture.md),
+  [Alexandria](../../screens/alexandria/DESIGN.md), and installed Next.js
+  `layouts-and-pages` and `linking-and-navigating` guides. Read the relevant
+  installed guides before application edits.
+- Verified: `SignedInShell` currently recognizes Clinics, Activity and Summary.
+  It retains the last monthly query while visiting non-monthly routes;
+  `MainNavigation` defines destination types/order. Preserve that continuity and
+  Activity landing behavior while adding Invoices to the real route contracts.
+- Inspect signed-in history guards, Proxy/auth destinations, existing shared
+  controls and route tests; do not assume adding a navigation label is sufficient.
+  Reuse the actual controls and keep invoice-only helpers beside their route.
+- Validation: run lint, type checking, formatting, production build and meaningful
+  focused tests for validation, decimal rounding, dates and navigation. Follow the
+  [local signed-in procedure](../../supabase.md#local-signed-in-validation) with
+  each role's own fixture; check all four destinations and history on desktop and
+  mobile. Both the launcher and server required `NODE_USE_SYSTEM_CA=1` for the
+  installed trusted certificates. Do not expose fixture values in evidence.
+- Use `chrome-screenshots` for independent captures/inspection and `github-pr`
+  for publication with verified inline attachments. Confine explicit fixture
+  scenarios to development/test boundaries; production must explain unavailable
+  generation and never display a mock PDF or successful download.
+- Hypothesis to verify: retaining the shared shell's monthly state through
+  Invoice visits can preserve existing month/clinic selection without adding
+  invoice persistence or importing monthly amounts.
+- Open product questions: none. Correction rounds used: 0 of 2.

@@ -60,7 +60,7 @@ describe("scoped header navigation", () => {
       "false",
     );
   });
-  it("preserves period and clinic across monthly screens and Clinics without carrying pagination", () => {
+  it("preserves period and clinic across monthly screens, Clinics and Invoices without carrying pagination", () => {
     route.segment = "activity";
     route.query = "year=2026&month=10&clinic=7&page=4";
     const view = render(shell);
@@ -68,7 +68,7 @@ describe("scoped header navigation", () => {
       "href",
       "/summary?year=2026&month=10&clinic=7",
     );
-    route.segment = "clinics";
+    route.segment = "invoices";
     route.query = "";
     view.rerender(
       <SignedInShell
