@@ -1,13 +1,63 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { test } from "node:test";
+import { checkTemplateBucket } from "./template-storage-validation.mjs";
 import { fileURLToPath } from "node:url";
 import {
   checkParity,
   checkTypes,
   organization,
   verifyTarget,
+  isTypesTransportError,
+  api,
 } from "./database-validation.mjs";
+
+test("disposable API guard prohibits shared development and production writes before network access", async () => {
+  for (const ref of ["lvqbrjybwstvdhaxyxyn", "xihkrkgrhupiwcsfjctp"])
+    await assert.rejects(
+      api(`/projects/${ref}`, "DELETE"),
+      /mutations are prohibited/,
+    );
+});
+
+test("Storage configuration check rejects public, MIME and byte-limit drift", () => {
+  const bucket = {
+    public: false,
+    file_size_limit: 10000000,
+    allowed_mime_types: ["application/pdf"],
+  };
+  checkTemplateBucket(bucket);
+  for (const drift of [
+    { public: true },
+    { file_size_limit: 10000001 },
+    { allowed_mime_types: null },
+  ])
+    assert.throws(() => checkTemplateBucket({ ...bucket, ...drift }));
+});
+
+test("type generation fallback accepts only the observed transport error, never authorization or schema failures", () => {
+  assert.equal(
+    isTypesTransportError({
+      stdout:
+        "Target\n" +
+        JSON.stringify({
+          error: {
+            code: "GenTypesNetworkError",
+            message: "failed to get typescript types: TransportError",
+          },
+        }),
+    }),
+    true,
+  );
+  for (const code of ["Unauthorized", "Forbidden", "GenTypesDatabaseError"])
+    assert.equal(
+      isTypesTransportError({
+        stdout: JSON.stringify({ error: { code, message: "failed" } }),
+      }),
+      false,
+    );
+  assert.equal(isTypesTransportError({ stdout: "403 Forbidden" }), false);
+});
 
 test("validation credentials fail closed and stay out of diagnostics", () => {
   const script = fileURLToPath(

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { readFile, readdir, writeFile } from "node:fs/promises";
+import { appendFile, readFile, readdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { format } from "prettier";
 import { activityConcurrencyTests } from "./activity-database-validation.mjs";
@@ -14,6 +14,7 @@ import {
 
 export const organization = "njnmfutclorywskqrftd";
 const protectedRef = "lvqbrjybwstvdhaxyxyn";
+const productionRef = "xihkrkgrhupiwcsfjctp";
 const organizationPath = `/organizations/${organization}`;
 const root = fileURLToPath(new URL("../", import.meta.url));
 const typesPath = new URL(
@@ -45,7 +46,15 @@ async function sqlFiles(folder) {
     .sort();
 }
 
-async function api(path, method = "GET", body) {
+export async function api(path, method = "GET", body) {
+  if (method !== "GET") {
+    assert.ok(
+      ![protectedRef, productionRef].some((ref) =>
+        path.startsWith(`/projects/${ref}`),
+      ),
+      "Shared development and production mutations are prohibited by the disposable runner",
+    );
+  }
   const response = await fetch(`https://api.supabase.com/v1${path}`, {
     method,
     headers: {
@@ -110,13 +119,14 @@ export function verifyTarget(project, name) {
     protectedRef,
     "Shared development target is prohibited",
   );
+  assert.notEqual(project.id, productionRef, "Production target is prohibited");
   assert.equal(project.name, name);
   assert.equal(project.organization_id, organization);
   assert.ok(name.startsWith("myclinics-validation-"));
 }
 
 const owned = new Map();
-async function query(ref, sql) {
+export async function query(ref, sql) {
   assert.ok(owned.has(ref), "SQL requires a target created by this process");
   const config = await api(`/projects/${ref}/postgrest`);
   assert.ok(
@@ -126,7 +136,12 @@ async function query(ref, sql) {
   return api(`/projects/${ref}/database/query`, "POST", { query: sql });
 }
 
-async function disposable(label, run) {
+export async function disposable(label, run) {
+  assert.equal(
+    process.env.MYCLINICS_DISPOSABLE_AUTHORIZATION,
+    organization,
+    "Explicit disposable-target authorization is required",
+  );
   const name = `myclinics-validation-${label}-${randomBytes(5).toString("hex")}`;
   const password = randomBytes(32).toString("base64url");
   const project = await api("/projects", "POST", {
@@ -139,7 +154,12 @@ async function disposable(label, run) {
   // Register immediately so provisioning/configuration failures still clean up.
   assert.match(ref, /^[a-z]{20}$/);
   assert.notEqual(ref, protectedRef);
+  assert.notEqual(ref, productionRef);
   owned.set(ref, name);
+  await appendFile(
+    new URL("../.env.database-validation-ledger.jsonl", import.meta.url),
+    `${JSON.stringify({ event: "created", ref, name, date: new Date().toISOString() })}\n`,
+  );
   console.log(`Created ${name} (${ref})`);
   try {
     let healthy = false;
@@ -167,6 +187,10 @@ async function disposable(label, run) {
     );
     owned.delete(ref);
     console.log(`Deleted and verified absent: ${ref}`);
+    await appendFile(
+      new URL("../.env.database-validation-ledger.jsonl", import.meta.url),
+      `${JSON.stringify({ event: "deleted-confirmed-absent", ref, date: new Date().toISOString() })}\n`,
+    );
   }
 }
 
@@ -180,7 +204,7 @@ async function snapshot(ref) {
   return rows[0].catalog;
 }
 
-async function replay(ref, files = undefined) {
+export async function replay(ref, files = undefined) {
   await query(
     ref,
     `create schema if not exists supabase_migrations;
@@ -332,7 +356,36 @@ async function clinicUpgrade(ref) {
   assert.ok(clinicDeletionPosition > activityPosition);
   await replay(ref, files.slice(activityPosition + 1, clinicDeletionPosition));
   await clinicDeletionUpgrade(ref, files[clinicDeletionPosition]);
+  const templateUpgradeClinics = await query(
+    ref,
+    "select id::text,name,percentage,active,owner_id from public.clinics order by id",
+  );
+  const templateUpgradeActivity = await query(
+    ref,
+    "select * from public.activity order by id",
+  );
   await replay(ref, files.slice(clinicDeletionPosition + 1));
+  assert.deepEqual(
+    await query(
+      ref,
+      "select id::text,name,percentage,active,owner_id from public.clinics order by id",
+    ),
+    templateUpgradeClinics,
+  );
+  assert.deepEqual(
+    await query(ref, "select * from public.activity order by id"),
+    templateUpgradeActivity,
+  );
+  assert.deepEqual(
+    await query(
+      ref,
+      "select count(*)::int as count from public.clinic_templates",
+    ),
+    [{ count: 0 }],
+  );
+  console.log(
+    "Template upgrade preserved owned/unassigned and active/inactive clinics and saved activity; existing clinics have no template",
+  );
   await query(ref, "drop schema validation_preclinic cascade");
   console.log(
     "Actual clinic migration upgrade from previous empty baseline preserved committed synthetic data",
@@ -410,33 +463,67 @@ async function clinicDeletionUpgrade(ref, migration) {
   );
 }
 
+export function isTypesTransportError(error) {
+  try {
+    const diagnostic = JSON.parse(
+      String(error.stdout ?? "")
+        .split("\n")
+        .find((line) => line.startsWith("{")) ?? "null",
+    );
+    return (
+      diagnostic?.error?.code === "GenTypesNetworkError" &&
+      diagnostic.error.message ===
+        "failed to get typescript types: TransportError"
+    );
+  } catch {
+    return false;
+  }
+}
+
 async function generateTypes(ref, accessToken) {
   assert.ok(
     owned.has(ref),
     "Type generation requires a target created by this process",
   );
-  const raw = execFileSync(
-    process.execPath,
-    [
-      `${root}node_modules/supabase/dist/supabase.js`,
-      "gen",
-      "types",
-      "--profile=supabase",
-      "--lang=typescript",
-      "--schema=public",
-      `--remote=${ref}`,
-    ],
-    {
-      cwd: root,
-      encoding: "utf8",
-      env: {
-        ...process.env,
-        SUPABASE_ACCESS_TOKEN: accessToken,
-        SUPABASE_CLI_BINARY_OVERRIDE: "",
+  let raw;
+  try {
+    raw = execFileSync(
+      process.execPath,
+      [
+        `${root}node_modules/supabase/dist/supabase.js`,
+        "gen",
+        "types",
+        "--profile=supabase",
+        "--lang=typescript",
+        "--schema=public",
+        `--remote=${ref}`,
+      ],
+      {
+        cwd: root,
+        encoding: "utf8",
+        env: {
+          ...process.env,
+          SUPABASE_ACCESS_TOKEN: accessToken,
+          SUPABASE_CLI_BINARY_OVERRIDE: "",
+        },
+        stdio: ["ignore", "pipe", "pipe"],
       },
-      stdio: ["ignore", "pipe", "pipe"],
-    },
-  );
+    );
+  } catch (error) {
+    if (!isTypesTransportError(error)) throw error;
+    console.log(
+      "CLI transport unavailable; generating hosted types through official Management API",
+    );
+    const generated = await api(
+      `/projects/${ref}/types/typescript?included_schemas=public`,
+    );
+    assert.equal(
+      typeof generated.types,
+      "string",
+      "Generation endpoint returned no types",
+    );
+    raw = generated.types;
+  }
   assert.ok(
     raw.includes("export type Database"),
     "CLI did not return Database types",
@@ -547,6 +634,9 @@ export async function main(mode = process.argv[2]) {
       );
       await clinicConcurrencyTests((sql) => query(ref, sql));
       await activityConcurrencyTests((sql) => query(ref, sql));
+      const { templateStorageTests } =
+        await import("./template-storage-validation.mjs");
+      await templateStorageTests({ ref, api, query, production: true });
       await clinicNegativeControls(
         (sql) => query(ref, sql),
         await readFile(
@@ -602,6 +692,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
         ? error.message.split("\n")[0]
         : `Database validation failed (${error.name}); inspect stage logs and disposable cleanup`,
     );
+    if (error instanceof assert.AssertionError) {
+      const primitive = (value) =>
+        ["string", "number", "boolean"].includes(typeof value) || value === null
+          ? String(value).slice(0, 150)
+          : "[structured]";
+      console.error(
+        `Assertion expected ${primitive(error.expected)}, actual ${primitive(error.actual)}; ${error.stack?.split("\n").find((line) => line.includes(".mjs:")) ?? ""}`,
+      );
+    }
     process.exitCode = 1;
   });
 }

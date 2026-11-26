@@ -1,7 +1,11 @@
 # Private clinic template storage investigation
 
-Research date: 2026-11-26. Phase 1 decision proposal; independent acceptance and
-phase 2 configuration are pending. Base:
+Research date: 2026-11-26. The independent reviewer accepted the phase 1 report at
+`67fd610d804b1f453e385aa7801603c29d250996`. The investigation below preserves that
+phase's evidence and limitations. Phase 2 implementation, operational contracts,
+and the sourced `PT409` correction are recorded in the
+[operator runbook](template-storage-runbook.md). Persistent shared-development
+rollout remains separately unauthorized. Base:
 `22942979af63c2db5c7331fc9726c3a75d022f0d` on
 `feature/private-template-infrastructure`. No application migration, bucket,
 policy, dependency, or deployment setting has been selected for rollout by this
