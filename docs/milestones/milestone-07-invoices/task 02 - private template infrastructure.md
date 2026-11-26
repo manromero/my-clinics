@@ -1,6 +1,6 @@
 # Task 02 — Private template infrastructure
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -99,16 +99,16 @@ role tests do not replace hosted setup and API checks. No UI screenshots require
 
 ## Execution context
 
-- Readiness: phase 1 research and authorized disposable probes may proceed. The
-  user authorized pausing development to release capacity, then deleting disposable
-  targets and restoring development after testing. The pause request returned HTTP
-  200 after verifying exact project identity; follow-up status was `PAUSING`.
-  Verify `INACTIVE` before provisioning. Never pause or modify production.
+- Readiness: both phases and independent reviews passed. The separately authorized
+  development rollout is complete and verified. All disposable projects are
+  deleted; development is restored and healthy. Production was not modified.
 - Branch: `feature/private-template-infrastructure`; base is `develop` commit
   `22942979af63c2db5c7331fc9726c3a75d022f0d`.
 - Authorized synthetic scope: create/test/delete disposable projects in organization
   `njnmfutclorywskqrftd`, including necessary Auth/Storage/API probe configuration.
-  Persistent rollout to development requires a separate concrete reviewed scope.
+  The user subsequently authorized the reviewed persistent rollout to development
+  `lvqbrjybwstvdhaxyxyn`, including migration, private buckets, local server secret,
+  verification and normal cleanup. That scope is complete.
 - Required sequencing: investigate with substantive evidence, obtain independent
   decision review, then implement the reviewed infrastructure. No architecture is
   preselected. Both phases remain required for completion.
@@ -125,8 +125,8 @@ role tests do not replace hosted setup and API checks. No UI screenshots require
   transfer. Next.js Server Actions default to 1 MB including multipart overhead.
 - Validation: task-specific proof, boundary and ownership checks plus generated
   types, replay/parity/upgrade/type freshness and applicable application checks.
-  No UI screenshots are required. Do not use the paused development project for
-  signed-in checks; use disposable ordinary users for Storage API probes.
+  No UI screenshots are required. Disposable checks and the separately authorized
+  two-account development acceptance passed; production is excluded.
 - Phase 1 accepted by the independent reviewer at
   `67fd610d804b1f453e385aa7801603c29d250996`, base as above. No blockers. See
   `template-storage-decision.md` and its committed reproducible probe/results.
@@ -145,9 +145,9 @@ role tests do not replace hosted setup and API checks. No UI screenshots require
 - Optional O1: research SQL conflict assertions accept generic request rejection;
   if reused for acceptance, require expected redacted SQLSTATE and winning state.
   This is not a phase 1 blocker and does not extend scope independently.
-- Open items: separately scoped development rollout authorization, execution and
-  target verification. Technical implementation and independent review passed;
-  the task stays `in_progress` and PR stays draft until hosted setup is complete.
+- Open agent-delivery items: none after final tracking review. Human acceptance
+  and manual merge remain pending. Daily operator cleanup is the documented
+  maintenance handoff; no unattended schedule is installed.
 - Phase 2 initial review of `8cf9e8577a22fb551ac401c4b67211878520d6bc`
   found B1 blocking: `begin.uploadGrant` exports the full ordinary-user account
   token across the existing HttpOnly boundary. Independent raw REST probes could
@@ -160,7 +160,7 @@ role tests do not replace hosted setup and API checks. No UI screenshots require
   required application checks, fresh SQL and all 14 non-Next hosted lifecycle
   checks. The reviewer inspected, rather than reran, full type-generation/parity/
   upgrade and production HTTP evidence. No UI review applies.
-- PR: <https://github.com/manromero/my-clinics/pull/72> (draft). All implementation
+- PR: <https://github.com/manromero/my-clinics/pull/72>. All implementation
   and reviewer disposable targets were deleted and absence confirmed. Development
   was paused for correction validation and is now restored: project, database,
   Auth, REST and Storage were independently read as `ACTIVE_HEALTHY`.
@@ -185,6 +185,23 @@ role tests do not replace hosted setup and API checks. No UI screenshots require
   separate follow-up, not resolved by this task.
 
 ## Progress notes
+
+2026-11-26: Task 02 is complete in PR #72 after independent rollout review at
+`9f07df7834a1091170822e8450bf0cf0980f97aa`. The user authorized the exact reviewed
+development scope. Native CLI applied only `20261126160000_private_templates.sql`
+after the separately reviewed command-specific consent procedure. Private bucket
+configuration and local server secret provisioning passed. All 17 development
+acceptance checks passed; the reviewer independently confirmed live identity,
+history, settings, grants, access isolation and production-server responses.
+All 14 original clinics, 63 activity rows and seven owner IDs retain their baseline
+digests; development is healthy and the approved public API exposure is restored.
+No blockers remain; correction rounds used: 1 of 2. Existing application/database
+checks remain applicable to unchanged source, and final tracking receives separate
+documentation review. Four private fixture objects remain within the normal
+retention grace, with zero current links and zero eligible cleanup candidates;
+daily manual collection and deadlines are documented in the runbook/PR. No clock
+bypass or unattended schedule was introduced. Human acceptance and manual merge
+remain pending. The existing Next.js advisory remains a separate follow-up.
 
 2026-11-26 restoration verification: Development `lvqbrjybwstvdhaxyxyn` and its
 database/Auth/REST/Storage services are `ACTIVE_HEALTHY` after restoration. A

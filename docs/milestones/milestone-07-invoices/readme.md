@@ -29,15 +29,15 @@ settings changes, and public deployment. Export extras do not extend scope.
 
 ## Task index and direct dependencies
 
-| Task                                                                                                | Status        | Direct dependencies                                                                |
-| --------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------- |
-| [00 — FileInput and catalogue](<task 00 - file input and catalogue.md>)                             | `done`        | Existing controls; independent                                                     |
-| [01 — Invoice route and form contracts](<task 01 - invoice route and form contracts.md>)            | `done`        | Existing controls/authenticated shell; independent of 00                           |
-| [02 — Private template analysis and infrastructure](<task 02 - private template infrastructure.md>) | `in_progress` | Existing clinics/authentication; independent of 01                                 |
-| [03 — Clinic template field and validation](<task 03 - clinic template field and validation.md>)    | `pending`     | 00 and independently reviewed 02 analysis/design contract, not hosted availability |
-| [04 — Clinic template persistence](<task 04 - clinic template persistence.md>)                      | `pending`     | 02 and 03                                                                          |
-| [05 — PDF fill and flatten engine](<task 05 - pdf fill and flatten engine.md>)                      | `pending`     | 01 validation contracts; 03 library/validator/fixtures                             |
-| [06 — Live preview and download integration](<task 06 - live preview and download integration.md>)  | `pending`     | 01, 04 and 05                                                                      |
+| Task                                                                                                | Status    | Direct dependencies                                                                |
+| --------------------------------------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------- |
+| [00 — FileInput and catalogue](<task 00 - file input and catalogue.md>)                             | `done`    | Existing controls; independent                                                     |
+| [01 — Invoice route and form contracts](<task 01 - invoice route and form contracts.md>)            | `done`    | Existing controls/authenticated shell; independent of 00                           |
+| [02 — Private template analysis and infrastructure](<task 02 - private template infrastructure.md>) | `done`    | Existing clinics/authentication; independent of 01                                 |
+| [03 — Clinic template field and validation](<task 03 - clinic template field and validation.md>)    | `pending` | 00 and independently reviewed 02 analysis/design contract, not hosted availability |
+| [04 — Clinic template persistence](<task 04 - clinic template persistence.md>)                      | `pending` | 02 and 03                                                                          |
+| [05 — PDF fill and flatten engine](<task 05 - pdf fill and flatten engine.md>)                      | `pending` | 01 validation contracts; 03 library/validator/fixtures                             |
+| [06 — Live preview and download integration](<task 06 - live preview and download integration.md>)  | `pending` | 01, 04 and 05                                                                      |
 
 Recommended order is numeric, 00 through 06. The table gives direct prerequisites,
 not blanket dependencies on every earlier task. Task 02 requires investigation,
@@ -91,6 +91,16 @@ this plan grants none. Record commands, head, target and actual results; unavail
 checks remain blockers rather than inferred passes.
 
 ## Progress notes
+
+2026-11-26: Task 02 is `done` in [PR #72](https://github.com/manromero/my-clinics/pull/72).
+Both phases, the explicitly authorized development rollout and independent review
+passed with no blockers. The migration, private buckets and local server secret
+are configured; 17 development acceptance checks passed and all original data
+digests are preserved. Development is healthy and all disposable projects are
+deleted. Correction rounds used: 1 of 2. Four private fixture objects remain within
+normal retention; the runbook/PR records deadlines and daily manual cleanup.
+Final tracking is included for review. Human acceptance and manual merge remain
+pending; tasks 03–06 remain pending.
 
 2026-11-26: Task 02 technical and documentation review passed after correction 1.
 Development is restored and all four services are `ACTIVE_HEALTHY`. Read-only
