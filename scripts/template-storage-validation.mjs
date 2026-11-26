@@ -1020,6 +1020,14 @@ export async function templateStorageTests({
         currentTemplatePreserved: true,
       },
     );
+    const expiredInput = input({ revision }),
+      expiredBegin = await a.templates.begin(expiredInput);
+    assert.ok(expiredBegin.uploadGrant);
+    await sql(
+      `update public.template_save_requests set expires_at=now()-interval '1 second' where id='${expiredInput.requestId}'`,
+    );
+    await deny(a.templates.begin(expiredInput), "55000");
+    checked("expired pending reservation cannot renew a file capability");
     const otherName = await a.client.from("clinics").insert({
       owner_id: a.id,
       name: "Duplicate save target",

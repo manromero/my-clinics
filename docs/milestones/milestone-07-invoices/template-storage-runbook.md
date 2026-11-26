@@ -47,6 +47,9 @@ clients cannot attest bytes, publish links, or mutate metadata.
    abbreviated guide example. See the decision report's B1 correction section.
 
    A capability lasts two hours and permits uploading only its exact bucket/path.
+   The server refuses to mint or renew a capability after reservation expiry,
+   checking the deadline both before and after signing. An expired request needs
+   a new save identity; it cannot extend the cleanup horizon by reminting tokens.
    It is transferable within that scope and cannot be revoked individually.
    Cancel blocks validation/publication, while an issued capability or in-flight
    upload can still finish into unreadable quarantine. No account API authority

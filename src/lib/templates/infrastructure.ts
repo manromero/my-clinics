@@ -32,6 +32,7 @@ type RecordValue = {
   owner_id: string;
   state: string;
   mode: string;
+  expires_at: string;
   lease_id: string | null;
   expected_sha256: string | null;
   expected_bytes: number | null;
@@ -168,11 +169,19 @@ export function templateInfrastructure(
         transport: "signed-tus";
       } | null = null;
       if (r.mode === "replace" && r.state === "pending") {
+        const reservationExpiry = Date.parse(r.expires_at);
+        if (
+          !Number.isFinite(reservationExpiry) ||
+          reservationExpiry <= Date.now()
+        )
+          throw new TemplateError("55000", "Upload reservation expired");
         const capability = await admin.storage
           .from(templateBuckets[0])
           .createSignedUploadUrl(key(r), { upsert: false });
         if (capability.error || !capability.data?.token)
           throw new TemplateError("upload-capability");
+        if (reservationExpiry <= Date.now())
+          throw new TemplateError("55000", "Upload reservation expired");
         const claims = JSON.parse(
           Buffer.from(
             capability.data.token.split(".")[1],
