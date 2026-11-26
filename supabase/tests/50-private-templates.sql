@@ -27,9 +27,9 @@ set local role authenticated;
 set local request.jwt.claims='{"sub":"00000000-0000-4000-8000-000000005001","role":"authenticated"}';
 do $$ begin
   if (select count(*) from public.template_save_requests)<>1 then raise exception 'Owner metadata unavailable'; end if;
-  if not public.template_upload_allowed('00000000-0000-4000-8000-000000005001/00000000-0000-4000-8000-000000005011.pdf')
-    or public.template_upload_allowed('00000000-0000-4000-8000-000000005001/forged.pdf') then raise exception 'Reservation path gate incorrect'; end if;
 end $$;
+
+
 select pg_temp.template_denied($s$update public.template_save_requests set state='ready'$s$);
 select pg_temp.template_denied($s$delete from public.template_save_requests$s$);
 select pg_temp.template_denied($s$insert into public.clinic_templates values(-5001,'00000000-0000-4000-8000-000000005001','00000000-0000-4000-8000-000000005011')$s$);
@@ -38,6 +38,18 @@ select pg_temp.template_denied($s$select public.commit_template_save('00000000-0
 set local request.jwt.claims='{"sub":"00000000-0000-4000-8000-000000005002","role":"authenticated"}';
 do $$ begin
   if exists(select id from public.template_save_requests) then raise exception 'Foreign metadata exposed'; end if;
-  if public.template_upload_allowed('00000000-0000-4000-8000-000000005001/00000000-0000-4000-8000-000000005011.pdf') then raise exception 'Foreign reservation exposed'; end if;
 end $$;
 reset role;
+
+-- Fresh replay has no client-upload policies: only server-minted file capabilities.
+do $$ begin
+ if exists(select 1 from pg_policies where schemaname='storage' and policyname like 'templates_%')
+ then raise exception 'Unexpected client Storage policy'; end if;
+end $$;
+
+select pg_temp.template_denied($s$select public.claim_template_cleanup('00000000-0000-4000-8000-000000005001','00000000-0000-4000-8000-000000005011')$s$,'55000');
+select public.cancel_template_save('00000000-0000-4000-8000-000000005001','00000000-0000-4000-8000-000000005011');
+do $$ begin
+ if (public.claim_template_cleanup('00000000-0000-4000-8000-000000005001','00000000-0000-4000-8000-000000005011')->>'state')<>'cancelled'
+ then raise exception 'Cleanup must follow terminal state'; end if;
+end $$;

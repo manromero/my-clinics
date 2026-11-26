@@ -1,419 +1,115 @@
-# Private template infrastructure operations
+# Private template setup and operation
 
-This implements the independently accepted [decision](template-storage-decision.md).
-It provides infrastructure for tasks 03–06; clinic forms are not wired here.
-Generated invoices are never stored. The user explicitly authorized the reviewed
-development rollout at `6b3af7fa68ba0379a70db119e652bfd54b376d3a`, including the
-migration, two private buckets, local server secret, verification and cleanup.
-The migration, buckets and local server secret are now applied; scoped development
-acceptance passed on 2026-11-26. Independent rollout review remains pending.
-The task-specific consent amendment was independently accepted at
-`9b3f7d8f981e2ff7159d00470cdba53b0e880a5c`. Disposable validation is separately
-authorized.
+Use one private bucket: `clinic-templates`, MIME `application/pdf`, maximum
+10,000,000 bytes. The [decision](template-storage-decision.md) defines the lifecycle.
+Clinic form integration remains task 04. Generated invoices are never stored.
 
-## Runtime contract
+## Setup
 
-`src/lib/templates/infrastructure.ts` exports server-only helpers. Pass the verified
-session's Supabase client and a separate private service client; the production
-factory is `createTemplateServer(session.client)`. Each owner operation calls
-`auth.getUser()` afresh. Never pass an owner ID, object path, or validation boolean
-from a browser. The service RPCs are executable only by `service_role`; ordinary
-clients cannot attest bytes, publish links, or mutate metadata.
+The final migration is `20261126230000_private_templates.sql`. On a fresh approved
+six-migration baseline, verify project identity/history and preservation first,
+then disable and read back the Data API before migration. Follow the
+[manual migration procedure](../../supabase.md#5-manual-migration-application).
+Review a dry run containing only the final template migration, no seeds or roles.
+CLI 3.0.0 trusts the operating-system CA store with `NODE_USE_SYSTEM_CA=1`; never
+turn off TLS verification. A command-specific consent flag requires exact user
+scope and independent procedure acceptance; never use a global consent setting.
 
-1. Keep the file local until Save. Hash its exact bytes with SHA-256 and reserve
-   using `begin`: random request UUID, clinic ID/revision as strings (both null
-   for creation), clinic fields, mode `keep`/`replace`/`remove`, and optional display
-   filename. Replacement additionally requires byte count and hash. New clinics
-   must start active; inactive existing clinics accept templates. A request UUID
-   binds the entire payload; retries with another payload fail with `22023`.
-2. Upload using the **file-scoped signed TUS capability** in `begin.uploadGrant`:
-   `transport: "signed-tus"`, `endpoint`, `token`, and `expiresAt`. The server
-   verifies the owner, reserves the exact request path, and calls Storage's
-   `createSignedUploadUrl` with `upsert: false`. It never returns an account access
-   token, refresh token, or service credential. Existing SSR cookies stay HttpOnly.
-   Hold the capability only in memory; discard after upload/cancel/sign-out and
-   never cache, log or persist it.
-
-   POST to the returned `/storage/v1/upload/resumable/sign` endpoint. Send the
-   project's **public** API key in `apikey`, the capability token in `x-signature`,
-   and `Tus-Resumable: 1.0.0`. Do not send account `Authorization` or cookies.
-   Use 6,291,456-byte chunks, no upsert, the exact returned `uploadPath` and
-   quarantine bucket in TUS metadata. Keep `x-signature` and the public API key on
-   PATCH/HEAD requests to the returned signed Location. Recover its offset with
-   HEAD on retry; 409 never authorizes overwriting an existing object. After an
-   uncertain completed upload, let server validation verify the request-bound
-   hash/size rather than replacing the object or starting another save identity.
-
-   The base `/upload/resumable` route uses account JWT/RLS authorization and does
-   **not** select the signed handler merely because `x-signature` is present.
-   The explicit `/sign` route is required. This distinction is verified against
-   current official source and actual hosted transfer, not assumed from the
-   abbreviated guide example. See the decision report's B1 correction section.
-
-   A capability lasts two hours and permits uploading only its exact bucket/path.
-   The server refuses to mint or renew a capability after reservation expiry,
-   checking the deadline both before and after signing. An expired request needs
-   a new save identity; it cannot extend the cleanup horizon by reminting tokens.
-   It is transferable within that scope and cannot be revoked individually.
-   Cancel blocks validation/publication, while an issued capability or in-flight
-   upload can still finish into unreadable quarantine. No account API authority
-   is conferred. The reservation
-   predicate enforces the exact owner/request path, pending state, and expiry.
-   The original filename never determines a path. Quarantine is unreadable even
-   by the owner. Standard uploads are also permitted by the same gate.
-
-3. Call `validate`. The server downloads at most **10,000,000 bytes**, parses in
-   an isolated worker, rejects encryption/unreadable PDFs and missing/wrong-type
-   text fields, checks the reserved hash and byte count, and seals exactly that
-   buffer with overwrite disabled. The parser is PDF-LIB 1.17.1, versioned as
-   `pdf-lib@1.17.1/text-fields-v1`. Its ES5 error subclass requires comparing the
-   parser's encryption-error message rather than `instanceof`. Task 03 can reuse
-   the field/byte/error contract; browser integration remains its own scope.
-4. Call `commit`. One transaction locks the request and clinic, compares the
-   revision, writes clinic fields and template pointer, retires the old template,
-   and records the outcome. `PT409` means a competing edit won; retain inputs and
-   reload the current clinic. `23505` means a duplicate clinic name; saved fields
-   and template remain unchanged. Failed validation/storage never publishes.
-
-   Domain revision conflicts deliberately use `PT409`/HTTP 409, not the database's
-   serialization-failure code. During acceptance the original `40001` caused
-   repeated server transactions and a gateway failure. The current
-   [Supabase diagnosis](https://supabase.com/kb/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions-77326b)
-   documents this PostgREST bug and recommends `PT409` for domain conflicts. RPC
-   requests have a 30-second transport deadline; uncertain commits still require
-   outcome lookup. Actual database serialization failures remain distinct.
-
-5. For an uncertain commit response, query `outcome` with the **same request UUID**
-   before displaying failure. Retrying commit returns that recorded outcome,
-   including after retirement/cleanup. It never republishes an old pointer.
-   Cancel before commit makes the reservation terminal. Cancel after commit
-   returns the saved outcome; it does not undo it. Task 04 must disable/defer
-   Cancel while the commit outcome is unresolved.
-6. Read only through
-   `GET /api/clinic-templates/<clinicId>/<templateId>`. It verifies the SSR session
-   and exact current owner association before streaming bytes with
-   `Cache-Control: private, no-store`. Anonymous requests return 401, inaccessible
-   or stale versions return 404, missing infrastructure/configuration returns 503. It supplies `X-Template-Id` and `X-Template-SHA256`; consumers must verify
-   identity/hash and ignore late generation results after any input, template or
-   session change. No client SELECT policy exists for sealed files; normal-flow
-   signed URLs are not created. Downloaded buffers cannot be recalled, and an
-   already authorized stream is not retroactively revoked.
-
-Validation workers have a five-second deadline and a 128 MB old-generation heap
-limit, with 16 MB young generation and a 4 MB stack. These are **not a total RSS or
-native-allocation memory guarantee**. Parsing is not sanitization, malware scanning
-or PDF certification. Storage downloads have a 120-second network deadline;
-the deployment's own function-duration limit also applies. Validate representative
-templates when changing parser/runtime versions. Failed transient validation can
-retry after its two-minute lease; request expiry is 24 hours. A returned invalid
-PDF result cancels the request; choosing another file needs a new UUID.
-
-The per-owner admission lock caps live pending/validating/ready requests at ten
-(`54000` on overflow). No saved template is overwritten. Saved request outcomes
-are retained for idempotency, not invoice history. Metadata is owner-readable with
-limited column grants; direct insert/update/delete and forged linkage are denied.
-The existing no-template clinic actions remain usable and advance a revision on
-each update, protecting later combined saves against stale clinic fields.
-
-## Hosted configuration and rollout proposal
-
-Target for the proposed synthetic development rollout:
-`lvqbrjybwstvdhaxyxyn`, `my-clinics_dev`, organization `njnmfutclorywskqrftd`.
-Production `xihkrkgrhupiwcsfjctp` is prohibited by both disposable and template
-operator mutation paths. The execution record below distinguishes the completed
-development rollout from the reusable procedure and its operational obligations.
-
-1. Record reviewed head, current migration history, and a read-only inventory of
-   clinics/activity/owners. Verify exact ref/name/org and healthy status. Follow
-   [the manual migration procedure](../../supabase.md#5-manual-migration-application).
-   Disable the Data API before migration. The only new migration is
-   `20261126160000_private_templates.sql`; do not replay desired SQL on an existing
-   target or repair history. Expected preservation: same existing clinics/activity,
-   no template links, revision 1 on existing clinics.
-2. Review the CLI's dry run and apply the append-only migration using the existing
-   manual procedure. Verify the migration record and application catalog against
-   the reviewed files. Application Storage policy coverage includes only the
-   `templates_*` policies, not all provider-managed Storage tables or internals.
-   Verify `storage.objects` RLS remains enabled. Review **all** Storage policies
-   for overlap; the operator refuses unexpected policy inventory rather than
-   deleting another application's policy.
-
-   Exact CLI 3.0.0 commands, after approval and target verification:
-
-   ```powershell
-   $templateRef='lvqbrjybwstvdhaxyxyn'
-   pnpm supabase db query --remote=$templateRef --read-only --file supabase/check.sql
-   pnpm supabase migration list --remote=$templateRef
-   pnpm supabase db push --remote=$templateRef --dry-run --skip-vault
-   pnpm supabase db push --remote=$templateRef --skip-vault
-   ```
-
-   The preview must name only `20261126160000_private_templates.sql`. These
-   migration commands were run against development with the task-specific consent
-   amendment below. Stop on unexpected history, drift or connectivity errors.
-
-### Task-specific native CLI consent amendment
-
-The initial native apply attempt stopped before SQL with CLI 3.0.0's hosted
-mutation consent requirement. Fresh read-only inspection still returns only the
-six previous migrations through `20261114120000`; the new migration is absent.
-The Data API was restored to its recorded `public` schema while this procedure
-amendment received independent review. The preservation baseline is 14 clinics,
-63 activity rows and seven Auth owners, with read-only ordered-record digests.
-
-CLI 3.0.0 [hosted-consent source](https://github.com/supabase/cli/blob/v3.0.0/apps/cli/src/command-internal/hosted-consent/hosted-consent.ts)
-explicitly refuses an agent-driven prompt, even with a terminal, and never
-accepts piped answers. The native command needs its own explicit acknowledgement
-after the user's authorization and independent review. For **this task only**,
-after independent acceptance of this amendment, the following command-specific
-`--yes` acknowledges the already reviewed and authorized migration. It does not
-replace the review, authorize another target or permit a global flag/environment
-setting. The generic manual migration rule remains unchanged. Never set
-`SUPABASE_YES`, hide agent detection, use global `--yes`, reset, seed or repair.
-
-Before that command, fail closed unless all of these conditions hold:
-
-- Live Management API identity is `lvqbrjybwstvdhaxyxyn`, `my-clinics_dev`,
-  organization `njnmfutclorywskqrftd`, status `ACTIVE_HEALTHY`.
-- Read-only history matches the six baseline versions exactly; the new version
-  is absent, and clinic/activity/owner inventory and digests still match.
-- Reviewed migration `20261126160000_private_templates.sql` has SHA-256
-  `dca0e0f0bd9375d0c00991484d383f67bea3b8062249fc7e8a6e595bbb4ca2c4`.
-- Disable and independently read back the Data API configuration, then repeat
-  the exact native dry run with `--skip-vault`. Its target ref must match and
-  its plan must contain only that migration, with empty `seeds` and `roles`.
-- Record the amendment's independently reviewed head. Use the same pinned
-  CLI 3.0.0, explicit target and migration file for apply; stop on any discrepancy.
+After grants/RLS are verified, configure and inspect the bucket with the reviewed
+exact-target authorization marker:
 
 ```powershell
-$env:NODE_USE_SYSTEM_CA='1'
 $templateRef='lvqbrjybwstvdhaxyxyn'
-pnpm supabase db push --remote=$templateRef --dry-run --skip-vault
-# Only after the guarded exact preview and accepted procedure amendment:
-pnpm supabase db push --remote=$templateRef --skip-vault --yes
+$env:MYCLINICS_TEMPLATE_CONFIG_AUTHORIZATION=$templateRef
+node --conditions=react-server --use-system-ca --env-file=.env.database-validation scripts/template-storage-operator.mjs configure $templateRef
+node --conditions=react-server --use-system-ca --env-file=.env.database-validation scripts/template-storage-operator.mjs inspect $templateRef
 ```
 
-System CA trust fixes the native transport without disabling TLS verification.
-The CLI labels this linked project's default branch `production` and displays
-the cached name `my-clinics`; these are not the application's production project
-identity. Its [pinned identity renderer](https://github.com/supabase/cli/blob/v3.0.0/apps/cli/src/command-internal/target/target-identity.ts)
-derives those fields from linked-project metadata. Verify the explicit ref and
-live Management API identity, never those cached labels. Production's distinct
-ref remains prohibited. After apply, verify the new migration record, grants,
-RLS and preservation before restoring the original Data API schema. On a blocked
-preview or pre-apply refusal, restore and verify that original schema.
+Supply `SUPABASE_TEMPLATE_SECRET_KEY` only to the server environment or ignored
+`.env.local`. Never use `NEXT_PUBLIC_*` or Next.js `env` for it. Verify the public
+URL/key and private key name the same project. Restart the approved local server.
+Restore the recorded Data API setting only after permission checks. No Vercel
+or production deployment is authorized by this development procedure.
 
-3. Supply the organization-scoped PAT in ignored `.env.database-validation`, with
-   existing lifecycle/database/config permissions plus API Keys Read and API Key
-   Secrets Read. The bucket operator fetches keys into process memory, never logs
-   them, and creates/updates only the two named buckets. Both must be private,
-   limit 10,000,000 bytes, and allow only `application/pdf`. Global Storage limits
-   must permit that file size; the actual boundary transfer is the final check.
+## Server contract
 
-   ```powershell
-   $templateRef='lvqbrjybwstvdhaxyxyn'
-   $env:MYCLINICS_TEMPLATE_CONFIG_AUTHORIZATION=$templateRef
-   node --conditions=react-server --use-system-ca --env-file=.env.database-validation scripts/template-storage-operator.mjs configure $templateRef
-   node --conditions=react-server --use-system-ca --env-file=.env.database-validation scripts/template-storage-operator.mjs inspect $templateRef
-   ```
+`createTemplateServer(session.client)` verifies the owner for every operation:
 
-   Set the authorization marker only after approval of this exact rollout. It is
-   a fail-closed execution guard, not an authorization substitute. Never run the
-   disposable acceptance suite against development; it creates fixtures and
-   advances timestamps only in projects created by that invocation.
+1. `begin`: reserve clinic fields, revision, UUID, exact file size and SHA-256.
+   `keep`/`replace`/`remove` are supported. Retry with the same identity/payload.
+2. For replacement, call ordinary SDK `uploadToSignedUrl` with the returned path
+   and capability in `clinic-templates`. No overwrite. Keep the capability in
+   memory; do not log or persist it. Interrupted uploads may require a whole-file
+   retry. After an uncertain reply, validation determines whether bytes arrived.
+3. `validate`: validate the actual stored object. No second upload/copy occurs.
+4. `commit`: atomically save fields and association. `PT409` means a competing
+   edit won; reload before a new save identity. An uncertain reply requires
+   `outcome` with the same UUID. Cleanup errors do not reverse a successful Save.
+5. `cancel`: preserve the saved pair and automatically delete unused bytes.
 
-4. Provision `SUPABASE_TEMPLATE_SECRET_KEY` in the server environment or ignored
-   `.env.local`. It is a project secret/service-role key, **never** `NEXT_PUBLIC_*`
-   or a Next.js `env` entry. Keep `NEXT_PUBLIC_SUPABASE_URL` and the publishable key
-   aligned with the same approved project. Restart/redeploy the approved server
-   after environment changes. Restrict operator credentials to trusted server use.
-   This task supplied the secret only in ignored local `.env.local`; it did not
-   change Vercel or any production environment.
-5. Verify grants/policies and bucket API configuration before restoring the approved
-   synthetic Data API exposure. Perform separately authorized two-account
-   development acceptance with reviewed fixtures, preserving other synthetic data.
-   Test the production build read route, unchanged no-template workflows, and
-   inactive clinics. There is no clinic upload UI in task 02; use the reviewed
-   server helper contract for acceptance. Record refs, head, checks and cleanup.
+Only the current association is readable at
+`/api/clinic-templates/<clinicId>/<templateId>`. This is a production API, not a
+sample route. It returns private/no-store PDF bytes; anonymous requests return
+401 and foreign/stale associations return 404. Previously downloaded bytes and
+already authorized streams cannot be recalled.
 
-## Cleanup and recovery
+Cancel and invalid validation delete their own upload. Replacement/removal delete
+only the previous object after the clinic transaction succeeds. Two bounded
+attempts run immediately; `cleanupPending` indicates that the saved operation
+succeeded but its deletion still needs retry. Repeat that same operation identity
+to retry only its affected object. There is no scan, collector, scheduled job or
+manual daily command. An abandoned upload or late-arriving file may remain private
+indefinitely unless that specific operation is retried. Signed capabilities last
+two hours and cannot be revoked individually. Outcomes remain for safe retries.
 
-Run the operator **daily**, repeating batches until fewer than 100 candidates are
-returned. This operator execution path is provided; no unattended schedule is
-installed on a shared target without rollout authorization.
+## Existing development reconciliation — review required before execution
 
-```powershell
-node --conditions=react-server --use-system-ca --env-file=.env.database-validation scripts/template-storage-operator.mjs collect $templateRef
-```
+The user explicitly instructed removal of this task's erroneous two-bucket
+migration, including reconciliation of its already applied development state.
+This is an exception only for `20261126160000`, not permission to rewrite other
+migration history. The PR therefore contains one correct final template migration.
+No revised shared-development change is executed by these repository edits.
 
-Keep the same reviewed target authorization marker. A row-locked claim prevents
-publication after collection begins. Current linked versions cannot be claimed.
-Retired sealed objects wait 24 hours. Unpublished objects wait until reservation
-expiry plus 27 hours. This conservative bound composes a two-hour signed-upload
-capability, a TUS URL initiated near
-that token's expiry with up to 24 more hours, and one hour of grace. This extends
-the research proposal's 25-hour value; it does not assume that every provider
-request actually survives all those windows.
-Quarantine cleanup also runs for still-published templates after that grace.
-Daily execution bounds ordinary quarantine retention to roughly 75 hours from
-reservation creation. Claim leases expire after five minutes for retry; a failed
-delete leaves the claim retryable. Deletion uses the Storage API, followed by a
-privileged filtered listing to confirm absence. Never delete `storage.objects`
-metadata directly, overwrite a sealed key, or delete a current link to free space.
+The exact proposed reconciliation is limited to `my-clinics_dev`, ref
+`lvqbrjybwstvdhaxyxyn`, organization `njnmfutclorywskqrftd`. Production ref
+`xihkrkgrhupiwcsfjctp` is excluded. Before any write, require:
 
-A provider/CDN may still serve an old cached Storage URL after logical deletion.
-The application denies direct client reads and does a fresh association check
-before each read, so a newly requested retired/removed template is rejected even
-if Storage retains a cached response. We do not promise a provider cache purge
-deadline or mid-stream cancellation. Keep originals and cleanup receipts in the
-operator record when investigating outages; never copy secrets into evidence.
+- Healthy exact identity; seven history records comprising the six versions
+  through `20261114120000` plus erroneous `20261126160000`, and no other drift.
+- Zero current template links; the 14 clinics, 63 activity rows and seven Auth
+  owner IDs match the recorded preservation baseline. Existing revisions equal one.
+- Only the four known synthetic objects across `clinic-template-quarantine` and
+  `clinic-template-sealed`: request IDs `3383f441-a571-4d2b-a3c3-39bde0f88869`
+  (10,000,000 bytes per bucket) and `7cfcda0c-f236-4a12-9929-fb0d70370402`
+  (10,000 bytes per bucket). The four known terminal request/outcome rows and
+  their payload identities must match; stop for any additional template data.
 
-If upload succeeds but validation fails transiently, retry validation after its
-lease expires; exact hash/size binding and immutable sealed-key recovery prevent
-publishing different bytes. If commit succeeds but its response is lost, query
-the request outcome. If collection fails, retry the same ID after lease expiry.
-The SQL claim and reference checks remain authoritative; do not bypass them by
-calling raw Storage deletion as a repair shortcut.
+After independent acceptance of the concrete procedure and exact hosted scope:
 
-## Development execution record — 2026-11-26
+1. Stop the local template server; disable and verify Data API exposure.
+2. Delete only those enumerated objects through Storage API and confirm listing
+   absence. Delete the two old buckets only after verifying they are empty.
+3. In one reviewed SQL transaction, recheck the guards; remove only this task's
+   Storage policy, template routines/triggers, `clinic_templates` and
+   `template_save_requests`, and the added `clinics.template_revision` column.
+   Remove only history version `20261126160000`. No CASCADE, reset, seed,
+   unrestricted history repair or change to the six previous migration records.
+4. Recheck preserved clinic/activity/owner data, then native dry-run/apply the
+   single final migration. Verify desired schema, service-only RPCs, metadata RLS
+   and absence of ordinary Storage policies before configuring the new bucket.
+5. Verify ordinary two-account 10 MB Save/Cancel/retry/replace/remove, current
+   private production reads, affected-file deletion/retry and preservation. Restore/read
+   back the original Data API state. Record results and remaining limitations.
 
-The user explicitly authorized this exact rollout after technical review. The
-native CLI initially refused agent-hosted consent before writing SQL. The
-task-specific per-command acknowledgement then received separate independent
-review at `9b3f7d8`; the correction count remains one of two. No application source,
-SQL migration or generated type changed during rollout.
+If a guard fails, stop and preserve existing objects/data for a revised review.
+The actual transaction and native apply commands must be independently reviewed
+before execution; this scope description is not an applied rollback.
 
-Fresh guards verified live development ref/name/organization/health, the six
-previous migration versions, unchanged data digests, the recorded migration
-SHA-256, disabled Data API readback and the exact native preview. CLI 3.0.0 applied
-only `20261126160000_private_templates.sql` using `--skip-vault --yes`; its result
-listed no seeds or roles. Seven history versions now include `20261126160000`.
-TLS stayed verified with `NODE_USE_SYSTEM_CA=1`. There was no reset, repair,
-Management API migration substitution, production mutation or Vercel deployment.
+## Validation
 
-Before restoring Data API exposure, read-only SQL verified all 14 existing clinic
-revisions equal one, zero template links/requests, RLS on both metadata tables and
-`storage.objects`, zero metadata mutation grants, and all eleven service RPCs
-executable only by `service_role`. The entire Storage policy inventory contained
-only `templates_quarantine_insert`. Both buckets were configured and inspected as
-private, limited to 10,000,000 bytes and `application/pdf`. The local server secret
-and public project URL/key were checked against the same development ref without
-logging credentials. Data API configuration was restored and read back as
-`db_schema: public`; one transient failed restoration request was followed by a
-successful bounded retry. Final project status is `ACTIVE_HEALTHY`.
-
-Preservation was checked both immediately after migration and after fixture
-cleanup. Clinic digest excludes only the newly added `template_revision` column;
-activity digest covers complete ordered rows; owner digest covers ordered Auth
-user IDs, not mutable authentication timestamps. Existing fixture clinics were
-only read. Final counts and digests match the pre-migration baseline:
-
-| Inventory      | Count | Ordered-record MD5                 |
-| -------------- | ----: | ---------------------------------- |
-| Clinics        |    14 | `b8e2a0742361187612ecb7ba3bb7ed87` |
-| Activity       |    63 | `49679abcbf9bdf2e4c8a4f35b6a98e73` |
-| Auth owner IDs |     7 | `a8bd0d4e45329a11c08a313398756111` |
-
-Two existing ordinary fixture accounts each created a new uniquely marked clinic,
-updated it through the ordinary no-template path, and published a real validated
-template while inactive. Signed TUS transferred 10,000,000 and 10,000 bytes without
-account Authorization or cookies. Wrong path/bucket returned 400; 10,000,001 bytes
-returned 413. Exact-byte validation/sealing, idempotent publication, owner hash and
-no-store reads, cross-owner denial, and anonymous/ordinary metadata and direct-byte
-denial passed. `pnpm build` passed with the configured local server environment;
-its client assets contained no server credential. The actual loopback Next
-production server returned owner 200 with exact bytes/hash and private/no-store,
-anonymous 401, cross-owner 404 and stale-version 404 for both accounts. Signed-in
-clinic/activity/summary/invoice pages returned 200. Removal returned both fixture
-clinics to no-template state before owner-authorized deletion of only those new
-clinics (IDs 131 and 132). All 14 pre-existing clinics remain unchanged at revision
-one, all 63 activity rows remain unchanged, and there are zero template links.
-
-**Normal grace is retained, not bypassed for test cleanup.** Daily operator
-`collect` was executed and returned zero eligible candidates. No timestamps were
-advanced. Two retired template requests and two saved removal outcomes remain for
-the lifecycle/idempotency contract. Four private fixture objects total 20,020,000
-bytes; they are not claimed absent:
-
-| Template request                       | Bytes in each bucket | Sealed eligible (UTC) | Quarantine grace ends (UTC) |
-| -------------------------------------- | -------------------: | --------------------- | --------------------------- |
-| `3383f441-a571-4d2b-a3c3-39bde0f88869` |           10,000,000 | 2026-11-27 21:17:37   | 2026-11-29 00:17:20         |
-| `7cfcda0c-f236-4a12-9929-fb0d70370402` |               10,000 | 2026-11-27 21:17:39   | 2026-11-29 00:17:28         |
-
-The daily operator must run after eligibility, with Storage API deletion/listing
-confirmation, and again after quarantine grace to cover any late bytes. Request
-outcomes remain by design. No unattended schedule was installed. These retained
-private fixtures are the documented operational handoff, not a migration failure.
-
-Redacted local receipts are `.env.template-rollout-native-apply.json`,
-`.env.template-rollout-post-migration.json`, `.env.template-development-rollout.json`
-and `.env.template-rollout-final.json`. The scoped development probe is retained
-locally for independent inspection; it never calls the disposable driver or
-changes clocks. Its SHA-256 is
-`37b5e009e11bfa83c5935abc98f6ce6c16f00d27d5ff1613abcf97684e08d50a`.
-The unchanged infrastructure SHA-256 is
-`ab43855805ec4785bb6335aa89c3fdf75d11a759fd7ea8cde859334394224198`.
-Public PR evidence preserves the execution results; credential-bearing local
-configuration and transient capabilities remain ignored and unpublished. Actual
-deployed Vercel behavior and physical mobile networking are still not claimed.
-
-## Scoped rollback
-
-First disable the new read route through server-secret removal/restart and stop
-the future template UI/actions; keep existing clinic workflows available. Stop
-cleanup while investigating a lifecycle incident. Preserve current objects and
-outcomes. Database downgrade is not required to roll the app back: added tables,
-revision trigger and column grants are compatible with the previous clinic code.
-
-If a schema rollback is necessary, obtain a separate reviewed append-only reverse
-migration, inventory owned links/requests and objects, and back up the approved
-synthetic data first. Do not delete a bucket or use CASCADE against platform
-schemas. Only after explicit approval and proving there are no retained current
-templates may an operator remove the two application buckets through Storage API,
-then the application policy/functions/tables and revision trigger/column in
-dependency order. Never erase or rewrite migration history. Production has no
-authorization under this plan.
-
-## Validation reproduction and coverage
-
-Use Node 24 and pnpm 11.25.0, TLS verification enabled. Hosted commands need the
-authorized disposable marker, scoped PAT, and one Free slot. They verify target
-identity, prohibit development/production mutations, and delete only projects
-created by that invocation. Preserve every printed ref and final absence result.
-
-```powershell
-$env:NODE_OPTIONS='--use-system-ca'
-pnpm db:types
-pnpm db:test-tooling
-pnpm db:validate
-pnpm db:test-templates
-pnpm lint
-pnpm typecheck
-pnpm format:check
-pnpm test -- src/lib/templates/pdf-validation.test.ts
-pnpm build
-```
-
-`db:validate` adds actual bucket/API/policy/lifecycle checks after transactional SQL
-owner/grant assertions. It temporarily enables only `public` on its disposable
-project, then disables it before every Management SQL query and in `finally`.
-Both `db:validate` and `db:test-templates` build/start the actual Next production server
-against that disposable project, creates an SSR cookie session, tests the full
-10 MB streamed response, and verifies removed-template 404. It stores redacted
-stage receipts in ignored `.env.template-validation-<ref>.json`; PR evidence records
-the delivered commit, refs, outcomes and cleanup. No UI screenshot applies.
-
-On this workstation the pinned native CLI reports `GenTypesNetworkError` /
-`TransportError` for generation. The runner falls back **only for that exact
-transport error** to the official
-[hosted generation endpoint](https://supabase.com/docs/reference/api/v1-generate-typescript-types),
-using Node's system certificate trust. Auth/schema/other failures do not trigger
-fallback. `pnpm db:types` still generates twice from a fresh replay, reconciles
-desired/history catalog parity, and only then writes generated types. No type is
-hand-authored. `db:validate` checks committed freshness without rewriting it.
-
-Storage coverage is deliberately bounded: application policy definitions join the
-semantic SQL catalog; bucket private/MIME/byte settings and Storage API behavior
-are checked independently. Provider migrations, backend object-store internals,
-CDN propagation timing, real mobile network failures and a deployed Vercel runtime
-are not equated with catalog parity or the local production server proof.
+`pnpm db:types` and `pnpm db:validate` use authorized disposable projects, not shared
+development. They check generated types, SQL roles, replay/upgrade/parity and
+ordinary SDK lifecycle operations. `pnpm db:test-tooling`, application checks and
+production build remain required. No new test endpoints, Edge Functions, cron,
+queues or background scheduler are needed. No deployed Vercel or physical mobile
+network behavior is inferred from local production checks.

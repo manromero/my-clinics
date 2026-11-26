@@ -1,14 +1,10 @@
 import "server-only";
 
-import { createHash } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../supabase/database.types";
 import { templateByteLimit, validateTemplatePdf } from "./pdf-validation.ts";
 
-export const templateBuckets = [
-  "clinic-template-quarantine",
-  "clinic-template-sealed",
-] as const;
+export const templateBucket = "clinic-templates";
 export const templateBucketOptions = {
   public: false,
   fileSizeLimit: templateByteLimit,
@@ -110,11 +106,12 @@ export function templateInfrastructure(
   async function rpc(
     name: keyof Database["public"]["Functions"],
     args: Record<string, unknown>,
+    timeout = 30000,
   ) {
     // Generated Postgres RPC types do not express nullable scalar arguments.
     const result = await admin
       .rpc(name, args as never)
-      .abortSignal(AbortSignal.timeout(30000));
+      .abortSignal(AbortSignal.timeout(timeout));
     if (result.error)
       throw new TemplateError(result.error.code || "rpc-unavailable");
     return result.data as unknown;
@@ -135,21 +132,75 @@ export function templateInfrastructure(
       },
     );
   }
-  async function remove(bucket: string, path: string) {
-    const result = await admin.storage.from(bucket).remove([path]);
-    if (result.error) throw new TemplateError("storage-delete");
+  async function remove(path: string) {
+    const headers = {
+      apikey: secret,
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "application/json",
+    };
+    const deleted = await fetch(
+      `${url.origin}/storage/v1/object/${templateBucket}`,
+      {
+        method: "DELETE",
+        headers,
+        body: JSON.stringify({ prefixes: [path] }),
+        signal: AbortSignal.timeout(3000),
+      },
+    );
+    if (!deleted.ok) throw new TemplateError("storage-delete");
     const [folder, filename] = path.split("/");
-    const listing = await admin.storage
-      .from(bucket)
-      .list(folder, { search: filename, limit: 100 });
-    if (listing.error || listing.data?.some((item) => item.name === filename))
+    const listing = await fetch(
+      `${url.origin}/storage/v1/object/list/${templateBucket}`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          prefix: folder + "/",
+          search: filename,
+          limit: 100,
+        }),
+        signal: AbortSignal.timeout(3000),
+      },
+    );
+    if (!listing.ok) throw new TemplateError("storage-delete-unconfirmed");
+    const objects: { name: string }[] = await listing.json();
+    if (objects.some((item) => item.name === filename))
       throw new TemplateError("storage-delete-unconfirmed");
+  }
+  async function cleanup(ownerId: string, requestId: string): Promise<boolean> {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const r = record(
+          await rpc(
+            "claim_template_cleanup",
+            { p_owner: ownerId, p_id: requestId },
+            5000,
+          ),
+        );
+        await remove(key(r));
+        return true;
+      } catch {
+        // Retry only this operation's affected object, never scan another file.
+      }
+    }
+    return false;
+  }
+  async function savedOutcome(ownerId: string, outcome: unknown) {
+    if (outcome === null) return null;
+    if (!outcome || typeof outcome !== "object")
+      throw new TemplateError("invalid-response");
+    const retired =
+      "retiredTemplateId" in outcome ? outcome.retiredTemplateId : null;
+    const cleaned =
+      typeof retired !== "string" || (await cleanup(ownerId, retired));
+    return { ...outcome, cleanupPending: !cleaned };
   }
   return {
     async begin(input: TemplateSaveInput) {
+      const ownerId = await owner();
       const r = record(
         await rpc("begin_template_save", {
-          p_owner: await owner(),
+          p_owner: ownerId,
           p_id: input.requestId,
           p_clinic: input.clinicId,
           p_revision: input.revision,
@@ -165,8 +216,7 @@ export function templateInfrastructure(
       let uploadGrant: {
         token: string;
         expiresAt: number;
-        endpoint: string;
-        transport: "signed-tus";
+        transport: "signed-standard";
       } | null = null;
       if (r.mode === "replace" && r.state === "pending") {
         const reservationExpiry = Date.parse(r.expires_at);
@@ -176,7 +226,7 @@ export function templateInfrastructure(
         )
           throw new TemplateError("55000", "Upload reservation expired");
         const capability = await admin.storage
-          .from(templateBuckets[0])
+          .from(templateBucket)
           .createSignedUploadUrl(key(r), { upsert: false });
         if (capability.error || !capability.data?.token)
           throw new TemplateError("upload-capability");
@@ -195,7 +245,7 @@ export function templateInfrastructure(
           sub?: string;
         };
         if (
-          claims.url !== `${templateBuckets[0]}/${key(r)}` ||
+          claims.url !== `${templateBucket}/${key(r)}` ||
           claims.upsert !== false ||
           claims.role ||
           claims.sub ||
@@ -203,14 +253,10 @@ export function templateInfrastructure(
           claims.exp! <= Date.now() / 1000
         )
           throw new TemplateError("upload-capability");
-        const uploadOrigin = url.hostname.endsWith(".supabase.co")
-          ? `${url.protocol}//${url.hostname.replace(".supabase.co", ".storage.supabase.co")}`
-          : url.origin;
         uploadGrant = {
           token: capability.data.token,
           expiresAt: claims.exp!,
-          endpoint: `${uploadOrigin}/storage/v1/upload/resumable/sign`,
-          transport: "signed-tus",
+          transport: "signed-standard",
         };
       }
       return {
@@ -222,21 +268,31 @@ export function templateInfrastructure(
       };
     },
     async outcome(requestId: string) {
-      return record(
-        await rpc("template_request", {
-          p_owner: await owner(),
-          p_id: requestId,
-        }),
-      ).outcome;
+      const ownerId = await owner();
+      const r = record(
+        await rpc("template_request", { p_owner: ownerId, p_id: requestId }),
+      );
+      return savedOutcome(ownerId, r.outcome);
     },
     async cancel(requestId: string) {
+      const ownerId = await owner();
       const r = record(
         await rpc("cancel_template_save", {
-          p_owner: await owner(),
+          p_owner: ownerId,
           p_id: requestId,
         }),
       );
-      return { state: r.state, outcome: r.outcome };
+      if (r.outcome !== null) {
+        const outcome = await savedOutcome(ownerId, r.outcome);
+        return {
+          state: r.state,
+          outcome,
+          cleanupPending: outcome?.cleanupPending ?? false,
+        };
+      }
+      const cleaned =
+        r.state !== "cancelled" || (await cleanup(ownerId, requestId));
+      return { state: r.state, outcome: r.outcome, cleanupPending: !cleaned };
     },
     async validate(requestId: string) {
       const ownerId = await owner();
@@ -248,7 +304,7 @@ export function templateInfrastructure(
       );
       if (r.state === "ready" || r.state === "saved") return;
       const bytes = await boundedTemplateBytes(
-        await storageRead(templateBuckets[0], key(r)),
+        await storageRead(templateBucket, key(r)),
       );
       const validated = await validateTemplatePdf(bytes);
       if (!validated.valid) {
@@ -256,34 +312,19 @@ export function templateInfrastructure(
           p_owner: ownerId,
           p_id: requestId,
         });
-        return validated;
+        const cleaned = await cleanup(ownerId, requestId);
+        return { ...validated, cleanupPending: !cleaned };
       }
       if (
         validated.sha256 !== r.expected_sha256 ||
         validated.bytes !== r.expected_bytes
-      )
-        throw new TemplateError("identity-mismatch");
-      const uploaded = await admin.storage
-        .from(templateBuckets[1])
-        .upload(key(r), bytes, {
-          contentType: "application/pdf",
-          cacheControl: "0",
-          upsert: false,
+      ) {
+        await rpc("cancel_template_save", {
+          p_owner: ownerId,
+          p_id: requestId,
         });
-      if (uploaded.error) {
-        if (String(uploaded.error.statusCode) !== "409")
-          throw new TemplateError("storage-write");
-        // A worker may have sealed the same immutable request before losing its
-        // response/lease. Recover only the exact request-bound validated bytes.
-        const existing = await boundedTemplateBytes(
-          await storageRead(templateBuckets[1], key(r)),
-        );
-        if (
-          existing.length !== validated.bytes ||
-          createHash("sha256").update(existing).digest("hex") !==
-            validated.sha256
-        )
-          throw new TemplateError("sealed-identity-mismatch");
+        await cleanup(ownerId, requestId);
+        throw new TemplateError("identity-mismatch");
       }
       await rpc("finish_template_validation", {
         p_owner: ownerId,
@@ -296,10 +337,27 @@ export function templateInfrastructure(
       return validated;
     },
     async commit(requestId: string) {
-      return rpc("commit_template_save", {
-        p_owner: await owner(),
-        p_id: requestId,
-      });
+      const ownerId = await owner();
+      try {
+        const outcome = await rpc("commit_template_save", {
+          p_owner: ownerId,
+          p_id: requestId,
+        });
+        return savedOutcome(ownerId, outcome);
+      } catch (error) {
+        if (
+          error instanceof TemplateError &&
+          ["PT409", "23505"].includes(error.code)
+        ) {
+          await rpc("cancel_template_save", {
+            p_owner: ownerId,
+            p_id: requestId,
+          }).catch(() => {});
+          await cleanup(ownerId, requestId);
+        }
+        // Unknown transport outcomes remain retryable with the same request ID.
+        throw error;
+      }
     },
     async read(clinicId: string, templateId: string) {
       const r = record(
@@ -309,7 +367,7 @@ export function templateInfrastructure(
           p_template: templateId,
         }),
       );
-      const upstream = await storageRead(templateBuckets[1], key(r));
+      const upstream = await storageRead(templateBucket, key(r));
       if (!upstream.ok || !upstream.body)
         throw new TemplateError("storage-read");
       return new Response(upstream.body, {
@@ -322,47 +380,6 @@ export function templateInfrastructure(
           "X-Content-Type-Options": "nosniff",
         },
       });
-    },
-    // Operator-only: no route/action exports this method. Daily invocation is
-    // required; terminal state + leases serialize it with publication.
-    async collect(requestId: string) {
-      let r: RecordValue | null = null;
-      try {
-        r = record(await rpc("claim_template_cleanup", { p_id: requestId }));
-      } catch (error) {
-        if (!(error instanceof TemplateError) || error.code !== "55000")
-          throw error;
-      }
-      if (r) {
-        await remove(templateBuckets[0], key(r));
-        await remove(templateBuckets[1], key(r));
-        await rpc("finish_template_cleanup", {
-          p_id: r.id,
-          p_lease: r.lease_id,
-        });
-      }
-      try {
-        const stage = record(
-          await rpc("template_quarantine_cleanup", {
-            p_id: requestId,
-            p_finished: false,
-          }),
-        );
-        await remove(templateBuckets[0], key(stage));
-        await rpc("template_quarantine_cleanup", {
-          p_id: requestId,
-          p_finished: true,
-        });
-      } catch (error) {
-        if (!(error instanceof TemplateError) || error.code !== "55000")
-          throw error;
-      }
-    },
-    async cleanupCandidates() {
-      const result = await rpc("list_template_cleanup", {});
-      if (!Array.isArray(result) || result.some((id) => typeof id !== "string"))
-        throw new TemplateError("invalid-response");
-      return result as string[];
     },
   };
 }

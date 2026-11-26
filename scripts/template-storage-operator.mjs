@@ -1,16 +1,12 @@
 import assert from "node:assert/strict";
 import { createClient } from "@supabase/supabase-js";
 import {
-  templateInfrastructure,
-  templateBuckets,
+  templateBucket,
   templateBucketOptions,
 } from "../src/lib/templates/infrastructure.ts";
 
 const [mode, ref] = process.argv.slice(2);
-assert.ok(
-  ["inspect", "configure", "collect"].includes(mode),
-  "Use inspect|configure|collect REF",
-);
+assert.ok(["inspect", "configure"].includes(mode), "Use inspect|configure REF");
 assert.match(ref ?? "", /^[a-z]{20}$/);
 assert.notEqual(
   ref,
@@ -56,21 +52,20 @@ const policies = await management(`/projects/${ref}/database/query`, "POST", {
 });
 assert.equal(
   policies.length,
-  1,
+  0,
   "Review unexpected Storage policies before configuration",
 );
-assert.equal(policies[0].policyname, "templates_quarantine_insert");
 if (mode === "configure") {
   const existing = await admin.storage.listBuckets();
   assert.ifError(existing.error);
-  for (const id of templateBuckets) {
+  for (const id of [templateBucket]) {
     const r = existing.data.some((bucket) => bucket.id === id)
       ? await admin.storage.updateBucket(id, templateBucketOptions)
       : await admin.storage.createBucket(id, templateBucketOptions);
     assert.ifError(r.error);
   }
 }
-for (const id of templateBuckets) {
+for (const id of [templateBucket]) {
   const r = await admin.storage.getBucket(id);
   assert.ifError(r.error);
   assert.equal(r.data.public, false);
@@ -85,10 +80,4 @@ for (const id of templateBuckets) {
       mimeTypes: r.data.allowed_mime_types,
     }),
   );
-}
-if (mode === "collect") {
-  const templates = templateInfrastructure(admin, admin, url, secret);
-  const candidates = await templates.cleanupCandidates();
-  for (const id of candidates) await templates.collect(id);
-  console.log(JSON.stringify({ ref, collectedCandidates: candidates.length }));
 }

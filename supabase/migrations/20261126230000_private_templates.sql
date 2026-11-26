@@ -19,7 +19,7 @@ create table public.template_save_requests (
   -- Retain the request and outcome even when a clinic is later deleted.
   payload jsonb not null,
   mode text not null check (mode in ('keep', 'replace', 'remove')),
-  state text not null check (state in ('pending', 'validating', 'ready', 'saved', 'retired', 'cancelled', 'collecting', 'cleaned')),
+  state text not null check (state in ('pending', 'validating', 'ready', 'saved', 'retired', 'cancelled')),
   expected_sha256 text,
   expected_bytes integer,
   original_filename text,
@@ -32,7 +32,6 @@ create table public.template_save_requests (
   outcome jsonb,
   created_at timestamptz not null default now(),
   retired_at timestamptz,
-  quarantine_cleaned_at timestamptz,
   constraint template_request_identity unique(owner_id, id),
   constraint template_expected_bytes check (
     (mode='replace' and expected_bytes is not null and expected_sha256 is not null
@@ -79,18 +78,6 @@ $$;
 revoke execute on function public.retire_clinic_template() from public, anon, authenticated, service_role;
 create trigger clinic_templates_retire after delete on public.clinic_templates
 for each row execute function public.retire_clinic_template();
-
-create function public.template_upload_allowed(object_name text)
-returns boolean language sql stable security definer set search_path = pg_catalog as $$
-  select exists(select 1 from public.template_save_requests r
-    where r.owner_id=auth.uid() and r.mode='replace' and r.state='pending'
-      and r.expires_at>now() and object_name=r.owner_id::text || '/' || r.id::text || '.pdf');
-$$;
-revoke execute on function public.template_upload_allowed(text) from public, anon, authenticated, service_role;
-grant execute on function public.template_upload_allowed(text) to authenticated;
-create policy templates_quarantine_insert on storage.objects for insert to authenticated
-with check(bucket_id='clinic-template-quarantine' and public.template_upload_allowed(name));
--- No SELECT, UPDATE or DELETE policies for either template bucket.
 
 create function public.begin_template_save(p_owner uuid,p_id uuid,p_clinic text,p_revision text,
   p_name text,p_percentage numeric,p_active boolean,p_mode text,p_filename text,p_sha256 text,p_bytes integer)
@@ -194,7 +181,7 @@ $$;
 
 create function public.commit_template_save(p_owner uuid,p_id uuid)
 returns jsonb language plpgsql security definer set search_path=pg_catalog as $$
-declare r public.template_save_requests; c public.clinics; target bigint;
+declare r public.template_save_requests; c public.clinics; target bigint; previous uuid;
 begin
   select * into r from public.template_save_requests where id=p_id and owner_id=p_owner for update;
   if not found then raise exception 'Request unavailable' using errcode='42501'; end if;
@@ -216,13 +203,14 @@ begin
   end if;
   target:=c.id;
   if r.mode in ('replace','remove') then
+    select template_id into previous from public.clinic_templates where clinic_id=target;
     delete from public.clinic_templates where clinic_id=target;
   end if;
   if r.mode='replace' then
     insert into public.clinic_templates(clinic_id,owner_id,template_id) values(target,p_owner,p_id);
   end if;
   update public.template_save_requests set state='saved',outcome=jsonb_build_object('clinicId',target::text,
-    'revision',c.template_revision::text,'templateId',(select template_id::text from public.clinic_templates where clinic_id=target))
+    'revision',c.template_revision::text,'retiredTemplateId',previous::text,'templateId',(select template_id::text from public.clinic_templates where clinic_id=target))
     where id=p_id returning * into r;
   return r.outcome;
 end;
@@ -241,61 +229,24 @@ begin
 end;
 $$;
 
--- Claim terminal requests under the same row lock used by publisher/validator.
--- Capability grace runs from expiry, not from creation or cancellation.
-create function public.claim_template_cleanup(p_id uuid)
+-- The request row serializes cancellation/expiry with validation and publication.
+-- Retrying the same operation may delete its affected terminal object again.
+create function public.claim_template_cleanup(p_owner uuid,p_id uuid)
 returns jsonb language plpgsql security definer set search_path=pg_catalog as $$
 declare r public.template_save_requests;
 begin
-  select * into r from public.template_save_requests where id=p_id for update;
+  select * into r from public.template_save_requests where id=p_id and owner_id=p_owner for update;
   if not found or r.mode<>'replace' or exists(select 1 from public.clinic_templates where template_id=p_id) then
     raise exception 'Object is not collectible' using errcode='55000';
   end if;
-  if (r.state='retired' and r.retired_at+interval '24 hours'<=now())
-    or (r.state in ('pending','validating','ready','cancelled') and r.expires_at+interval '27 hours'<=now())
-    or (r.state='collecting' and r.lease_until<=now()) then
-    update public.template_save_requests set state='collecting',lease_id=gen_random_uuid(),lease_until=now()+interval '5 minutes'
+  if r.state in ('retired','cancelled') then return to_jsonb(r); end if;
+  if r.state in ('pending','validating','ready') and r.expires_at<=now() then
+    update public.template_save_requests set state='cancelled',lease_id=null,lease_until=null
       where id=p_id returning * into r;
     return to_jsonb(r);
   end if;
-  raise exception 'Cleanup grace or lease active' using errcode='55000';
+  raise exception 'Object is not collectible' using errcode='55000';
 end;
-$$;
-
-create function public.finish_template_cleanup(p_id uuid,p_lease uuid)
-returns void language plpgsql security definer set search_path=pg_catalog as $$
-begin
-  update public.template_save_requests set state='cleaned',lease_id=null,lease_until=null
-    where id=p_id and state='collecting' and lease_id=p_lease;
-  if not found then raise exception 'Cleanup lease lost' using errcode='55000'; end if;
-end;
-$$;
-
-create function public.template_quarantine_cleanup(p_id uuid,p_finished boolean default false)
-returns jsonb language plpgsql security definer set search_path=pg_catalog as $$
-declare r public.template_save_requests;
-begin
-  select * into r from public.template_save_requests where id=p_id for update;
-  if not found or r.mode<>'replace' or r.expires_at+interval '27 hours'>now() then
-    raise exception 'Quarantine grace active' using errcode='55000';
-  end if;
-  if p_finished then
-    update public.template_save_requests set quarantine_cleaned_at=now() where id=p_id;
-  end if;
-  return to_jsonb(r);
-end;
-$$;
-
-create function public.list_template_cleanup()
-returns jsonb language sql security definer set search_path=pg_catalog as $$
-  select coalesce(jsonb_agg(id),'[]'::jsonb) from (
-    select id from public.template_save_requests r where mode='replace' and (
-      (quarantine_cleaned_at is null and expires_at+interval '27 hours'<=now())
-      or (state='retired' and retired_at+interval '24 hours'<=now())
-      or (state in ('pending','validating','ready','cancelled') and expires_at+interval '27 hours'<=now())
-      or (state='collecting' and lease_until<=now()))
-    order by created_at limit 100
-  ) candidates;
 $$;
 
 -- Only the trusted server can attest validation or publish. Never grant these
@@ -304,12 +255,10 @@ revoke execute on function public.begin_template_save(uuid,uuid,text,text,text,n
   public.template_request(uuid,uuid), public.claim_template_validation(uuid,uuid),
   public.finish_template_validation(uuid,uuid,uuid,text,integer,text), public.cancel_template_save(uuid,uuid),
   public.commit_template_save(uuid,uuid), public.read_clinic_template(uuid,text,uuid),
-  public.claim_template_cleanup(uuid), public.finish_template_cleanup(uuid,uuid),
-  public.template_quarantine_cleanup(uuid,boolean), public.list_template_cleanup()
+  public.claim_template_cleanup(uuid,uuid)
   from public, anon, authenticated, service_role;
 grant execute on function public.begin_template_save(uuid,uuid,text,text,text,numeric,boolean,text,text,text,integer),
   public.template_request(uuid,uuid), public.claim_template_validation(uuid,uuid),
   public.finish_template_validation(uuid,uuid,uuid,text,integer,text), public.cancel_template_save(uuid,uuid),
   public.commit_template_save(uuid,uuid), public.read_clinic_template(uuid,text,uuid),
-  public.claim_template_cleanup(uuid), public.finish_template_cleanup(uuid,uuid),
-  public.template_quarantine_cleanup(uuid,boolean), public.list_template_cleanup() to service_role;
+  public.claim_template_cleanup(uuid,uuid) to service_role;
