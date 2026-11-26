@@ -1,6 +1,6 @@
 # Task 01 — Invoice route and form contracts
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -48,6 +48,13 @@ destinations, direct/auth/history navigation, keyboard order, monthly continuity
 and production-safe interim state. Capture S05/Alexandria evidence, disclosing fixtures.
 
 ## Progress notes
+
+2026-11-26: Reopened after the user requested removal of the full invoice form
+from the component catalogue. Remove `/components/invoices` and its specimen;
+retain the route-local form and existing test-only scenarios. Update PR #71 in
+place, preserving earlier review and evidence as historical. This user-requested
+change awaits implementation checks and independent re-review. No automatic
+correction rounds have been consumed (0 of 2).
 
 2026-11-26: The user assigned this task under the project workflow, authorizing
 its existing scope for implementation.
