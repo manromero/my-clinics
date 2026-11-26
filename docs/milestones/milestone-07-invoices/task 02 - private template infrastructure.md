@@ -1,6 +1,26 @@
 # Task 02 — Private template infrastructure
 
-Status: `done`
+Status: `in_progress`
+
+## User-directed simplification
+
+The user reopened PR #72 for a simpler design: one private definitive Storage
+bucket, automatic lifecycle cleanup with no daily manual obligation, and no
+unnecessary duplicate PDF storage. Keep owner isolation, authoritative validation,
+10 MB support and coherent Save/Cancel behavior. Investigate and independently
+review the smallest reliable design before changing hosted configuration.
+
+Deliver only final conclusions and concise operating instructions. Remove obsolete
+research probes, raw intermediate result artifacts and narrative development logs
+from the final repository/PR description; retain useful regression validation.
+Audit actual added routes rather than assuming production endpoints are tests.
+The PR currently adds one real template-read API and no demonstration pages.
+
+Existing applied migrations remain append-only. The prior automatic correction
+count remains 1 of 2; this user-directed scope change does not silently reset it.
+The earlier two-bucket rollout is historical, not acceptance of the revised design.
+Prepare any exact hosted migration/removal scope for review before applying it;
+production remains excluded.
 
 ## Objective
 
