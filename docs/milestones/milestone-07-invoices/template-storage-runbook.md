@@ -5,9 +5,11 @@ It provides infrastructure for tasks 03–06; clinic forms are not wired here.
 Generated invoices are never stored. The user explicitly authorized the reviewed
 development rollout at `6b3af7fa68ba0379a70db119e652bfd54b376d3a`, including the
 migration, two private buckets, local server secret, verification and cleanup.
-The migration has **not yet been applied**. The task-specific native CLI consent
-amendment below requires independent procedure review before execution.
-Disposable validation is separately authorized.
+The migration, buckets and local server secret are now applied; scoped development
+acceptance passed on 2026-11-26. Independent rollout review remains pending.
+The task-specific consent amendment was independently accepted at
+`9b3f7d8f981e2ff7159d00470cdba53b0e880a5c`. Disposable validation is separately
+authorized.
 
 ## Runtime contract
 
@@ -118,7 +120,8 @@ each update, protecting later combined saves against stale clinic fields.
 Target for the proposed synthetic development rollout:
 `lvqbrjybwstvdhaxyxyn`, `my-clinics_dev`, organization `njnmfutclorywskqrftd`.
 Production `xihkrkgrhupiwcsfjctp` is prohibited by both disposable and template
-operator mutation paths. This authorized plan is not yet an executed rollout.
+operator mutation paths. The execution record below distinguishes the completed
+development rollout from the reusable procedure and its operational obligations.
 
 1. Record reviewed head, current migration history, and a read-only inventory of
    clinics/activity/owners. Verify exact ref/name/org and healthy status. Follow
@@ -146,9 +149,8 @@ operator mutation paths. This authorized plan is not yet an executed rollout.
    ```
 
    The preview must name only `20261126160000_private_templates.sql`. These
-   migration commands have **not** been run against development for this task.
-   CLI help was checked locally; native transport/authentication may still need
-   operator resolution. Stop on unexpected history, drift or connectivity errors.
+   migration commands were run against development with the task-specific consent
+   amendment below. Stop on unexpected history, drift or connectivity errors.
 
 ### Task-specific native CLI consent amendment
 
@@ -156,7 +158,7 @@ The initial native apply attempt stopped before SQL with CLI 3.0.0's hosted
 mutation consent requirement. Fresh read-only inspection still returns only the
 six previous migrations through `20261114120000`; the new migration is absent.
 The Data API was restored to its recorded `public` schema while this procedure
-amendment receives independent review. The preservation baseline is 14 clinics,
+amendment received independent review. The preservation baseline is 14 clinics,
 63 activity rows and seven Auth owners, with read-only ordered-record digests.
 
 CLI 3.0.0 [hosted-consent source](https://github.com/supabase/cli/blob/v3.0.0/apps/cli/src/command-internal/hosted-consent/hosted-consent.ts)
@@ -225,7 +227,8 @@ preview or pre-apply refusal, restore and verify that original schema.
    or a Next.js `env` entry. Keep `NEXT_PUBLIC_SUPABASE_URL` and the publishable key
    aligned with the same approved project. Restart/redeploy the approved server
    after environment changes. Restrict operator credentials to trusted server use.
-   No secret configuration has been written to the shared target by this task.
+   This task supplied the secret only in ignored local `.env.local`; it did not
+   change Vercel or any production environment.
 5. Verify grants/policies and bucket API configuration before restoring the approved
    synthetic Data API exposure. Perform separately authorized two-account
    development acceptance with reviewed fixtures, preserving other synthetic data.
@@ -271,6 +274,88 @@ publishing different bytes. If commit succeeds but its response is lost, query
 the request outcome. If collection fails, retry the same ID after lease expiry.
 The SQL claim and reference checks remain authoritative; do not bypass them by
 calling raw Storage deletion as a repair shortcut.
+
+## Development execution record — 2026-11-26
+
+The user explicitly authorized this exact rollout after technical review. The
+native CLI initially refused agent-hosted consent before writing SQL. The
+task-specific per-command acknowledgement then received separate independent
+review at `9b3f7d8`; the correction count remains one of two. No application source,
+SQL migration or generated type changed during rollout.
+
+Fresh guards verified live development ref/name/organization/health, the six
+previous migration versions, unchanged data digests, the recorded migration
+SHA-256, disabled Data API readback and the exact native preview. CLI 3.0.0 applied
+only `20261126160000_private_templates.sql` using `--skip-vault --yes`; its result
+listed no seeds or roles. Seven history versions now include `20261126160000`.
+TLS stayed verified with `NODE_USE_SYSTEM_CA=1`. There was no reset, repair,
+Management API migration substitution, production mutation or Vercel deployment.
+
+Before restoring Data API exposure, read-only SQL verified all 14 existing clinic
+revisions equal one, zero template links/requests, RLS on both metadata tables and
+`storage.objects`, zero metadata mutation grants, and all eleven service RPCs
+executable only by `service_role`. The entire Storage policy inventory contained
+only `templates_quarantine_insert`. Both buckets were configured and inspected as
+private, limited to 10,000,000 bytes and `application/pdf`. The local server secret
+and public project URL/key were checked against the same development ref without
+logging credentials. Data API configuration was restored and read back as
+`db_schema: public`; one transient failed restoration request was followed by a
+successful bounded retry. Final project status is `ACTIVE_HEALTHY`.
+
+Preservation was checked both immediately after migration and after fixture
+cleanup. Clinic digest excludes only the newly added `template_revision` column;
+activity digest covers complete ordered rows; owner digest covers ordered Auth
+user IDs, not mutable authentication timestamps. Existing fixture clinics were
+only read. Final counts and digests match the pre-migration baseline:
+
+| Inventory      | Count | Ordered-record MD5                 |
+| -------------- | ----: | ---------------------------------- |
+| Clinics        |    14 | `b8e2a0742361187612ecb7ba3bb7ed87` |
+| Activity       |    63 | `49679abcbf9bdf2e4c8a4f35b6a98e73` |
+| Auth owner IDs |     7 | `a8bd0d4e45329a11c08a313398756111` |
+
+Two existing ordinary fixture accounts each created a new uniquely marked clinic,
+updated it through the ordinary no-template path, and published a real validated
+template while inactive. Signed TUS transferred 10,000,000 and 10,000 bytes without
+account Authorization or cookies. Wrong path/bucket returned 400; 10,000,001 bytes
+returned 413. Exact-byte validation/sealing, idempotent publication, owner hash and
+no-store reads, cross-owner denial, and anonymous/ordinary metadata and direct-byte
+denial passed. `pnpm build` passed with the configured local server environment;
+its client assets contained no server credential. The actual loopback Next
+production server returned owner 200 with exact bytes/hash and private/no-store,
+anonymous 401, cross-owner 404 and stale-version 404 for both accounts. Signed-in
+clinic/activity/summary/invoice pages returned 200. Removal returned both fixture
+clinics to no-template state before owner-authorized deletion of only those new
+clinics (IDs 131 and 132). All 14 pre-existing clinics remain unchanged at revision
+one, all 63 activity rows remain unchanged, and there are zero template links.
+
+**Normal grace is retained, not bypassed for test cleanup.** Daily operator
+`collect` was executed and returned zero eligible candidates. No timestamps were
+advanced. Two retired template requests and two saved removal outcomes remain for
+the lifecycle/idempotency contract. Four private fixture objects total 20,020,000
+bytes; they are not claimed absent:
+
+| Template request                       | Bytes in each bucket | Sealed eligible (UTC) | Quarantine grace ends (UTC) |
+| -------------------------------------- | -------------------: | --------------------- | --------------------------- |
+| `3383f441-a571-4d2b-a3c3-39bde0f88869` |           10,000,000 | 2026-11-27 21:17:37   | 2026-11-29 00:17:20         |
+| `7cfcda0c-f236-4a12-9929-fb0d70370402` |               10,000 | 2026-11-27 21:17:39   | 2026-11-29 00:17:28         |
+
+The daily operator must run after eligibility, with Storage API deletion/listing
+confirmation, and again after quarantine grace to cover any late bytes. Request
+outcomes remain by design. No unattended schedule was installed. These retained
+private fixtures are the documented operational handoff, not a migration failure.
+
+Redacted local receipts are `.env.template-rollout-native-apply.json`,
+`.env.template-rollout-post-migration.json`, `.env.template-development-rollout.json`
+and `.env.template-rollout-final.json`. The scoped development probe is retained
+locally for independent inspection; it never calls the disposable driver or
+changes clocks. Its SHA-256 is
+`37b5e009e11bfa83c5935abc98f6ce6c16f00d27d5ff1613abcf97684e08d50a`.
+The unchanged infrastructure SHA-256 is
+`ab43855805ec4785bb6335aa89c3fdf75d11a759fd7ea8cde859334394224198`.
+Public PR evidence preserves the execution results; credential-bearing local
+configuration and transient capabilities remain ignored and unpublished. Actual
+deployed Vercel behavior and physical mobile networking are still not claimed.
 
 ## Scoped rollback
 
