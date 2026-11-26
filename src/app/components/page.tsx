@@ -8,6 +8,11 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/components/file-input",
+    title: "FileInput · Archivos",
+    description: "Selección nativa, arrastre, validación y archivos guardados.",
+  },
+  {
     href: "/components/app-footer",
     title: "AppFooter · Pie de aplicación",
     description: "Identidad, información y enlaces adaptables.",
