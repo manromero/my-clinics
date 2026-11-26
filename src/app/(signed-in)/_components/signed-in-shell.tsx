@@ -41,7 +41,10 @@ export function SignedInShell({
     : lastScope;
   if (monthly && lastScope !== scope) setLastScope(scope);
   const currentHref =
-    segment === "clinics" || segment === "activity" || segment === "summary"
+    segment === "clinics" ||
+    segment === "activity" ||
+    segment === "summary" ||
+    segment === "invoices"
       ? (`/${segment}` as const)
       : undefined;
   const [pending, startTransition] = useTransition();
@@ -59,7 +62,12 @@ export function SignedInShell({
           "/activity": `/activity?${scope}`,
           "/summary": `/summary?${scope}`,
         }}
-        availableDestinations={["/clinics", "/activity", "/summary"]}
+        availableDestinations={[
+          "/clinics",
+          "/activity",
+          "/summary",
+          "/invoices",
+        ]}
         account={{
           identity: { displayName, email },
           signOutPending: pending,

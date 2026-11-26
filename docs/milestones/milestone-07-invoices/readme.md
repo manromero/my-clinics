@@ -32,7 +32,7 @@ settings changes, and public deployment. Export extras do not extend scope.
 | Task                                                                                                | Status    | Direct dependencies                                                                |
 | --------------------------------------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------- |
 | [00 — FileInput and catalogue](<task 00 - file input and catalogue.md>)                             | `done`    | Existing controls; independent                                                     |
-| [01 — Invoice route and form contracts](<task 01 - invoice route and form contracts.md>)            | `pending` | Existing controls/authenticated shell; independent of 00                           |
+| [01 — Invoice route and form contracts](<task 01 - invoice route and form contracts.md>)            | `done`    | Existing controls/authenticated shell; independent of 00                           |
 | [02 — Private template analysis and infrastructure](<task 02 - private template infrastructure.md>) | `pending` | Existing clinics/authentication; independent of 01                                 |
 | [03 — Clinic template field and validation](<task 03 - clinic template field and validation.md>)    | `pending` | 00 and independently reviewed 02 analysis/design contract, not hosted availability |
 | [04 — Clinic template persistence](<task 04 - clinic template persistence.md>)                      | `pending` | 02 and 03                                                                          |
@@ -91,6 +91,24 @@ this plan grants none. Record commands, head, target and actual results; unavail
 checks remain blockers rather than inferred passes.
 
 ## Progress notes
+
+2026-11-26: Task 01 is complete after the user-requested removal of the invoice-form
+catalogue specimen in PR #71. The route-local form and tests are unchanged.
+Required checks, 41 invoice tests and independent re-review passed; the removed
+development route returns 404 and the catalogue still works. Earlier evidence is
+retained as history and removed-specimen captures are superseded. O1 catalogue
+width is retired; O2 Next.js advisory remains separate follow-up scope. Automatic
+correction rounds used remain 0 of 2. Final tracking is included for review;
+human acceptance and manual merge remain pending.
+
+2026-11-26: Task 01 is complete in
+[PR #71](https://github.com/manromero/my-clinics/pull/71). Required checks,
+124 focused tests and independent desktop/mobile review passed with no blockers;
+no correction rounds were needed. Production keeps PDF generation unavailable;
+the actual clinic/template integration belongs to task 06. Four inline captures
+are verified. The existing Next.js security advisory and catalogue specimen width
+remain optional follow-ups. The tracking update is included for final review;
+human acceptance and manual merge remain pending. Tasks 02–06 remain pending.
 
 2026-11-26: The user assigned task 00 for implementation under the project
 workflow. Its existing scope is approved for execution; other tasks remain pending.

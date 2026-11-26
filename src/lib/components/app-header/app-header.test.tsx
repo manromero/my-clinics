@@ -37,7 +37,7 @@ describe("AppHeader", () => {
     expect(
       banner.queryByText("Acceso Profesional Clínico"),
     ).not.toBeInTheDocument();
-    expect(navigation.getAllByRole("link")).toHaveLength(4);
+    expect(navigation.getAllByRole("link")).toHaveLength(5);
     expect(
       navigation.getByRole("link", { current: "page" }),
     ).toHaveAccessibleName("Clínicas");
@@ -72,7 +72,13 @@ describe("AppHeader", () => {
     const trigger = screen.getByRole("button", {
       name: "Menú de cuenta de Ana Hurtado",
     });
-    for (const name of ["Clínicas", "Actividad", "Resumen", "Ajustes"]) {
+    for (const name of [
+      "Clínicas",
+      "Actividad",
+      "Resumen",
+      "Facturas",
+      "Ajustes",
+    ]) {
       await user.tab();
       expect(screen.getByRole("link", { name })).toHaveFocus();
     }

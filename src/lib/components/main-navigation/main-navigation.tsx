@@ -5,6 +5,7 @@ const destinations = [
   { href: "/clinics", label: "Clínicas" },
   { href: "/activity", label: "Actividad" },
   { href: "/summary", label: "Resumen" },
+  { href: "/invoices", label: "Facturas" },
   { href: "/settings", label: "Ajustes" },
 ] as const;
 

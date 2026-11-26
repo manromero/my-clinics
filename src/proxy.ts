@@ -68,6 +68,7 @@ export const config = {
     "/clinics",
     "/activity",
     "/summary",
+    "/invoices",
     "/login",
     "/components/:path*",
   ],

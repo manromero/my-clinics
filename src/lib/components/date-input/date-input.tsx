@@ -17,6 +17,7 @@ export type DateInputProps = Omit<
   | "max"
 > & {
   label: string;
+  inputFormat?: "dd/MM/yyyy";
   help?: ReactNode;
   error?: ReactNode;
   invalid?: boolean;
@@ -28,6 +29,7 @@ export type DateInputProps = Omit<
 
 export function DateInput({
   label,
+  inputFormat,
   help,
   error,
   invalid = false,
@@ -67,7 +69,10 @@ export function DateInput({
         <input
           {...props}
           id={controlId}
-          type="date"
+          type={inputFormat ? "text" : "date"}
+          inputMode={inputFormat ? "numeric" : undefined}
+          placeholder={inputFormat}
+          maxLength={inputFormat ? 10 : undefined}
           required={required}
           disabled={disabled}
           readOnly={readOnly}

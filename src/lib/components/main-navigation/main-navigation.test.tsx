@@ -13,8 +13,14 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-const routes = ["/clinics", "/activity", "/summary", "/settings"] as const;
-const labels = ["Clínicas", "Actividad", "Resumen", "Ajustes"];
+const routes = [
+  "/clinics",
+  "/activity",
+  "/summary",
+  "/invoices",
+  "/settings",
+] as const;
+const labels = ["Clínicas", "Actividad", "Resumen", "Facturas", "Ajustes"];
 
 describe("MainNavigation", () => {
   it("prefetches only the available alternate destinations at their supplied scope", () => {
@@ -46,12 +52,12 @@ describe("MainNavigation", () => {
       screen.queryByRole("link", { name: "Ajustes" }),
     ).not.toBeInTheDocument();
   });
-  it("provides all four Spanish destinations in a named navigation landmark", () => {
+  it("provides all Spanish destinations in a named navigation landmark", () => {
     render(<MainNavigation />);
     const links = within(
       screen.getByRole("navigation", { name: "Navegación principal" }),
     ).getAllByRole("link");
-    expect(links).toHaveLength(4);
+    expect(links).toHaveLength(5);
     links.forEach((link, index) => {
       expect(link).toHaveAccessibleName(labels[index]);
       expect(link).toHaveAttribute("href", routes[index]);
@@ -128,9 +134,9 @@ describe("MainNavigation", () => {
       expect(screen.getByRole("link", { name: label })).toHaveFocus();
       await user.keyboard("{Enter}");
     }
-    expect(activate).toHaveBeenCalledTimes(4);
+    expect(activate).toHaveBeenCalledTimes(5);
     await user.tab({ shift: true });
-    expect(screen.getByRole("link", { name: "Resumen" })).toHaveFocus();
+    expect(screen.getByRole("link", { name: "Facturas" })).toHaveFocus();
   });
 
   it("keeps full long labels accessible without changing destinations", () => {
