@@ -48,6 +48,30 @@ standard independent review/PR workflow when implementation is assigned.
 workflow. Implementation, independent review, human approval and manual merge
 are pending.
 
+2026-11-26: Implementation published in [draft PR #70](https://github.com/manromero/my-clinics/pull/70),
+head `487eff7cb92115a03f0d416da1cea469197645c2`. Implementer and independent
+reviewer passed lint, typecheck, production build and six shared-component tests.
+Independent code, desktop/mobile interaction and visual review found no product
+defects. Six inline captures were retrieved and verified by the coordinator.
+Detailed evidence and review limitations are preserved in the PR.
+
+Delivery remains blocked with status `in_progress`:
+
+- B01: `pnpm format:check` fails only the untouched supplied S02/S05 reference
+  HTML, also reproduced from the base commit. Assignment files pass formatting.
+  User authorization to normalize these reference files is pending.
+- B02: actual native chooser cancellation is unverified. Automated chooser
+  opening/selection and empty completion retain selection, but empty completion
+  does not prove native cancellation. The reviewer's isolated headed Chrome
+  was found by native UI automation; selecting its window did not return and
+  the coordinator interrupted the attempt. No native dialog cancellation occurred.
+  A working native UI session or an explicit user decision on this validation
+  limitation is required before readiness.
+
+No automatic correction rounds used (0 of 2); no application fixes were identified.
+Human acceptance and manual merge remain pending; do not merge this draft as a
+clean validated delivery.
+
 ## Execution context
 
 - Readiness: ready. The assignment approves task 00's existing scope and criteria;
