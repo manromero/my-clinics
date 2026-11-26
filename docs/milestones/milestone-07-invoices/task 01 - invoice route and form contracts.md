@@ -1,6 +1,6 @@
 # Task 01 — Invoice route and form contracts
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -50,8 +50,33 @@ and production-safe interim state. Capture S05/Alexandria evidence, disclosing f
 ## Progress notes
 
 2026-11-26: The user assigned this task under the project workflow, authorizing
-its existing scope for implementation. Implementation and independent review are
-pending; human acceptance and manual merge remain separate.
+its existing scope for implementation.
+
+[PR #71](https://github.com/manromero/my-clinics/pull/71) adds authenticated
+invoice navigation, the route-local form and exact validation/calculation/output
+contracts. Production explains that clinic/template selection and PDF generation
+are unavailable; download remains disabled. Development-only specimens cover the
+fixture states. Actual clinic/template integration remains in task 06.
+
+Independent review of `b1fa1598eb50f48b9348c9b88832b1523676c39f` against the
+recorded base found no blocking defects. Both agents passed
+lint, type checking, formatting, the production build and 124 focused tests. Each
+verified navigation, auth/history, monthly/clinic continuity, inputs, rounding,
+production boundaries and development fixture states with its own browser session.
+Desktop and narrow responsive captures were inspected against S05/Alexandria;
+four inline PR images were retrieved and verified. Detailed results and evidence
+are in the PR. Correction rounds used: 0 of 2.
+
+Both agents observed the existing Next.js 16.4.3 security advisory stop an initial
+build; unchanged retries completed successfully. A dependency upgrade is an
+optional separate follow-up, as is widening the desktop catalogue specimen.
+Narrow Chrome viewports were tested without touch emulation. Google OAuth was
+unchanged and its provider flow was not revalidated. The rendered GitHub PR page
+was not inspected; the attached image artifacts were verified directly.
+
+Required implementation checks and independent review are complete. The final
+tracking-only update is included in the same PR for administrative re-review.
+Human acceptance and manual merge remain pending.
 
 ## Execution context
 
