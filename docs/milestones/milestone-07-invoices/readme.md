@@ -92,65 +92,12 @@ checks remain blockers rather than inferred passes.
 
 ## Progress notes
 
-2026-11-26: Task 02 is `done` in [PR #72](https://github.com/manromero/my-clinics/pull/72).
-Both phases, the explicitly authorized development rollout and independent review
-passed with no blockers. The migration, private buckets and local server secret
-are configured; 17 development acceptance checks passed and all original data
-digests are preserved. Development is healthy and all disposable projects are
-deleted. Correction rounds used: 1 of 2. Four private fixture objects remain within
-normal retention; the runbook/PR records deadlines and daily manual cleanup.
-Final tracking is included for review. Human acceptance and manual merge remain
-pending; tasks 03–06 remain pending.
-
-2026-11-26: Task 02 technical and documentation review passed after correction 1.
-Development is restored and all four services are `ACTIVE_HEALTHY`. Read-only
-history confirms the template migration is still absent. PR #72 stays draft and
-task 02 stays `in_progress` pending explicit persistent rollout authorization,
-application and verification. No disposable project remains.
-
-2026-11-26: Task 02 correction 1 passed independent technical review at `402bf77`:
-B1 is fixed by a file-scoped signed resumable upload capability, with no account
-credential returned. Required checks, 383 unit tests, affected hosted validation
-and independent scope/Cancel/expiry probes passed. No code blockers remain; one
-automatic correction round was used. [PR #72](https://github.com/manromero/my-clinics/pull/72)
-stays draft and task 02 stays `in_progress` pending separate authorization and
-execution of the reviewed persistent development rollout. All disposable targets
-are deleted; development restoration was requested. Human acceptance and manual
-merge remain pending.
-
-2026-11-26: Task 02 implementation and required validation passed, but the initial
-independent phase 2 review of [PR #72](https://github.com/manromero/my-clinics/pull/72)
-found blocking B1 in the browser upload credential scope. Correction round 1 of 2
-is assigned. Other independent checks passed, including the fresh hosted lifecycle
-suite and 383 unit tests. The task remains `in_progress`; deployment authorization
-and human acceptance remain pending.
-
-2026-11-26: Task 02 phase 1 investigation and independent decision review passed
-at `67fd610d804b1f453e385aa7801603c29d250996`, with no blockers and one optional
-research diagnostic suggestion. Actual hosted transfer/access/cache proofs and
-the downstream contract are documented in `template-storage-decision.md`. All
-research targets were deleted and development restored. Phase 2 implementation,
-validation, final review and separate rollout authorization remain outstanding;
-task 02 stays `in_progress`, correction count 0 of 2.
-
-2026-11-26: Task 02 is `in_progress` after the user authorized pausing development
-for disposable capacity and restoring it after testing. The verified development
-pause request succeeded; phase 1 investigation and independent decision review must
-precede infrastructure implementation. Persistent development rollout remains a
-separate concrete authorization after review.
-
-2026-11-26: The user authorized the task 02 disposable project. Supabase rejected
-the actual creation attempt with HTTP 400 `free_project_limit` because the account
-owner already has two active Free projects across organizations. No project was
-created or changed. Task 02 remains `pending` at intake until capacity is resolved;
-the earlier pending disposable authorization is superseded.
-
-2026-11-26: Task 02 was assigned but remains `pending` at blocked intake. Read-only
-inspection verified that the Free validation organization has two active projects;
-the validation runner requires a free slot. Task-specific disposable Storage/Auth/API
-probe authorization and a capacity solution are pending. Shared-development rollout
-requires separate authorization after decision review. No implementation branch or
-hosted writes were made. See task 02 for the intake record.
+2026-11-26: Task 02 is reopened in PR #72 at the user’s request to simplify the
+whole solution: one private bucket, no duplicate PDF, operation-specific deletion
+and concise final documentation. The incorrect migration will be replaced under
+an independently reviewed development-only reconciliation. The PR is draft;
+implementation, validation and final review are in progress. The prior automatic
+correction count remains 1 of 2.
 
 2026-11-26: Task 01 is complete after the user-requested removal of the invoice-form
 catalogue specimen in PR #71. The route-local form and tests are unchanged.
@@ -185,7 +132,3 @@ acceptance and manual merge are recorded in the PR. Other tasks remain pending.
 2026-11-25: Prepared for direct documentation delivery, human acceptance pending.
 All implementation tasks remain pending. No implementation, hosted operations,
 branch, PR or application validation is claimed.
-
-2026-11-26: User required deeper independent analysis in 02 before choosing and
-configuring infrastructure. Earlier suggestions remain hypotheses, not approved
-architecture. All statuses remain pending; this clarification performs no research.
