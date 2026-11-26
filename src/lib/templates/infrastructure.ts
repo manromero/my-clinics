@@ -161,24 +161,48 @@ export function templateInfrastructure(
           p_bytes: input.bytes ?? null,
         }),
       );
-      let uploadGrant: { accessToken: string; expiresAt: number } | null = null;
+      let uploadGrant: {
+        token: string;
+        expiresAt: number;
+        endpoint: string;
+        transport: "signed-tus";
+      } | null = null;
       if (r.mode === "replace" && r.state === "pending") {
-        const session = await auth.auth.getSession();
-        const token = session.data.session?.access_token;
-        if (session.error || !token) throw new TemplateError("unauthenticated");
-        const verified = await auth.auth.getUser(token);
+        const capability = await admin.storage
+          .from(templateBuckets[0])
+          .createSignedUploadUrl(key(r), { upsert: false });
+        if (capability.error || !capability.data?.token)
+          throw new TemplateError("upload-capability");
         const claims = JSON.parse(
-          Buffer.from(token.split(".")[1], "base64url").toString(),
-        ) as { sub?: string; exp?: number };
+          Buffer.from(
+            capability.data.token.split(".")[1],
+            "base64url",
+          ).toString(),
+        ) as {
+          url?: string;
+          upsert?: boolean;
+          exp?: number;
+          role?: string;
+          sub?: string;
+        };
         if (
-          verified.error ||
-          verified.data.user?.id !== r.owner_id ||
-          claims.sub !== r.owner_id ||
+          claims.url !== `${templateBuckets[0]}/${key(r)}` ||
+          claims.upsert !== false ||
+          claims.role ||
+          claims.sub ||
           !Number.isSafeInteger(claims.exp) ||
           claims.exp! <= Date.now() / 1000
         )
-          throw new TemplateError("unauthenticated");
-        uploadGrant = { accessToken: token, expiresAt: claims.exp! };
+          throw new TemplateError("upload-capability");
+        const uploadOrigin = url.hostname.endsWith(".supabase.co")
+          ? `${url.protocol}//${url.hostname.replace(".supabase.co", ".storage.supabase.co")}`
+          : url.origin;
+        uploadGrant = {
+          token: capability.data.token,
+          expiresAt: claims.exp!,
+          endpoint: `${uploadOrigin}/storage/v1/upload/resumable/sign`,
+          transport: "signed-tus",
+        };
       }
       return {
         requestId: r.id,

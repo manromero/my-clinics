@@ -11,6 +11,57 @@ rollout remains separately unauthorized. Base:
 policy, dependency, or deployment setting has been selected for rollout by this
 report. Disposable research configuration is explicitly distinguished below.
 
+## Correction round 1 — B1 transport and credential revision
+
+Independent review of implementation `8cf9e85` found a blocking error in the
+browser upload contract: `begin.uploadGrant.accessToken` was the full account JWT.
+The reviewer used it after Cancel to create/read unrelated owned clinics without
+cookies (HTTP 201/200). Returning that credential crossed the existing explicit
+HttpOnly boundary and was unnecessary for file transfer. The account-token grant
+is removed. This section supersedes the initial recommendation C and the rejected
+phase 2 token clarification; the earlier investigation below is retained as history.
+
+The corrected selection is **D, signed direct TUS** with the same private
+quarantine, exact-buffer sealing, atomic publication and server-read lifecycle.
+The server returns only a no-upsert upload capability for the reserved bucket/path,
+its expiry, and the signed TUS endpoint. It does not extract or return the account
+access/refresh token. The capability has no account role/subject and cannot
+authorize account Data API or Auth requests. Its authority remains file upload,
+not metadata association, validation or publication.
+
+Inspected 2026-11-26: the [resumable guide](https://supabase.com/docs/guides/storage/uploads/resumable-uploads)
+describes `x-signature`; the exact route distinction is explicit in official
+Storage source at revision `4341c445f963ad7372629f6fede14f3e240a1541`:
+[route registration](https://github.com/supabase/storage/blob/4341c445f963ad7372629f6fede14f3e240a1541/src/http/routes/tus/index.ts#L206)
+and [capability verification](https://github.com/supabase/storage/blob/4341c445f963ad7372629f6fede14f3e240a1541/src/http/routes/tus/lifecycle.ts#L58).
+The signed endpoint is `/storage/v1/upload/resumable/sign`. It accepts the public
+project `apikey` plus `x-signature`, without account Authorization or cookies,
+and checks the upload-scoped signature against the bucket/object name. Returned
+PATCH/HEAD Locations retain `/sign`. The base `/resumable` route uses ordinary
+JWT/RLS authorization; adding `x-signature` alone does not switch handlers. This
+explains the reviewer's failed base-route diagnostics without relaxing policies.
+
+Disposable correction probe `iqujehhtqgvjlgnuexij` independently transferred and
+resumed a 10,000,000-byte PDF through the signed route without an account bearer,
+rejected a different path, rejected 10,000,001 bytes with 413, and passed the
+existing selected lifecycle checks. That target was deleted and inventory-confirmed
+absent. Expanded correction receipts in PR #72 verify the original account-API
+reproduction and Cancel during upload; their head/source hashes distinguish them
+from the historical account-token transfer evidence. Renewed affected review is
+required before treating this revised transport contract as accepted.
+
+The capability lasts two hours and is transferable for its one path; it cannot be
+revoked individually ([signed upload API](https://supabase.com/docs/reference/javascript/storage-from-createsigneduploadurl)).
+Cancellation is therefore a publication boundary: late bytes can finish into
+unreadable quarantine, but cancelled requests cannot validate or publish and do
+not alter the saved clinic/template pair. The existing 27-hour post-expiry cleanup
+grace conservatively covers a two-hour capability followed by a 24-hour TUS URL,
+plus one hour. No new SQL, Storage policy, or generated-type change is needed.
+Signed standard upload remains a supported alternative; its whole-file restart
+tradeoff is unnecessary here because the signed TUS route is now proven. No
+broader account credential or insecure policy exception is required to retain
+resumability.
+
 ## Decision criteria established before selection
 
 The [requirements](../../requirements.md#invoice-templates-and-generation) require

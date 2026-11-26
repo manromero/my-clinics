@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash, randomUUID } from "node:crypto";
 import { readFile, readdir, writeFile } from "node:fs/promises";
-import { execFile, spawn } from "node:child_process";
+import { execFile, execFileSync, spawn } from "node:child_process";
 import { promisify } from "node:util";
 import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
@@ -49,7 +49,23 @@ export async function templateStorageTests({
   assert.ok(!["lvqbrjybwstvdhaxyxyn", "xihkrkgrhupiwcsfjctp"].includes(ref));
   const { templateInfrastructure, templateBuckets, templateBucketOptions } =
     await import("../src/lib/templates/infrastructure.ts");
-  const result = { ref, date: new Date().toISOString(), checks: [] };
+  const result = {
+    ref,
+    date: new Date().toISOString(),
+    head: execFileSync("git", ["rev-parse", "HEAD"], {
+      encoding: "utf8",
+      windowsHide: true,
+    }).trim(),
+    sourceHashes: {
+      infrastructure: hash(
+        await readFile(
+          new URL("../src/lib/templates/infrastructure.ts", import.meta.url),
+        ),
+      ),
+      validation: hash(await readFile(new URL(import.meta.url))),
+    },
+    checks: [],
+  };
   const checked = (label, details = {}) => {
     result.checks.push({ label, ...details });
     console.log(`Template check passed: ${label}`);
@@ -606,46 +622,51 @@ export async function templateStorageTests({
     );
 
     async function tus(
-      user,
+      grant,
       path,
       data,
-      accessToken = user.session.access_token,
+      afterFirstChunk,
+      bucket = templateBuckets[0],
     ) {
       const headers = {
-        apikey: anon,
-        Authorization: `Bearer ${accessToken}`,
+        apikey: publishable ?? anon,
+        "x-signature": grant.token,
         "Tus-Resumable": "1.0.0",
       };
+      assert.equal(grant.transport, "signed-tus");
+      assert.equal(
+        new URL(grant.endpoint).pathname,
+        "/storage/v1/upload/resumable/sign",
+      );
       const metadata = Object.entries({
-        bucketName: templateBuckets[0],
+        bucketName: bucket,
         objectName: path,
         contentType: "application/pdf",
         cacheControl: "0",
       })
         .map(([k, v]) => `${k} ${Buffer.from(v).toString("base64")}`)
         .join(",");
-      let r = await fetch(
-        `https://${ref}.storage.supabase.co/storage/v1/upload/resumable`,
-        {
-          method: "POST",
-          headers: {
-            ...headers,
-            "Upload-Length": String(data.length),
-            "Upload-Metadata": metadata,
-          },
+      let response = await fetch(grant.endpoint, {
+        method: "POST",
+        headers: {
+          ...headers,
+          "Upload-Length": String(data.length),
+          "Upload-Metadata": metadata,
         },
-      );
-      if (r.status !== 201) return r.status;
-      const location = r.headers.get("location");
+        signal: AbortSignal.timeout(30000),
+      });
+      if (response.status !== 201) return response.status;
+      const location = response.headers.get("location");
       assert.ok(
         [`${ref}.storage.supabase.co`, `${ref}.supabase.co`].includes(
           new URL(location).hostname,
         ),
       );
+      assert.ok(new URL(location).pathname.includes("/resumable/sign/"));
       let offset = 0;
       while (offset < data.length) {
         const end = Math.min(offset + 6 * 1024 * 1024, data.length);
-        r = await fetch(location, {
+        response = await fetch(location, {
           method: "PATCH",
           headers: {
             ...headers,
@@ -653,29 +674,59 @@ export async function templateStorageTests({
             "Upload-Offset": String(offset),
           },
           body: data.slice(offset, end),
+          signal: AbortSignal.timeout(30000),
         });
-        if (r.status !== 204) return r.status;
+        if (response.status !== 204) return response.status;
         offset = end;
-        r = await fetch(location, { method: "HEAD", headers });
-        assert.equal(r.status, 200);
-        assert.equal(Number(r.headers.get("upload-offset")), offset);
+        response = await fetch(location, {
+          method: "HEAD",
+          headers,
+          signal: AbortSignal.timeout(30000),
+        });
+        assert.equal(response.status, 200);
+        assert.equal(Number(response.headers.get("upload-offset")), offset);
+        if (offset === 6 * 1024 * 1024 && afterFirstChunk)
+          await afterFirstChunk();
       }
       return 204;
     }
-    assert.equal(
-      JSON.parse(
-        Buffer.from(
-          begun.uploadGrant.accessToken.split(".")[1],
-          "base64url",
-        ).toString(),
-      ).sub,
-      a.id,
-    );
+    const serializedGrant = JSON.stringify(begun);
+    for (const credential of [
+      a.session.access_token,
+      a.session.refresh_token,
+      secret,
+    ])
+      assert.ok(
+        !serializedGrant.includes(credential),
+        "Account/service credential escaped in begin result",
+      );
+    assert.equal(begun.uploadGrant.accessToken, undefined);
     assert.ok(begun.uploadGrant.expiresAt > Date.now() / 1000);
-    assert.equal(
-      await tus(a, begun.uploadPath, bytes, begun.uploadGrant.accessToken),
-      204,
+    const capClaims = JSON.parse(
+      Buffer.from(
+        begun.uploadGrant.token.split(".")[1],
+        "base64url",
+      ).toString(),
     );
+    assert.equal(capClaims.url, `${templateBuckets[0]}/${begun.uploadPath}`);
+    assert.equal(capClaims.upsert, false);
+    assert.equal(capClaims.role, undefined);
+    assert.equal(capClaims.sub, undefined);
+    const forgedPath = await tus(
+      begun.uploadGrant,
+      `${a.id}/${randomUUID()}.pdf`,
+      await templateFixture(),
+    );
+    assert.ok([400, 401, 403].includes(forgedPath));
+    const forgedBucket = await tus(
+      begun.uploadGrant,
+      begun.uploadPath,
+      await templateFixture(),
+      undefined,
+      templateBuckets[1],
+    );
+    assert.ok([400, 401, 403].includes(forgedBucket));
+    assert.equal(await tus(begun.uploadGrant, begun.uploadPath, bytes), 204);
     for (const client of [a.client, b.client, anonymous])
       assert.ok(
         (
@@ -687,7 +738,7 @@ export async function templateStorageTests({
     const tooBig = input({ requestId: randomUUID() }),
       tooBigBegin = await a.templates.begin(tooBig);
     const tooBigStatus = await tus(
-      a,
+      tooBigBegin.uploadGrant,
       tooBigBegin.uploadPath,
       await templateFixture(10000001),
     );
@@ -700,9 +751,16 @@ export async function templateStorageTests({
       ).data.some((x) => x.name === `${tooBig.requestId}.pdf`),
     );
     await a.templates.cancel(tooBig.requestId);
-    checked("selected authenticated TUS 10MB resume and boundary+1 rejection", {
-      overLimitStatus: tooBigStatus,
-    });
+    checked(
+      "file-scoped signed TUS10MB resume, path forgery denial and boundary+1 rejection",
+      {
+        overLimitStatus: tooBigStatus,
+        wrongPathStatus: forgedPath,
+        wrongBucketStatus: forgedBucket,
+        accountAuthorizationHeader: false,
+        cookieHeader: false,
+      },
+    );
     await deny(a.templates.commit(request.requestId), "55000");
     const validation = await a.templates.validate(request.requestId);
     assert.equal(validation.valid, true);
@@ -898,18 +956,66 @@ export async function templateStorageTests({
 
     const cancelInput = input({ revision }),
       cancelBegin = await a.templates.begin(cancelInput);
-    assert.ifError(
-      (
-        await a.client.storage
-          .from(templateBuckets[0])
-          .upload(cancelBegin.uploadPath, bytes, {
-            contentType: "application/pdf",
-          })
-      ).error,
+    const lateUpload = await tus(
+      cancelBegin.uploadGrant,
+      cancelBegin.uploadPath,
+      bytes,
+      () => a.templates.cancel(cancelInput.requestId),
     );
-    await a.templates.cancel(cancelInput.requestId);
+    assert.equal(lateUpload, 204);
     await deny(a.templates.validate(cancelInput.requestId), "55000");
     await deny(a.templates.commit(cancelInput.requestId), "55000");
+    assert.equal((await a.templates.begin(cancelInput)).uploadGrant, null);
+    const marker = `capability-scope-${randomUUID()}`;
+    const capHeaders = {
+      apikey: publishable ?? anon,
+      Authorization: `Bearer ${cancelBegin.uploadGrant.token}`,
+      "Content-Type": "application/json",
+    };
+    const unrelatedInsert = await fetch(
+      `${url}/rest/v1/clinics?select=id,name`,
+      {
+        method: "POST",
+        headers: { ...capHeaders, Prefer: "return=representation" },
+        body: JSON.stringify({ owner_id: a.id, name: marker, percentage: 10 }),
+      },
+    );
+    const unrelatedRead = await fetch(`${url}/rest/v1/clinics?select=id,name`, {
+      headers: capHeaders,
+    });
+    const authIdentity = await fetch(`${url}/auth/v1/user`, {
+      headers: capHeaders,
+    });
+    for (const response of [unrelatedInsert, unrelatedRead, authIdentity]) {
+      assert.ok([401, 403].includes(response.status));
+      await response.arrayBuffer();
+    }
+    const absentMarker = await a.client
+      .from("clinics")
+      .select("id")
+      .eq("name", marker);
+    assert.ifError(absentMarker.error);
+    assert.deepEqual(absentMarker.data, []);
+    const untouchedLink = await a.client
+      .from("clinic_templates")
+      .select("template_id")
+      .eq("clinic_id", clinicId)
+      .single();
+    assert.ifError(untouchedLink.error);
+    assert.equal(untouchedLink.data.template_id, request.requestId);
+    checked(
+      "B1: capability cannot access account APIs after Cancel; late upload cannot validate/publish or change current template",
+      {
+        cookieHeaderSent: false,
+        unrelatedClinicInsertStatus: unrelatedInsert.status,
+        unrelatedClinicReadStatus: unrelatedRead.status,
+        authIdentityStatus: authIdentity.status,
+        lateUploadStatus: lateUpload,
+        validationCode: "55000",
+        publicationCode: "55000",
+        currentTemplatePreserved: true,
+      },
+    );
     const otherName = await a.client.from("clinics").insert({
       owner_id: a.id,
       name: "Duplicate save target",

@@ -22,22 +22,39 @@ clients cannot attest bytes, publish links, or mutate metadata.
    filename. Replacement additionally requires byte count and hash. New clinics
    must start active; inactive existing clinics accept templates. A request UUID
    binds the entire payload; retries with another payload fail with `22023`.
-2. Upload through authenticated TUS to the returned quarantine path, using
-   6,291,456-byte chunks, no upsert and `begin.uploadGrant.accessToken`. Existing
-   SSR cookies remain HttpOnly; the explicit grant makes this authenticated direct
-   transport usable without reading those cookies in JavaScript. The server
-   verifies that exact JWT with Auth, checks its subject and expiry, and returns
-   only the current user's token while the replacement request is pending.
-   Hold it only in memory for the upload, discard on success/cancel/sign-out, and
-   never cache, log or persist the grant. It is an account bearer credential with
-   that user's RLS permissions, **not** a path-scoped service key. It can remain
-   valid after sign-out until JWT expiry; cancellation closes the reservation for
-   new authenticated uploads, not already minted Storage capabilities. This
-   explicit transport result is a phase 2 contract clarification for review.
-   The reservation
+2. Upload using the **file-scoped signed TUS capability** in `begin.uploadGrant`:
+   `transport: "signed-tus"`, `endpoint`, `token`, and `expiresAt`. The server
+   verifies the owner, reserves the exact request path, and calls Storage's
+   `createSignedUploadUrl` with `upsert: false`. It never returns an account access
+   token, refresh token, or service credential. Existing SSR cookies stay HttpOnly.
+   Hold the capability only in memory; discard after upload/cancel/sign-out and
+   never cache, log or persist it.
+
+   POST to the returned `/storage/v1/upload/resumable/sign` endpoint. Send the
+   project's **public** API key in `apikey`, the capability token in `x-signature`,
+   and `Tus-Resumable: 1.0.0`. Do not send account `Authorization` or cookies.
+   Use 6,291,456-byte chunks, no upsert, the exact returned `uploadPath` and
+   quarantine bucket in TUS metadata. Keep `x-signature` and the public API key on
+   PATCH/HEAD requests to the returned signed Location. Recover its offset with
+   HEAD on retry; 409 never authorizes overwriting an existing object. After an
+   uncertain completed upload, let server validation verify the request-bound
+   hash/size rather than replacing the object or starting another save identity.
+
+   The base `/upload/resumable` route uses account JWT/RLS authorization and does
+   **not** select the signed handler merely because `x-signature` is present.
+   The explicit `/sign` route is required. This distinction is verified against
+   current official source and actual hosted transfer, not assumed from the
+   abbreviated guide example. See the decision report's B1 correction section.
+
+   A capability lasts two hours and permits uploading only its exact bucket/path.
+   It is transferable within that scope and cannot be revoked individually.
+   Cancel blocks validation/publication, while an issued capability or in-flight
+   upload can still finish into unreadable quarantine. No account API authority
+   is conferred. The reservation
    predicate enforces the exact owner/request path, pending state, and expiry.
    The original filename never determines a path. Quarantine is unreadable even
    by the owner. Standard uploads are also permitted by the same gate.
+
 3. Call `validate`. The server downloads at most **10,000,000 bytes**, parses in
    an isolated worker, rejects encryption/unreadable PDFs and missing/wrong-type
    text fields, checks the reserved hash and byte count, and seals exactly that
@@ -175,7 +192,7 @@ Keep the same reviewed target authorization marker. A row-locked claim prevents
 publication after collection begins. Current linked versions cannot be claimed.
 Retired sealed objects wait 24 hours. Unpublished objects wait until reservation
 expiry plus 27 hours. This conservative bound composes a two-hour signed-upload
-token (which a pending authenticated writer can mint), a TUS URL initiated near
+capability, a TUS URL initiated near
 that token's expiry with up to 24 more hours, and one hour of grace. This extends
 the research proposal's 25-hour value; it does not assume that every provider
 request actually survives all those windows.
