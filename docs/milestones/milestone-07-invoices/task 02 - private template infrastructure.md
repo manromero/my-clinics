@@ -162,7 +162,8 @@ role tests do not replace hosted setup and API checks. No UI screenshots require
   upgrade and production HTTP evidence. No UI review applies.
 - PR: <https://github.com/manromero/my-clinics/pull/72> (draft). All implementation
   and reviewer disposable targets were deleted and absence confirmed. Development
-  remains paused to provide capacity for correction validation.
+  was paused for correction validation and is now restored: project, database,
+  Auth, REST and Storage were independently read as `ACTIVE_HEALTHY`.
 - B1 fixed and independently verified at
   `402bf77f33dade2e6dbd894c8ec4c141791bae6f`: no account token is returned. A
   path-scoped, no-upsert signed TUS capability uses `/upload/resumable/sign`.
@@ -184,6 +185,15 @@ role tests do not replace hosted setup and API checks. No UI screenshots require
   separate follow-up, not resolved by this task.
 
 ## Progress notes
+
+2026-11-26 restoration verification: Development `lvqbrjybwstvdhaxyxyn` and its
+database/Auth/REST/Storage services are `ACTIVE_HEALTHY` after restoration. A
+read-only migration-history transaction returned the six existing versions through
+`20261114120000`; the new `20261126160000` migration is absent. This confirms the
+reviewed persistent rollout is still pending, not already applied. All disposable
+projects remain removed. Final technical and documentation review passed; only
+explicit persistent rollout authorization/execution/verification remains before
+the task can be complete.
 
 2026-11-26: Correction 1 technical review passed at `402bf77` with B1 fixed and no
 open code blockers. The revised signed-TUS contract and concrete rollout proposal

@@ -92,6 +92,12 @@ checks remain blockers rather than inferred passes.
 
 ## Progress notes
 
+2026-11-26: Task 02 technical and documentation review passed after correction 1.
+Development is restored and all four services are `ACTIVE_HEALTHY`. Read-only
+history confirms the template migration is still absent. PR #72 stays draft and
+task 02 stays `in_progress` pending explicit persistent rollout authorization,
+application and verification. No disposable project remains.
+
 2026-11-26: Task 02 correction 1 passed independent technical review at `402bf77`:
 B1 is fixed by a file-scoped signed resumable upload capability, with no account
 credential returned. Required checks, 383 unit tests, affected hosted validation
