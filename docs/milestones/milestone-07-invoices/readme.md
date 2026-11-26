@@ -92,6 +92,16 @@ checks remain blockers rather than inferred passes.
 
 ## Progress notes
 
+2026-11-26: Task 02 correction 1 passed independent technical review at `402bf77`:
+B1 is fixed by a file-scoped signed resumable upload capability, with no account
+credential returned. Required checks, 383 unit tests, affected hosted validation
+and independent scope/Cancel/expiry probes passed. No code blockers remain; one
+automatic correction round was used. [PR #72](https://github.com/manromero/my-clinics/pull/72)
+stays draft and task 02 stays `in_progress` pending separate authorization and
+execution of the reviewed persistent development rollout. All disposable targets
+are deleted; development restoration was requested. Human acceptance and manual
+merge remain pending.
+
 2026-11-26: Task 02 implementation and required validation passed, but the initial
 independent phase 2 review of [PR #72](https://github.com/manromero/my-clinics/pull/72)
 found blocking B1 in the browser upload credential scope. Correction round 1 of 2

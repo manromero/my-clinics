@@ -145,8 +145,9 @@ role tests do not replace hosted setup and API checks. No UI screenshots require
 - Optional O1: research SQL conflict assertions accept generic request rejection;
   if reused for acceptance, require expected redacted SQLSTATE and winning state.
   This is not a phase 1 blocker and does not extend scope independently.
-- Open items: phase 2 implementation, hosted validation, PR, independent final
-  review, and separately scoped development rollout authorization.
+- Open items: separately scoped development rollout authorization, execution and
+  target verification. Technical implementation and independent review passed;
+  the task stays `in_progress` and PR stays draft until hosted setup is complete.
 - Phase 2 initial review of `8cf9e8577a22fb551ac401c4b67211878520d6bc`
   found B1 blocking: `begin.uploadGrant` exports the full ordinary-user account
   token across the existing HttpOnly boundary. Independent raw REST probes could
@@ -162,10 +163,39 @@ role tests do not replace hosted setup and API checks. No UI screenshots require
 - PR: <https://github.com/manromero/my-clinics/pull/72> (draft). All implementation
   and reviewer disposable targets were deleted and absence confirmed. Development
   remains paused to provide capacity for correction validation.
-- Correction rounds used: 1 of 2 dispatched for B1. Phase 1 accepted; phase 2
-  remains blocked pending correction and re-review. O1 is addressed for acceptance.
+- B1 fixed and independently verified at
+  `402bf77f33dade2e6dbd894c8ec4c141791bae6f`: no account token is returned. A
+  path-scoped, no-upsert signed TUS capability uses `/upload/resumable/sign`.
+  The revised transport/lifetime contract and rollout proposal were independently
+  accepted. Initial failed signed-TUS diagnostics used the different JWT endpoint.
+- Current-head application checks and 383 unit tests passed. Sixteen affected
+  hosted checks passed. The reviewer independently passed required application
+  checks, document links and a fresh signed-transfer/credential/Cancel/expiry
+  probe. Both source hashes matched recorded evidence. The previous full database
+  replay/types/parity/upgrade and production HTTP evidence applies to unchanged
+  SQL, generated types and read route; it was not repeated for the correction.
+- Independent correction proof: 10 MB resumes without account Authorization;
+  wrong path/bucket and upload-token download attempts are denied; unrelated
+  account POST/GET return 401 and Auth returns 403. Cancel blocks validation and
+  publication even if issued capability bytes arrive later. Expired reservations
+  cannot renew grants. Saved bytes and pointer remain intact.
+- Correction rounds used: 1 of 2 completed. No open code blockers or new optional
+  findings. O1 is addressed. The existing Next.js security advisory remains a
+  separate follow-up, not resolved by this task.
 
 ## Progress notes
+
+2026-11-26: Correction 1 technical review passed at `402bf77` with B1 fixed and no
+open code blockers. The revised signed-TUS contract and concrete rollout proposal
+were independently accepted. The reviewer target `cqzvbgbhximespqlqamd` and all
+implementation targets were deleted with absence confirmed. Development restore
+was requested successfully after the last independent probe. PR #72 remains draft
+and task 02 remains `in_progress`: applying migration
+`20261126160000_private_templates.sql`, private buckets, server credential and
+cleanup/verification to `lvqbrjybwstvdhaxyxyn` requires separate user authorization.
+No such persistent rollout or production change is claimed. Human acceptance and
+manual merge remain pending. Detailed checks and review history are preserved in
+the PR; final tracking changes receive documentation review.
 
 2026-11-26: Phase 2 initial independent review of PR #72 at `8cf9e85` found B1:
 the upload grant exposes the full account token rather than a file-scoped
