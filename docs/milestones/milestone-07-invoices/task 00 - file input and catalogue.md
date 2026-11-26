@@ -1,6 +1,6 @@
 # Task 00 — FileInput and catalogue
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -45,8 +45,7 @@ standard independent review/PR workflow when implementation is assigned.
 ## Progress notes
 
 2026-11-26: The user assigned implementation of this task under the project
-workflow. Implementation, independent review, human approval and manual merge
-are pending.
+workflow. Human approval and manual merge remain pending.
 
 2026-11-26: Implementation published in [draft PR #70](https://github.com/manromero/my-clinics/pull/70),
 head `487eff7cb92115a03f0d416da1cea469197645c2`. Implementer and independent
@@ -55,23 +54,34 @@ Independent code, desktop/mobile interaction and visual review found no product
 defects. Six inline captures were retrieved and verified by the coordinator.
 Detailed evidence and review limitations are preserved in the PR.
 
-Delivery remains blocked with status `in_progress`:
+Final validation and independent review at
+`0c7c30463d7508e2dcdfc04a583e31c449154441` resolved both blockers:
 
-- B01: fixed, independent re-review pending. With explicit user authorization,
+- B01: fixed and independently verified. With explicit user authorization,
   formatted S02/S05 reference HTML using project Prettier 3.9.10 (matching the
   lockfile). `pnpm format:check` now passes globally. The original failure was
   independently reproduced from the base commit; its original cause is unknown.
-- B02: actual native chooser cancellation is unverified. Automated chooser
-  opening/selection and empty completion retain selection, but empty completion
-  does not prove native cancellation. The reviewer's isolated headed Chrome
-  was found by native UI automation; selecting its window did not return and
-  the coordinator interrupted the attempt. No native dialog cancellation occurred.
-  A working native UI session or an explicit user decision on this validation
-  limitation is required before readiness.
+- B02: verified through Chrome's actual headless chooser cancellation path under
+  the user's headless-only constraint. Implementer and independent reviewer each
+  observed trusted `click` and `cancel` events after native keyboard activation,
+  with chooser interception and forced cancellation disabled. No empty-file
+  assignment or synthetic cancel event was used. Local selections were retained;
+  the reviewer also verified persisted-descriptor retention. The earlier empty
+  completion probe was insufficient and is superseded by these browser-generated
+  cancellation checks. A visible Windows dialog remains untested; no OS-dialog
+  cancellation result is claimed.
 
-Correction round 1 of 2 addresses B01; no application fixes were identified.
-Human acceptance and manual merge remain pending; do not merge this draft as a
-clean validated delivery.
+All required checks pass: lint, typecheck, global format check, production build
+and six meaningful shared-component tests. Independent desktop/mobile code,
+functional and visual review found no defects or optional suggestions. Captures
+use `chrome-screenshots`; detailed metadata, review history and limitations remain
+in [PR #70](https://github.com/manromero/my-clinics/pull/70).
+
+Correction rounds used: 2 of 2 (reference formatting, then headless cancellation
+validation). No application fixes were required after initial implementation.
+Ready for human review and manual merge after final tracking review; human
+approval and merge remain pending. Mobile uses emulation and drops use browser
+DataTransfer events; no physical-device or OS file-explorer test is claimed.
 
 ## Execution context
 
@@ -97,4 +107,4 @@ clean validated delivery.
 - Technical choices: implementer must verify native file input/drop capabilities
   against primary documentation, document rejection retention, and keep local File
   state distinct from persisted descriptors. These do not add product scope.
-- Open product questions: none. Correction rounds used: 0 of 2.
+- Open product questions: none. Correction rounds used: 2 of 2.

@@ -29,15 +29,15 @@ settings changes, and public deployment. Export extras do not extend scope.
 
 ## Task index and direct dependencies
 
-| Task                                                                                                | Status        | Direct dependencies                                                                |
-| --------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------- |
-| [00 — FileInput and catalogue](<task 00 - file input and catalogue.md>)                             | `in_progress` | Existing controls; independent                                                     |
-| [01 — Invoice route and form contracts](<task 01 - invoice route and form contracts.md>)            | `pending`     | Existing controls/authenticated shell; independent of 00                           |
-| [02 — Private template analysis and infrastructure](<task 02 - private template infrastructure.md>) | `pending`     | Existing clinics/authentication; independent of 01                                 |
-| [03 — Clinic template field and validation](<task 03 - clinic template field and validation.md>)    | `pending`     | 00 and independently reviewed 02 analysis/design contract, not hosted availability |
-| [04 — Clinic template persistence](<task 04 - clinic template persistence.md>)                      | `pending`     | 02 and 03                                                                          |
-| [05 — PDF fill and flatten engine](<task 05 - pdf fill and flatten engine.md>)                      | `pending`     | 01 validation contracts; 03 library/validator/fixtures                             |
-| [06 — Live preview and download integration](<task 06 - live preview and download integration.md>)  | `pending`     | 01, 04 and 05                                                                      |
+| Task                                                                                                | Status    | Direct dependencies                                                                |
+| --------------------------------------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------- |
+| [00 — FileInput and catalogue](<task 00 - file input and catalogue.md>)                             | `done`    | Existing controls; independent                                                     |
+| [01 — Invoice route and form contracts](<task 01 - invoice route and form contracts.md>)            | `pending` | Existing controls/authenticated shell; independent of 00                           |
+| [02 — Private template analysis and infrastructure](<task 02 - private template infrastructure.md>) | `pending` | Existing clinics/authentication; independent of 01                                 |
+| [03 — Clinic template field and validation](<task 03 - clinic template field and validation.md>)    | `pending` | 00 and independently reviewed 02 analysis/design contract, not hosted availability |
+| [04 — Clinic template persistence](<task 04 - clinic template persistence.md>)                      | `pending` | 02 and 03                                                                          |
+| [05 — PDF fill and flatten engine](<task 05 - pdf fill and flatten engine.md>)                      | `pending` | 01 validation contracts; 03 library/validator/fixtures                             |
+| [06 — Live preview and download integration](<task 06 - live preview and download integration.md>)  | `pending` | 01, 04 and 05                                                                      |
 
 Recommended order is numeric, 00 through 06. The table gives direct prerequisites,
 not blanket dependencies on every earlier task. Task 02 requires investigation,
@@ -95,12 +95,14 @@ checks remain blockers rather than inferred passes.
 2026-11-26: The user assigned task 00 for implementation under the project
 workflow. Its existing scope is approved for execution; other tasks remain pending.
 
-Task 00 implementation is in [draft PR #70](https://github.com/manromero/my-clinics/pull/70).
-Independent review found no product defects. The user authorized formatting S02/S05
-reference HTML with project Prettier 3.9.10; the global format check now passes,
-pending independent re-review. Actual native-dialog cancellation validation remains
-unavailable and prevents readiness. Task 00 remains `in_progress`; correction round
-1 of 2 addresses formatting only.
+Task 00 is complete in [PR #70](https://github.com/manromero/my-clinics/pull/70).
+Required checks and independent review pass with no product defects or open
+blockers. Reference HTML formatting was normalized with authorized project
+Prettier 3.9.10. Implementer and reviewer verified browser-generated trusted
+chooser cancellation in headless Chrome, retaining local and saved selections;
+visible OS dialogs remain untested under the user's headless-only constraint.
+Correction rounds used: 2 of 2. Task 00 is `done`; final tracking review, human
+acceptance and manual merge are recorded in the PR. Other tasks remain pending.
 
 2026-11-25: Prepared for direct documentation delivery, human acceptance pending.
 All implementation tasks remain pending. No implementation, hosted operations,
