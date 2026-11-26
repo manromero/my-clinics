@@ -1,0 +1,66 @@
+{
+  "date": "2026-11-26T15:02:53.440Z",
+  "node": "v24.14.0",
+  "results": [
+    {
+      "label": "pdf-below-boundary",
+      "bytes": 9999999,
+      "result": "valid",
+      "ms": 8
+    },
+    {
+      "label": "pdf-boundary",
+      "bytes": 10000000,
+      "result": "valid",
+      "ms": 8
+    },
+    {
+      "label": "pdf-oversize",
+      "bytes": 10000001,
+      "result": "too-large",
+      "ms": 0
+    },
+    {
+      "label": "pdf-missing",
+      "bytes": 5234,
+      "result": "invalid-or-missing-text-field",
+      "ms": 3
+    },
+    {
+      "label": "pdf-wrong-type",
+      "bytes": 6771,
+      "result": "invalid-or-missing-text-field",
+      "ms": 10
+    },
+    {
+      "label": "pdf-spoof",
+      "bytes": 9,
+      "result": "invalid-or-missing-text-field",
+      "ms": 1
+    },
+    {
+      "label": "encrypted_new.pdf",
+      "bytes": 19556,
+      "sha256": "a9b6d95fa1d4a18ba0a9da2fc1b58d9702582d4905006f94eaf7234d60233e8c",
+      "encryptionRejected": true
+    },
+    {
+      "label": "encrypted_old.pdf",
+      "bytes": 20038,
+      "sha256": "e114c47dbb70c0ce7f0fd5bf58dec35bd638a1a3388346f4e17625ffa724c641",
+      "encryptionRejected": true
+    },
+    {
+      "label": "multipart",
+      "fileBytes": 10000000,
+      "bodyBytes": 10000279
+    }
+  ],
+  "memory": {
+    "rss": 169861120,
+    "heapTotal": 33091584,
+    "heapUsed": 16182504,
+    "external": 94139926,
+    "arrayBuffers": 100494563
+  }
+}
