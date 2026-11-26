@@ -1,6 +1,6 @@
 # Task 01 — Invoice route and form contracts
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -49,12 +49,22 @@ and production-safe interim state. Capture S05/Alexandria evidence, disclosing f
 
 ## Progress notes
 
-2026-11-26: Reopened after the user requested removal of the full invoice form
-from the component catalogue. Remove `/components/invoices` and its specimen;
-retain the route-local form and existing test-only scenarios. Update PR #71 in
-place, preserving earlier review and evidence as historical. This user-requested
-change awaits implementation checks and independent re-review. No automatic
-correction rounds have been consumed (0 of 2).
+2026-11-26: Removed `/components/invoices` and its specimen at the user's request
+in PR #71. The route-local invoice form, contracts and test-only scenarios are
+unchanged. Independent re-review of
+`534233960271280fd228e9673543a7b8f7649373` passed with no blockers: lint, type
+checking, formatting, 41 invoice tests, production build on unchanged retry,
+diff checks and 40 local Markdown targets. Both agents verified the removed
+development route returns 404, the catalogue and TextInput specimen return 200,
+and the build manifest retains the actual invoice route without the specimen.
+Earlier reviews and all eight attachments remain historical evidence; removed
+specimen captures are superseded and optional finding O1 is retired. Existing
+Next.js advisory O2 remains a separate follow-up. No new visual captures were
+needed because production UI is unchanged. Automatic correction rounds used:
+0 of 2. Final tracking is included for administrative re-review; human acceptance
+and manual merge remain pending.
+
+### Initial implementation and review history
 
 2026-11-26: The user assigned this task under the project workflow, authorizing
 its existing scope for implementation.
