@@ -91,6 +91,13 @@ describe("template lifecycle recovery", () => {
       f.events.indexOf("DELETE"),
     );
   });
+  it("does not try to delete a file for a cancelled no-upload operation", async () => {
+    const f = fixture();
+    f.row.mode = "keep";
+    expect((await f.templates.cancel(requestId)).cleanupPending).toBe(false);
+    expect(f.events).not.toContain("claim_template_cleanup");
+    expect(f.fetcher).not.toHaveBeenCalled();
+  });
   it("returns the saved outcome and retries its affected deletion when Cancel arrives after Save", async () => {
     const f = fixture();
     f.rpc.mockImplementationOnce(() => ({

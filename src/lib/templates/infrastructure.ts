@@ -291,7 +291,9 @@ export function templateInfrastructure(
         };
       }
       const cleaned =
-        r.state !== "cancelled" || (await cleanup(ownerId, requestId));
+        r.state !== "cancelled" ||
+        r.mode !== "replace" ||
+        (await cleanup(ownerId, requestId));
       return { state: r.state, outcome: r.outcome, cleanupPending: !cleaned };
     },
     async validate(requestId: string) {
@@ -349,11 +351,13 @@ export function templateInfrastructure(
           error instanceof TemplateError &&
           ["PT409", "23505"].includes(error.code)
         ) {
-          await rpc("cancel_template_save", {
+          const cancelled = await rpc("cancel_template_save", {
             p_owner: ownerId,
             p_id: requestId,
-          }).catch(() => {});
-          await cleanup(ownerId, requestId);
+          })
+            .then(record)
+            .catch(() => null);
+          if (cancelled?.mode === "replace") await cleanup(ownerId, requestId);
         }
         // Unknown transport outcomes remain retryable with the same request ID.
         throw error;
