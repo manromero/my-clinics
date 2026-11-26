@@ -1,6 +1,6 @@
 # Task 02 — Private template infrastructure
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -97,7 +97,101 @@ transfer/boundary/ownership probes on an explicitly authorized synthetic target;
 record exact head, target, cleanup and redacted results. Research/local files/SQL
 role tests do not replace hosted setup and API checks. No UI screenshots required.
 
+## Execution context
+
+- Readiness: phase 1 research and authorized disposable probes may proceed. The
+  user authorized pausing development to release capacity, then deleting disposable
+  targets and restoring development after testing. The pause request returned HTTP
+  200 after verifying exact project identity; follow-up status was `PAUSING`.
+  Verify `INACTIVE` before provisioning. Never pause or modify production.
+- Branch: `feature/private-template-infrastructure`; base is `develop` commit
+  `22942979af63c2db5c7331fc9726c3a75d022f0d`.
+- Authorized synthetic scope: create/test/delete disposable projects in organization
+  `njnmfutclorywskqrftd`, including necessary Auth/Storage/API probe configuration.
+  Persistent rollout to development requires a separate concrete reviewed scope.
+- Required sequencing: investigate with substantive evidence, obtain independent
+  decision review, then implement the reviewed infrastructure. No architecture is
+  preselected. Both phases remain required for completion.
+- Relevant references: this task, milestone index, requirements invoice section,
+  `supabase/AGENTS.md`, `docs/supabase.md`, architecture, installed Next.js guides,
+  current official Supabase and deployment documentation, existing database runner,
+  catalog, upgrade checks and clinic ownership/save actions.
+- Verified tooling: Node 24.14.0, pnpm 11.25.0, Next.js 16.4.3, Supabase CLI 3.0.0.
+  Management API reads work with Node `--use-system-ca`; keep TLS verification on.
+  Local ignored validation credential files exist. Never expose their values.
+- Research lead, not a decision: current Vercel documentation describes a 20 MiB
+  inbound-body beta under specific compute/memory settings, alongside the default
+  4.5 MB limit. Verify applicability to the actual host before rejecting server
+  transfer. Next.js Server Actions default to 1 MB including multipart overhead.
+- Validation: task-specific proof, boundary and ownership checks plus generated
+  types, replay/parity/upgrade/type freshness and applicable application checks.
+  No UI screenshots are required. Do not use the paused development project for
+  signed-in checks; use disposable ordinary users for Storage API probes.
+- Phase 1 accepted by the independent reviewer at
+  `67fd610d804b1f453e385aa7801603c29d250996`, base as above. No blockers. See
+  `template-storage-decision.md` and its committed reproducible probe/results.
+  The reviewer independently reran local PDF/boundary checks, lint, formatting,
+  syntax, links and diff checks; inspected hosted evidence/source hash rather than
+  rerunning hosted probes. No application/schema/build/type validation is claimed
+  for the research-only phase.
+- Research targets `jvncfmriewhwyyjrpciu`, `etxkuazppylxohjbscya` and
+  `emvglsxducywzeyjwmvq` were deleted with inventory absence confirmed. Development
+  was restored and verified `ACTIVE_HEALTHY`. Expanded local PAT access was
+  verified without recording credentials. Repeat the authorized pause/restore
+  lifecycle only when disposable validation needs capacity.
+- Phase 2 implements the accepted quarantine/validated-buffer sealing/atomic
+  publication/server-authorized read contract and decimal 10 MB limit. It must
+  prove actual selected policies/lifecycle, not reuse model results as acceptance.
+- Optional O1: research SQL conflict assertions accept generic request rejection;
+  if reused for acceptance, require expected redacted SQLSTATE and winning state.
+  This is not a phase 1 blocker and does not extend scope independently.
+- Open items: phase 2 implementation, hosted validation, PR, independent final
+  review, and separately scoped development rollout authorization.
+- Correction rounds used: 0 of 2. Phase 1 decision review accepted with no blockers.
+
 ## Progress notes
+
+2026-11-26: Phase 1 investigation and independent decision review passed at
+`67fd610d804b1f453e385aa7801603c29d250996`. Actual 10 MB raw/multipart/TUS transfers,
+byte hashes, owner isolation, cache revocation limitations and server-read proof
+are recorded with precise limits. The reviewer accepted the proposed contract
+without blocking findings; optional O1 concerns diagnostics in the research SQL
+model. Phase 2 may begin; it must independently implement and validate production
+policies and lifecycle. All disposable research projects are absent and development
+is restored. The task remains `in_progress`, with no automatic correction rounds
+used. Persistent development rollout remains separately unauthorized.
+
+2026-11-26: The user authorized pausing `my-clinics_dev`
+(`lvqbrjybwstvdhaxyxyn`) to create the disposable project. Exact ref/name/organization
+were verified before requesting pause; the API returned HTTP 200. This supersedes
+the earlier capacity decision blocker, subject to successful pause/provisioning.
+The coordinator will restore development after disposable cleanup.
+
+2026-11-26 authorization follow-up: The user authorized creating a disposable
+project for this task, following the proposed create/test/delete scope. An actual
+Management API creation attempt for a randomly named `myclinics-validation-intake-`
+project in `njnmfutclorywskqrftd` returned HTTP 400, `entitlement_required` /
+`free_project_limit`: the account owner has reached the two-active-Free-project
+limit across organizations. No project was created and no cleanup was needed.
+The authorization blocker above is superseded; capacity remains blocked. Resolving
+capacity requires the user's decision to pause, remove or upgrade an existing
+project, or provide another eligible authorized environment. No existing project
+was changed. Shared-development rollout remains separately unauthorized.
+
+2026-11-26 intake: The user assigned this task. Readiness is blocked before
+implementation: task-specific authorization for disposable Auth/Storage/API probes
+is pending, and read-only Management API inspection found the Free organization
+`njnmfutclorywskqrftd` has two active projects: development
+`lvqbrjybwstvdhaxyxyn` and production `xihkrkgrhupiwcsfjctp`. The existing validation
+runner requires a free project slot. No existing project may be removed to obtain
+capacity; the user must resolve capacity or authorize a suitable alternative target.
+Shared-development rollout remains separately scoped and unauthorized for this task.
+No implementation branch, configuration, disposable project, migration, generated
+types, proof results or independent decision review is claimed. Correction count: 0.
+The task remains `pending` at intake. Repository and official-source inspection
+began; no architecture has been selected. Node Management API reads succeeded using
+the Windows system certificate trust store (`--use-system-ca`), with TLS verification
+enabled; the initial CLI inventory attempt failed at transport level.
 
 Planning only. Byte convention, API decisions, target permission and hosted results
 remain implementation-intake work; none is claimed. Human acceptance is pending.
