@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash, randomUUID } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, readdir, writeFile } from "node:fs/promises";
 import { execFile, spawn } from "node:child_process";
 import { promisify } from "node:util";
 import { createClient } from "@supabase/supabase-js";
@@ -182,6 +182,167 @@ export async function templateStorageTests({
       ).error,
     );
     let revision = "2";
+    async function productionProof(currentRevision, proofBytes) {
+      assert.ok(
+        publishable?.startsWith("sb_publishable_"),
+        "Disposable publishable key required for production SSR proof",
+      );
+      proofBytes ??= await templateFixture(10000000);
+      const nextInput = {
+        requestId: randomUUID(),
+        clinicId,
+        revision: currentRevision,
+        name: "Production streaming template",
+        percentage: 25,
+        active: false,
+        mode: "replace",
+        sha256: hash(proofBytes),
+        bytes: proofBytes.length,
+      };
+      const nextBegin = await a.templates.begin(nextInput);
+      assert.ifError(
+        (
+          await a.client.storage
+            .from(templateBuckets[0])
+            .upload(nextBegin.uploadPath, proofBytes, {
+              contentType: "application/pdf",
+            })
+        ).error,
+      );
+      await a.templates.validate(nextInput.requestId);
+      const nextSaved = await a.templates.commit(nextInput.requestId);
+      async function cookiesFor(user) {
+        const jar = [];
+        const ssr = createServerClient(url, publishable, {
+          cookies: {
+            getAll: () => jar,
+            setAll: (values) => {
+              for (const c of values) {
+                const index = jar.findIndex((x) => x.name === c.name);
+                if (index < 0) jar.push(c);
+                else jar[index] = c;
+              }
+            },
+          },
+        });
+        assert.ifError(
+          (
+            await ssr.auth.setSession({
+              access_token: user.session.access_token,
+              refresh_token: user.session.refresh_token,
+            })
+          ).error,
+        );
+        return jar.map((c) => `${c.name}=${c.value}`).join("; ");
+      }
+      const cookie = await cookiesFor(a),
+        foreignCookie = await cookiesFor(b);
+      const env = {
+        ...process.env,
+        NEXT_PUBLIC_SUPABASE_URL: url,
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: publishable,
+        SUPABASE_TEMPLATE_SECRET_KEY: secret,
+      };
+      delete env.SUPABASE_ACCESS_TOKEN;
+      const build = () =>
+        promisify(execFile)(
+          process.execPath,
+          ["node_modules/next/dist/bin/next", "build"],
+          { env, maxBuffer: 2000000 },
+        );
+      try {
+        await build();
+      } catch (error) {
+        if (String(error.stderr).includes("SecurityFatalError")) {
+          console.log(
+            "Existing Next security advisory: retrying identical build once; upgrade remains separate scope",
+          );
+          await build();
+        } else {
+          let diagnostic = String(error.stderr ?? error.message);
+          for (const value of [secret, anon, publishable])
+            diagnostic = diagnostic.replaceAll(value, "[redacted]");
+          console.error(diagnostic.slice(0, 2500));
+          throw new Error("Production build failed; see redacted diagnostic");
+        }
+      }
+      const clientFiles = async (folder) =>
+        (
+          await Promise.all(
+            (await readdir(folder, { withFileTypes: true })).map((item) =>
+              item.isDirectory()
+                ? clientFiles(`${folder}/${item.name}`)
+                : [`${folder}/${item.name}`],
+            ),
+          )
+        ).flat();
+      for (const file of (await clientFiles(".next/static")).filter((file) =>
+        file.endsWith(".js"),
+      ))
+        assert.ok(
+          !(await readFile(file)).includes(Buffer.from(secret)),
+          "Service credential in client build",
+        );
+      app = spawn(
+        process.execPath,
+        [
+          "node_modules/next/dist/bin/next",
+          "start",
+          "--hostname",
+          "127.0.0.1",
+          "--port",
+          "3217",
+        ],
+        { env, stdio: "ignore", windowsHide: true },
+      );
+      let ready = false;
+      for (let i = 0; i < 60; i++) {
+        try {
+          await fetch("http://127.0.0.1:3217/login");
+          ready = true;
+          break;
+        } catch {
+          await new Promise((r) => setTimeout(r, 500));
+        }
+      }
+      assert.ok(ready);
+      const route = `http://127.0.0.1:3217/api/clinic-templates/${clinicId}/${nextInput.requestId}`;
+      assert.equal((await fetch(route)).status, 401);
+      assert.equal(
+        (await fetch(route, { headers: { Cookie: foreignCookie } })).status,
+        404,
+      );
+      const response = await fetch(route, { headers: { Cookie: cookie } });
+      assert.equal(response.status, 200);
+      assert.equal(response.headers.get("cache-control"), "private, no-store");
+      assert.equal(
+        hash(new Uint8Array(await response.arrayBuffer())),
+        hash(proofBytes),
+      );
+      const remove = {
+        requestId: randomUUID(),
+        clinicId,
+        revision: nextSaved.revision,
+        name: "Removed production template",
+        percentage: 25,
+        active: false,
+        mode: "remove",
+      };
+      await a.templates.begin(remove);
+      await a.templates.commit(remove.requestId);
+      assert.equal(
+        (await fetch(route, { headers: { Cookie: cookie } })).status,
+        404,
+      );
+      checked(
+        "actual Next production route:10MB/hash,no-store,anonymous401,cross-owner404,removed404;no service credential in client assets",
+      );
+    }
+    if (process.argv.includes("--production-only")) {
+      await productionProof(revision);
+      result.passed = true;
+      return result;
+    }
     if (process.argv.includes("--cleanup-only")) {
       const data = await templateFixture();
       const id = randomUUID();
@@ -947,107 +1108,7 @@ export async function templateStorageTests({
       "removal revokes new reads, retired cleanup preserves idempotency outcome",
     );
 
-    // Actual Next production route uses the same verified SSR session and service module.
-    if (production) {
-      assert.ok(
-        publishable?.startsWith("sb_publishable_"),
-        "Disposable publishable key required for production SSR proof",
-      );
-      const nextInput = input({
-          revision,
-          name: "Production streaming template",
-        }),
-        nextBegin = await a.templates.begin(nextInput);
-      assert.ifError(
-        (
-          await a.client.storage
-            .from(templateBuckets[0])
-            .upload(nextBegin.uploadPath, bytes, {
-              contentType: "application/pdf",
-            })
-        ).error,
-      );
-      await a.templates.validate(nextInput.requestId);
-      const nextSaved = await a.templates.commit(nextInput.requestId);
-      const jar = [];
-      const ssr = createServerClient(url, publishable, {
-        cookies: {
-          getAll: () => jar,
-          setAll: (values) => {
-            for (const c of values) {
-              const i = jar.findIndex((x) => x.name === c.name);
-              if (i < 0) jar.push(c);
-              else jar[i] = c;
-            }
-          },
-        },
-      });
-      assert.ifError(
-        (
-          await ssr.auth.setSession({
-            access_token: a.session.access_token,
-            refresh_token: a.session.refresh_token,
-          })
-        ).error,
-      );
-      const env = {
-        ...process.env,
-        NEXT_PUBLIC_SUPABASE_URL: url,
-        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: publishable,
-        SUPABASE_TEMPLATE_SECRET_KEY: secret,
-      };
-      await promisify(execFile)(
-        process.execPath,
-        ["node_modules/next/dist/bin/next", "build"],
-        { env, maxBuffer: 2000000 },
-      );
-      app = spawn(
-        process.execPath,
-        [
-          "node_modules/next/dist/bin/next",
-          "start",
-          "--hostname",
-          "127.0.0.1",
-          "--port",
-          "3217",
-        ],
-        { env, stdio: "ignore", windowsHide: true },
-      );
-      let reachable = false;
-      for (let i = 0; i < 60; i++) {
-        try {
-          await fetch("http://127.0.0.1:3217/login");
-          reachable = true;
-          break;
-        } catch {
-          await new Promise((r) => setTimeout(r, 500));
-        }
-      }
-      assert.ok(reachable);
-      const route = `http://127.0.0.1:3217/api/clinic-templates/${clinicId}/${nextInput.requestId}`;
-      const anonymousRead = await fetch(route);
-      assert.equal(anonymousRead.status, 401);
-      const cookie = jar.map((c) => `${c.name}=${c.value}`).join("; ");
-      const response = await fetch(route, { headers: { Cookie: cookie } });
-      assert.equal(response.status, 200);
-      assert.equal(response.headers.get("cache-control"), "private, no-store");
-      assert.equal(hash(new Uint8Array(await response.arrayBuffer())), sha);
-      const remove = input({
-        revision: nextSaved.revision,
-        mode: "remove",
-        sha256: undefined,
-        bytes: undefined,
-      });
-      await a.templates.begin(remove);
-      await a.templates.commit(remove.requestId);
-      assert.equal(
-        (await fetch(route, { headers: { Cookie: cookie } })).status,
-        404,
-      );
-      checked(
-        "actual next build/start Node streaming route transfers10MB, anonymous401 and removed template404",
-      );
-    }
+    if (production) await productionProof(revision, bytes);
     result.passed = true;
   } finally {
     app?.kill();
