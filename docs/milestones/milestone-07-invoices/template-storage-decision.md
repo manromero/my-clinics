@@ -88,13 +88,13 @@ All links were consulted on 2026-11-26; hosted documentation can change.
 All credible variants need a trusted validator, a single database commit, and
 garbage collection. Moving the upload alone does not solve those problems.
 
-| Variant                                                                                                                 | Transfer and validation                                                                                                                                                                                                                                                                                                                | Save, identity, access and cleanup                                                                                                                                                                                                                                                                | Assessment                                                                                                                                                                                                                               |
-| ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A. Application server receives file, validates, writes a new private object, commits clinic/metadata                    | One browser upload; Node validator sees submitted bytes directly. Requires verified Vercel beta eligibility/settings or another explicitly chosen host. An action additionally needs a raw-body override; a Node Route Handler avoids that action-specific limit but not Vercel's limit. Streamed download needed for 10 MB responses. | Immutable final keys, transactional pointer swap, version check, and post-commit garbage collection. Can use server-authorized reads and keep all Storage writes private to server. Failed DB save leaves one orphan.                                                                             | Strong simplicity and fewer prevalidation steps; weak interrupted-upload recovery. **Conditional viable contender**, not disproved by obsolete limits. Host gate currently unproven; paid-plan dependence cannot be silently introduced. |
-| B. Authenticated direct standard upload to private quarantine; server validates downloaded bytes and writes sealed copy | Avoids application ingress cap; 10 MB falls within Storage's supported range. A failed network upload restarts the file. Validator downloads at most limit+1 bytes, then writes precisely the validated buffer to sealed Storage.                                                                                                      | Reservation binds owner and random path. Nothing in quarantine is client-readable or usable. DB commit binds sealed version to clinic. Orphans from upload, validation or failed save require collection. Server-authorized read avoids signed download lifetime and CDN authorization ambiguity. | Adequate simplicity; mobile retry weaker than C. Supported fallback, not ruled out for size. Actual hosted transfer unproven pending access.                                                                                             |
-| C. Authenticated direct TUS upload to quarantine; same validator/sealed/transaction/read lifecycle                      | Avoids application ingress cap and resumes from the completed chunk. Adds TUS client/protocol work and small control requests. Uses user access token, no upsert, fixed chunks, no user-readable quarantine.                                                                                                                           | Same atomic save as B. Sealed copy protects against delayed upload completion, replayed capabilities or changes to quarantine during validation. Fresh immutable version is the preview/download identity. Cleanup handles abandoned TUS and sealed orphans.                                      | **Provisional recommendation** for mobile resilience without requiring a paid hosting feature. More operational/code complexity than A/B; hosted protocol and security gates remain unproven.                                            |
-| D. Server issues signed direct standard/TUS upload capability; same sealing/commit                                      | Avoids application ingress cap and can avoid browser token plumbing. Token path-bound but transferable, and may survive sign-out/cancel. Two-hour lifetime requires cleanup grace and replay-resistant publication.                                                                                                                    | Server reservation, sealed copy and final commit still necessary. No client-read permission in quarantine. Revoking reservation prevents publication, not necessarily continued token upload.                                                                                                     | Viable where external upload delegation is needed; this app already has Auth. Added capability lifetime provides no confirmed product benefit over C.                                                                                    |
-| E. Supabase Edge Function receives/validates file; final transaction and private read                                   | Avoids Vercel ingress but adds another deploy/runtime/secret boundary. Edge CPU/memory budgets require representative parser stress tests; 10 MB compressed PDF can expand well beyond 10 MB.                                                                                                                                          | Same immutable object and DB transaction; same collector. User verification must happen in function, and service credentials must never authorize a forged clinic.                                                                                                                                | Plausible alternative, **unproven** runtime limits. No evidence to justify adding a second application runtime now.                                                                                                                      |
+| Variant                                                                                                                 | Transfer and validation                                                                                                                                                                                                                                                                                                                | Save, identity, access and cleanup                                                                                                                                                                                                                                                                | Assessment                                                                                                                                                                                                                                                  |
+| ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A. Application server receives file, validates, writes a new private object, commits clinic/metadata                    | One browser upload; Node validator sees submitted bytes directly. Requires verified Vercel beta eligibility/settings or another explicitly chosen host. An action additionally needs a raw-body override; a Node Route Handler avoids that action-specific limit but not Vercel's limit. Streamed download needed for 10 MB responses. | Immutable final keys, transactional pointer swap, version check, and post-commit garbage collection. Can use server-authorized reads and keep all Storage writes private to server. Failed DB save leaves one orphan.                                                                             | Strong simplicity and fewer prevalidation steps; weak interrupted-upload recovery. **Conditional viable contender**, not disproved by obsolete limits. Host gate currently unproven; paid-plan dependence cannot be silently introduced.                    |
+| B. Authenticated direct standard upload to private quarantine; server validates downloaded bytes and writes sealed copy | Avoids application ingress cap; 10 MB falls within Storage's supported range. A failed network upload restarts the file. Validator downloads at most limit+1 bytes, then writes precisely the validated buffer to sealed Storage.                                                                                                      | Reservation binds owner and random path. Nothing in quarantine is client-readable or usable. DB commit binds sealed version to clinic. Orphans from upload, validation or failed save require collection. Server-authorized read avoids signed download lifetime and CDN authorization ambiguity. | Adequate simplicity; mobile retry weaker than C. Supported fallback, not ruled out for size. Hosted raw and multipart boundary transfers passed.                                                                                                            |
+| C. Authenticated direct TUS upload to quarantine; same validator/sealed/transaction/read lifecycle                      | Avoids application ingress cap and resumes from the completed chunk. Adds TUS client/protocol work and small control requests. Uses user access token, no upsert, fixed chunks, no user-readable quarantine.                                                                                                                           | Same atomic save as B. Sealed copy protects against delayed upload completion, replayed capabilities or changes to quarantine during validation. Fresh immutable version is the preview/download identity. Cleanup handles abandoned TUS and sealed orphans.                                      | **Provisional recommendation** for mobile resilience without requiring a paid hosting feature. More operational/code complexity than A/B; hosted transfer/resume and read-boundary mechanisms proved; final policy/lifecycle validation belongs to phase 2. |
+| D. Server issues signed direct standard/TUS upload capability; same sealing/commit                                      | Avoids application ingress cap and can avoid browser token plumbing. Token path-bound but transferable, and may survive sign-out/cancel. Two-hour lifetime requires cleanup grace and replay-resistant publication.                                                                                                                    | Server reservation, sealed copy and final commit still necessary. No client-read permission in quarantine. Revoking reservation prevents publication, not necessarily continued token upload.                                                                                                     | Viable where external upload delegation is needed; this app already has Auth. Added capability lifetime provides no confirmed product benefit over C.                                                                                                       |
+| E. Supabase Edge Function receives/validates file; final transaction and private read                                   | Avoids Vercel ingress but adds another deploy/runtime/secret boundary. Edge CPU/memory budgets require representative parser stress tests; 10 MB compressed PDF can expand well beyond 10 MB.                                                                                                                                          | Same immutable object and DB transaction; same collector. User verification must happen in function, and service credentials must never authorize a forged clinic.                                                                                                                                | Plausible alternative, **unproven** runtime limits. No evidence to justify adding a second application runtime now.                                                                                                                                         |
 
 Rejected shortcuts: browser-only validation (a direct caller bypasses it), MIME-only
 validation (not byte validation), overwriting the current path before database
@@ -258,30 +258,100 @@ rendering. The multipart result does not cover React action metadata, long names
 or other form fields. A future server-file route must use an explicit total-body
 ceiling with overhead allowance and independently enforce the file byte limit.
 
-### Hosted lifecycle — cleanup passed; Storage proof blocked
+### Hosted lifecycle — completed research proof; all targets deleted
 
 The first run created `myclinics-validation-template-c9de80194a`, ref
 `jvncfmriewhwyyjrpciu`, EU Central, after verifying development was `INACTIVE`.
 It reached healthy state and disabled its Data API. Fetching API keys returned
-HTTP 403. The existing token lacks API Keys access by design. The finalizer deleted
+HTTP 403. The original token lacked API Keys access by design. The finalizer deleted
 this exact target and the organization inventory confirmed it absent.
 [Actual failed-run evidence](template-storage-probe-jvncfmriewhwyyjrpciu-results.json).
 
-**Unperformed:** actual standard/TUS boundary transfers, resumed chunk/hash check,
-two-user/anonymous byte access, signed capability lifetime, MIME spoof acceptance
-by Storage, and SQL transaction/concurrency model. Their assertions exist in the
-probe but code existence is not an executed result. No configured infrastructure
-or security acceptance is claimed from this failed run.
-
-The exact required access is API Keys **Read** plus API Key Secrets **Read** on
-the existing organization-scoped validation PAT, preserving its current scopes.
+The user then updated the scoped PAT with API Keys **Read** and API Key Secrets
+**Read**, preserving its existing permissions.
 Current [key documentation](https://supabase.com/docs/guides/getting-started/api-keys)
 requires both permissions for `GET /v1/projects/{ref}/api-keys?reveal=true`.
-Keys are needed only inside the process to create ordinary synthetic Auth users
-and call the Storage API. Do not obtain them by bypassing the token boundary via
-database secret extraction. The coordinator requested this access and restored
-development while it is pending. Pause/provision/test/delete/restore may resume
-under the already authorized disposable lifecycle when access is ready.
+Revealed keys stayed only inside the process for synthetic Auth/Storage requests;
+no credential values were emitted or committed.
+
+The next run used `etxkuazppylxohjbscya`,
+`myclinics-validation-template-69ef6c12a5`. Most probes passed, but the final research
+assertion incorrectly expected an immediate failed download after successful
+privileged object deletion. Cached bytes were still readable. The run exited 1
+and deleted the target, with absence confirmed in organization inventory.
+[Preserved failed research assertion](template-storage-probe-etxkuazppylxohjbscya-results.json).
+This was evidence against the assumed revocation mechanism, not an access failure.
+The probe was corrected to distinguish API deletion/list absence from a cached
+download, and to measure the proposed server read boundary.
+
+The final run used `emvglsxducywzeyjwmvq`,
+`myclinics-validation-template-a8464ffa37`, EU Central, Node 24.14.0,
+Supabase JS 2.119.0 and research PDF-LIB 1.17.1. It exited 0 and deleted the target;
+organization inventory confirmed absence. Development was verified `INACTIVE`
+before each creation; production was never a write target. The Data API remained
+disabled throughout. [Complete final evidence](template-storage-probe-emvglsxducywzeyjwmvq-results.json)
+records the exact probe SHA-256 and versions; earlier failed runs are retained
+separately.
+The coordinator restores development after receiving cleanup confirmation.
+
+| Final hosted check                                                      | Actual result                                                                                                       |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Standard raw 10,000,000-byte upload                                     | Passed; 1,102 ms                                                                                                    |
+| SDK Blob/multipart 10,000,000-byte upload                               | Passed; 933 ms                                                                                                      |
+| Second ordinary owner's 9,999,999-byte upload                           | Passed                                                                                                              |
+| 10,000,001-byte standard upload                                         | Rejected with 413                                                                                                   |
+| Duplicate path without upsert                                           | Rejected with 409                                                                                                   |
+| Owner/cross-owner/anonymous quarantine reads                            | All denied, 404                                                                                                     |
+| Cross-owner/anonymous quarantine writes                                 | Denied, 403                                                                                                         |
+| Arbitrary bytes declaring `application/pdf`                             | Storage accepted them; confirms authoritative byte parsing is necessary                                             |
+| TUS 10 MB, recover offset after first chunk                             | Passed; recovered 6,291,456-byte offset; final SHA-256 matched; 2,973 ms including privileged verification download |
+| Signed upload with anonymous client and valid token                     | Passed; token is a bearer capability                                                                                |
+| Same signed token used for another owner's path                         | Denied, 400                                                                                                         |
+| Download quarantine buffer, parse, upload exact buffer to sealed bucket | Passed; byte count and hash recorded                                                                                |
+| Direct ordinary client insert/update in sealed bucket                   | Denied, 403                                                                                                         |
+| Experimental owner-readable sealed object                               | Owner read passed; other owner and anonymous denied, 404                                                            |
+| SQL model unique-name save failure                                      | Clinic fields/version/template all preserved                                                                        |
+| Two concurrent SQL model saves with same expected version               | Exactly one success and one conflict                                                                                |
+| Server read PoC, owner/cross-owner/anonymous                            | 200 with 10 MB and matching hash / 404 / 401                                                                        |
+| Server read PoC after current association revoked                       | 404                                                                                                                 |
+| Fresh sealed object after experimental client SELECT policy removed     | Direct owner Storage download denied; authorized server stream passed and hash matched                              |
+| Privileged Storage deletion                                             | API succeeded; object absent from privileged list; earlier authenticated download still returned cached bytes       |
+
+The direct read comparison is material. The initial response had
+`Cache-Control: private, max-age=0, must-revalidate` and `cf-cache-status: HIT`.
+After SQL set the association to `current=false` and a separate SQL read confirmed
+that value, the same authenticated URL still returned 200/CF HIT. A fresh
+`cacheNonce` URL returned 400/CF BYPASS, while the server's current-association
+check returned 404. The signed download URL, issued with a 60-second TTL, also
+returned 200 after association revocation. Following API deletion and confirmed
+list absence, the old authenticated URL again returned 200/CF HIT. These are
+new HTTP requests, not re-use of an already acquired in-memory PDF. We did not
+measure the total cache-retention window or wait for signed expiry, and infer no
+arbitrary duration from these observations. `Age` and `x-cache` headers were absent;
+ETags are preserved in redacted results. No token or signed URL is recorded.
+
+The successful streaming proof ran a temporary Node HTTP server bound to loopback.
+Each request independently verified its bearer token with Supabase Auth, selected
+the current owner association through Management API SQL, and only then fetched
+and streamed Storage bytes using the process-only service key. Responses carried
+`private, no-store`. It also proved the server could read a fresh sealed object
+with no client SELECT policy. The server closed in `finally`. This tests the
+mechanism, not the final Next.js route, cookie auth integration, production
+deployment, immediate session invalidation, or a browser/mobile interaction.
+
+Remaining phase 2 checks include exact reservation/clinic/owner policies, inactive
+clinic behavior, metadata HTTP authorization, path/clinic forgery, the real
+combined-save/idempotency transaction, upload expiry and collector/publisher races,
+and production-host streaming. The SQL model proves atomic update/conflict
+feasibility; it does not implement full Save/Cancel or uncertain-response recovery.
+The delete-attempt probes checked that original bytes were still returned through
+privileged downloads; cached delivery means they alone do not prove underlying
+object preservation. Phase 2 must additionally verify privileged listing/state
+after each denied delete. TUS resumed from a complete chunk via HEAD; we did not
+kill a TCP connection mid-chunk or run a real mobile browser. No TUS over-limit
+transfer was tested; the selected bucket limit must also be verified through TUS
+during implementation. No persistent infrastructure or final security acceptance
+is claimed from these disposable research policies.
 
 ### Performance and cost reasoning — estimates, not measurements
 
@@ -334,8 +404,10 @@ implement the recommended reservation/streaming-read policies.
 
 Phase 1 checks actually executed: local probe (passed), `node --check` on the
 probe (passed), `pnpm exec eslint` on the probe (passed), `pnpm lint` (passed),
-`pnpm format:check` (passed), and resolution of all four local Markdown file links
-(passed). Sandboxed pnpm initially failed to reach Corepack's registry; repeating
+`pnpm format:check` (passed), and resolution of all six local Markdown file links
+(passed). The final hosted probe completed successfully and its recorded SHA-256
+matches the delivered probe source. Sandboxed pnpm initially failed to reach
+Corepack's registry; repeating
 with authorized external tooling and system certificate trust succeeded. No
 application/build/schema/type change is included: `pnpm typecheck`, `pnpm build`,
 `pnpm db:types`, `pnpm db:validate`, and `pnpm db:test-tooling` were not performed
@@ -343,9 +415,10 @@ for this research-only delivery. Phase 2 still requires its specified checks.
 Use `--local --verify` to rerun local assertions without overwriting the original
 timing evidence; `--setup-fixtures` verifies pinned fixture SHA-256 values.
 
-Before decision acceptance: complete hosted critical-assumption probes, challenge
-the two-bucket/streaming-read cost against simpler alternatives, and independently
-review this proposal. Vercel settings may remain unavailable if the chosen design
+Before decision acceptance: independently challenge the completed hosted proofs and
+the two-bucket/streaming-read cost against simpler alternatives, then review the
+proposed contract and its stated implementation-stage validation gaps. Vercel
+settings may remain unavailable if the chosen design
 does not rely on the beta, but must remain an explicit limitation on alternative A.
 No configuration starts before that review. Phase 2 must implement/replay/parity
 check the selected schema, generate types, verify all real Storage operations and

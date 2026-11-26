@@ -3,6 +3,10 @@ import assert from "node:assert/strict";
 import { randomBytes, createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
+import { createServer } from "node:http";
+import { once } from "node:events";
+import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import { createClient } from "@supabase/supabase-js";
 
 const require = createRequire(import.meta.url);
@@ -36,6 +40,24 @@ async function api(path, method = "GET", body) {
   return r.status === 204 ? null : r.json();
 }
 const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
+const cacheHeaders = (response) =>
+  Object.fromEntries(
+    ["cache-control", "cf-cache-status", "age", "x-cache", "etag"].map(
+      (name) => [name, response.headers.get(name)],
+    ),
+  );
+evidence.probeSha256 = sha(await readFile(new URL(import.meta.url)));
+evidence.supabaseJs = JSON.parse(
+  await readFile(
+    new URL(
+      "../../../node_modules/@supabase/supabase-js/package.json",
+      import.meta.url,
+    ),
+    "utf8",
+  ),
+).version;
+evidence.pdfLib =
+  require("../../../.env.template-research/node_modules/pdf-lib/package.json").version;
 const encryptedFixtures = {
   "encrypted_new.pdf":
     "a9b6d95fa1d4a18ba0a9da2fc1b58d9702582d4905006f94eaf7234d60233e8c",
@@ -171,6 +193,7 @@ if (process.argv.includes("--local")) {
   process.exit(0);
 }
 let ref;
+let researchServer;
 const name = `myclinics-validation-template-${randomBytes(5).toString("hex")}`;
 try {
   assert.equal(
@@ -310,6 +333,37 @@ try {
     ms: Math.round(performance.now() - start),
     bytes: bytes.length,
   });
+  const multipartStart = performance.now();
+  const multipartUpload = await a.c.storage
+    .from("research-stage")
+    .upload(
+      `${a.id}/multipart.pdf`,
+      new Blob([bytes], { type: "application/pdf" }),
+      { contentType: "application/pdf", upsert: false },
+    );
+  assert.ifError(multipartUpload.error);
+  record("standard-multipart-10MB", {
+    bytes: bytes.length,
+    ms: Math.round(performance.now() - multipartStart),
+  });
+  const bUpload = await b.c.storage
+    .from("research-stage")
+    .upload(`${b.id}/boundary-minus-one.pdf`, await pdf(9999999), {
+      contentType: "application/pdf",
+    });
+  assert.ifError(bUpload.error);
+  record("second-owner-below-boundary", { bytes: 9999999, allowed: true });
+  const duplicate = await a.c.storage
+    .from("research-stage")
+    .upload(path, Buffer.from("changed"), {
+      contentType: "application/pdf",
+      upsert: false,
+    });
+  assert.ok(duplicate.error);
+  record("duplicate-path", {
+    denied: true,
+    status: duplicate.error.statusCode,
+  });
   const over = await a.c.storage
     .from("research-stage")
     .upload(`${a.id}/oversize.pdf`, await pdf(10000001), {
@@ -407,6 +461,8 @@ try {
     sha(new Uint8Array(await downloaded.data.arrayBuffer())),
     sha(bytes),
   );
+  const validatedBuffer = new Uint8Array(await downloaded.data.arrayBuffer());
+  assert.equal(await validate(validatedBuffer), "valid");
   record("tus-resume-10MB", {
     ms: Math.round(performance.now() - start),
     offset: chunk,
@@ -423,15 +479,39 @@ try {
     });
   assert.ifError(signedUpload.error);
   record("signed-upload-bearer", { anonymousWithToken: true });
+  const signedForgery = await anonymous.storage
+    .from("research-stage")
+    .uploadToSignedUrl(`${b.id}/forged-signed.pdf`, signed.data.token, bytes, {
+      contentType: "application/pdf",
+    });
+  assert.ok(signedForgery.error);
+  record("signed-upload-path-forgery", {
+    denied: true,
+    status: signedForgery.error.statusCode,
+  });
   const finalPath = `${a.id}/immutable.pdf`;
   const final = await admin.storage
     .from("research-ready")
-    .upload(finalPath, bytes, {
+    .upload(finalPath, validatedBuffer, {
       contentType: "application/pdf",
       cacheControl: "0",
       upsert: false,
     });
   assert.ifError(final.error);
+  record("sealed-validated-buffer", {
+    bytes: validatedBuffer.length,
+    sha256: sha(validatedBuffer),
+  });
+  const directFinal = await a.c.storage
+    .from("research-ready")
+    .upload(`${a.id}/forged-final.pdf`, bytes, {
+      contentType: "application/pdf",
+    });
+  assert.ok(directFinal.error);
+  record("client-sealed-insert", {
+    denied: true,
+    status: directFinal.error.statusCode,
+  });
   await sql(
     `insert into research.binding(path,owner) values ('${finalPath}','${a.id}');`,
   );
@@ -457,9 +537,69 @@ try {
   );
   record("authenticated-cache", {
     status: raw.status,
-    cacheControl: raw.headers.get("cache-control"),
+    headers: cacheHeaders(raw),
   });
   await raw.arrayBuffer();
+  // Research-only loopback streaming boundary; never installs an app route.
+  researchServer = createServer(async (req, res) => {
+    try {
+      res.setHeader("Cache-Control", "private, no-store");
+      const bearer = req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];
+      if (!bearer) {
+        res.writeHead(401).end();
+        return;
+      }
+      const identity = await admin.auth.getUser(bearer);
+      const owner = identity.data.user?.id;
+      if (identity.error || !owner || !/^[-a-f0-9]{36}$/.test(owner)) {
+        res.writeHead(401).end();
+        return;
+      }
+      const rows = await sql(
+        `select path from research.binding where owner='${owner}' and current=true`,
+      );
+      if (rows.length !== 1) {
+        res.writeHead(404).end();
+        return;
+      }
+      const upstream = await fetch(
+        `${url}/storage/v1/object/authenticated/research-ready/${rows[0].path}`,
+        {
+          headers: { apikey: adminKey, Authorization: `Bearer ${adminKey}` },
+          cache: "no-store",
+        },
+      );
+      if (!upstream.ok) {
+        res.writeHead(502).end();
+        return;
+      }
+      res.writeHead(200, { "Content-Type": "application/pdf" });
+      await pipeline(Readable.fromWeb(upstream.body), res);
+    } catch {
+      if (!res.headersSent) res.writeHead(500);
+      res.end();
+    }
+  });
+  researchServer.listen(0, "127.0.0.1");
+  await once(researchServer, "listening");
+  const streamingUrl = `http://127.0.0.1:${researchServer.address().port}/template`;
+  for (const [label, token, expected] of [
+    ["owner", a.token, 200],
+    ["cross", b.token, 404],
+    ["anonymous", null, 401],
+  ]) {
+    const streamed = await fetch(streamingUrl, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    assert.equal(streamed.status, expected);
+    const data = new Uint8Array(await streamed.arrayBuffer());
+    if (expected === 200) assert.equal(sha(data), sha(bytes));
+    record(`streaming-${label}`, {
+      status: streamed.status,
+      bytes: data.length,
+      cacheControl: streamed.headers.get("cache-control"),
+    });
+  }
   const downloadUrl = await a.c.storage
     .from("research-ready")
     .createSignedUrl(finalPath, 60);
@@ -468,12 +608,38 @@ try {
     `update research.binding set current=false where path='${finalPath}';`,
   );
   const revoked = await a.c.storage.from("research-ready").download(finalPath);
-  assert.ok(revoked.error);
+  assert.deepEqual(
+    await sql(`select current from research.binding where path='${finalPath}'`),
+    [{ current: false }],
+  );
+  const revokedRaw = await fetch(
+    `${url}/storage/v1/object/authenticated/research-ready/${finalPath}`,
+    { headers: { apikey: anonKey, Authorization: `Bearer ${a.token}` } },
+  );
+  const revokedFresh = await fetch(
+    `${url}/storage/v1/object/authenticated/research-ready/${finalPath}?cacheNonce=${randomBytes(8).toString("hex")}`,
+    { headers: { apikey: anonKey, Authorization: `Bearer ${a.token}` } },
+  );
+  record("revoked-direct-cache", {
+    sameUrlStatus: revokedRaw.status,
+    sameUrlHeaders: cacheHeaders(revokedRaw),
+    freshNonceStatus: revokedFresh.status,
+    freshNonceHeaders: cacheHeaders(revokedFresh),
+  });
+  await revokedRaw.arrayBuffer();
+  await revokedFresh.arrayBuffer();
+  const revokedStream = await fetch(streamingUrl, {
+    headers: { Authorization: `Bearer ${a.token}` },
+  });
+  assert.equal(revokedStream.status, 404);
+  await revokedStream.arrayBuffer();
+  record("streaming-revoked", { status: 404 });
+  // Measure revocation behavior rather than assuming CDN authorization freshness.
   const bearer = await fetch(downloadUrl.data.signedUrl);
   assert.equal(bearer.status, 200);
   await bearer.arrayBuffer();
   record("read-revocation", {
-    authenticatedDenied: true,
+    authenticatedDenied: Boolean(revoked.error),
     signedStillReadable: true,
     signedTTL: 60,
   });
@@ -526,12 +692,62 @@ try {
     concurrentWinners: 1,
     concurrentConflicts: 1,
   });
+  await sql("drop policy research_read on storage.objects");
+  const serverOnlyPath = `${a.id}/server-only.pdf`;
+  const serverOnly = await admin.storage
+    .from("research-ready")
+    .upload(serverOnlyPath, validatedBuffer, {
+      contentType: "application/pdf",
+      cacheControl: "0",
+      upsert: false,
+    });
+  assert.ifError(serverOnly.error);
+  await sql(
+    `insert into research.binding(path,owner) values('${serverOnlyPath}','${a.id}')`,
+  );
+  const directDenied = await a.c.storage
+    .from("research-ready")
+    .download(serverOnlyPath);
+  assert.ok(directDenied.error);
+  const selectedStream = await fetch(streamingUrl, {
+    headers: { Authorization: `Bearer ${a.token}` },
+  });
+  assert.equal(selectedStream.status, 200);
+  assert.equal(
+    sha(new Uint8Array(await selectedStream.arrayBuffer())),
+    sha(validatedBuffer),
+  );
+  record("server-only-read-contract", {
+    directOwnerReadDenied: true,
+    streamOwnerAllowed: true,
+    hashEqual: true,
+  });
+  const deleted = await admin.storage
+    .from("research-ready")
+    .remove([finalPath]);
+  assert.ifError(deleted.error);
+  const listed = await admin.storage.from("research-ready").list(a.id);
+  assert.ifError(listed.error);
+  assert.ok(!listed.data.some((item) => item.name === "immutable.pdf"));
+  const cachedAfterDelete = await fetch(
+    `${url}/storage/v1/object/authenticated/research-ready/${finalPath}`,
+    { headers: { apikey: anonKey, Authorization: `Bearer ${a.token}` } },
+  );
+  record("privileged-storage-delete", {
+    deleted: true,
+    absentFromPrivilegedList: true,
+    cachedDownloadStatus: cachedAfterDelete.status,
+    headers: cacheHeaders(cachedAfterDelete),
+  });
+  await cachedAfterDelete.arrayBuffer();
   evidence.completed = true;
 } catch (error) {
   evidence.failure = error.message;
   console.error(error.message);
   process.exitCode = 1;
 } finally {
+  if (researchServer)
+    await new Promise((resolve) => researchServer.close(resolve));
   if (ref) {
     const current = await api(`/projects/${ref}`);
     assert.equal(current.name, name);
