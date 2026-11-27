@@ -78,10 +78,12 @@ export function ClinicList({
       )}
       {editing && (
         <ClinicForm
+          templatePersistence
           clinic={editing}
           save={(formData) => updateClinic(editing.id, formData)}
           deletion={{
-            remove: () => deleteClinic(editing.id, ownerId),
+            remove: () =>
+              deleteClinic(editing.id, ownerId, editing.template?.id),
             onDeleted: () => {
               setEditing(null);
               setNotice("deleted");

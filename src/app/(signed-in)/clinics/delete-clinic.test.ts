@@ -1,9 +1,11 @@
+vi.mock("@/lib/templates/server", () => ({ createTemplateServer: vi.fn() }));
 import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { beforeEach, expect, it, vi } from "vitest";
 import type { Database } from "@/lib/supabase/database.types";
 import { requireSupabaseActionSession } from "@/lib/supabase/session";
 import { deleteClinic } from "./delete-clinic";
+import { createTemplateServer } from "@/lib/templates/server";
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/supabase/session", () => ({
@@ -53,7 +55,7 @@ it("calls the scoped RPC with the exact ID and invalidates both routes after del
       body: JSON.stringify({ p_id: clinicId }),
     }),
   );
-  expect(revalidatePath).toHaveBeenCalledTimes(3);
+  expect(revalidatePath).toHaveBeenCalledTimes(4);
   expect(revalidatePath).toHaveBeenCalledWith("/clinics");
   expect(revalidatePath).toHaveBeenCalledWith("/activity");
 });
@@ -66,4 +68,31 @@ it.each([
   fetch.mockResolvedValue(Response.json({ code, message }, { status: 409 }));
   expect(await deleteClinic(clinicId, user.id)).toBe(result);
   expect(revalidatePath).not.toHaveBeenCalled();
+});
+
+it("attempts only the affected guarded UUID after successful deletion and preserves deletion on cleanup failure", async () => {
+  const cleanupAffected = vi
+    .fn()
+    .mockRejectedValue(new Error("private storage unavailable"));
+  vi.mocked(createTemplateServer).mockReturnValue({ cleanupAffected } as never);
+  fetch.mockResolvedValue(Response.json(clinicId));
+  expect(await deleteClinic(clinicId, user.id, "affected-template-uuid")).toBe(
+    "deleted",
+  );
+  expect(cleanupAffected).toHaveBeenCalledExactlyOnceWith(
+    "affected-template-uuid",
+  );
+});
+
+it("does not clean any bytes when activity blocks clinic deletion", async () => {
+  fetch.mockResolvedValue(
+    Response.json(
+      { code: "23503", message: "Clinic has saved activity" },
+      { status: 409 },
+    ),
+  );
+  expect(await deleteClinic(clinicId, user.id, "affected-template-uuid")).toBe(
+    "linked-activity",
+  );
+  expect(createTemplateServer).not.toHaveBeenCalled();
 });

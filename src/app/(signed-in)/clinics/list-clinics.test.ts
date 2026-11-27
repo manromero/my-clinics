@@ -14,6 +14,7 @@ const row: ClinicRow = {
   name: "Dental Sintética",
   percentage: 27.5,
   active: false,
+  template_revision: "1",
 };
 
 function testClient(fetch: typeof globalThis.fetch) {
@@ -50,9 +51,11 @@ describe("Supabase clinic listing", () => {
       .fn<typeof globalThis.fetch>()
       .mockImplementation(async (input, init) => {
         const url = new URL(String(input));
+        if (url.pathname === "/rest/v1/clinic_templates") return response([]);
+        if (url.pathname === "/rest/v1/clinic_templates") return response([]);
         expect(url.pathname).toBe("/rest/v1/clinics");
         expect(url.searchParams.get("select")).toBe(
-          "id::text,name,percentage,active",
+          "id::text,name,percentage,active,template_revision::text",
         );
         expect(url.searchParams.get("order")).toBe("id.asc");
         expect(new Headers(init?.headers).get("apikey")).toBe(
@@ -66,11 +69,16 @@ describe("Supabase clinic listing", () => {
       });
     testClient(fetch);
     expect(await listClinics()).toEqual([
-      { ...row, id: "9" },
-      { ...row, id: "10" },
-      row,
+      ...["9", "10", row.id].map((id) => ({
+        id,
+        name: row.name,
+        percentage: row.percentage,
+        active: row.active,
+        revision: "1",
+        template: undefined,
+      })),
     ]);
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   it("preserves the signed-out redirect instead of reporting a list failure", async () => {
@@ -83,6 +91,27 @@ describe("Supabase clinic listing", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
+  it("maps saved metadata through scoped requests", async () => {
+    const templateId = "11111111-1111-4111-8111-111111111111";
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(response([row]))
+      .mockResolvedValueOnce(
+        response([{ clinic_id: row.id, template_id: templateId }]),
+      )
+      .mockResolvedValueOnce(
+        response([{ id: templateId, original_filename: "owned.pdf" }]),
+      );
+    testClient(fetch);
+    expect(await listClinics()).toEqual([
+      expect.objectContaining({
+        revision: "1",
+        template: { id: templateId, name: "owned.pdf" },
+      }),
+    ]);
+    expect(String(fetch.mock.calls[1][0])).toContain(row.id);
+    expect(String(fetch.mock.calls[2][0])).toContain(templateId);
+  });
   it.each([
     { id: 9007199254740992 },
     { id: "9223372036854775808" },

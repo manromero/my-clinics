@@ -28,7 +28,12 @@ export async function validateTemplatePdf(
   if (!bytes.byteLength) return { valid: false, reason: "unreadable" };
   if (typeof PDFDocument.load !== "function")
     throw new Error("PDF parser unavailable");
-  const parser = createRequire(import.meta.url).resolve("pdf-lib");
+  // Resolve at runtime from the deployed app, not from a statically analyzable
+  // module URL: Turbopack otherwise substitutes its numeric module ID, which a
+  // native worker cannot require.
+  const parser = createRequire(`${process.cwd()}/package.json`).resolve(
+    "pdf-lib",
+  );
   const result = await new Promise<
     Exclude<PdfValidation, { valid: true }> | { valid: true }
   >((resolve) => {

@@ -11,7 +11,12 @@ type InvalidClinicFields = {
 };
 
 export type ClinicSaveResult =
-  { status: "saved" | "failed" | "missing" } | InvalidClinicFields;
+  | {
+      status: "saved" | "failed" | "missing";
+      message?: string;
+      cleanupPending?: boolean;
+    }
+  | InvalidClinicFields;
 
 const nameLengthError = `El nombre de la clínica debe tener como máximo ${CLINIC_NAME_MAX_LENGTH} caracteres.`;
 

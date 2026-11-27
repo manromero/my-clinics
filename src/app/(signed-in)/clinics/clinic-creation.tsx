@@ -43,6 +43,7 @@ export function ClinicCreation() {
       />
       {open && (
         <ClinicForm
+          templatePersistence
           save={createClinic}
           onCancel={() => setOpen(false)}
           onSaved={() => {

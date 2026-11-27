@@ -8,6 +8,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ClinicCreation } from "./clinic-creation";
 import { createClinic } from "./create-clinic";
 
+vi.mock("./template-save", () => ({
+  saveClinicTemplate: (data: FormData) => createClinic(data),
+  cancelTemplateAttempt: async () => ({
+    status: "cancelled",
+    cleanupPending: false,
+  }),
+}));
 vi.mock("./create-clinic", () => ({ createClinic: vi.fn() }));
 
 beforeEach(() => {
