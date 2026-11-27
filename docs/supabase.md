@@ -231,8 +231,10 @@ these operations. See the [Supabase permission scopes](https://supabase.com/docs
 | Database              | Read-write | `POST /v1/projects/{ref}/database/query` runs SQL including writes. The pinned CLI calls `GET /v1/projects/{ref}/types/typescript` to generate types. |
 
 The runner uses the organization-specific inventory, so **Projects (account-wide)**
-can stay disabled. Leave other permissions disabled, including Data API JWT Secret,
-API Keys and Migrations. Validation replays migrations as SQL.
+can stay disabled. Private-template Storage acceptance additionally needs **API
+Keys Read** and **API Key Secrets Read** to retrieve disposable keys in process
+memory for real Auth/Storage requests. Leave other permissions disabled, including
+Data API JWT Secret and Migrations. Validation replays migrations as SQL.
 
 New disposable projects need access as soon as they are created. Supabase offers
 fixed project selections or all projects in selected organizations. The organization

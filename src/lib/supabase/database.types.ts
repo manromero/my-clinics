@@ -67,6 +67,39 @@ export type Database = {
           },
         ];
       };
+      clinic_templates: {
+        Row: {
+          clinic_id: number;
+          owner_id: string;
+          template_id: string;
+        };
+        Insert: {
+          clinic_id: number;
+          owner_id: string;
+          template_id: string;
+        };
+        Update: {
+          clinic_id?: number;
+          owner_id?: string;
+          template_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "clinic_template_owner";
+            columns: ["owner_id", "clinic_id"];
+            isOneToOne: false;
+            referencedRelation: "clinics";
+            referencedColumns: ["owner_id", "id"];
+          },
+          {
+            foreignKeyName: "clinic_template_request_owner";
+            columns: ["owner_id", "template_id"];
+            isOneToOne: false;
+            referencedRelation: "template_save_requests";
+            referencedColumns: ["owner_id", "id"];
+          },
+        ];
+      };
       clinics: {
         Row: {
           active: boolean;
@@ -74,6 +107,7 @@ export type Database = {
           name: string;
           owner_id: string | null;
           percentage: number;
+          template_revision: number;
         };
         Insert: {
           active?: boolean;
@@ -81,6 +115,7 @@ export type Database = {
           name: string;
           owner_id?: string | null;
           percentage: number;
+          template_revision?: number;
         };
         Update: {
           active?: boolean;
@@ -88,6 +123,67 @@ export type Database = {
           name?: string;
           owner_id?: string | null;
           percentage?: number;
+          template_revision?: number;
+        };
+        Relationships: [];
+      };
+      template_save_requests: {
+        Row: {
+          byte_count: number | null;
+          created_at: string;
+          expected_bytes: number | null;
+          expected_sha256: string | null;
+          expires_at: string;
+          id: string;
+          lease_id: string | null;
+          lease_until: string | null;
+          mode: string;
+          original_filename: string | null;
+          outcome: Json | null;
+          owner_id: string;
+          payload: Json;
+          retired_at: string | null;
+          sha256: string | null;
+          state: string;
+          validator_version: string | null;
+        };
+        Insert: {
+          byte_count?: number | null;
+          created_at?: string;
+          expected_bytes?: number | null;
+          expected_sha256?: string | null;
+          expires_at?: string;
+          id: string;
+          lease_id?: string | null;
+          lease_until?: string | null;
+          mode: string;
+          original_filename?: string | null;
+          outcome?: Json | null;
+          owner_id: string;
+          payload: Json;
+          retired_at?: string | null;
+          sha256?: string | null;
+          state: string;
+          validator_version?: string | null;
+        };
+        Update: {
+          byte_count?: number | null;
+          created_at?: string;
+          expected_bytes?: number | null;
+          expected_sha256?: string | null;
+          expires_at?: string;
+          id?: string;
+          lease_id?: string | null;
+          lease_until?: string | null;
+          mode?: string;
+          original_filename?: string | null;
+          outcome?: Json | null;
+          owner_id?: string;
+          payload?: Json;
+          retired_at?: string | null;
+          sha256?: string | null;
+          state?: string;
+          validator_version?: string | null;
         };
         Relationships: [];
       };
@@ -110,7 +206,39 @@ export type Database = {
           row_count: string;
         }[];
       };
+      begin_template_save: {
+        Args: {
+          p_active: boolean;
+          p_bytes: number;
+          p_clinic: string;
+          p_filename: string;
+          p_id: string;
+          p_mode: string;
+          p_name: string;
+          p_owner: string;
+          p_percentage: number;
+          p_revision: string;
+          p_sha256: string;
+        };
+        Returns: Json;
+      };
+      cancel_template_save: {
+        Args: { p_id: string; p_owner: string };
+        Returns: Json;
+      };
+      claim_template_cleanup: {
+        Args: { p_id: string; p_owner: string };
+        Returns: Json;
+      };
+      claim_template_validation: {
+        Args: { p_id: string; p_owner: string };
+        Returns: Json;
+      };
       clinic_name_key: { Args: { value: string }; Returns: string };
+      commit_template_save: {
+        Args: { p_id: string; p_owner: string };
+        Returns: Json;
+      };
       create_activity: {
         Args: {
           p_activity_date: string;
@@ -124,7 +252,26 @@ export type Database = {
       };
       delete_activity: { Args: { p_id: string }; Returns: string };
       delete_clinic: { Args: { p_id: string }; Returns: string };
+      finish_template_validation: {
+        Args: {
+          p_bytes: number;
+          p_id: string;
+          p_lease: string;
+          p_owner: string;
+          p_sha256: string;
+          p_validator: string;
+        };
+        Returns: Json;
+      };
       parse_activity_amount: { Args: { amount: string }; Returns: number };
+      read_clinic_template: {
+        Args: { p_clinic: string; p_owner: string; p_template: string };
+        Returns: Json;
+      };
+      template_request: {
+        Args: { p_id: string; p_owner: string };
+        Returns: Json;
+      };
       update_activity: {
         Args: {
           p_activity_date: string;

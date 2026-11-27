@@ -86,6 +86,11 @@ with relations as (
     to_jsonb(p) - 'schemaname' - 'tablename' - 'policyname'
   from pg_policies p where schemaname='public'
   union all
+  -- Only application-owned Storage policies, never platform table definitions.
+  select 'storage_policy', tablename || '.' || policyname,
+    to_jsonb(p) - 'schemaname' - 'tablename' - 'policyname'
+  from pg_policies p where schemaname='storage' and policyname like 'templates\_%' escape '\'
+  union all
   select 'routine', p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')',
     jsonb_build_object('definition',pg_get_functiondef(p.oid),'acl',p.proacl,
       'owner',pg_get_userbyid(p.proowner))
