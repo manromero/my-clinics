@@ -1,80 +1,65 @@
 # Task 02 — Private template infrastructure
 
-Status: `in_progress`
+Status: `done`
 
-## Objective
+## Result
 
-Provide the simplest private PDF-template infrastructure needed by clinics and
-invoices: one definitive Storage bucket, one stored object per upload, server
-validation and coherent clinic/template saves.
+One private `clinic-templates` bucket and one stored object per upload. The server
+validates those same bytes before atomically associating the PDF with its clinic.
+There is no temporary bucket, duplicate copy, batch collector or scheduled service.
+The PR contains one final migration: `20261126230000_private_templates.sql`.
 
-## Approved scope
+## Contract for the following tasks
 
-The user reopened PR #72 to simplify the design, code, validation and
-documentation. The current requirements supersede the earlier two-bucket design:
-
-- Use one private bucket and a fresh immutable object key for each upload. Upload
-  once, with overwrite disabled. Validate those same stored bytes before linking
-  them to a clinic; do not create a second PDF copy.
-- Keep owner-only metadata and byte access, authoritative PDF validation and the
-  inclusive 10,000,000-byte limit. Reject unreadable or encrypted PDFs and missing
-  or wrong-type text fields: `invoice_number`, `issue_date`, `gross_amount`,
-  `withholding_amount` and `net_amount`.
+- Use ordinary signed uploads to fresh UUID paths with overwrite disabled. No
+  account or service credential is returned to the browser.
+- Enforce the inclusive 10,000,000-byte limit. Reject unreadable/encrypted PDFs and
+  missing or wrong-type text fields: `invoice_number`, `issue_date`,
+  `gross_amount`, `withholding_amount` and `net_amount`.
 - Preserve optional filenames, active/inactive clinics and no-template workflows.
-  Save clinic fields and their template association atomically. Preserve the saved
-  pair on Cancel or failed Save, and handle retries and concurrent saves coherently.
-- Delete only the file affected by the concrete operation: rejected/cancelled
-  upload, replaced template or removed template. Retrying that same operation may
-  retry its deletion. Do not scan unrelated files or add batch collectors, daily
-  maintenance, queues or background services.
-- Keep the real private PDF-read API and essential regression tests. Remove
-  obsolete research scripts/results and intermediate narrative documents. Final
-  documentation and the PR description should contain conclusions, current usage,
-  checks and material limitations only.
+  Save clinic fields and the template association atomically. Cancel and failed
+  Save preserve the previously saved pair; recorded outcomes support safe retries.
+- Cancel and invalid validation delete their own upload. Replacement/removal delete
+  only the affected previous file after the clinic transaction succeeds. Retrying
+  that same operation retries its deletion. A cleanup error does not reverse a
+  committed Save or trigger a scan of other files.
+- The real private PDF-read API checks the current owner/association and returns
+  private/no-store bytes. No demonstration or test routes were added.
 
-No clinic-form integration, invoice generation/history, public deployment or
-production-project changes are included. Subsequent tasks retain those scopes.
+Clinic-form integration and invoice generation remain in the following tasks.
+Obsolete research scripts/results and intermediate narratives are removed; the
+[decision](template-storage-decision.md) contains final conclusions and the
+[operating guide](template-storage-runbook.md) contains current setup and usage.
 
-## Database correction
+## Validation and deployed state
 
-The user explicitly instructed that the erroneous
-`20261126160000_private_templates.sql` migration must not remain in the PR. This
-is a task-specific exception to retaining that applied migration, not a general
-change to repository database rules. Deliver one correct final creation migration.
+Application checks, 389 tests, eight tooling tests, official type generation,
+replay/type freshness/parity/upgrade checks and ordinary hosted SDK/production
+checks passed. Thirteen development business checks passed with the two existing
+fixture accounts. Independent code, procedure and live rollout review passed at
+`4e01a65f5c2f2da3388cfdc97b22fbeb1ebfc40d`, with no blockers.
 
-Prepare and independently review the exact development-only reconciliation before
-hosted writes. Preserve all existing clinics, activity and owners; do not reset the
-database or alter unrelated migration history. Inventory template links and objects
-before removing the former template-only infrastructure. Production is excluded.
+Development `lvqbrjybwstvdhaxyxyn` is healthy and its approved public API exposure
+is restored. History contains the six original migrations and only the final
+template migration. The previous two buckets are gone. Original data digests are
+unchanged: 14 clinics, 63 activity rows and seven owner IDs. Fixture clinics and
+PDFs are removed; zero stored objects and zero current links remain. Small request
+outcomes remain for idempotency. Production was not modified.
 
-## Validation and acceptance
+## Limits
 
-Follow [database rules](../../../supabase/AGENTS.md), the
-[Supabase guide](../../supabase.md), [architecture](../../architecture.md) and
-[invoice requirements](../../requirements.md#invoice-templates-and-generation).
+An abandoned upload, late-arriving bytes or a failed deletion can remain private
+without retrying that specific operation. No idle cleanup deadline is promised.
+Interrupted standard uploads may need whole-file retry. The existing Next.js
+advisory remains separate follow-up scope. No deployed Vercel or physical mobile
+network behavior is inferred from the local production checks.
 
-Run the required application checks, focused useful tests, generated-type/replay/
-parity/upgrade validation and applicable actual Storage API checks on authorized
-synthetic targets. Use the ordinary supported SDK flows and provider contracts;
-do not claim unperformed probes passed. No test pages or UI screenshots are needed.
+## Delivery
 
-Independent review must verify current code, functionality, database preservation,
-private access and the final documentation before completion. Do not merge the PR.
+[PR #72](https://github.com/manromero/my-clinics/pull/72), targeting `develop`.
+Automatic correction rounds used: 1 of 2. Human acceptance and manual merge remain
+pending; final completion tracking receives documentation review.
 
-## Execution context
-
-- Branch: `feature/private-template-infrastructure`; PR:
-  <https://github.com/manromero/my-clinics/pull/72> (draft during revision).
-- Base: `22942979af63c2db5c7331fc9726c3a75d022f0d`.
-- Development target: `lvqbrjybwstvdhaxyxyn`, `my-clinics_dev`, organization
-  `njnmfutclorywskqrftd`. The earlier two-bucket version is deployed there; the
-  replacement and its scoped history correction have not been applied.
-- Preserve the verified baseline: 14 clinics, 63 activity rows and seven owner IDs.
-  Recheck current data and links before any reconciliation.
-- Previous automatic correction rounds used: 1 of 2; not reset by this user-directed
-  revision. Prior validation covers the former implementation, not the current edits.
-- Current implementation and verification are in progress. Record final conclusions
-  in the decision document and operating guide, with detailed validation in the PR.
-- Failed deletion, abandoned upload or late-arriving bytes cannot be guaranteed
-  reclaimed while idle without an additional trigger. State that limit plainly;
-  do not reintroduce a collector or promise a cleanup deadline.
+Sources: [requirements](../../requirements.md#invoice-templates-and-generation),
+[architecture](../../architecture.md), [database rules](../../../supabase/AGENTS.md)
+and [Supabase guide](../../supabase.md).
