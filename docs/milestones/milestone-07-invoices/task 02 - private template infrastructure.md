@@ -1,6 +1,6 @@
 # Task 02 — Private template infrastructure
 
-Status: `in_progress`
+Status: `done`
 
 ## Result
 
@@ -56,10 +56,10 @@ network behavior is inferred from the local production checks.
 
 ## Delivery
 
-Final cleanup requested: remove the redundant standalone template-test command and
-entry point, plus task-generated local temporary artifacts. Keep the validation
-module used by `db:validate` and useful regression tests. No database change is
-needed; cleanup validation and independent review are pending.
+Final cleanup removed the redundant standalone template-test command, entry point
+and intermediate report output. Integrated validation and regression tests remain.
+Task-generated local temporaries were removed; configuration and credentials were
+preserved. Scoped checks and independent cleanup review passed at `f7a07b3`.
 
 [PR #72](https://github.com/manromero/my-clinics/pull/72), targeting `develop`.
 Automatic correction rounds used: 1 of 2. Human acceptance and manual merge remain
