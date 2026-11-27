@@ -69,4 +69,12 @@ safe production interim form. Capture S02/Alexandria evidence with `chrome-scree
 - Validation: lint, typecheck, format:check, build, meaningful actual-byte validator/race tests, and live desktop/mobile harness plus production create/edit checks. Use chrome-screenshots and github-pr for evidence and publication. Catalogue/demo checks remain live, not specimen unit tests.
 - Synthetic access verified independently for implementer and reviewer with `scripts/agent-validation.mjs` and isolated headless Chrome. Follow `docs/supabase.md#local-signed-in-validation`; read ignored credentials directly without printing them. This workstation requires `NODE_USE_SYSTEM_CA=1` for trusted TLS; do not disable certificate verification. Use fresh role sessions for actual checks and keep DevTools loopback-only.
 - Tooling: pnpm 11.25.0 verified; Chrome is installed. Network/Git writes may require the normal tool approval path. No credentials belong in task notes, PRs, evidence or browser scripts.
-- Correction rounds used: 0 of 2. Implementation checks, PR and independent review have not yet run.
+- Correction rounds used: 1 of 2 (first correction dispatched after initial review).
+
+### Initial implementation and independent review
+
+Implementation: [PR #73](https://github.com/manromero/my-clinics/pull/73), head `1a988432ae180f30ebd4f8d72e3dde742d28f70c`, base `f58c9e6df188e913f366b91a97845b6c02c8672a`. Both roles independently passed lint, typecheck, formatting, build and all 392 tests. Independent desktop/mobile and signed-in production checks covered validation, boundary, staging, retry and the disabled production field. Eleven inline PR images were published and verified. Detailed evidence and limitations belong to the PR.
+
+Initial independent review: blocked by B1. Selecting the first corrupt PDF with no accepted template leaves a blocking error with no clear/remove recovery; Save cannot continue without a valid PDF or canceling all clinic inputs. The same problem can follow pending removal. Correction round 1 requires explicit discard/clear recovery preserving clinic inputs and pending intent, clearing the error, allowing no-template save, and invalidating stale asynchronous validation. B1 remains open pending independent verification.
+
+Optional observations: existing Next.js advisory remains separate follow-up scope. Local parsing has no browser worker/resource bounds (production editing remains disabled). Native OS picker UI was not exercised; browser automation verified file delivery and drop. Human acceptance and manual merge remain pending.

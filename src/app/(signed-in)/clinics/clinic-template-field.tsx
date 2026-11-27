@@ -5,6 +5,7 @@ import {
 } from "@/lib/components/file-input/file-input";
 import { templateByteLimit } from "@/lib/templates/pdf-contract";
 import type { LocalPdfValidation } from "@/lib/templates/pdf-inspection";
+import { Button } from "@/lib/components/button/button";
 
 export type StoredTemplate = { id: string; name: string };
 export type TemplateIntent =
@@ -52,6 +53,7 @@ export function ClinicTemplateField({
   validate?: (file: File) => Promise<LocalPdfValidation>;
 }) {
   const revision = useRef(0);
+  const field = useRef<HTMLDivElement>(null);
   const [candidate, setCandidate] = useState<File>();
   useEffect(
     () => () => {
@@ -95,7 +97,11 @@ export function ClinicTemplateField({
     );
   }
   return (
-    <div className="space-y-2" aria-busy={draft.pending || undefined}>
+    <div
+      ref={field}
+      className="space-y-2"
+      aria-busy={draft.pending || undefined}
+    >
       <FileInput
         label="Plantilla de factura (PDF)"
         value={value}
@@ -110,6 +116,20 @@ export function ClinicTemplateField({
             : "La asignación de plantillas todavía no está disponible. Puedes guardar los demás datos de la clínica."
         }
       />
+      {enabled && draft.error && !value && (
+        <Button
+          variant="tertiary"
+          size="sm"
+          onClick={() => {
+            revision.current += 1;
+            setCandidate(undefined);
+            onChange({ ...draft, pending: false, error: undefined });
+            field.current?.querySelector("input")?.focus();
+          }}
+        >
+          Descartar archivo rechazado
+        </Button>
+      )}
       {enabled && (
         <p role="status" className="text-sm leading-6 text-on-surface-variant">
           {draft.pending
