@@ -1,6 +1,6 @@
 # Task 03 — Clinic template field and validation
 
-Status: `done`
+Status: `in_progress`
 
 ## Objective
 
@@ -86,3 +86,7 @@ Correction round 1: `d1922db45d89fd96576bdcc27e05ebb3beab3ed6` adds explicit rej
 Both roles passed `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build` and all 395 tests across 48 files at the corrected implementation head. Independent visual inspection of refreshed desktop/mobile captures found no visual blocker. The PR preserves initial review history and eight refreshed correction images in addition to eleven original images; the implementer verified remote PNG content, dimensions, hashes and rendered attachments.
 
 Task and milestone index are `done` for agent delivery in [PR #73](https://github.com/manromero/my-clinics/pull/73). This tracking-only update is included in the same PR for final documentation review. Human acceptance and manual merge into `develop` remain pending. Production template editing remains explicitly unavailable until task 04; no template upload or persistence was implemented. Detailed evidence, optional observations and practical limits are retained in the PR.
+
+### User-requested catalogue removal
+
+2026-11-27: The user requested removal of `/components/clinic-template` from PR #73, consistent with task 01 catalogue cleanup. Reopened for this scoped change and independent review. Remove the development page and specimen; retain the route-local actual ClinicForm, field, PDF contracts/fixtures and meaningful tests. No new public demonstration route replaces it. Earlier harness captures remain historical evidence, not current route availability. Verify the removed route returns 404 in development, the shared catalogue and FileInput page remain usable, and the production build excludes the removed route. Required application checks and affected tests apply. Existing correction count remains 1 of 2; this user-requested change does not reset it. Continue on the same assignment branch and PR; no new branch is needed.
