@@ -1,6 +1,6 @@
 # Task 03 — Clinic template field and validation
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -90,3 +90,7 @@ Task and milestone index are `done` for agent delivery in [PR #73](https://githu
 ### User-requested catalogue removal
 
 2026-11-27: The user requested removal of `/components/clinic-template` from PR #73, consistent with task 01 catalogue cleanup. Reopened for this scoped change and independent review. Remove the development page and specimen; retain the route-local actual ClinicForm, field, PDF contracts/fixtures and meaningful tests. No new public demonstration route replaces it. Earlier harness captures remain historical evidence, not current route availability. Verify the removed route returns 404 in development, the shared catalogue and FileInput page remain usable, and the production build excludes the removed route. Required application checks and affected tests apply. Existing correction count remains 1 of 2; this user-requested change does not reset it. Continue on the same assignment branch and PR; no new branch is needed.
+
+Removal completed at `45dab5430978d5cddfbc4b01aa23e0f195f38739` and independently reviewed with no blockers. Both roles passed lint, typecheck, formatting, build, diff checks and 17 affected tests across four files. Independent fresh Chrome verified the removed development route returns 404, while the catalogue and FileInput pages return 200 with expected content and no removed-route links. Both production manifests exclude the removed route and retain the common pages. Actual application code and tests are unchanged; prior functional/visual review and B1 verification remain applicable. No new screenshots are needed for this deletion. The PR preserves its 19 historical images, with removed-harness captures labeled superseded.
+
+Task and index are `done` again; this final tracking update is included for documentation review. Correction count remains 1 of 2. Human acceptance and manual merge of [PR #73](https://github.com/manromero/my-clinics/pull/73) remain pending.
