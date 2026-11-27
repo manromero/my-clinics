@@ -1,3 +1,4 @@
+vi.mock("./template-actions", () => ({}));
 import {
   cleanup,
   fireEvent,

@@ -11,6 +11,14 @@ import { updateClinic } from "./update-clinic";
 vi.mock("next/navigation", () => ({ useRouter: vi.fn() }));
 vi.mock("./list-clinics", () => ({ listClinics: vi.fn() }));
 vi.mock("./delete-clinic", () => ({ deleteClinic: vi.fn() }));
+vi.mock("./template-save", () => ({
+  saveClinicTemplate: (data: FormData, _intent: unknown, clinic: Clinic) =>
+    updateClinic(clinic.id, data),
+  cancelTemplateAttempt: async () => ({
+    status: "cancelled",
+    cleanupPending: false,
+  }),
+}));
 vi.mock("./update-clinic", () => ({ updateClinic: vi.fn() }));
 
 afterEach(() => {
@@ -128,7 +136,11 @@ it("cancels without deleting, then preserves the last clinic after a failed dele
   await user.click(deleteButton());
   expect(screen.getByRole("button", { name: "Eliminando…" })).toBeDisabled();
   await user.click(screen.getByRole("button", { name: "Eliminando…" }));
-  expect(deleteClinic).toHaveBeenCalledExactlyOnceWith(clinic.id, ownerId);
+  expect(deleteClinic).toHaveBeenCalledExactlyOnceWith(
+    clinic.id,
+    ownerId,
+    undefined,
+  );
 
   await act(async () => deletion.resolve("failed"));
   expect(screen.getByText(/para reintentar/)).toBeVisible();

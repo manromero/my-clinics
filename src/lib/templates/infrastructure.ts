@@ -196,6 +196,9 @@ export function templateInfrastructure(
     return { ...outcome, cleanupPending: !cleaned };
   }
   return {
+    async cleanupAffected(requestId: string) {
+      return cleanup(await owner(), requestId);
+    },
     async begin(input: TemplateSaveInput) {
       const ownerId = await owner();
       const r = record(

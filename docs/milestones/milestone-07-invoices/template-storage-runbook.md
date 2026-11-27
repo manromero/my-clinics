@@ -3,7 +3,7 @@
 Templates use one private `clinic-templates` bucket and one stored PDF per upload.
 There is no temporary bucket, duplicate copy, collector or daily maintenance task.
 The [storage decision](template-storage-decision.md) records the final contract.
-Clinic-form integration remains task 04; generated invoices are never stored.
+The clinic form uses this lifecycle; generated invoices are never stored.
 
 ## Configured development
 
@@ -53,7 +53,7 @@ private key name the same project, then restart the approved server. Production
 ## Server usage
 
 `createTemplateServer(session.client)` verifies the owner for every operation.
-The future clinic form keeps the file local until Save:
+The clinic form keeps the file local until Save:
 
 1. `begin`: reserve fields, clinic revision, request UUID, exact file size and
    SHA-256. `keep`/`replace`/`remove` preserve no-template and inactive clinics.
@@ -84,6 +84,19 @@ last two hours and cannot be revoked individually. Abandoned uploads, failed
 deletions or late-arriving files may remain private indefinitely without retrying
 that specific operation. No idle cleanup deadline is promised. Downloaded bytes
 and already authorized streams cannot be recalled.
+
+Clinic deletion retains the existing activity constraint and cascades its template
+association. After a successful deletion, the application attempts guarded cleanup
+of the template UUID observed by the form. A concurrent unseen replacement or a
+cleanup outage can leave private retired bytes indefinitely; a deleted clinic has
+no application cleanup retry control. There is no new ledger or collection job.
+Rejected deletion leaves the association and bytes usable.
+
+The authoritative PDF validator resolves the external `pdf-lib` parser at runtime
+from the application working directory for its native Node worker. The deployment
+must run from the application root with its package manifest and traced dependency
+files present. Local production build tracing includes those files; local checks
+do not verify a deployed Vercel runtime.
 
 `pnpm db:types`, `pnpm db:validate` and `pnpm db:test-tooling` provide disposable
 replay/types/parity/upgrade and ordinary SDK lifecycle checks. Application checks,

@@ -3,6 +3,7 @@ import {
   FileInput,
   type FileInputValue,
 } from "@/lib/components/file-input/file-input";
+import { templateRejection } from "@/lib/templates/rejection";
 import { templateByteLimit } from "@/lib/templates/pdf-contract";
 import type { LocalPdfValidation } from "@/lib/templates/pdf-inspection";
 import { Button } from "@/lib/components/button/button";
@@ -19,21 +20,6 @@ export const initialTemplateDraft: TemplateDraft = {
   intent: { kind: "keep" },
   pending: false,
 };
-
-function rejection(result: Exclude<LocalPdfValidation, { valid: true }>) {
-  switch (result.reason) {
-    case "too-large":
-      return "El PDF supera el máximo de 10.000.000 bytes (10 MB).";
-    case "encrypted":
-      return "El PDF está cifrado o protegido con contraseña. Usa un PDF sin protección.";
-    case "missing-fields":
-      return `Faltan campos de texto: ${result.fields?.join(", ")}.`;
-    case "wrong-field-type":
-      return `Estos campos deben ser de texto: ${result.fields?.join(", ")}.`;
-    case "unreadable":
-      return "No se puede leer este PDF rellenable. Selecciona otro archivo o vuelve a intentarlo.";
-  }
-}
 
 export function ClinicTemplateField({
   stored,
@@ -55,6 +41,15 @@ export function ClinicTemplateField({
   const revision = useRef(0);
   const field = useRef<HTMLDivElement>(null);
   const [candidate, setCandidate] = useState<File>();
+  const restored = useRef(draft);
+  useEffect(() => {
+    if (restored.current.pending)
+      onChange({
+        ...restored.current,
+        pending: false,
+        error: "Vuelve a seleccionar el PDF para completar su validación.",
+      });
+  }, [onChange]);
   useEffect(
     () => () => {
       revision.current += 1;
@@ -93,7 +88,7 @@ export function ClinicTemplateField({
     onChange(
       result.valid
         ? { intent: { kind: "replace", file }, pending: false }
-        : { ...draft, pending: false, error: rejection(result) },
+        : { ...draft, pending: false, error: templateRejection(result) },
     );
   }
   return (
@@ -102,6 +97,11 @@ export function ClinicTemplateField({
       className="space-y-2"
       aria-busy={draft.pending || undefined}
     >
+      {stored && draft.intent.kind !== "keep" && (
+        <p className="text-sm leading-6 text-on-surface-variant">
+          Plantilla guardada: {stored.name}. Se conserva hasta Guardar.
+        </p>
+      )}
       <FileInput
         label="Plantilla de factura (PDF)"
         value={value}
@@ -112,7 +112,7 @@ export function ClinicTemplateField({
         error={draft.error}
         help={
           enabled
-            ? "PDF rellenable sin contraseña, máximo 10 MB (10.000.000 bytes). La selección se valida en este dispositivo; no se sube ningún archivo."
+            ? "PDF rellenable sin contraseña, máximo 10 MB (10.000.000 bytes). El archivo se sube y guarda solo al pulsar Guardar."
             : "La asignación de plantillas todavía no está disponible. Puedes guardar los demás datos de la clínica."
         }
       />

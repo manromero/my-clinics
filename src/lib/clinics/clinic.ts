@@ -5,6 +5,8 @@ export type Clinic = {
   name: string;
   percentage: number;
   active: boolean;
+  revision?: string;
+  template?: { id: string; name: string };
 };
 
 export const CLINIC_NAME_MAX_LENGTH = 200;

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { isClinicId } from "@/lib/clinics/clinic";
 import { requireSupabaseActionSession } from "@/lib/supabase/session";
+import { createTemplateServer } from "@/lib/templates/server";
 
 export type ClinicDeleteResult =
   "deleted" | "linked-activity" | "session-changed" | "missing" | "failed";
@@ -10,6 +11,7 @@ export type ClinicDeleteResult =
 export async function deleteClinic(
   id: string,
   expectedOwnerId: string,
+  templateId?: string,
 ): Promise<ClinicDeleteResult> {
   const { client, user } = await requireSupabaseActionSession();
   if (user.id !== expectedOwnerId) return "session-changed";
@@ -31,8 +33,20 @@ export async function deleteClinic(
     return "failed";
   }
 
+  // The form-observed UUID is only a cleanup candidate. The existing server
+  // guard rejects foreign, current and publishable files. A concurrent unseen
+  // replacement can remain private under the established retention policy.
+  if (templateId) {
+    try {
+      await createTemplateServer(client)?.cleanupAffected(templateId);
+    } catch {
+      // Deletion already committed; a cleanup outage must not report failure.
+    }
+  }
+
   revalidatePath("/clinics");
   revalidatePath("/summary");
   revalidatePath("/activity");
+  revalidatePath("/invoices");
   return "deleted";
 }
