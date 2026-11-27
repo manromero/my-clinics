@@ -14,7 +14,6 @@
     "test:watch": "vitest",
     "supabase": "supabase",
     "db:validate": "node --conditions=react-server --env-file-if-exists=.env.database-validation scripts/database-validation.mjs validate",
-    "db:test-templates": "node --conditions=react-server --use-system-ca --env-file-if-exists=.env.database-validation scripts/template-storage-validation.mjs --production",
     "db:types": "node --env-file-if-exists=.env.database-validation scripts/database-validation.mjs types",
     "db:test-tooling": "node --test scripts/database-validation.test.mjs scripts/clinic-database-validation.test.mjs"
   },

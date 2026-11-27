@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash, randomUUID } from "node:crypto";
-import { readFile, readdir, writeFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { execFile, execFileSync, spawn } from "node:child_process";
 import { promisify } from "node:util";
 import { createClient } from "@supabase/supabase-js";
@@ -604,27 +604,6 @@ export async function templateStorageTests({
       });
     }
     await api(`/projects/${ref}/postgrest`, "PATCH", { db_schema: "" });
-    await writeFile(
-      new URL(`../.env.template-validation-${ref}.json`, import.meta.url),
-      JSON.stringify(result, null, 2),
-    );
   }
   return result;
-}
-if (process.argv[1]?.endsWith("template-storage-validation.mjs")) {
-  const { api, disposable, replay, query } =
-    await import("./database-validation.mjs");
-  await disposable("templates", async (ref) => {
-    await replay(ref);
-    await query(
-      ref,
-      `begin;${await readFile(new URL("../supabase/tests/50-private-templates.sql", import.meta.url), "utf8")}rollback;`,
-    );
-    await templateStorageTests({
-      ref,
-      api,
-      query,
-      production: process.argv.includes("--production"),
-    });
-  });
 }
