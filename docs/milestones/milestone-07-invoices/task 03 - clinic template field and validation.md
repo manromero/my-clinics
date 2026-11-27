@@ -1,6 +1,6 @@
 # Task 03 — Clinic template field and validation
 
-Status: `in_progress`
+Status: `done`
 
 ## Objective
 
@@ -69,12 +69,20 @@ safe production interim form. Capture S02/Alexandria evidence with `chrome-scree
 - Validation: lint, typecheck, format:check, build, meaningful actual-byte validator/race tests, and live desktop/mobile harness plus production create/edit checks. Use chrome-screenshots and github-pr for evidence and publication. Catalogue/demo checks remain live, not specimen unit tests.
 - Synthetic access verified independently for implementer and reviewer with `scripts/agent-validation.mjs` and isolated headless Chrome. Follow `docs/supabase.md#local-signed-in-validation`; read ignored credentials directly without printing them. This workstation requires `NODE_USE_SYSTEM_CA=1` for trusted TLS; do not disable certificate verification. Use fresh role sessions for actual checks and keep DevTools loopback-only.
 - Tooling: pnpm 11.25.0 verified; Chrome is installed. Network/Git writes may require the normal tool approval path. No credentials belong in task notes, PRs, evidence or browser scripts.
-- Correction rounds used: 1 of 2 (first correction dispatched after initial review).
+- Correction rounds used: 1 of 2; B1 fixed and independently verified on `d1922db45d89fd96576bdcc27e05ebb3beab3ed6`.
 
 ### Initial implementation and independent review
 
 Implementation: [PR #73](https://github.com/manromero/my-clinics/pull/73), head `1a988432ae180f30ebd4f8d72e3dde742d28f70c`, base `f58c9e6df188e913f366b91a97845b6c02c8672a`. Both roles independently passed lint, typecheck, formatting, build and all 392 tests. Independent desktop/mobile and signed-in production checks covered validation, boundary, staging, retry and the disabled production field. Eleven inline PR images were published and verified. Detailed evidence and limitations belong to the PR.
 
-Initial independent review: blocked by B1. Selecting the first corrupt PDF with no accepted template leaves a blocking error with no clear/remove recovery; Save cannot continue without a valid PDF or canceling all clinic inputs. The same problem can follow pending removal. Correction round 1 requires explicit discard/clear recovery preserving clinic inputs and pending intent, clearing the error, allowing no-template save, and invalidating stale asynchronous validation. B1 remains open pending independent verification.
+Initial independent review: blocked by B1. Selecting the first corrupt PDF with no accepted template leaves a blocking error with no clear/remove recovery; Save cannot continue without a valid PDF or canceling all clinic inputs. The same problem can follow pending removal. Correction round 1 requires explicit discard/clear recovery preserving clinic inputs and pending intent, clearing the error, allowing no-template save, and invalidating stale asynchronous validation. B1 was open at this initial review; the correction outcome is recorded below.
 
 Optional observations: existing Next.js advisory remains separate follow-up scope. Local parsing has no browser worker/resource bounds (production editing remains disabled). Native OS picker UI was not exercised; browser automation verified file delivery and drop. Human acceptance and manual merge remain pending.
+
+### Correction and ready delivery
+
+Correction round 1: `d1922db45d89fd96576bdcc27e05ebb3beab3ed6` adds explicit rejected-file discard recovery, retains clinic inputs and keep/remove intent, restores chooser focus and suppresses stale results. The same independent reviewer verified B1 as fixed in fresh desktop and 390 × 844 touch-emulated sessions. Both recovery/save flows, keyboard activation, focus, additional invalid-file cases, replacement preservation and no selection uploads passed. Production disabled-field, ordinary clinic save and production harness 404 regression checks also passed. No open blocking findings remain.
+
+Both roles passed `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm build` and all 395 tests across 48 files at the corrected implementation head. Independent visual inspection of refreshed desktop/mobile captures found no visual blocker. The PR preserves initial review history and eight refreshed correction images in addition to eleven original images; the implementer verified remote PNG content, dimensions, hashes and rendered attachments.
+
+Task and milestone index are `done` for agent delivery in [PR #73](https://github.com/manromero/my-clinics/pull/73). This tracking-only update is included in the same PR for final documentation review. Human acceptance and manual merge into `develop` remain pending. Production template editing remains explicitly unavailable until task 04; no template upload or persistence was implemented. Detailed evidence, optional observations and practical limits are retained in the PR.
