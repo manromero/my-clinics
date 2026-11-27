@@ -5,27 +5,18 @@ import { createRequire } from "node:module";
 import { Worker } from "node:worker_threads";
 import { PDFDocument } from "pdf-lib";
 
-export const templateByteLimit = 10_000_000;
-export const templateValidatorVersion = "pdf-lib@1.17.1/text-fields-v1";
-export const requiredTemplateFields = [
-  "invoice_number",
-  "issue_date",
-  "gross_amount",
-  "withholding_amount",
-  "net_amount",
-];
-export type PdfValidation =
-  | { valid: true; sha256: string; bytes: number; validator: string }
-  | {
-      valid: false;
-      reason:
-        | "too-large"
-        | "encrypted"
-        | "unreadable"
-        | "missing-fields"
-        | "wrong-field-type";
-      fields?: string[];
-    };
+import {
+  templateByteLimit,
+  templateValidatorVersion,
+  requiredTemplateFields,
+  type PdfValidation,
+} from "./pdf-contract";
+export {
+  templateByteLimit,
+  templateValidatorVersion,
+  requiredTemplateFields,
+  type PdfValidation,
+} from "./pdf-contract";
 
 // A hard worker deadline and heap bound protect the request process from parser
 // work in malformed/compressed PDFs. The worker receives a copy, never user code.
