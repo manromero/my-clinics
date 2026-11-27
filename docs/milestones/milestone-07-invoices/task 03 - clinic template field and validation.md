@@ -1,6 +1,6 @@
 # Task 03 — Clinic template field and validation
 
-Status: `pending`
+Status: `in_progress`
 
 ## Objective
 
@@ -55,5 +55,18 @@ safe production interim form. Capture S02/Alexandria evidence with `chrome-scree
 
 ## Progress notes
 
-Planning only; no library selected/capability asserted, checks or captures performed.
-Human acceptance of this refined task is pending.
+2026-11-27: The user assigned task 03 under the project workflow, authorizing its existing scope. Implementation and independent review are pending. Human acceptance and manual merge remain separate.
+
+## Execution context
+
+- Readiness: ready. Tasks 00 and 02 are integrated in the updated development baseline. No product decisions remain open.
+- Branch: `feature/clinic-template-validation`; base: `f58c9e6df188e913f366b91a97845b6c02c8672a` (`develop`). The initial working tree was clean.
+- Scope remains the approved criteria above: local validation and staged intent only; production template mutation stays unavailable until task 04. No hosted infrastructure or schema changes are authorized by this task.
+- Relevant implementation: `src/app/(signed-in)/clinics/clinic-form.tsx`, clinic create/edit callers and tests; shared FileInput and its catalogue; `src/lib/templates/pdf-validation.ts` and tests; template infrastructure/server boundaries.
+- Verified baseline: `pdf-lib` 1.17.1 is installed and pinned. The existing authoritative validator uses a bounded Node worker and SHA-256, rejects encryption and requires the five text fields. Its server-only imports cannot enter the browser bundle. Reuse contracts where appropriate and retain authoritative resource bounds. Browser validation/library suitability and fill/flatten appearance still require capability evidence; these are not assumed passes.
+- Contract: `template-storage-decision.md` sets an inclusive maximum of 10,000,000 bytes. Selection never uploads, and stored descriptors must remain distinct from Files. Both chooser and drop use the same validation.
+- References: requirements invoice templates/generation; screens S02 and shared interaction rules; Alexandria; supplied S02 HTML/image (HTML duplicates S05, so preserve assets and follow current clinic UI/text); architecture and development workflow. Read installed Next.js client-boundary and route/proxy guides relevant to implementation.
+- Validation: lint, typecheck, format:check, build, meaningful actual-byte validator/race tests, and live desktop/mobile harness plus production create/edit checks. Use chrome-screenshots and github-pr for evidence and publication. Catalogue/demo checks remain live, not specimen unit tests.
+- Synthetic access verified independently for implementer and reviewer with `scripts/agent-validation.mjs` and isolated headless Chrome. Follow `docs/supabase.md#local-signed-in-validation`; read ignored credentials directly without printing them. This workstation requires `NODE_USE_SYSTEM_CA=1` for trusted TLS; do not disable certificate verification. Use fresh role sessions for actual checks and keep DevTools loopback-only.
+- Tooling: pnpm 11.25.0 verified; Chrome is installed. Network/Git writes may require the normal tool approval path. No credentials belong in task notes, PRs, evidence or browser scripts.
+- Correction rounds used: 0 of 2. Implementation checks, PR and independent review have not yet run.

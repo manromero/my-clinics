@@ -27,6 +27,13 @@ import { TextInput } from "@/lib/components/text-input/text-input";
 import { ConcealSignedInContent } from "../_components/signed-in-history-guard";
 import type { ClinicSaveResult } from "./clinic-write";
 import type { ClinicDeleteResult } from "./delete-clinic";
+import {
+  ClinicTemplateField,
+  initialTemplateDraft,
+  type StoredTemplate,
+  type TemplateDraft,
+  type TemplateIntent,
+} from "./clinic-template-field";
 
 const stateOptions = [
   { value: "active", label: "Activa" },
@@ -39,6 +46,7 @@ export function ClinicForm({
   deletion,
   onCancel,
   onSaved,
+  templateDemo,
 }: {
   clinic?: Clinic;
   save: (data: FormData) => Promise<ClinicSaveResult>;
@@ -48,7 +56,13 @@ export function ClinicForm({
   };
   onCancel: (result: ClinicSaveResult | null) => void;
   onSaved: () => void;
+  templateDemo?: {
+    stored?: StoredTemplate;
+    save: (data: FormData, intent: TemplateIntent) => Promise<ClinicSaveResult>;
+  };
 }) {
+  const [templateDraft, setTemplateDraft] =
+    useState<TemplateDraft>(initialTemplateDraft);
   const conceal = useContext(ConcealSignedInContent);
   const draftKey = `clinic-form:${clinic?.id ?? "new"}`;
   const clearDraft = useClearDraft();
@@ -114,12 +128,15 @@ export function ClinicForm({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     if (saving.current || deleteStage === "confirm") return;
+    if (templateDemo && (templateDraft.pending || templateDraft.error)) return;
     const formData = new FormData(event.currentTarget);
     saving.current = true;
     setResult(null);
     setPending(true);
     try {
-      const response = await save(formData);
+      const response = await (templateDemo
+        ? templateDemo.save(formData, templateDraft.intent)
+        : save(formData));
       if (response.status === "saved") {
         clearDraft(draftKey);
         notifyDataChanged();
@@ -228,6 +245,18 @@ export function ClinicForm({
           adornment="%"
           required
           error={fieldErrors?.percentageError}
+        />
+        {templateDemo && (
+          <p className="rounded-lg bg-surface-container-low p-3 text-sm">
+            Demostración local: Guardar simula el resultado. No se guarda ni
+            sube la plantilla.
+          </p>
+        )}
+        <ClinicTemplateField
+          stored={templateDemo?.stored}
+          enabled={!!templateDemo}
+          draft={templateDraft}
+          onChange={setTemplateDraft}
         />
         {clinic ? (
           <div className="space-y-2">
